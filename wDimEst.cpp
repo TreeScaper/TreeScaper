@@ -25,30 +25,148 @@
 
 #include "wDimEst.h"
 
+void DimEst::initial_DimEst(String filename, double **dist, int sizeinput, int diminput, String meth, String dataform, String para_fname)
+{
+    method = meth;
+    num_r = parameters.cor_n;// only for this interface version
+    File D_file(filename);
+    D_prefname = D_file.prefix_name();
+    D_postfname = D_file.postfix_name();
+
+    // get distance matrix
+    if(dataform == (String) "DIS")
+    {
+        if(dist == NULL && sizeinput == 0)
+        {
+            if(!D_file.is_open())
+            {
+                cout << "Error: File \"" << filename << "\" cannot be open! Please check if this file exists or is readable." << endl;
+                exit(0);
+            }
+
+            size = D_file.lines();
+            D.resize(size, size);
+            X.resize(num_r, 1);
+            D_file.seek(0);
+
+            if(parameters.distance_file_type == 0)
+            {
+                for(int i = 0; i < size; i++)
+                    for(int j = 0; j <= i; j++)
+                    {
+                        D_file >> D.matrix[i][j];
+                        D.matrix[j][i] = D.matrix[i][j];
+                    }
+            }
+            else if(parameters.distance_file_type == 1)
+            {
+                String tree;
+                double index;
+                size--;
+                D.resize(size, size);
+                D_file >> tree;
+                for(int i = 0; i < size; i++)
+                    D_file >> index;
+                for(int i = 0; i < size; i++)
+                {
+                    D_file >> index;
+                    for(int j = 0; j <= i; j++)
+                    {
+                        D_file >> D.matrix[i][j];
+                        D.matrix[j][i] = D.matrix[i][j];
+                    }
+                }
+            } else
+            {
+                cout << "Warning: This is not a type of distance file format!" << endl;
+            }
+        }
+        else if(dist != NULL && sizeinput > 0)
+        {
+            size = sizeinput;
+            D.resize(size, size);
+            X.resize(num_r, 1);
+
+            for(int i = 0; i < size; i++)
+                for(int j = 0; j < size; j++)
+                    D.matrix[i][j] = (double) dist[i][j];
+        }
+        else
+        {
+            cout << "Error: Incorrect input data parameters" << endl;
+            exit(0);
+        }
+    }
+    else if(dataform == (String) "COR")
+    {
+        if(dist == NULL && sizeinput == 0 && diminput == 0)
+        {
+            if(!D_file.is_open())
+            {
+                cout << "Error: File \"" << filename << "\" cannot be open! Please check if this file exists or is readable." << endl;
+                exit(0);
+            }
+
+            size = D_file.lines();
+            D.resize(size, size);
+            X.resize(num_r, 1);
+            D_file.seek(0);
+
+            int dim = D_file.cols();
+            Matrix<double> X(size, dim);
+            for(int i = 0; i < size; i++)
+                for(int j = 0; j < dim; j++)
+                    D_file >> X.matrix[i][j];
+            D = X.compute_Distance_Matrix();
+
+        }
+        else if(dist != NULL && sizeinput > 0 && diminput > 0)
+        {
+            size = sizeinput;
+            int dim = diminput;
+            D.resize(size, size);
+            X.resize(num_r, 1);
+
+            Matrix<double> X(size, dim);
+            for(int i = 0; i < size; i++)
+                for(int j = 0; j < dim; j++)
+                    X.matrix[i][j] = (double) dist[i][j];
+            D = X.compute_Distance_Matrix();
+        }
+        else
+        {
+            cout << "Error: Incorrect input data parameters" << endl;
+            exit(0);
+        }
+    }
+    else
+    {
+        cout << "Warning: Undefined matrix type!\n\n";
+        exit(0);
+    }
+};
+
+#ifdef COMMAND_LINE_VERSION
 void DimEst::initial_DimEst(String filename, String meth, String dataform, String para_fname)
 {
-	method = meth;
-#ifdef COMMAND_LINE_VERSION
+    method = meth;
     init_parameters(para_fname); //for command version
-#else
-    num_r = parameters.cor_n;// only for this interface version
-#endif
-	File D_file(filename);
-	if(!D_file.is_open())
-	{
-		cout << "error: file \"" << filename << "\" can not be open, please check if this file exists or is readable." << endl;
-		exit(0);
+    File D_file(filename);
+    if(!D_file.is_open())
+    {
+        cout << "Error: File \"" << filename << "\" cannot be opened! Please check if this file exists or is readable." << endl;
+        exit(0);
     }
     size = D_file.lines();
     D_prefname = D_file.prefix_name();
     D_postfname = D_file.postfix_name();
     D.resize(size, size);
     X.resize(num_r, 1);
-	D_file.seek(0);
+    D_file.seek(0);
 
-	// get distance matrix
-	if(dataform == (String) "DIS")
-	{
+    // get distance matrix
+    if(dataform == (String) "DIS")
+    {
         if(parameters.distance_file_type == 0)
         {
             for(int i = 0; i < size; i++)
@@ -57,8 +175,7 @@ void DimEst::initial_DimEst(String filename, String meth, String dataform, Strin
                     D_file >> D.matrix[i][j];
                     D.matrix[j][i] = D.matrix[i][j];
                 }
-        } else
-        if(parameters.distance_file_type == 1)
+        } else if(parameters.distance_file_type == 1)
         {
             String tree;
             double index;
@@ -78,23 +195,24 @@ void DimEst::initial_DimEst(String filename, String meth, String dataform, Strin
             }
         } else
         {
-            cout << "warning: there is not this type of distance file format!" << endl;
+            cout << "Warning: This is not a type of distance file format!" << endl;
         }
-	} else
-	if(dataform == (String) "COR")
-	{
-		int dim = D_file.cols();
-		Matrix<double> X(size, dim);
-		for(int i = 0; i < size; i++)
-			for(int j = 0; j < dim; j++)
-			{
-				D_file >> X.matrix[i][j];
-			}
-		D = X.compute_Distance_Matrix();
+    } else if(dataform == (String) "COR")
+    {
+        int dim = D_file.cols();
+        Matrix<double> X(size, dim);
+        for(int i = 0; i < size; i++)
+            for(int j = 0; j < dim; j++)
+                D_file >> X.matrix[i][j];
+        D = X.compute_Distance_Matrix();
+    }
+    else
+    {
+        cout << "Warning: Undefined matrix type!\n\n";
+        exit(0);
     }
 };
 
-#ifdef COMMAND_LINE_VERSION
 void DimEst::init_parameters(String para_filename)
 {
 	parameters.cor_n = 200;
@@ -133,7 +251,7 @@ void DimEst::init_parameters(String para_filename)
 		num_r = parameters.mle_n;
 	else
 	{
-		cout << "error: this estimator doesn't exist in this program!!" << endl;
+        cout << "Error: This estimator does not exist in this program!!" << endl;
 		exit(0);
 	}
 };
@@ -154,7 +272,7 @@ void DimEst::Compute_Dim()
     if(method == (String) "MLE_DIM")
         return Compute_MLE_Dim();
 
-	cout << "error: this estimator doesn't exist in this program!!" << endl;
+    cout << "Error: This estimator does not exist in this program!!" << endl;
 	exit(0);
 };
 

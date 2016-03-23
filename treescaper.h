@@ -84,7 +84,7 @@ private slots:
     void on_comboboxNLDRmethod_currentIndexChanged(QString );
     void on_pushdimplotfile_clicked();
     void on_pushNLDRplotfile_clicked();
-    void on_pushDIMfile_clicked();
+//    void on_pushDIMfile_clicked();
 //    void on_pushNLDRfile_clicked();
     void on_pushdimdimest_clicked();
 //    void on_pusdimclear_clicked();
@@ -153,6 +153,7 @@ private slots:
     void on_listDATAmem_itemActivated(QListWidgetItem *item);
     void on_listDATAmem_2_itemActivated(QListWidgetItem *item);
     void on_listDATAmem_3_itemActivated(QListWidgetItem *item);
+    void on_comboBoxDIMdata_currentIndexChanged(const QString &arg1);
 };
 
 #endif // TREESCAPER_H

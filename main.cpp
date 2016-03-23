@@ -16,12 +16,12 @@
 //# http://www.gnu.org/copyleft/gpl.html
 //##########################################################################
 
-//#define vtkRenderingCore_AUTOINIT 4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)
-//#define vtkRenderingVolume_AUTOINIT 1(vtkRenderingVolumeOpenGL)
-#include <vtkAutoInit.h>
-VTK_MODULE_INIT(vtkRenderingOpenGL);
-VTK_MODULE_INIT(vtkInteractionStyle);
-VTK_MODULE_INIT(vtkRenderingFreeType);
+#define vtkRenderingCore_AUTOINIT 4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)
+#define vtkRenderingVolume_AUTOINIT 1(vtkRenderingVolumeOpenGL)
+//#include <vtkAutoInit.h>
+//VTK_MODULE_INIT(vtkRenderingOpenGL);
+//VTK_MODULE_INIT(vtkInteractionStyle);
+//VTK_MODULE_INIT(vtkRenderingFreeType);
 
 #ifdef _WIN32
 //#include <windef.h>
@@ -50,9 +50,6 @@ VTK_MODULE_INIT(vtkRenderingFreeType);
 #include <QDebug>
 #include "treescaper.h"
 #include "woutput.h"
-
-#undef max
-#undef min
 
 int main(int argc, char *argv[])
 {

@@ -31,7 +31,7 @@ Dimestthread::~Dimestthread()
 {
 };
 
-void Dimestthread::initialization(String fname, String estimator, String type, int num)
+void Dimestthread::initialization(String fname, double **dist, int sizeinput, int diminput, String estimator, String type, int num)
 {
     dimest = new DimEst;
     cout << "initialzing" << endl;
@@ -39,8 +39,19 @@ void Dimestthread::initialization(String fname, String estimator, String type, i
     dimest->parameters.mle_n = num;
     dimest->parameters.nn_n = num;
     dimest->parameters.distance_file_type = 1;
-    dimest->initial_DimEst(fname, estimator, type, "");
+    dimest->initial_DimEst(fname, dist, sizeinput, diminput, estimator, type, "");
 };
+
+//void Dimestthread::initialization(String fname, String estimator, String type, int num)
+//{
+//    dimest = new DimEst;
+//    cout << "initialzing" << endl;
+//    dimest->parameters.cor_n = num;
+//    dimest->parameters.mle_n = num;
+//    dimest->parameters.nn_n = num;
+//    dimest->parameters.distance_file_type = 1;
+//    dimest->initial_DimEst(fname, estimator, type, "");
+//};
 
 void Dimestthread::run()
 {

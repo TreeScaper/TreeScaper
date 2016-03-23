@@ -21,6 +21,6 @@
 #ifndef WDEF_H
 #define WDEF_H
 
-#define _WINDOWS //_MAC // COMMAND_LINE_VERSION //_WINDOWS //_LINUX //
+#define _MAC //_MAC // COMMAND_LINE_VERSION //_WINDOWS //_LINUX //
 
 #endif // WDEF_H
