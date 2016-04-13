@@ -40,6 +40,7 @@
 #include <QChar>
 #include "plot2d.h"
 #include "plot2d_AWTY.h"
+#include <QDebug>
 
 /*
  "No data in memory": empty memory
@@ -53,6 +54,7 @@
  "SPR-distance": Subtree Prune and Regraft distance
  "Geodesic-distance": Geodesic distance (to do)
  "File-distance": distance from load file
+ "File-coordinate": distance coordinates from load file
  "Affinity-URF": Affinity matrix for unweighted Robinson-Foulds distance
  "Affinity-RF": Affinity matrix for weighted Robinson-Foulds distance
  "Affinity-match": Affinity matrix for matching distance
@@ -96,22 +98,19 @@ TreeScaper::TreeScaper(QWidget *parent, Qt::WindowFlags flags) :
     }
     freopen(logfileName.toLocal8Bit().data(),"w",stdout);
     setvbuf(stdout, NULL, _IONBF, 0);
-#endif
-
-#ifdef _WINDOWS
+#elif _WINDOWS
+    freopen("./log.txt","w",stdout);
+#elif _LINUX
     freopen("./log.txt","w",stdout);
 #endif
 
-#ifdef _LINUX
-    freopen("./log.txt","w",stdout);
-#endif
 
 //    freopen("./log.txt","w",stdout);
 //    setvbuf(stdout, NULL, _IONBF, 0);
 //    QFileSystemWatcher * watcher = new QFileSystemWatcher(this);
 //    watcher->addPath("./log.txt");
 //    connect(watcher,SIGNAL(fileChanged(QString)),this,SLOT(HandleFileChange(QString)));
-//    qDebug() << "hsdf" << std::endl;//---
+//    qDebug() << "hsdf\n";//---
 //    setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);//-- | Qt::WindowMinMaxButtonsHint);
     ui->setupUi(this);
     timer = new QTimer(this);
@@ -133,8 +132,7 @@ TreeScaper::TreeScaper(QWidget *parent, Qt::WindowFlags flags) :
     ui->pushNLDRplottrees->setEnabled(false);
     ui->pushNLDRsaveindices->setEnabled(false);
 
-
-    ui->comboBoxdimtype->setCurrentIndex(1);
+    ui->comboBoxdimtype->setCurrentIndex(0);
     ui->comboboxNLDRmethod->setCurrentIndex(4);
     ui->comboBoxNLDRalgo->setCurrentIndex(2);
     ui->textdimstart->setReadOnly(true);
@@ -160,7 +158,7 @@ TreeScaper::TreeScaper(QWidget *parent, Qt::WindowFlags flags) :
 
     ui->labelDISTaffinity->setEnabled(true);
     ui->comboBoxDISTaffinity->setEnabled(true);
-//    ui->pushDISTaffinity->setEnabled(false);
+    ui->pushDISTaffinity->setEnabled(false);
 //    ui->labelDISTHighfreq->setEnabled(false);
 //    ui->labelDISTLowfreq->setEnabled(false);
 //    ui->textDISThighfreq->setEnabled(false);
@@ -780,23 +778,16 @@ void TreeScaper::on_pushNLDRsetting_clicked()
 
 void TreeScaper::on_pushdimrun_clicked()
 {
-    QString qtfname = ui->textdimfile->toPlainText();
-    string stdfname = qtfname.toStdString();
-    String fname(stdfname.c_str());
-    File file(fname);
-    if(! file.is_open())
+    if(dimestthd.isRunning())
     {
-        cout << "Error: Can not open the data file!\n\n";
+        QMessageBox::warning(NULL, "Warning", "Dimension estimation is running!", 0, 0);
         return;
     }
-
-    QString qttype = ui->comboBoxdimtype->currentText();
-    string stdtype = qttype.toStdString();
-    String type(stdtype.c_str());
-    if(type == (String) "Distance")
-        type = "DIS";
-    else
-        type = "COR";
+    double **dist = NULL;
+    int ** distint = NULL;
+    int size = 0;
+    int dim = 0;
+    String type;
 
     QString qtest = ui->comboBoxdimestimator->currentText();
     string stdest = qtest.toStdString();
@@ -816,16 +807,98 @@ void TreeScaper::on_pushdimrun_clicked()
         return;
     }
 
-    if(dimestthd.isRunning())
+    QString qtDIMdata = ui->comboBoxDIMdata->currentText();
+    string stdDIMdata = qtDIMdata.toStdString();
+    String DIMdata(stdDIMdata.c_str());
+
+    QString qtfname = ui->textDATAfile->toPlainText();
+    string stdfname = qtfname.toStdString();
+    String fname(stdfname.c_str());
+    File file(fname);
+    DIMplot = file.prefix_name();
+    if(DIMdata == (String) "Unweighted RF-distance")
     {
-        cout << "Warning: Estimating the dimension now!\n\n";
+        dist = TreesData->GetdistURF();
+        size = TreesData->Get_n_trees();
+        DIMplot += "_URF";
+        type = "DIS";
+    } else if(DIMdata == (String) "Weighted RF-distance")
+    {
+        dist = TreesData->GetdistRF();
+        size = TreesData->Get_n_trees();
+        DIMplot += "_RF";
+        type = "DIS";
+    } else if(DIMdata == (String) "Matching-distance")
+    {
+        distint = TreesData->GetdistMatch();
+        size = TreesData->Get_n_trees();
+        DIMplot += "_Match";
+        type = "DIS";
+    } else if(DIMdata == (String) "SPR-distance")
+    {
+        distint = TreesData->GetdistSPR();
+        size = TreesData->Get_n_trees();
+        DIMplot += "_SPR";
+        type = "DIS";
+    }
+    else if(DIMdata == (String) "Geodesic-distance")
+    {
+        dist = TreesData->GetdistGeo();
+        size = TreesData->Get_n_trees();
+        DIMplot += "_Geo";
+        type = "DIS";
+    }
+    else if(DIMdata == (String) "File-distance")
+    {
+        dist = TreesData->GetdistFile();
+        size = TreesData->Get_filedistsize();
+        type = "DIS";
+
+        QString qtdistfname = ui->textDISTfile_2->toPlainText();
+        string stddistfname = qtdistfname.toStdString();
+        String fdistname(stddistfname.c_str());
+        File filedist(fdistname);
+        DIMplot = filedist.prefix_name();
+    }
+    else if(DIMdata == (String) "File-coordinate")
+    {
+        cout << "Here1:" << endl; //-- MMtest
+        dist = TreesData->GetcoordFile();
+        size = TreesData->Get_filedcoordinatesize();
+        dim = TreesData->Get_filedcoordinatedim();
+
+        cout << "size: " << size << " dim: " << dim << endl;
+        type = "COR";
+
+        QString qtcoordfname = ui->textDISTfile_2->toPlainText();
+        string stdcoordfname = qtcoordfname.toStdString();
+        String fcoordname(stdcoordfname.c_str());
+        File filecoord(fcoordname);
+        DIMplot = filecoord.prefix_name();
+    }
+    else
+    {
+        cout << "Warning: There is no distance matrix or coordinate data in memory!\n\n";
         return;
     }
 
-    dimestthd.initialization(fname, est, type, qtnum.toInt());
+    if(DIMdata == (String) "Matching-distance" || DIMdata == (String) "SPR-distance")
+    {
+        dist = new double *[size];
+        for(int i = 0; i < size; i++)
+            dist[i] = new double [size];
+        for(int i = 0; i < size; i++)
+            for(int j = 0; j < size; j++)
+            {
+                dist[i][j] = (double) distint[i][j];
+            }
+    }
+
+
+    dimestthd.initialization(DIMplot, dist, size, dim, est, type, qtnum.toInt());
     dimestthd.start();
 
-    DIMplot = file.prefix_name();
+//    DIMplot = file.prefix_name();
     DIMplot += "_";
     DIMplot += est;
     if(est == (String) "MLE_DIM")
@@ -839,7 +912,77 @@ void TreeScaper::on_pushdimrun_clicked()
         ui->textdimstart->setText("(input)");
         ui->textdimend->setText("(input)");
     }
+
+    if(DIMdata == (String) "Matching-distance" || DIMdata == (String) "SPR-distance")
+    {
+        for(int i = 0; i < size; i++)
+            delete [] dist[i];
+        delete [] dist;
+    }
 }
+
+//void TreeScaper::on_pushdimrun_clicked()
+//{
+//    QString qtfname = ui->textdimfile->toPlainText();
+//    string stdfname = qtfname.toStdString();
+//    String fname(stdfname.c_str());
+//    File file(fname);
+//    if(! file.is_open())
+//    {
+//        cout << "Error: Can not open the data file!\n\n";
+//        return;
+//    }
+
+//    QString qttype = ui->comboBoxdimtype->currentText();
+//    string stdtype = qttype.toStdString();
+//    String type(stdtype.c_str());
+//    if(type == (String) "Distance")
+//        type = "DIS";
+//    else
+//        type = "COR";
+
+//    QString qtest = ui->comboBoxdimestimator->currentText();
+//    string stdest = qtest.toStdString();
+//    String est(stdest.c_str());
+//    if(est == (String) "Correlation dimension")
+//        est = "CORR_DIM";
+//    else
+//    if(est == (String) "Maximum likelihood")
+//        est = "MLE_DIM";
+//    else
+//        est = "NN_DIM";
+
+//    QString qtnum = ui->textdimnumber->toPlainText();
+//    if(qtnum.toInt() < 2)
+//    {
+//        cout << "Warning: The number is at least 2!\n\n";
+//        return;
+//    }
+
+//    if(dimestthd.isRunning())
+//    {
+//        cout << "Warning: Estimating the dimension now!\n\n";
+//        return;
+//    }
+
+//    dimestthd.initialization(fname, est, type, qtnum.toInt());
+//    dimestthd.start();
+
+//    DIMplot = file.prefix_name();
+//    DIMplot += "_";
+//    DIMplot += est;
+//    if(est == (String) "MLE_DIM")
+//        DIMplot += "_k.out";
+//    else
+//        DIMplot += "_logvslog.out";
+//    ui->textdimstart->setReadOnly(false);
+//    ui->textdimend->setReadOnly(false);
+//    if(ui->textdimstart->toPlainText() == "(disable)")
+//    {
+//        ui->textdimstart->setText("(input)");
+//        ui->textdimend->setText("(input)");
+//    }
+//}
 
 void TreeScaper::on_pushdimplot_clicked()
 {
@@ -869,20 +1012,6 @@ void TreeScaper::on_pushdimplot_clicked()
     plotdimthd.initialization(filename);
     plotdimthd.start();
 }
-
-//void TreeScaper::on_pusdimclear_clicked()
-//{
-//    File fout("log.txt");
-//    fout.clean();
-//    fout.close();
-//    ui->textBrowserDATAlog->setText("");
-////    ui->textBrowserCONSlog->setText("");
-////    ui->textBrowserCONVlog->setText("");
-//    ui->textBrowserCOVAlog->setText("");
-////    ui->textBrowserDISTlog->setText("");
-////    ui->textBrowserdimlog->setText("");
-//    ui->textBrowserNLDRlog->setText("");
-//}
 
 void TreeScaper::on_pushdimdimest_clicked()
 {
@@ -1024,18 +1153,18 @@ void TreeScaper::on_pushNLDRfile_clicked()
     }
 }*/
 
-void TreeScaper::on_pushDIMfile_clicked()
-{
-    QFileDialog *fileDialog = new QFileDialog(this);
-    fileDialog->setWindowTitle(tr("Open File"));
-    fileDialog->setDirectory(".");
-//    fileDialog->setFilter(tr("Files(*)"));
-    if(fileDialog->exec() == QDialog::Accepted)
-    {
-        QString path = fileDialog->selectedFiles()[0];
-        ui->textdimfile->setPlainText(path);
-    }
-}
+//void TreeScaper::on_pushDIMfile_clicked()
+//{
+//    QFileDialog *fileDialog = new QFileDialog(this);
+//    fileDialog->setWindowTitle(tr("Open File"));
+//    fileDialog->setDirectory(".");
+////    fileDialog->setFilter(tr("Files(*)"));
+//    if(fileDialog->exec() == QDialog::Accepted)
+//    {
+//        QString path = fileDialog->selectedFiles()[0];
+//        ui->textdimfile->setPlainText(path);
+//    }
+//}
 
 void TreeScaper::on_pushNLDRplotfile_clicked()
 {
@@ -1200,20 +1329,6 @@ void TreeScaper::on_pushButton_clicked()
     }
 }
 
-//void TreeScaper::on_pushDISTclear_clicked()
-//{
-//    File fout("log.txt");
-//    fout.clean();
-//    fout.close();
-//    ui->textBrowserDATAlog->setText("");
-////    ui->textBrowserCONSlog->setText("");
-////    ui->textBrowserCONVlog->setText("");
-//    ui->textBrowserCOVAlog->setText("");
-////    ui->textBrowserDISTlog->setText("");
-//    ui->textBrowserdimlog->setText("");
-//    ui->textBrowserNLDRlog->setText("");
-//}
-
 void TreeScaper::on_pushDISTrun_clicked()
 {
     QString qtmethod = ui->comboBoxDISTmethod->currentText();
@@ -1262,9 +1377,6 @@ void TreeScaper::on_pushDISTrun_clicked()
         if(method == (String) "Unweighted Robinson Foulds")
         {
             QString qstr("Unweighted RF-distance");
-//            if (ui->comboBoxDISTmemdata->findText("Unweighted RF-distance") == -1)
-//                ui->comboBoxDISTmemdata->addItem(qstr);
-
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
                 ui->listDATAmem->addItem(qstr);
@@ -1279,15 +1391,14 @@ void TreeScaper::on_pushDISTrun_clicked()
 
             if (ui->comboBoxNLDRdata->findText("Unweighted RF-distance") == -1)
                 ui->comboBoxNLDRdata->addItem(qstr);
+            if (ui->comboBoxDIMdata->findText("Unweighted RF-distance") == -1)
+                ui->comboBoxDIMdata->addItem(qstr);
             if (ui->comboBoxDISTmemdata_2->findText("Unweighted RF-distance") == -1)
                 ui->comboBoxDISTmemdata_2->addItem(qstr);
         }
         if(method == (String) "Weighted Robinson Foulds")
         {
             QString qstr("Weighted RF-distance");
-//            if (ui->comboBoxDISTmemdata->findText("Weighted RF-distance") == -1)
-//                ui->comboBoxDISTmemdata->addItem(qstr);
-
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
                 ui->listDATAmem->addItem(qstr);
@@ -1302,6 +1413,8 @@ void TreeScaper::on_pushDISTrun_clicked()
 
             if (ui->comboBoxNLDRdata->findText("Weighted RF-distance") == -1)
                 ui->comboBoxNLDRdata->addItem(qstr);
+            if (ui->comboBoxDIMdata->findText("Weighted RF-distance") == -1)
+                ui->comboBoxDIMdata->addItem(qstr);
             if (ui->comboBoxDISTmemdata_2->findText("Weighted RF-distance") == -1)
                 ui->comboBoxDISTmemdata_2->addItem(qstr);
         }
@@ -1309,9 +1422,6 @@ void TreeScaper::on_pushDISTrun_clicked()
         if(method == (String) "Matching")
         {
             QString qstr("Matching-distance");
-//            if (ui->comboBoxDISTmemdata->findText("Matching-distance") == -1)
-//                ui->comboBoxDISTmemdata->addItem(qstr);
-
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
                 ui->listDATAmem->addItem(qstr);
@@ -1326,6 +1436,8 @@ void TreeScaper::on_pushDISTrun_clicked()
 
             if (ui->comboBoxNLDRdata->findText("Matching-distance") == -1)
                 ui->comboBoxNLDRdata->addItem(qstr);
+            if (ui->comboBoxDIMdata->findText("Matching-distance") == -1)
+                ui->comboBoxDIMdata->addItem(qstr);
             if (ui->comboBoxDISTmemdata_2->findText("Matching-distance") == -1)
                 ui->comboBoxDISTmemdata_2->addItem(qstr);
         }
@@ -1333,9 +1445,6 @@ void TreeScaper::on_pushDISTrun_clicked()
         if(method == (String) "Subtree Prune and Regraft")
         {
             QString qstr("SPR-distance");
-//            if (ui->comboBoxDISTmemdata->findText("SPR-distance") == -1)
-//                ui->comboBoxDISTmemdata->addItem(qstr);
-
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
                 ui->listDATAmem->addItem(qstr);
@@ -1350,6 +1459,8 @@ void TreeScaper::on_pushDISTrun_clicked()
 
             if (ui->comboBoxNLDRdata->findText("SPR-distance") == -1)
                 ui->comboBoxNLDRdata->addItem(qstr);
+            if (ui->comboBoxDIMdata->findText("SPR-distance") == -1)
+                ui->comboBoxDIMdata->addItem(qstr);
             if (ui->comboBoxDISTmemdata_2->findText("SPR-distance") == -1)
                 ui->comboBoxDISTmemdata_2->addItem(qstr);
         }
@@ -1364,7 +1475,15 @@ void TreeScaper::on_pushDISTrun_clicked()
             int idex = ui->comboBoxNLDRdata->findText("No distance data in memory");
             ui->comboBoxNLDRdata->removeItem(idex);
         }
+        if(ui->comboBoxDIMdata->findText("No distance/coordinate data in memory") != -1)
+        {
+            int idex = ui->comboBoxDIMdata->findText("No distance/coordinate data in memory");
+            ui->comboBoxDIMdata->removeItem(idex);
+        }
     }
+    ui->pushDISTaffinity->setEnabled(true);
+
+    cout << "Successfully computed distance matrix.\n\n";
 }
 
 void TreeScaper::on_pushDATAcov_clicked()
@@ -1376,9 +1495,6 @@ void TreeScaper::on_pushDATAcov_clicked()
     }
     TreesData->Compute_Bipart_Covariance();
     QString qstr("Covariance Matrix");
-//    if (ui->comboBoxDISTmemdata->findText("Covariance Matrix") == -1)
-//        ui->comboBoxDISTmemdata->addItem(qstr);
-
     QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
     if(item1.empty())
         ui->listDATAmem->addItem(qstr);
@@ -1447,9 +1563,6 @@ void TreeScaper::on_pushDATApartition_clicked()
     TreesData->Compute_Bipart_Matrix();
 
     QString qstr("Bipartition Matrix");
-//    if (ui->comboBoxDISTmemdata->findText("Bipartition Matrix") == -1)
-//        ui->comboBoxDISTmemdata->addItem(qstr);
-
     QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
     if(item1.empty())
         ui->listDATAmem->addItem(qstr);
@@ -1475,9 +1588,9 @@ void TreeScaper::on_pushDATAloadtrees_clicked()
     string stdfname = qtfname.toStdString();
     String fname(stdfname.c_str());
     File file(fname);
-    if(! file.is_open())
+    if(!file.is_open())
     {
-        cout << "Error: Cannot open the data file!\n\n";
+        std::cout << "Error: Cannot open the data file!\n\n";
         return;
     }
     TreesData->initialTrees(stdfname);
@@ -1512,21 +1625,18 @@ void TreeScaper::on_pushDATAloadtrees_clicked()
 //    int aaa[] = {350};
 //    TreesData->Printf(aaa, 1);
     TreesData->compute_numofbipart();
-//    ui->comboBoxDISTmemdata->clear();
     ui->listDATAmem->clear();
     ui->listDATAmem_2->clear();
     ui->listDATAmem_3->clear();
     ui->comboBoxCOVAmemdata->clear();
     ui->comboBoxDISTmemdata_2->clear();
     ui->comboBoxDISTmemdata_3->clear();
-
     ui->comboBoxNLDRdata->clear();
+    ui->comboBoxDIMdata->clear();
+
     if(! ui->checkBoxDATAweighted->isChecked()) //(bipart_type == (String) "unweighted")
     {
         QString qstr("Unweighted treeset");
-//        if (ui->comboBoxDISTmemdata->findText("Unweighted treeset") == -1)
-//            ui->comboBoxDISTmemdata->addItem(qstr);
-
         QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
         if(item1.empty())
             ui->listDATAmem->addItem(qstr);
@@ -1542,9 +1652,6 @@ void TreeScaper::on_pushDATAloadtrees_clicked()
     } else if(ui->checkBoxDATAweighted->isChecked())
     {
         QString qstr("Weighted treeset");
-//        if (ui->comboBoxDISTmemdata->findText("Weighted treeset") == -1)
-//            ui->comboBoxDISTmemdata->addItem(qstr);
-
         QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
         if(item1.empty())
             ui->listDATAmem->addItem(qstr);
@@ -1581,62 +1688,173 @@ void TreeScaper::on_pushDATAloadtrees_clicked()
 
 void TreeScaper::on_pushDISTloaddist_clicked()
 {
+    int msg1 = QMessageBox::question(this, "Load File", "Are you sure the input file and format are correct?", "Yes", "No");
+    if(msg1 == 1) // No
+        return;
+
     QString qtfname = ui->textDISTfile_2->toPlainText();
     string stdfname = qtfname.toStdString();
     String fname(stdfname.c_str());
     File file(fname);
-    if(! file.is_open())
+    if(!file.is_open())
     {
         cout << "Error: Cannot open the data file!\n\n";
         return;
     }
-    TreesData->load_distfile(stdfname);
 
-    QString qstr("File-distance");
-//    if (ui->comboBoxDISTmemdata->findText("File-distance") == -1)
-//        ui->comboBoxDISTmemdata->addItem(qstr);
+    QString qttype = ui->comboBoxdimtype->currentText();
+    string stdtype = qttype.toStdString();
+    String type(stdtype.c_str());
 
-    QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
-    if(item1.empty())
-        ui->listDATAmem->addItem(qstr);
+    if(type == (String) "Distance")
+    {
+        TreesData->load_distfile(stdfname);
 
-    QList<QListWidgetItem *> item2 = ui->listDATAmem_2->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
-    if(item2.empty())
-        ui->listDATAmem_2->addItem(qstr);
+        QString qstr("File-distance");
+        QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+        if(item1.empty())
+            ui->listDATAmem->addItem(qstr);
 
-    QList<QListWidgetItem *> item3 = ui->listDATAmem_3->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
-    if(item3.empty())
-        ui->listDATAmem_3->addItem(qstr);
+        QList<QListWidgetItem *> item2 = ui->listDATAmem_2->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+        if(item2.empty())
+            ui->listDATAmem_2->addItem(qstr);
 
-//    int idex = ui->comboBoxDISTmemdata->findText("No data in memory");
-//    ui->comboBoxDISTmemdata->removeItem(idex);
+        QList<QListWidgetItem *> item3 = ui->listDATAmem_3->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+        if(item3.empty())
+            ui->listDATAmem_3->addItem(qstr);
 
-    QList<QListWidgetItem *> itemTmp1 = ui->listDATAmem->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
-    for (int i = 0; i < itemTmp1.size(); i++)
-        delete ui->listDATAmem->takeItem(ui->listDATAmem->row(itemTmp1[i]));
+        QList<QListWidgetItem *> itemTmp1 = ui->listDATAmem->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
+        for (int i = 0; i < itemTmp1.size(); i++)
+            delete ui->listDATAmem->takeItem(ui->listDATAmem->row(itemTmp1[i]));
 
-    QList<QListWidgetItem *> itemTmp2 = ui->listDATAmem_2->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
-    for (int i = 0; i < itemTmp2.size(); i++)
-        delete ui->listDATAmem_2->takeItem(ui->listDATAmem_2->row(itemTmp2[i]));
+        QList<QListWidgetItem *> itemTmp2 = ui->listDATAmem_2->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
+        for (int i = 0; i < itemTmp2.size(); i++)
+            delete ui->listDATAmem_2->takeItem(ui->listDATAmem_2->row(itemTmp2[i]));
 
-    QList<QListWidgetItem *> itemTmp3 = ui->listDATAmem_3->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
-    for (int i = 0; i < itemTmp3.size(); i++)
-        delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(itemTmp3[i]));
+        QList<QListWidgetItem *> itemTmp3 = ui->listDATAmem_3->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
+        for (int i = 0; i < itemTmp3.size(); i++)
+            delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(itemTmp3[i]));
 
-    if (ui->comboBoxNLDRdata->findText("File-distance") == -1)
-        ui->comboBoxNLDRdata->addItem(qstr);
+        if (ui->comboBoxNLDRdata->findText("File-distance") == -1)
+            ui->comboBoxNLDRdata->addItem(qstr);
 
-    int idex = ui->comboBoxNLDRdata->findText("No distance data in memory");
-    ui->comboBoxNLDRdata->removeItem(idex);
+        int idex = ui->comboBoxNLDRdata->findText("No distance data in memory");
+        ui->comboBoxNLDRdata->removeItem(idex);
 
-    if (ui->comboBoxDISTmemdata_2->findText("File-distance") == -1)
-        ui->comboBoxDISTmemdata_2->addItem(qstr);
+        if (ui->comboBoxDIMdata->findText("File-distance") == -1)
+            ui->comboBoxDIMdata->addItem(qstr);
 
-    idex = ui->comboBoxDISTmemdata_2->findText("No distance data in memory");
-    ui->comboBoxDISTmemdata_2->removeItem(idex);
+        idex = ui->comboBoxDIMdata->findText("No distance/coordinate data in memory");
+        ui->comboBoxDIMdata->removeItem(idex);
 
-    cout << "Successfully read distance file.\n\n";
+        if (ui->comboBoxDISTmemdata_2->findText("File-distance") == -1)
+            ui->comboBoxDISTmemdata_2->addItem(qstr);
+
+        idex = ui->comboBoxDISTmemdata_2->findText("No distance data in memory");
+        ui->comboBoxDISTmemdata_2->removeItem(idex);
+
+        ui->pushDISTaffinity->setEnabled(true);
+
+        cout << "Successfully read distance file.\n\n";
+    }
+    else
+    {
+        TreesData->load_coordinatefile(stdfname);
+
+        QString qstr("File-coordinate");
+        QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+        if(item1.empty())
+            ui->listDATAmem->addItem(qstr);
+
+        QList<QListWidgetItem *> item2 = ui->listDATAmem_2->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+        if(item2.empty())
+            ui->listDATAmem_2->addItem(qstr);
+
+        QList<QListWidgetItem *> item3 = ui->listDATAmem_3->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+        if(item3.empty())
+            ui->listDATAmem_3->addItem(qstr);
+
+        QList<QListWidgetItem *> itemTmp1 = ui->listDATAmem->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
+        for (int i = 0; i < itemTmp1.size(); i++)
+            delete ui->listDATAmem->takeItem(ui->listDATAmem->row(itemTmp1[i]));
+
+        QList<QListWidgetItem *> itemTmp2 = ui->listDATAmem_2->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
+        for (int i = 0; i < itemTmp2.size(); i++)
+            delete ui->listDATAmem_2->takeItem(ui->listDATAmem_2->row(itemTmp2[i]));
+
+        QList<QListWidgetItem *> itemTmp3 = ui->listDATAmem_3->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
+        for (int i = 0; i < itemTmp3.size(); i++)
+            delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(itemTmp3[i]));
+
+        if (ui->comboBoxDIMdata->findText("File-coordinate") == -1)
+            ui->comboBoxDIMdata->addItem(qstr);
+
+        int idex = ui->comboBoxDIMdata->findText("No distance/coordinate data in memory");
+        ui->comboBoxDIMdata->removeItem(idex);
+
+        cout << "Successfully read coordinate file.\n\n";
+    }
+    file.close();
 }
+
+//void TreeScaper::on_pushDISTloaddist_clicked()
+//{
+//    QString qtfname = ui->textDISTfile_2->toPlainText();
+//    string stdfname = qtfname.toStdString();
+//    String fname(stdfname.c_str());
+//    File file(fname);
+//    if(! file.is_open())
+//    {
+//        cout << "Error: Cannot open the data file!\n\n";
+//        return;
+//    }
+//    TreesData->load_distfile(stdfname);
+
+//    QString qstr("File-distance");
+////    if (ui->comboBoxDISTmemdata->findText("File-distance") == -1)
+////        ui->comboBoxDISTmemdata->addItem(qstr);
+
+//    QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+//    if(item1.empty())
+//        ui->listDATAmem->addItem(qstr);
+
+//    QList<QListWidgetItem *> item2 = ui->listDATAmem_2->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+//    if(item2.empty())
+//        ui->listDATAmem_2->addItem(qstr);
+
+//    QList<QListWidgetItem *> item3 = ui->listDATAmem_3->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+//    if(item3.empty())
+//        ui->listDATAmem_3->addItem(qstr);
+
+////    int idex = ui->comboBoxDISTmemdata->findText("No data in memory");
+////    ui->comboBoxDISTmemdata->removeItem(idex);
+
+//    QList<QListWidgetItem *> itemTmp1 = ui->listDATAmem->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
+//    for (int i = 0; i < itemTmp1.size(); i++)
+//        delete ui->listDATAmem->takeItem(ui->listDATAmem->row(itemTmp1[i]));
+
+//    QList<QListWidgetItem *> itemTmp2 = ui->listDATAmem_2->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
+//    for (int i = 0; i < itemTmp2.size(); i++)
+//        delete ui->listDATAmem_2->takeItem(ui->listDATAmem_2->row(itemTmp2[i]));
+
+//    QList<QListWidgetItem *> itemTmp3 = ui->listDATAmem_3->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
+//    for (int i = 0; i < itemTmp3.size(); i++)
+//        delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(itemTmp3[i]));
+
+//    if (ui->comboBoxNLDRdata->findText("File-distance") == -1)
+//        ui->comboBoxNLDRdata->addItem(qstr);
+
+//    int idex = ui->comboBoxNLDRdata->findText("No distance data in memory");
+//    ui->comboBoxNLDRdata->removeItem(idex);
+
+//    if (ui->comboBoxDISTmemdata_2->findText("File-distance") == -1)
+//        ui->comboBoxDISTmemdata_2->addItem(qstr);
+
+//    idex = ui->comboBoxDISTmemdata_2->findText("No distance data in memory");
+//    ui->comboBoxDISTmemdata_2->removeItem(idex);
+
+//    cout << "Successfully read distance file.\n\n";
+//}
 
 //void TreeScaper::on_pushDISTcleardata_clicked()
 //{
@@ -1696,13 +1914,12 @@ void TreeScaper::on_pushDISTaffinity_clicked()
     int type;
     if(method == (String) "Reciprocal")
         type = 1;
-    else
-        if(method == (String) "Exponential")
-            type = 2;
+    else if(method == (String) "Exponential")
+        type = 2;
 
-    if(memorydata != (String) "Unweighted RF-distance" && memorydata != (String)"Weighted RF-distance" &&
-            memorydata != (String)"Matching-distance" && memorydata != (String)"SPR-distance" &&
-            memorydata != (String)"File-distance")
+    if(memorydata == (String) "No distance data in memory" && memorydata != (String) "Unweighted RF-distance"
+            && memorydata != (String) "Weighted RF-distance" && memorydata != (String)"Matching-distance"
+            && memorydata != (String) "SPR-distance" && memorydata != (String)"File-distance")
     {
         cout << "Warning: No Distance file in memory! Please compute first.\n\n";
         return;
@@ -1817,6 +2034,11 @@ void TreeScaper::on_pushDISTaffinity_clicked()
             if (ui->comboBoxDISTmemdata_3->findText("Affinity-filedist") == -1)
                 ui->comboBoxDISTmemdata_3->addItem(qstr);
         }
+
+        int idex = ui->comboBoxDISTmemdata_3->findText("No affinity data in memory");
+        ui->comboBoxDISTmemdata_3->removeItem(idex);
+
+
         cout << "Successfully computed affinity matrix.\n\n";
     }
 }
@@ -1910,11 +2132,11 @@ void TreeScaper::on_pushDISTcomm_clicked()
     QString qtmemorydata = ui->comboBoxDISTmemdata_3->currentText();
     string stdmemorydata = qtmemorydata.toStdString();
     String memorydata(stdmemorydata.c_str());
-//    if(memorydata == (String) "No data in memory" || memorydata == (String) "Unweighted treeset"
-//            || memorydata == (String) "Weighted treeset" || memorydata == (String) "Bipartition Matrix"
-//            || memorydata == (String)"Unweighted RF-distance" || memorydata == (String)"Weighted RF-distance"
-//            || memorydata == (String)"Matching-distance" || memorydata == (String)"SPR-distance"
-//            || memorydata == (String) "Geodesic-distance"|| memorydata == (String)"File-distance")
+
+//    if(memorydata == (String) "No affinity data in memory" || memorydata != (String) "Affinity-URF"
+//            || memorydata != (String) "Affinity-RF" || memorydata != (String) "Affinity-match"
+//            || memorydata != (String) "Affinity-SPR" || memorydata != (String) "Affinity-geodesic"
+//            || memorydata != (String) "Affinity-filedist")
 //    {
 //        cout << "Warning: Cannot detect community!" << endl;
 //        return;
@@ -2730,9 +2952,6 @@ void TreeScaper::on_pushCOVAloaddist_clicked()
     if (ui->comboBoxCOVAmemdata->findText("File-covariance") == -1)
         ui->comboBoxCOVAmemdata->addItem(qstr);
 
-//    if (ui->comboBoxDISTmemdata->findText("File-covariance") == -1)
-//        ui->comboBoxDISTmemdata->addItem(qstr);
-
     QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
     if(item1.empty())
         ui->listDATAmem->addItem(qstr);
@@ -2747,9 +2966,6 @@ void TreeScaper::on_pushCOVAloaddist_clicked()
 
     int idex = ui->comboBoxCOVAmemdata->findText("No covariance data in memory");
     ui->comboBoxCOVAmemdata->removeItem(idex);
-
-//    idex = ui->comboBoxDISTmemdata->findText("No data in memory");
-//    ui->comboBoxDISTmemdata->removeItem(idex);
 
     QList<QListWidgetItem *> itemTmp1 = ui->listDATAmem->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
     for (int i = 0; i < itemTmp1.size(); i++)
@@ -2933,16 +3149,10 @@ void TreeScaper::on_comboBoxDISTmemdata_3_currentIndexChanged(const QString &tex
             || (text == (String) "Affinity-geodesic") || (text == (String) "Affinity-filedist"))
     {
         ui->pushDISTcomm->setEnabled(true);
-        ui->labelDISTaffinity->setEnabled(false);
-        ui->comboBoxDISTaffinity->setEnabled(false);
-        ui->pushDISTaffinity->setEnabled(false);
     }
     else
     {
         ui->pushDISTcomm->setEnabled(false);
-        ui->labelDISTaffinity->setEnabled(true);
-        ui->comboBoxDISTaffinity->setEnabled(true);
-        ui->pushDISTaffinity->setEnabled(true);
     }
 }
 
@@ -3031,7 +3241,7 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
             cout << "Successfully printed " << memorydata << " !\n\n";
         }
     }
-    else if(msg1 == 1)
+    else if(msg1 == 1) // delete
     {
 
         if(memorydata == (String) "Unweighted treeset" || memorydata == (String) "Weighted treeset")
@@ -3046,9 +3256,6 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
             QList<QListWidgetItem *> item3 = ui->listDATAmem_3->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
             for (int i = 0; i < item3.size(); i++)
                 delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(item3[i]));
-
-//            int idex = ui->comboBoxDISTmemdata->findText(qtmemorydata);
-//            ui->comboBoxDISTmemdata->removeItem(idex);
 
             TreesData->deletetrees();
         }
@@ -3070,11 +3277,10 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
             for (int i = 0; i < item3.size(); i++)
                 delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(item3[i]));
 
-//            int idex = ui->comboBoxDISTmemdata->findText(qtmemorydata);
-//            ui->comboBoxDISTmemdata->removeItem(idex);
-
             int idex = ui->comboBoxNLDRdata->findText(qtmemorydata);
             ui->comboBoxNLDRdata->removeItem(idex);
+            idex = ui->comboBoxDIMdata->findText(qtmemorydata);
+            ui->comboBoxDIMdata->removeItem(idex);
             idex = ui->comboBoxDISTmemdata_2->findText(qtmemorydata);
             ui->comboBoxDISTmemdata_2->removeItem(idex);
             idex = ui->comboBoxDISTmemdata_3->findText(qtmemorydata);
@@ -3100,15 +3306,20 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
             QString qstr("No data in memory");
             ui->listDATAmem_3->addItem(qstr);
         }
-//        if(ui->comboBoxDISTmemdata->count() == 0)
-//        {
-//            QString qstr("No data in memory");
-//            ui->comboBoxDISTmemdata->addItem(qstr);
-//        }
         if(ui->comboBoxNLDRdata->count() == 0)
         {
             QString qstr("No distance data in memory");
             ui->comboBoxNLDRdata->addItem(qstr);
+        }
+        if(ui->comboBoxDIMdata->count() == 0)
+        {
+            QString qstr("No distance/coordinate data in memory");
+            ui->comboBoxDIMdata->addItem(qstr);
+        }
+        if(ui->comboBoxCOVAmemdata->count() == 0)
+        {
+            QString qstr("No covariance data in memory");
+            ui->comboBoxCOVAmemdata->addItem(qstr);
         }
     }
     else if(msg1 == 2) // Cancel
@@ -3201,7 +3412,7 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
             cout << "Successfully printed " << memorydata << " !\n\n";
         }
     }
-    else if(msg1 == 1)
+    else if(msg1 == 1) // delete
     {
         if(memorydata == (String) "Unweighted treeset" || memorydata == (String) "Weighted treeset")
         {
@@ -3215,9 +3426,6 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
             QList<QListWidgetItem *> item3 = ui->listDATAmem_3->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
             for (int i = 0; i < item3.size(); i++)
                 delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(item3[i]));
-
-//            int idex = ui->comboBoxDISTmemdata->findText(qtmemorydata);
-//            ui->comboBoxDISTmemdata->removeItem(idex);
 
             TreesData->deletetrees();
         }
@@ -3239,11 +3447,10 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
             for (int i = 0; i < item3.size(); i++)
                 delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(item3[i]));
 
-//            int idex = ui->comboBoxDISTmemdata->findText(qtmemorydata);
-//            ui->comboBoxDISTmemdata->removeItem(idex);
-
             int idex = ui->comboBoxNLDRdata->findText(qtmemorydata);
             ui->comboBoxNLDRdata->removeItem(idex);
+            idex = ui->comboBoxDIMdata->findText(qtmemorydata);
+            ui->comboBoxDIMdata->removeItem(idex);
             idex = ui->comboBoxDISTmemdata_2->findText(qtmemorydata);
             ui->comboBoxDISTmemdata_2->removeItem(idex);
             idex = ui->comboBoxDISTmemdata_3->findText(qtmemorydata);
@@ -3279,6 +3486,16 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
             QString qstr("No distance data in memory");
             ui->comboBoxNLDRdata->addItem(qstr);
         }
+        if(ui->comboBoxDIMdata->count() == 0)
+        {
+            QString qstr("No distance/coordinate data in memory");
+            ui->comboBoxDIMdata->addItem(qstr);
+        }
+        if(ui->comboBoxCOVAmemdata->count() == 0)
+        {
+            QString qstr("No covariance data in memory");
+            ui->comboBoxCOVAmemdata->addItem(qstr);
+        }
     }
     else if(msg1 == 2) // Cancel
     {
@@ -3293,7 +3510,7 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
     QString qtmemorydata = item->text();
     string stdmemorydata = qtmemorydata.toStdString();
     String memorydata(stdmemorydata.c_str());
-    if(msg1 == 0) // output item
+    if(msg1 == 0) // output
     {
         if(memorydata == (String) "Unweighted treeset" || memorydata == (String) "Weighted treeset")
         {
@@ -3363,85 +3580,6 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
                 cout << "Outputted Bipartition matrix in matrix format to " << namebipartmatrix << "\n\n";
                 TreesData->OutputBipartitionMatrix(outBipartMatrix, FULLMATRIX);
             }
-    }
-    else if(msg1 == 1) // delete
-    {
-            if(memorydata == (String) "Unweighted treeset" || memorydata == (String) "Weighted treeset")
-            {
-                QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
-                for (int i = 0; i < item1.size(); i++)
-                    delete ui->listDATAmem->takeItem(ui->listDATAmem->row(item1[i]));
-
-                QList<QListWidgetItem *> item2 = ui->listDATAmem_2->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
-                for (int i = 0; i < item2.size(); i++)
-                    delete ui->listDATAmem_2->takeItem(ui->listDATAmem_2->row(item2[i]));
-
-                int rowItm = ui->listDATAmem_3->row(item);
-                delete ui->listDATAmem_3->takeItem(rowItm);
-
-    //            int idex = ui->comboBoxDISTmemdata->findText(qtmemorydata);
-    //            ui->comboBoxDISTmemdata->removeItem(idex);
-
-                TreesData->deletetrees();
-            }
-            else if(memorydata == (String) "No data in memory")
-            {
-                cout << "Warning: There is no data in memory!\n\n";
-                return;
-            }
-            else
-            {
-                QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
-                for (int i = 0; i < item1.size(); i++)
-                    delete ui->listDATAmem->takeItem(ui->listDATAmem->row(item1[i]));
-
-                QList<QListWidgetItem *> item2 = ui->listDATAmem_2->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
-                for (int i = 0; i < item2.size(); i++)
-                    delete ui->listDATAmem_2->takeItem(ui->listDATAmem_2->row(item2[i]));
-
-                int rowItm = ui->listDATAmem_3->row(item);
-                delete ui->listDATAmem_3->takeItem(rowItm);
-
-    //            int idex = ui->comboBoxDISTmemdata->findText(qtmemorydata);
-    //            ui->comboBoxDISTmemdata->removeItem(idex);
-
-                int idex = ui->comboBoxNLDRdata->findText(qtmemorydata);
-                ui->comboBoxNLDRdata->removeItem(idex);
-                idex = ui->comboBoxDISTmemdata_2->findText(qtmemorydata);
-                ui->comboBoxDISTmemdata_2->removeItem(idex);
-                idex = ui->comboBoxDISTmemdata_3->findText(qtmemorydata);
-                ui->comboBoxDISTmemdata_3->removeItem(idex);
-                idex = ui->comboBoxCOVAmemdata->findText(qtmemorydata);
-                ui->comboBoxCOVAmemdata->removeItem(idex);
-
-                TreesData->delete_matrix(memorydata);
-            }
-
-            if(ui->listDATAmem->count() == 0)
-            {
-                QString qstr("No data in memory");
-                ui->listDATAmem->addItem(qstr);
-            }
-            if(ui->listDATAmem_2->count() == 0)
-            {
-                QString qstr("No data in memory");
-                ui->listDATAmem_2->addItem(qstr);
-            }
-            if(ui->listDATAmem_3->count() == 0)
-            {
-                QString qstr("No data in memory");
-                ui->listDATAmem_3->addItem(qstr);
-            }
-    //        if(ui->comboBoxDISTmemdata->count() == 0)
-    //        {
-    //            QString qstr("No data in memory");
-    //            ui->comboBoxDISTmemdata->addItem(qstr);
-    //        }
-            if(ui->comboBoxNLDRdata->count() == 0)
-            {
-                QString qstr("No distance data in memory");
-                ui->comboBoxNLDRdata->addItem(qstr);
-            }
         }
         else
         {
@@ -3449,8 +3587,102 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
             cout << "Successfully printed " << memorydata << " !\n\n";
         }
     }
+    else if(msg1 == 1) // delete
+    {
+        if(memorydata == (String) "Unweighted treeset" || memorydata == (String) "Weighted treeset")
+        {
+            QList<QListWidgetItem *> item2 = ui->listDATAmem->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
+            for (int i = 0; i < item2.size(); i++)
+                delete ui->listDATAmem->takeItem(ui->listDATAmem->row(item2[i]));
+
+            QList<QListWidgetItem *> item3 = ui->listDATAmem_2->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
+            for (int i = 0; i < item3.size(); i++)
+                delete ui->listDATAmem_2->takeItem(ui->listDATAmem_2->row(item3[i]));
+
+            int rowItm = ui->listDATAmem_3->row(item);
+            delete ui->listDATAmem_3->takeItem(rowItm);
+
+            TreesData->deletetrees();
+        }
+        else if(memorydata == (String) "No data in memory")
+        {
+            cout << "Warning: There is no data in memory!\n\n";
+            return;
+        }
+        else
+        {
+            QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
+            for (int i = 0; i < item1.size(); i++)
+                delete ui->listDATAmem->takeItem(ui->listDATAmem->row(item1[i]));
+
+            QList<QListWidgetItem *> item3 = ui->listDATAmem_2->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
+            for (int i = 0; i < item3.size(); i++)
+                delete ui->listDATAmem_2->takeItem(ui->listDATAmem_2->row(item3[i]));
+
+            int rowItm = ui->listDATAmem_3->row(item);
+            delete ui->listDATAmem_3->takeItem(rowItm);
+
+            int idex = ui->comboBoxNLDRdata->findText(qtmemorydata);
+            ui->comboBoxNLDRdata->removeItem(idex);
+            idex = ui->comboBoxDIMdata->findText(qtmemorydata);
+            ui->comboBoxDIMdata->removeItem(idex);
+            idex = ui->comboBoxDISTmemdata_2->findText(qtmemorydata);
+            ui->comboBoxDISTmemdata_2->removeItem(idex);
+            idex = ui->comboBoxDISTmemdata_3->findText(qtmemorydata);
+            ui->comboBoxDISTmemdata_3->removeItem(idex);
+            idex = ui->comboBoxCOVAmemdata->findText(qtmemorydata);
+            ui->comboBoxCOVAmemdata->removeItem(idex);
+
+            TreesData->delete_matrix(memorydata);
+        }
+
+        if(ui->listDATAmem->count() == 0)
+        {
+            QString qstr("No data in memory");
+            ui->listDATAmem->addItem(qstr);
+        }
+        if(ui->listDATAmem_2->count() == 0)
+        {
+            QString qstr("No data in memory");
+            ui->listDATAmem_2->addItem(qstr);
+        }
+        if(ui->listDATAmem_3->count() == 0)
+        {
+            QString qstr("No data in memory");
+            ui->listDATAmem_3->addItem(qstr);
+        }
+//        if(ui->comboBoxDISTmemdata->count() == 0)
+//        {
+//            QString qstr("No data in memory");
+//            ui->comboBoxDISTmemdata->addItem(qstr);
+//        }
+        if(ui->comboBoxNLDRdata->count() == 0)
+        {
+            QString qstr("No distance data in memory");
+            ui->comboBoxNLDRdata->addItem(qstr);
+        }
+        if(ui->comboBoxDIMdata->count() == 0)
+        {
+            QString qstr("No distance/coordinate data in memory");
+            ui->comboBoxDIMdata->addItem(qstr);
+        }
+        if(ui->comboBoxCOVAmemdata->count() == 0)
+        {
+            QString qstr("No covariance data in memory");
+            ui->comboBoxCOVAmemdata->addItem(qstr);
+        }
+    }
     else if(msg1 == 2) // Cancel
     {
         return;
+    }
+}
+
+void TreeScaper::on_comboBoxDIMdata_currentIndexChanged(const QString &arg1)
+{
+    if(ui->comboBoxDIMdata->count() == 0)
+    {
+        QString qstr("No distance/coordinate data in memory");
+        ui->comboBoxDIMdata->addItem(qstr);
     }
 }

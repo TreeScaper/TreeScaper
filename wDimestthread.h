@@ -30,7 +30,7 @@ class Dimestthread : public QThread
 public:
     Dimestthread(QObject *parent = 0);
     ~Dimestthread();
-    void initialization(String fname, String estimator, String type, int num);
+    void initialization(String fname, double **dist, int sizeinput, int dim, String estimator, String type, int num);
 
 protected:
     void run();

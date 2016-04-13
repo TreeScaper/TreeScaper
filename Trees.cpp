@@ -47,6 +47,8 @@ Trees::Trees()
     StrToDist["Geodesic-distance"] = (void ***) &dist_geo;
     str_matrix = (String) "File-distance";
     StrToDist["File-distance"] = (void ***) &dist_file;
+    str_matrix = (String) "File-coordinate";
+    StrToDist["File-coordinate"] = (void ***) &coord_file;
     str_matrix = (String) "Affinity-URF";
     StrToDist["Affinity-URF"] = (void ***) &affi_URF;
     str_matrix = (String) "Affinity-RF";
@@ -90,6 +92,9 @@ Trees::Trees()
     file_distsize = 0;
     dist_file = NULL;
     affi_file = NULL;
+    file_coordinatesize = 0;
+    file_coordinatedim = 0;
+    coord_file = NULL;
 
     covariance_freeid_size = 0;
     covariance_freeid = NULL;
@@ -124,6 +129,7 @@ void Trees::destructor()
     delete_double_array(affi_SPR, n_trees);
     delete_double_array(affi_geo, n_trees);
 
+    delete_double_array(coord_file, file_coordinatesize);
     delete_double_array(dist_file, file_distsize);
     delete_double_array(affi_file, file_distsize);
     delete_double_array(com_info, covariance_nonfree_id_size + 4);
@@ -150,6 +156,8 @@ void Trees::destructor()
     treecov_size = 0;
     filecov_size = 0;
     file_distsize = 0;
+    file_coordinatesize = 0;
+    file_coordinatedim = 0;
 
     delete [] covariance_freeid;
     covariance_freeid = NULL;
@@ -184,9 +192,7 @@ void Trees::deletetrees()
             TreeOPE::killnewicktree(consensustrees[i]);
             consensustrees[i] = NULL;
         }
-//        std::cout << "Before: " << consensustrees.get_length() << std::endl;
         consensustrees.resize(0);
-//        std::cout << "After: " << consensustrees.get_length() << std::endl;
     }
 }
 
@@ -263,6 +269,8 @@ void Trees::delete_matrix(String str_matrix)
         delete_double_array((double ***) StrToDist[str_matrix], filecov_size);
     else if(str_matrix == (String)"File-distance" || str_matrix == (String)"Affinity-filedist")
         delete_double_array((double ***) StrToDist[str_matrix], file_distsize);
+    else if(str_matrix == (String)"File-coordinate")
+        delete_double_array((double ***) StrToDist[str_matrix], file_coordinatesize);
     else if(str_matrix == (String)"Matching-distance" || str_matrix == (String)"SPR-distance")
         delete_double_array((int ***) StrToDist[str_matrix], n_trees);
     else
@@ -276,15 +284,18 @@ string Trees::make_DISToutput_name(String str_matrix)
     result = result.before('.');
     result += "_";
 
-    if(isrooted)
-        result += "rooted_";
-    else
-        result += "unrooted_";
+    if(treesfilename != "")
+    {
+        if(isrooted)
+            result += "rooted_";
+        else
+            result += "unrooted_";
 
-    if(isweighted)
-        result += "weighted_";
-    else
-        result += "unweighted_";
+        if(isweighted)
+            result += "weighted_";
+        else
+            result += "unweighted_";
+    }
 
     if(str_matrix == (String) "Unweighted RF-distance")
         result += "RF-distance";
@@ -329,6 +340,28 @@ void Trees::print_double_array(T *** arr, int n, string outfile)
         fout.close();
 }
 
+template<class T>
+void Trees::print_coordinate_matrix(T *** arr, int n, int m, string outfile)
+{
+    ofstream fout;
+    if (outfile != "")
+        fout.open(outfile.c_str());
+
+    if((*arr) != NULL)
+    {
+        for(int i = 0; i < n; i++)
+        {
+            for(int j = 0; j < m; j++)
+            {
+                fout << setw(5) << (*arr)[i][j] << "\t";
+            }
+            fout << endl;
+        }
+    }
+    if (outfile != "")
+        fout.close();
+}
+
 void Trees::print_matrix(String str_matrix)
 {
     string outfile = make_DISToutput_name(str_matrix);
@@ -341,6 +374,8 @@ void Trees::print_matrix(String str_matrix)
         print_double_array((int ***) StrToDist[str_matrix], n_trees, outfile);
     else if(str_matrix == (String)"File-distance" || str_matrix == (String)"Affinity-filedist")
         print_double_array((double ***) StrToDist[str_matrix], file_distsize, outfile);
+    else if(str_matrix == (String)"File-coordinate")
+        print_coordinate_matrix((double ***) StrToDist[str_matrix], file_coordinatesize, file_coordinatedim, outfile);
     else
         print_double_array((double ***) StrToDist[str_matrix], n_trees, outfile);
 }
@@ -1742,6 +1777,67 @@ void Trees::load_distfile(string fname)
     }
 };
 
+void Trees::load_coordinatefile(string fname)
+{
+    ifstream coordfile(fname.c_str(), ios::binary);
+
+    if (!coordfile)
+    {
+        cout << "Unable to open the file!\n\n";
+        exit(0);
+    }
+
+    file_coordinatesize = 0;
+    string line;
+    while (!coordfile.eof())
+    {
+        getline(coordfile, line);
+        if (!line.empty())
+        {
+            file_coordinatesize++;
+        }
+    }
+
+    coordfile.clear();
+    coordfile.seekg(0, ios::beg);
+    file_coordinatedim = 0;
+    int pos = 0;
+    bool pre_is_table = true;
+    getline(coordfile, line);
+    for(int i = 0; i < line.size(); i++)
+    {
+        pos = line.find('\t', pos);
+        if(i == pos)
+        {
+            if(!pre_is_table)
+            {
+                file_coordinatedim++;
+                pos += 1;
+            }
+            pre_is_table = true;
+        }
+        else
+            pre_is_table = false;
+    }
+    if(!pre_is_table)
+        file_coordinatedim++;
+
+    delete_double_array(coord_file, file_coordinatesize);
+    coord_file = new double *[file_coordinatesize];
+    for(int i = 0; i < file_coordinatesize; i++)
+        coord_file[i] = new double [file_coordinatedim];
+
+    coordfile.clear();
+    coordfile.seekg(0, ios::beg);
+    for (int i = 0; i < file_coordinatesize; i++)
+    {
+        for (int j = 0; j < file_coordinatedim; j++)
+        {
+            coordfile >> coord_file[i][j];
+        }
+    }
+};
+
 void Trees::load_covariancefile(string fname)
 {
     ifstream covfile(fname.c_str(), ios::binary);
@@ -1917,8 +2013,8 @@ void Trees::Compute_Affinity_dist(String str_matrix, int type)
         switch(type)
         {
         case 1:
-            for(int i = 0; i < n_trees; i++)
-                for(int j = 0; j < n_trees; j++)
+            for(int i = 0; i < file_distsize; i++)
+                for(int j = 0; j < file_distsize; j++)
                     if(dist_file[i][j] > 0 && eps > dist_file[i][j])
                         eps = dist_file[i][j];
             eps = eps * ratio;

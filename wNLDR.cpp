@@ -45,7 +45,7 @@ void NLDR::init_NLDR(String fname, double **dist, int sizeinput, String dim, Str
     int dim_int = atoi(dim_str);
     if(dim_int < 1)
     {
-        cout << "error: the dimension must be equal to or greater than 1; please use command -h to see help." << endl;
+        cout << "Error: The dimension must be equal to or greater than 1! Please use command -h to see help." << endl;
         exit(0);
     }
 
@@ -53,7 +53,7 @@ void NLDR::init_NLDR(String fname, double **dist, int sizeinput, String dim, Str
     {
         if(!D_file.is_open())
         {
-            cout << "error: file \"" << fname << "\" can not be open, please check if this file exists or is readable." << endl;
+            cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << endl;
             exit(0);
         }
         size = D_file.lines();
@@ -76,13 +76,13 @@ void NLDR::init_NLDR(String fname, double **dist, int sizeinput, String dim, Str
                 D.matrix[i][j] = (double) dist[i][j];
     } else
     {
-        cout << "error: incorrect input data parameters" << endl;
+        cout << "Error: Incorrect input data parameters" << endl;
         exit(0);
     }
 
 	if(seed < -1)
 	{
-		cout << "error: the seed of random generator must be equal to or greater than -1 and also be a integer; please use command -h to see help." << endl;
+        cout << "Error: The seed of random generator must be equal to or greater than -1 and also be a integer! Please use command -h to see help." << endl;
 		exit(0);
     }
     this->NLDR_init_X(init_md, seed);
@@ -103,7 +103,7 @@ void NLDR::init_NLDR(String fname, String ftype, String dim, String cost, String
     File D_file(fname);
 	if(!D_file.is_open())
 	{
-		cout << "error: file \"" << fname << "\" can not be open, please check if this file exists or is readable." << endl;
+        cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << endl;
 		exit(0);
     }
 	
@@ -115,7 +115,7 @@ void NLDR::init_NLDR(String fname, String ftype, String dim, String cost, String
 
 	if(dim_int < 1)
 	{
-		cout << "error: the dimension must be equal to or greater than 1; please use command -h to see help." << endl;
+        cout << "Error: The dimension must be equal to or greater than 1! Please use command -h to see help." << endl;
 		exit(0);
 	}
 
@@ -129,11 +129,11 @@ void NLDR::init_NLDR(String fname, String ftype, String dim, String cost, String
 		this->NLDR_load_MX();
 		this->NLDR_init_X(init_md, seed);
 	} else
-		cout << "warning: undefined matrix type" << endl;
+        cout << "Warning: Undefined matrix type" << endl;
 
 	if(seed < -1)
 	{
-		cout << "error: the seed of random generator must be equal to or greater than -1 and also be a integer; please use command -h to see help." << endl;
+        cout << "Error: The seed of random generator must be equal to or greater than -1 and also be a integer! Please use command -h to see help." << endl;
 		exit(0);
 	}
 }
@@ -205,7 +205,7 @@ void NLDR::NLDR_init_parameters(String para_filename)
 	File fpara(para_filename);	
 	if(!fpara.is_open())
 	{
-		cout << "error: file \"" << para_filename << "\" can not be open, please check if this file exists or is readable." << endl;
+        cout << "Error: File \"" << para_filename << "\" cannot be opened! Please check if this file exists or is readable." << endl;
 		exit(0);
 	}
 
@@ -337,8 +337,8 @@ void NLDR::NLDR_load_MX()
 	File D_file(fname);	
 	if(!D_file.is_open())
 	{
-		cout << "error: file " << fname << " can not be open, please check if it exists or is readable." << endl;
-		exit(0);
+        cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << endl;
+        exit(0);
     }
 	int dim = D_file.cols();
 	D_file.seek(0);
@@ -376,10 +376,10 @@ void NLDR::NLDR_load_MX()
 
 void NLDR::Compute_NLDR()
 {
-	cout << "start program: " << D_prefname << "_" << dim_str << "D_" << cost_function << "_" << algorithm << endl;
+    cout << "Start program: " << D_prefname << "_" << dim_str << "D_" << cost_function << "_" << algorithm << endl;
 	long start = clock();
 	long end;
-	cout << "compute start time:" << start << endl;
+    cout << "Compute start time:" << start << endl;
 	if(cost_function == (String) "CLASSIC_MDS")
 		this->CLASSIC_MDS();
 	else
@@ -396,15 +396,15 @@ void NLDR::Compute_NLDR()
 		this->CCA();
 	end = clock();
 	time_cost = end - start;
-	cout << "compute end time:" << end << endl;
-	cout << "compute time cost:" << time_cost << endl;
+    cout << "Compute end time:" << end << endl;
+    cout << "Compute time cost:" << time_cost << endl;
 }
 
 void NLDR::result_analysis()
 {
 	long start = clock();
 	long end;
-	cout << "analysis start time:" << start << endl;
+    cout << "Analysis start time:" << start << endl;
 	Trustworthiness.resize(parameters.length_tru, 2);
 	Continuity.resize(parameters.length_con, 2);
 	for(int i = 0; i < parameters.length_tru; i++)
@@ -419,8 +419,8 @@ void NLDR::result_analysis()
 
 	oneNN_analysis();
 	end = clock();
-	cout << "analysis end time:" << end << endl;
-	cout << "analysis time cost:" << end - start << endl;
+    cout << "Analysis end time:" << end << endl;
+    cout << "Analysis time cost:" << end - start << endl;
 };
 
 void NLDR::output_to_files()
@@ -444,7 +444,7 @@ void NLDR::output_to_files()
 			file_COR << "" << endl;
 		}
 	} else
-		cout << "warning: not compute COR yet" << endl;
+        cout << "Warning: Have not computed COR yet" << endl;
 
 	if(DIS.get_row() > 0 && DIS.get_col() > 0)
 	{
@@ -456,21 +456,21 @@ void NLDR::output_to_files()
 			file_DIS << "" << endl;
 		}
 	} else
-		cout << "warning: not compute DIS yet" << endl;
+        cout << "Warning: Have not computed DIS yet" << endl;
 
 	if(STRESS != -1)
 	{
 		file_STR.clean();
 		file_STR << STRESS << endl;
 	} else
-		cout << "warning: not compute STRESS yet" << endl;
+        cout << "Warning: Have not computed STRESS yet" << endl;
 
 	if(time_cost != -1)
 	{
 		file_TIM.clean();
 		file_TIM << time_cost << endl;
 	} else
-		cout << "warning: not record time cost yet" << endl;
+        cout << "Warning: Have not recorded time cost yet" << endl;
 
 	if(Trustworthiness.get_row() > 0 && Trustworthiness.get_col() > 0)
 	{
@@ -500,7 +500,7 @@ void NLDR::output_to_files()
 		file_1NN << oneNN.matrix[0][0] << endl;
 		file_1NN << oneNN.matrix[1][0] << endl;
 	} else
-		cout << "warning: not compute 1NN yet" << endl;
+        cout << "Warning: Have not computed 1NN yet" << endl;
 
 	cout << "Please see the help for details of the introduction of output files." << endl;
 }
@@ -536,8 +536,8 @@ void NLDR::NLDR_load_D()
 	File D_file(fname);	
 	if(!D_file.is_open())
 	{
-		cout << "error: file " << fname << " can not be open, please check if it exists or is readable." << endl;
-		exit(0);
+        cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << endl;
+        exit(0);
     }
 	D_file.seek(0);
 
@@ -571,7 +571,7 @@ void NLDR::NLDR_load_D()
         }
     } else
     {
-        cout << "warning: there is not this type of distance file format!" << endl;
+        cout << "Warning: This distance file format does not exist in this program!" << endl;
     }
 };
 
@@ -835,7 +835,7 @@ void NLDR::CLASSIC_MDS()
         {
                 if(!Scalar_Product.SVD_LIB(U, S, Vt))
                 {
-                        cout << "error : Singular Value Decomposition failed." << endl;
+                        cout << "Error: Singular Value Decomposition failed." << endl;
                         exit(0);
                 }
 
@@ -921,8 +921,8 @@ void NLDR::KRUSKAL1()
         this->KRUSKAL1_METROPOLIS();
 	else
 	{
-		cout << "error: invalid algorithm for KRUSKAL1;" << endl;
-        cout << "for KRUSKAL1, the available algorithms are LINEAR_ITERATION, MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << endl;
+        cout << "Error: Invalid algorithm for KRUSKAL1!" << endl;
+        cout << "For KRUSKAL1, the available algorithms are LINEAR_ITERATION, MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << endl;
 		exit(0);
 	}
 
@@ -987,7 +987,7 @@ void NLDR::KRUSKAL1_LINEAR_ITERATION()
 		stress2 = stress_diff_accum / stress_norm_accum;
 		cout << "stress:" << stress2 << endl;
 		err = fabs((stress1 - stress2) / stress2);
-		cout << "rel_error : " << err << endl;
+        cout << "rel error : " << err << endl;
 		stress1 = stress2;
 		times++;
 		cout << "times : " << times << endl;
@@ -1024,7 +1024,7 @@ void NLDR::KRUSKAL1_MAJORIZATION()
 		stress2 = this->KRUSKAL1_rescale(DX);
 		cout << "stress:" << stress2 << endl;
 		err = fabs(((double) stress1 - stress2) / stress2);
-		cout << "rel_error : " << err << endl;
+        cout << "rel error : " << err << endl;
 		stress1 = stress2;
 		this->KRUSKAL1_compute_BX(DX, BX);
 		times++;
@@ -1449,8 +1449,8 @@ void NLDR::NORMALIZED()
         this->NORMALIZED_METROPOLIS();
 	else
 	{
-		cout << "error: invalid algorithm for NORMALIZED STRESS;" << endl;
-		cout << "for NORMALIZED STRESS, the available algorithms are MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << endl;
+        cout << "Error: Invalid algorithm for NORMALIZED STRESS!" << endl;
+        cout << "For NORMALIZED STRESS, the available algorithms are MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << endl;
 		exit(0);
 	}
 };
@@ -1481,7 +1481,7 @@ void NLDR::NORMALIZED_MAJORIZATION()
 		stress2 = this->NORMALIZED_stress_function(DX);
 		cout << "stress:" << stress2 << endl;
 		err = fabs(((double) stress1 - stress2) / stress2);
-		cout << "rel_error : " << err << endl;
+        cout << "rel error : " << err << endl;
 		stress1 = stress2;
 		this->NORMALIZED_compute_BX(DX, BX);
 		times++;
@@ -1866,8 +1866,8 @@ void NLDR::SAMMON()
         this->SAMMON_METROPOLIS();
 	else
 	{
-		cout << "error: invalid algorithm for SAMMON's STRESS(NLM);" << endl;
-		cout << "for SAMMON's STRESS, the available algorithms are MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << endl;
+        cout << "Error: Invalid algorithm for SAMMON's STRESS(NLM)!" << endl;
+        cout << "For SAMMON's STRESS, the available algorithms are MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << endl;
 		exit(0);
 	}
 };
@@ -1903,7 +1903,7 @@ void NLDR::SAMMON_MAJORIZATION()
 
 	if(! V.compute_inverse_matrix(V))
 	{
-		cout << "compute inverse fail" << endl;
+        cout << "Inverse computation failed!" << endl;
 		return;
 	}
 
@@ -1922,7 +1922,7 @@ void NLDR::SAMMON_MAJORIZATION()
 		stress2 = SAMMON_stress_function(DX);
 		cout << "stress : " << stress2 << endl;
 		err = fabs(((double) stress1 - stress2) / stress2);
-		cout << "rel_error : " << err << endl;
+        cout << "rel error : " << err << endl;
 		stress1 = stress2;
 		SAMMON_compute_BX(DX, BX);
 		times++;
@@ -2315,8 +2315,8 @@ void NLDR::CCA()
         this->CCA_METROPOLIS();
 	else
 	{
-		cout << "error: invalid algorithm for CCA's STRESS;" << endl;
-		cout << "for CCA's STRESS, the available algorithms are MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << endl;
+        cout << "Error: Invalid algorithm for CCA's STRESS!" << endl;
+        cout << "For CCA's STRESS, the available algorithms are MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << endl;
 		exit(0);
 	}
 };
@@ -2370,7 +2370,7 @@ void NLDR::CCA_MAJORIZATION()
 
 		if(!V.compute_inverse_matrix(V))
 		{
-			cout << "compute inverse fail" << endl;
+            cout << "Inverse computation failed!" << endl;
 			return;
 		}
 
@@ -2380,7 +2380,7 @@ void NLDR::CCA_MAJORIZATION()
 		stress2 = CCA_stress_function(DX, lambda.matrix[times][0]);
 		cout << "stress : " << stress2 << endl;
 		err = fabs(((double) stress1 - stress2) / stress2);
-		cout << "rel_error : " << err << endl;
+        cout << "rel error : " << err << endl;
 
 		CCA_compute_BX(DX, lambda.matrix[times][0], BX);
 
@@ -2956,7 +2956,7 @@ void NLDR::update_distance_matrix(Matrix<double> &DX, int i, int j, double xcnew
 	if(cost_function == (String) "CCA")
 		return CCA_update_distance_matrix(DX, i, j, xcnew, para);
 
-	cout << "warning: there isn't this cost function" << endl;
+    cout << "Warning: This cost function does not exist in this program!" << endl;
 };
 
 void NLDR::KRUSKAL1_update_distance_matrix(Matrix<double> &DX, int i, int j, double xcnew)
@@ -3069,7 +3069,7 @@ double NLDR::update_cost_function(const Matrix<double> &DX, double fxc, int i, i
 	if(cost_function == (String) "CCA")
 		return CCA_update_stress_function(DX, i, j, xcnew, fxc, para);
 
-	cout << "warning: there isn't this cost function" << endl;
+    cout << "Warning: This cost function does not exist in this program!" << endl;
 	return 0;
 };
 
@@ -3220,7 +3220,7 @@ double NLDR::update_Ei_cost_function(double fxc, const Matrix<double> &DX, int i
 	if(cost_function == (String) "CCA_Ei")
 		return CCA_update_Ei_cost_function(fxc, DX, ind, j, para, xcnew);
 
-	cout << "warning, no such cost function" << endl;
+    cout << "Warning: No such cost function" << endl;
 	return 0;
 }
 

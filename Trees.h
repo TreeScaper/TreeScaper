@@ -125,6 +125,8 @@ public:
 
     void load_distfile(string fname);
 
+    void load_coordinatefile(string stdfname);
+
     void load_covariancefile(string fname);
 
     void delete_matrix(String str_matrix);
@@ -169,7 +171,10 @@ public:
     int **GetdistSPR(){return dist_SPR;}
     double **GetdistGeo(){return dist_geo;}
     double **GetdistFile(){return dist_file;}
+    double **GetcoordFile(){return coord_file;}
     int Get_filedistsize(){return file_distsize;}
+    int Get_filedcoordinatesize(){return file_coordinatesize;}
+    int Get_filedcoordinatedim(){return file_coordinatedim;}
     bool Get_isrooted(){return isrooted;}
     bool Get_isweighted(){return isweighted;}
     const LabelMap *Get_labelmap(){return &leaveslabelsmaps;}
@@ -188,6 +193,8 @@ private:
     void delete_double_array(T *** arr, int n);
     template<class T>
     void print_double_array(T *** arr, int n, string outfile);
+    template<class T>
+    void print_coordinate_matrix(T *** arr, int n, int m, string outfile);
 
     Treefileformat CheckTreeFormat();
     void Sort(unsigned long long *matrix_hv,
@@ -250,6 +257,9 @@ private:
     int file_distsize;
     double **dist_file;
     double **affi_file;
+    int file_coordinatesize;
+    int file_coordinatedim;
+    double **coord_file;
     Array<int> idxlist;
 
     //--- to add storages for communities
