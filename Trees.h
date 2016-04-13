@@ -127,6 +127,8 @@ public:
 
     void load_coordinatefile(string stdfname);
 
+    void load_affinityfile(string fname);
+
     void load_covariancefile(string fname);
 
     void delete_matrix(String str_matrix);
@@ -173,6 +175,7 @@ public:
     double **GetdistFile(){return dist_file;}
     double **GetcoordFile(){return coord_file;}
     int Get_filedistsize(){return file_distsize;}
+    int Get_fileAffinitysize(){return affinityfile_size;}
     int Get_filedcoordinatesize(){return file_coordinatesize;}
     int Get_filedcoordinatedim(){return file_coordinatedim;}
     bool Get_isrooted(){return isrooted;}
@@ -253,6 +256,9 @@ private:
     double **affi_match;
     double **affi_SPR;
     double **affi_geo;
+
+    int affinityfile_size;
+    double **fileaffinity;
 
     int file_distsize;
     double **dist_file;

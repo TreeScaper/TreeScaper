@@ -61,6 +61,8 @@ Trees::Trees()
     StrToDist["Affinity-geodesic"] = (void ***) &affi_geo;
     str_matrix = (String) "Affinity-filedist";
     StrToDist["Affinity-filedist"] = (void ***) &affi_file;
+    str_matrix = (String)("File-affinity");
+    StrToDist["File-affinity"] = (void ***) &fileaffinity;
 
     isrooted = true;
     isweighted = false;
@@ -88,6 +90,9 @@ Trees::Trees()
     affi_match = NULL;
     affi_SPR = NULL;
     affi_geo = NULL;
+
+    affinityfile_size = 0;
+    fileaffinity = NULL;
 
     file_distsize = 0;
     dist_file = NULL;
@@ -132,6 +137,7 @@ void Trees::destructor()
     delete_double_array(coord_file, file_coordinatesize);
     delete_double_array(dist_file, file_distsize);
     delete_double_array(affi_file, file_distsize);
+    delete_double_array(fileaffinity, affinityfile_size);
     delete_double_array(com_info, covariance_nonfree_id_size + 4);
 
     delete sbipartmatrix;
@@ -158,6 +164,7 @@ void Trees::destructor()
     file_distsize = 0;
     file_coordinatesize = 0;
     file_coordinatedim = 0;
+    affinityfile_size = 0;
 
     delete [] covariance_freeid;
     covariance_freeid = NULL;
@@ -259,7 +266,7 @@ void Trees::delete_double_array(T *** arr, int n)
 
 void Trees::delete_matrix(String str_matrix)
 {
-    cout << "Deleting:" << str_matrix << "\n\n";
+    cout << "Deleting: " << str_matrix << "\n\n";
     if(str_matrix == (String)"Bipartition Matrix")
     {
         deleteBipartitionMatrix();
@@ -271,6 +278,8 @@ void Trees::delete_matrix(String str_matrix)
         delete_double_array((double ***) StrToDist[str_matrix], file_distsize);
     else if(str_matrix == (String)"File-coordinate")
         delete_double_array((double ***) StrToDist[str_matrix], file_coordinatesize);
+    else if(str_matrix == (String)"File-affinity")
+        delete_double_array((double ***) StrToDist[str_matrix], affinityfile_size);
     else if(str_matrix == (String)"Matching-distance" || str_matrix == (String)"SPR-distance")
         delete_double_array((int ***) StrToDist[str_matrix], n_trees);
     else
@@ -376,6 +385,8 @@ void Trees::print_matrix(String str_matrix)
         print_double_array((double ***) StrToDist[str_matrix], file_distsize, outfile);
     else if(str_matrix == (String)"File-coordinate")
         print_coordinate_matrix((double ***) StrToDist[str_matrix], file_coordinatesize, file_coordinatedim, outfile);
+    else if(str_matrix == (String)"File-affinity")
+        print_double_array((double ***) StrToDist[str_matrix], affinityfile_size, outfile);
     else
         print_double_array((double ***) StrToDist[str_matrix], n_trees, outfile);
 }
@@ -1838,6 +1849,48 @@ void Trees::load_coordinatefile(string fname)
     }
 };
 
+void Trees::load_affinityfile(string fname)
+{
+    ifstream afile(fname.c_str(), ios::binary);
+
+    if (!afile)
+    {
+        cout << "Unable to open the file!\n\n";
+        exit(0);
+    }
+
+    affinityfile_size = 0;
+    string line;
+    while (!afile.eof())
+    {
+        getline(afile, line);
+        if (!line.empty())
+        {
+            affinityfile_size++;
+        }
+    }
+    affinityfile_size--;
+
+    delete_double_array(fileaffinity, affinityfile_size);
+    fileaffinity = new double *[affinityfile_size];
+    double index;
+    afile.clear();
+    afile.seekg(0, ios::beg);
+    afile >> line;
+    for (int i = 0; i < affinityfile_size; i++)
+        afile >> index;
+    for (int i = 0; i < affinityfile_size; i++)
+    {
+        afile >> index;
+        fileaffinity[i] = new double [affinityfile_size];
+        for (int j = 0; j <= i; j++)
+        {
+            afile >> fileaffinity[i][j];
+            fileaffinity[j][i] = fileaffinity[i][j];
+        }
+    }
+};
+
 void Trees::load_covariancefile(string fname)
 {
     ifstream covfile(fname.c_str(), ios::binary);
@@ -2148,6 +2201,8 @@ string Trees::create_temp_name(String str_matrix)
         print_comm_array((double ***) StrToDist[str_matrix], filecov_size, outfile, true, highfreq, lowfreq);
      else if(str_matrix == (String)"Affinity-filedist")
         print_comm_array((double ***) StrToDist[str_matrix], file_distsize, outfile, false, highfreq, lowfreq);
+     else if(str_matrix == (String)"File-affinity")
+        print_comm_array((double ***) StrToDist[str_matrix], affinityfile_size, outfile, false, highfreq, lowfreq);
      else
         print_comm_array((double ***) StrToDist[str_matrix], n_trees, outfile, false, highfreq, lowfreq);
  }
@@ -2927,7 +2982,7 @@ bool Trees::compute_community_manually(String str_matrix, int modelType, Array<d
     string temp_file = create_temp_name(str_matrix);
     double highfrequence = atof(highfreq.c_str());
     double lowfrequence = atof(lowfreq.c_str());
-   if (str_matrix == (String)"Covariance Matrix" && (highfrequence > 1.0 || highfrequence < 0.0
+   if ((str_matrix == (String)"Covariance Matrix" || str_matrix == (String) "File-covariance") && (highfrequence > 1.0 || highfrequence < 0.0
         || lowfrequence > 1.0 || lowfrequence < 0.0 || (highfrequence - lowfrequence) <= 0.0))
     {
         cout << "Warning: The high and low frequencies must be between 0 and 1!\n\n";
