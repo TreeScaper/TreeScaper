@@ -154,6 +154,8 @@ private slots:
     void on_listDATAmem_2_itemActivated(QListWidgetItem *item);
     void on_listDATAmem_3_itemActivated(QListWidgetItem *item);
     void on_comboBoxDIMdata_currentIndexChanged(const QString &arg1);
+    void on_pushButtonAffinitybrowse_clicked();
+    void on_pushAffinityloaddist_clicked();
 };
 
 #endif // TREESCAPER_H

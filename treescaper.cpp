@@ -240,7 +240,7 @@ void TreeScaper::buttonCommunityPlotenable(int input)
 void TreeScaper::buttonvisible(int input)
 {
     ui->pushNLDRplot->setEnabled(true);
-    ui->pushNLDRplottrees->setEnabled(true);
+    ui->pushNLDRplottrees->setEnabled(false);
     ui->pushNLDRsaveindices->setEnabled(true);
 }
 
@@ -765,8 +765,12 @@ void TreeScaper::on_pushNLDRplot_clicked()
         return;
     }
 
+    ui->pushNLDRplottrees->setEnabled(true);
+    cout << "\nTo plot the trees, press SHIFT + R and circle points from the figure. Then, click the 'Plot Trees' button.\n\n";
+
     plotthd.initialization(filename, paras::imageparas, TreesData->selected_trees);
     plotthd.start();
+
 }
 
 void TreeScaper::on_pushNLDRsetting_clicked()
@@ -1930,8 +1934,6 @@ void TreeScaper::on_pushDISTaffinity_clicked()
         if (memorydata == (String)"Unweighted RF-distance")
         {
             QString qstr("Affinity-URF");
-//            if (ui->comboBoxDISTmemdata->findText("Affinity-URF") == -1)
-//                ui->comboBoxDISTmemdata->addItem(qstr);
 
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
@@ -1951,8 +1953,6 @@ void TreeScaper::on_pushDISTaffinity_clicked()
         else if (memorydata == (String)"Weighted RF-distance")
         {
             QString qstr("Affinity-RF");
-//            if (ui->comboBoxDISTmemdata->findText("Affinity-RF") == -1)
-//                ui->comboBoxDISTmemdata->addItem(qstr);
 
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
@@ -1973,8 +1973,6 @@ void TreeScaper::on_pushDISTaffinity_clicked()
         else if (memorydata == (String)"Matching-distance")
         {
             QString qstr("Affinity-match");
-//            if (ui->comboBoxDISTmemdata->findText("Affinity-match") == -1)
-//                ui->comboBoxDISTmemdata->addItem(qstr);
 
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
@@ -1995,8 +1993,6 @@ void TreeScaper::on_pushDISTaffinity_clicked()
         else if (memorydata == (String)"SPR-distance")
         {
             QString qstr("Affinity-SPR");
-//            if (ui->comboBoxDISTmemdata->findText("Affinity-SPR") == -1)
-//                ui->comboBoxDISTmemdata->addItem(qstr);
 
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
@@ -2016,8 +2012,6 @@ void TreeScaper::on_pushDISTaffinity_clicked()
         else if (memorydata == (String)"File-distance")
         {
             QString qstr("Affinity-filedist");
-//            if (ui->comboBoxDISTmemdata->findText("Affinity-filedist") == -1)
-//                ui->comboBoxDISTmemdata->addItem(qstr);
 
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
@@ -3145,8 +3139,8 @@ void TreeScaper::on_comboBoxDISTmemdata_3_currentIndexChanged(const QString &tex
 
     if ((text == (String) "Affinity-URF")
             || (text == (String) "Affinity-RF") || (text == (String) "Affinity-match")
-            || (text == (String) "Affinity-SPR")
-            || (text == (String) "Affinity-geodesic") || (text == (String) "Affinity-filedist"))
+            || (text == (String) "Affinity-SPR") || (text == (String) "Affinity-geodesic")
+            || (text == (String) "Affinity-filedist") || (text == (String) "File-affinity"))
     {
         ui->pushDISTcomm->setEnabled(true);
     }
@@ -3321,6 +3315,11 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
             QString qstr("No covariance data in memory");
             ui->comboBoxCOVAmemdata->addItem(qstr);
         }
+        if(ui->comboBoxDISTmemdata_3->count() == 0)
+        {
+            QString qstr("No affinity data in memory");
+            ui->comboBoxDISTmemdata_3->addItem(qstr);
+        }
     }
     else if(msg1 == 2) // Cancel
     {
@@ -3476,11 +3475,6 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
             QString qstr("No data in memory");
             ui->listDATAmem_3->addItem(qstr);
         }
-//        if(ui->comboBoxDISTmemdata->count() == 0)
-//        {
-//            QString qstr("No data in memory");
-//            ui->comboBoxDISTmemdata->addItem(qstr);
-//        }
         if(ui->comboBoxNLDRdata->count() == 0)
         {
             QString qstr("No distance data in memory");
@@ -3495,6 +3489,11 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
         {
             QString qstr("No covariance data in memory");
             ui->comboBoxCOVAmemdata->addItem(qstr);
+        }
+        if(ui->comboBoxDISTmemdata_3->count() == 0)
+        {
+            QString qstr("No affinity data in memory");
+            ui->comboBoxDISTmemdata_3->addItem(qstr);
         }
     }
     else if(msg1 == 2) // Cancel
@@ -3651,11 +3650,6 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
             QString qstr("No data in memory");
             ui->listDATAmem_3->addItem(qstr);
         }
-//        if(ui->comboBoxDISTmemdata->count() == 0)
-//        {
-//            QString qstr("No data in memory");
-//            ui->comboBoxDISTmemdata->addItem(qstr);
-//        }
         if(ui->comboBoxNLDRdata->count() == 0)
         {
             QString qstr("No distance data in memory");
@@ -3671,6 +3665,11 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
             QString qstr("No covariance data in memory");
             ui->comboBoxCOVAmemdata->addItem(qstr);
         }
+        if(ui->comboBoxDISTmemdata_3->count() == 0)
+        {
+            QString qstr("No affinity data in memory");
+            ui->comboBoxDISTmemdata_3->addItem(qstr);
+        }
     }
     else if(msg1 == 2) // Cancel
     {
@@ -3685,4 +3684,65 @@ void TreeScaper::on_comboBoxDIMdata_currentIndexChanged(const QString &arg1)
         QString qstr("No distance/coordinate data in memory");
         ui->comboBoxDIMdata->addItem(qstr);
     }
+}
+
+void TreeScaper::on_pushButtonAffinitybrowse_clicked()
+{
+    QFileDialog *fileDialog = new QFileDialog(this);
+    fileDialog->setWindowTitle(tr("Open File"));
+    fileDialog->setDirectory(".");
+    if(fileDialog->exec() == QDialog::Accepted)
+    {
+        QString path = fileDialog->selectedFiles()[0];
+        ui->textAfinityfile->setPlainText(path);
+    }
+}
+
+void TreeScaper::on_pushAffinityloaddist_clicked()
+{
+    QString qtfname = ui->textAfinityfile->toPlainText();
+    string stdfname = qtfname.toStdString();
+    String fname(stdfname.c_str());
+    File file(fname);
+    if(! file.is_open())
+    {
+        cout << "Error: Cannot open the affinity file!\n\n";
+        return;
+    }
+    TreesData->load_affinityfile(stdfname);
+
+    QString qstr("File-affinity");
+    if (ui->comboBoxDISTmemdata_3->findText("File-affinity") == -1)
+        ui->comboBoxDISTmemdata_3->addItem(qstr);
+
+    QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+    if(item1.empty())
+        ui->listDATAmem->addItem(qstr);
+
+    QList<QListWidgetItem *> item2 = ui->listDATAmem_2->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+    if(item2.empty())
+        ui->listDATAmem_2->addItem(qstr);
+
+    QList<QListWidgetItem *> item3 = ui->listDATAmem_3->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+    if(item3.empty())
+        ui->listDATAmem_3->addItem(qstr);
+
+    int idex = ui->comboBoxDISTmemdata_3->findText("No affinity data in memory");
+    ui->comboBoxDISTmemdata_3->removeItem(idex);
+
+    QList<QListWidgetItem *> itemTmp1 = ui->listDATAmem->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
+    for (int i = 0; i < itemTmp1.size(); i++)
+        delete ui->listDATAmem->takeItem(ui->listDATAmem->row(itemTmp1[i]));
+
+    QList<QListWidgetItem *> itemTmp2 = ui->listDATAmem_2->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
+    for (int i = 0; i < itemTmp2.size(); i++)
+        delete ui->listDATAmem_2->takeItem(ui->listDATAmem_2->row(itemTmp2[i]));
+
+    QList<QListWidgetItem *> itemTmp3 = ui->listDATAmem_3->findItems(QString("No data in memory"), Qt::MatchCaseSensitive | Qt::MatchExactly);
+    for (int i = 0; i < itemTmp3.size(); i++)
+        delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(itemTmp3[i]));
+
+    ui->pushDISTcomm->setEnabled(true);
+
+    cout << "Successfully read affinity file.\n\n";
 }

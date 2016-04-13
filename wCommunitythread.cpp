@@ -48,13 +48,24 @@ void Communitythread::initialization(Trees *TreesData, String in_str_matrix, int
 void Communitythread::run()
 {
     emit sendbuttonCommunityPlotenable(0);
+
+    string modelName;
+    if(modelType == 1)
+        modelName = "No Null Model";
+    else if(modelType == 2)
+        modelName = "Erdos-Renyi Null Model";
+    else if(modelType == 3)
+        modelName = "Configuration Null Model";
+    else if(modelType == 4)
+        modelName = "Constant Potts Model";
+
     if(isauto)
         if(lptrees->compute_community_automatically(str_matrix, modelType, highfreq, lowfreq))
-            std::cout << "Successfully detected communities of " << str_matrix << " by " << modelType << "!" << std::endl;
+            std::cout << "Successfully detected communities of " << str_matrix << " by the " << modelName << "!\n\n";
 
     if(!isauto)
         if(lptrees->compute_community_manually(str_matrix, modelType, param1, param2, highfreq, lowfreq))
-            std::cout << "Successfully detected communities of " << str_matrix << " by " << modelType << "!" << std::endl;
+            std::cout << "Successfully detected communities of " << str_matrix << " by the " << modelName << "!\n\n";
 
     emit sendbuttonCommunityPlotenable(buttonflag);
 }
