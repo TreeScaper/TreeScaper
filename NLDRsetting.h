@@ -1,4 +1,3 @@
-
 //##########################################################################
 //# This software is part of the Treescaper i
 //# -- Version 0.1
@@ -16,42 +15,41 @@
 //# http://www.gnu.org/copyleft/gpl.html
 //##########################################################################
 
-#ifndef SETTING_H
-#define SETTING_H
+#ifndef NLDRSETTING_H
+#define NLDRSETTING_H
 
 #include <QDialog>
 #include <QTableWidgetItem>
 
 namespace Ui {
-    class setting;
+class NLDRsetting;
 }
 
-class setting : public QDialog
+class NLDRsetting : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit setting(QWidget *parent = 0);
-    ~setting();
+    explicit NLDRsetting(QWidget *parent = 0);
+    ~NLDRsetting();
 
 private:
-    void loadplotparas();
+    void loadnldrparas();
 
-    Ui::setting *ui;
-    QTableWidgetItem **paravalues;
-    QTableWidgetItem **indexvalues;
-    int nparavalues;
-    int nindex;
+    Ui::NLDRsetting *ui;
+    QTableWidgetItem **nldrvalues;
+    int nnldrvalues;
 
 private slots:
-    void on_pushButton_clicked();
-    void on_pushplotcancel_clicked();
-    void on_checkBoxplotstepsize_stateChanged(int );
-    void on_textplotstepsize_textChanged();
-    void on_pushplotnum_clicked();
-    void on_textplotnumber_textChanged();
-    void on_pushplotapply_clicked();
-    void on_pushplotclose_clicked();
+    void on_pushnldrreset_clicked();
+    void on_pushnldrcancel_clicked();
+    void on_pushnldrapply_clicked();
+    void on_radionldrKruButton_clicked();
+    void on_radionldrtopButton_clicked();
+    void on_radionldrNorButton_clicked();
+    void on_radionldrNLMButton_clicked();
+    void on_radionldrCCAButton_clicked();
+    void on_pushnldrclose_clicked();
 };
 
-#endif // SETTING_H
+#endif // NLDRSETTING_H

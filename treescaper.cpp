@@ -32,6 +32,7 @@
 #include "wNLDRthread.h"
 #include "warray.cpp"
 #include "setting.h"
+#include "NLDRsetting.h"
 #include "QMessageBox"
 #include "sys/stat.h"
 #include "QFileDialog"
@@ -774,6 +775,13 @@ void TreeScaper::on_pushNLDRplot_clicked()
 }
 
 void TreeScaper::on_pushNLDRsetting_clicked()
+{
+    NLDRsetting nldrst(this);
+    nldrst.show();
+    nldrst.exec();
+}
+
+void TreeScaper::on_pushPlotsetting_clicked()
 {
     setting st(this);
     st.show();
