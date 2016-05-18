@@ -2340,7 +2340,6 @@ string Trees::create_temp_name(String str_matrix)
      map<double, Community *>::iterator it, it2;
      map<double, double> mods;
      int times = 0;
-     int numNodes = 0;
 
      while(times <= 20)
      {
@@ -2351,7 +2350,6 @@ string Trees::create_temp_name(String str_matrix)
          GreedyLouvain::detect_communities(community);
          if(community->nb_comm == 1)
          {
-             numNodes = community->g->nb_nodes;
              mods[lambda_pos_min] = community->modularity();
              LamCommunities[lambda_pos_min] = community;
              break;
@@ -2622,7 +2620,7 @@ string Trees::create_temp_name(String str_matrix)
      for(int i = 0; i < covariance_nonfree_id_size + 4; i++)
          com_info[i] = new double [com_info_col];
 
-     com_info[0][0] = numNodes;
+     com_info[0][0] = community->g->nb_nodes;
 
      com_info[1][0] = lambda_neg;
      com_info[2][0] = 0;
