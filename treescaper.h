@@ -91,6 +91,7 @@ private slots:
     void on_pushdimplot_clicked();
     void on_pushdimrun_clicked();
     void on_pushNLDRsetting_clicked();
+    void on_pushPlotsetting_clicked();
     void on_pushNLDRplot_clicked();
     void timerloadlog();
     void plottree(const NEWICKTREE *tree, char *title, bool isrooted, bool isweighted, const LabelMap *lm);
