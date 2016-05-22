@@ -410,11 +410,13 @@ void Trees::initialTrees(string fname)
         {
             for (num_line = 0; getline(treefile, line); num_line++)
             {
+                if (line.find_first_not_of("\t\n ") == string::npos) continue;
                 if (line.find("Translate", 0) != string::npos || line.find("TRANSLATE", 0) != string::npos || line.find("translate", 0) != string::npos)
                 {
                     Line_taxa_begin = num_line;
                     for (count = Line_taxa_begin + 1; getline(treefile, line); count++)
                     {
+                        if (line.find_first_not_of("\t\n ") == string::npos) continue;
                         if ((line.find(";", 0) == string::npos) || (line.find("(") == string::npos
                                                                     && find_if(line.begin(), line.end(), (int(*)(int))std::isdigit) != line.end()))
                         {
@@ -453,8 +455,10 @@ void Trees::initialTrees(string fname)
         ifstream treeFile(treesfilename.c_str(), ios::out);
         if (treeFile)
         {
-            while (getline(treeFile, line, ';'))
+            while (getline(treeFile, line) && (line.find_first_not_of("\t\n ") != string::npos))
+            {
                 n_trees ++;
+            }
         }
 
         newickTree = TreeOPE::loadnewicktree2(fp, &err);
@@ -555,11 +559,13 @@ void Trees::ReadTrees() // newick nexus
         {
             for (num_line = 0; getline(treefile, line); num_line++)
             {
+                if (line.find_first_not_of("\t\n ") == string::npos) continue;
                 if (line.find("Translate", 0) != string::npos || line.find("TRANSLATE", 0) != string::npos || line.find("translate", 0) != string::npos)
                 {
                     Line_taxa_begin = num_line;
                     for (count = Line_taxa_begin + 1; getline(treefile, line); count++)
                     {
+                        if (line.find_first_not_of("\t\n ") == string::npos) continue;
                         if(line.find("(",0) != string::npos)
                         {
                             size_t tstart = line.find_first_of("(", 0);
@@ -618,7 +624,7 @@ void Trees::ReadTrees() // newick nexus
 
         treeFile.clear();
         treeFile.seekg(0);
-        while (getline(treeFile, s))
+        while (getline(treeFile, s) && (s.find_first_not_of("\t\n ") != string::npos))
         {
 //            std::cout << "count:" << count << std::endl;//-- WHtest
             gzbuff[0] = NULL;
@@ -2340,6 +2346,7 @@ string Trees::create_temp_name(String str_matrix)
      map<double, Community *>::iterator it, it2;
      map<double, double> mods;
      int times = 0;
+     int numNodes = 0;
 
      while(times <= 20)
      {
@@ -2350,6 +2357,7 @@ string Trees::create_temp_name(String str_matrix)
          GreedyLouvain::detect_communities(community);
          if(community->nb_comm == 1)
          {
+             numNodes = community->g->nb_nodes;
              mods[lambda_pos_min] = community->modularity();
              LamCommunities[lambda_pos_min] = community;
              break;
@@ -2375,6 +2383,44 @@ string Trees::create_temp_name(String str_matrix)
          int stochastic = 0;
          GreedyLouvain::iterate_randomly = stochastic;
          GreedyLouvain::detect_communities(community);
+
+         if(str_matrix == (String) "Affinity-URF" || str_matrix == (String) "Affinity-RF" || str_matrix == (String) "Affinity-match" ||
+                 str_matrix == (String) "Affinity-SPR" || str_matrix == (String) "Affinity-geodesic" || str_matrix == (String) "Affinity-filedist"
+                  || str_matrix == (String) "File-affinity")
+         {
+             bool allsametopo = true;
+             double **affimatrix = *((double ***) StrToDist[(String) "Unweighted RF-distance"]);
+             if(affimatrix != NULL)
+             {
+                 double samevalue = affimatrix[0][0];
+                 for(int i = 0; i < community->nb_comm; i++)
+                 {
+                     int repidx = -1;
+                     for(int j = 0; j < covariance_nonfree_id_size; j++)
+                     {
+                         if(community->n2c[j] == i)
+                         {
+                             if(repidx == -1)
+                             {
+                                 repidx = j;
+                             } else
+                             {
+                                 if(fabs(affimatrix[repidx][j] - samevalue) >= 1e-10)
+                                 {
+                                     allsametopo = false;
+                                 }
+                             }
+                         }
+                     }
+                 }
+                 if(allsametopo)
+                 {
+                     mods[lambda_pos_max] = community->modularity();
+                     LamCommunities[lambda_pos_max] = community;
+                     break;
+                 }
+             }
+         }
          if(community->nb_comm == covariance_nonfree_id_size)
          {
              mods[lambda_pos_max] = community->modularity();
@@ -2620,7 +2666,7 @@ string Trees::create_temp_name(String str_matrix)
      for(int i = 0; i < covariance_nonfree_id_size + 4; i++)
          com_info[i] = new double [com_info_col];
 
-     com_info[0][0] = community->g->nb_nodes;
+     com_info[0][0] = numNodes;
 
      com_info[1][0] = lambda_neg;
      com_info[2][0] = 0;
@@ -2732,6 +2778,10 @@ string Trees::create_temp_name(String str_matrix)
      for(int i = 0; i < plateausLb.size(); i++)
          filepla << plateausUb[i].second << "\t";
      filepla << "\n";
+     if (str_matrix == (String) "Covariance Matrix")
+        filepla << "Bipartition index" << "\t" << "Community Index" << "\n";
+     else
+         filepla << "Tree index" << "\t" << "Community Index" << "\n";
      for(int i = 0; i < covariance_nonfree_id_size; i++)
      {
          filepla << covariance_nonfree_id[i] << "\t";
@@ -2777,6 +2827,26 @@ string Trees::create_temp_name(String str_matrix)
 
      for(int i = 0; i < covariance_nonfree_id_size + 4; i++)
      {
+         if (i == 0)
+         {
+             if (str_matrix == (String) "Covariance Matrix")
+                file << "Same community as previous or not (first number is number of bipartitions)" << "\n";
+             else
+                file << "Same community as previous or not (first number is number of trees)" << "\n";
+         }
+         else if (i == 1)
+             file << "Value of lambda: "<< "\n";
+         else if (i == 2)
+             file << "Number of communities: " << "\n";
+         else if (i == 3)
+             file << "Value of modularity: " << "\n";
+         else if (i == 4)
+         {
+             if (str_matrix == (String) "Covariance Matrix")
+                file << "Community index (first column is bipartition index): " << "\n";
+             else
+                 file << "Community index (first column is tree index): " << "\n";
+         }
          for(int j = 0; j < com_info_col; j++)
              file << com_info[i][j] << "\t";
          file << "\n";
@@ -3166,6 +3236,26 @@ bool Trees::compute_community_manually(String str_matrix, int modelType, Array<d
 
     for(int i = 0; i < covariance_nonfree_id_size + 4; i++)
     {
+        if (i == 0)
+        {
+            if (str_matrix == (String) "Covariance Matrix")
+               file << "Same community as previous or not (first number is number of bipartitions)" << "\n";
+            else
+               file << "Same community as previous or not (first number is number of trees)" << "\n";
+        }
+        else if (i == 1)
+            file << "Value of lambda: "<< "\n";
+        else if (i == 2)
+            file << "Number of communities: " << "\n";
+        else if (i == 3)
+            file << "Value of modularity: " << "\n";
+        else if (i == 4)
+        {
+            if (str_matrix == (String) "Covariance Matrix")
+               file << "Community index (first column is bipartition index): " << "\n";
+            else
+                file << "Community index (first column is tree index): " << "\n";
+        }
         for(int j = 0; j < lambdasize + 1; j++)
             file << com_info[i][j] << "\t";
         file << "\n";
@@ -3562,6 +3652,10 @@ bool Trees::Compute_SPR_dist()
                 name = s.substr(0, loc);
                 s.erase(0, loc);
             }
+
+            if (!isrooted)
+                s = SPR_root(s);
+
             SPRNode *T2 = spr_building_tree(s);
             T2->labels_to_numbers(&label_map, &reverse_label_map);
             names.push_back(name);

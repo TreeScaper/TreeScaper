@@ -16,12 +16,18 @@
 //# http://www.gnu.org/copyleft/gpl.html
 //##########################################################################
 
+
+#if VTK_MAJOR_VERSION <= 6 && VTK_MINOR_VERSION >= 3
+// for 6.0.0 VTK
 #define vtkRenderingCore_AUTOINIT 4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)
 #define vtkRenderingVolume_AUTOINIT 1(vtkRenderingVolumeOpenGL)
-//#include <vtkAutoInit.h>
-//VTK_MODULE_INIT(vtkRenderingOpenGL);
-//VTK_MODULE_INIT(vtkInteractionStyle);
-//VTK_MODULE_INIT(vtkRenderingFreeType);
+// for 6.3.0 VTK
+#else
+#include <vtkAutoInit.h>
+VTK_MODULE_INIT(vtkRenderingOpenGL);
+VTK_MODULE_INIT(vtkInteractionStyle);
+VTK_MODULE_INIT(vtkRenderingFreeType);
+#endif
 
 #ifdef _WIN32
 //#include <windef.h>

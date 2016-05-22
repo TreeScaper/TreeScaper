@@ -41,7 +41,7 @@ void PlotTreethread::initialization(image_parameters plotparas, const NEWICKTREE
     isrooted = inisrooted;
     isweighted = inisweighted;
     leaveslm = inleaveslm;
-#ifdef _MAC
+#if defined(_MAC) || defined(_LINUX)
     lpplottree->Initialize_PlotTree(tree, isrooted, isweighted, leaveslm, title);
     this->exec();
     delete lpplottree;
