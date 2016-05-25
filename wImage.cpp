@@ -394,40 +394,41 @@ void Image::Initialize_Image(String filename)
 {
 //---    testfunction();
     fname = filename;
-	File fcor(filename);
+    File fcor(filename);
     if(!fcor.is_open())
     {
         cout << "error: file \"" << filename << "\" can not be open." << endl;
         exit(0);
     }
-	fcor.seek(0);
+    fcor.seek(0);
     size = fcor.lines();
-	fcor.seek(0);
+    fcor.seek(0);
     dim = fcor.cols();
-	fcor.seek(0);
+    fcor.seek(0);
 
     centers = new double[parameters.cluster_num * dim];
-	COR = new double [size * dim];
-	selectpts = new bool[size];
-	for(int i = 0; i < size; i++)
-		selectpts[i] = true;
+    COR = new double [size * dim];
+    selectpts = new bool[size];
+    for(int i = 0; i < size; i++)
+        selectpts[i] = true;
 
     points = new vtkSmartPointer<vtkPoints> [parameters.cluster_num];
     Hull_points = new vtkSmartPointer<vtkPoints> [parameters.cluster_num];
     for(int i = 0; i < parameters.cluster_num; i++)
-	{
-		points[i] = vtkSmartPointer<vtkPoints>::New();
-		Hull_points[i] = vtkSmartPointer<vtkPoints>::New();
-	}
+    {
+        points[i] = vtkSmartPointer<vtkPoints>::New();
+        Hull_points[i] = vtkSmartPointer<vtkPoints>::New();
+    }
 
     ranks = new int [parameters.cluster_num];
     volumes = new double [parameters.cluster_num];
     for(int i = 0; i < parameters.cluster_num; i++)
-	{
-		ranks[i] = i;
-		volumes[i] = i;
-	}
+    {
+        ranks[i] = i;
+        volumes[i] = i;
+    }
 
+//    PointsActors = new vtkSmartPointer<vtkActor> [parameters.cluster_num];
     PointsActors = new vtkSmartPointer<vtkActor> [parameters.cluster_num];
     sphere = new vtkSphereSource *[parameters.cluster_num];
     model = new vtkPolyData *[parameters.cluster_num];
@@ -442,26 +443,26 @@ void Image::Initialize_Image(String filename)
     surfaceFilter = new vtkSmartPointer<vtkDataSetSurfaceFilter> [parameters.cluster_num];
 
     for(int i = 0; i < parameters.cluster_num; i++)
-	{
-		sphere[i] = vtkSphereSource::New();
-		sphere[i]->SetThetaResolution(7); 
-		sphere[i]->SetPhiResolution(7);
+    {
+        sphere[i] = vtkSphereSource::New();
+        sphere[i]->SetThetaResolution(7);
+        sphere[i]->SetPhiResolution(7);
         sphere[i]->Update();
-		model[i] = vtkPolyData::New();
+        model[i] = vtkPolyData::New();
 //		glyph[i] = vtkGlyph3D::New();
-		pointMapper[i] = vtkPolyDataMapper::New();
-		VP[i] = vtkProperty::New();
+        pointMapper[i] = vtkPolyDataMapper::New();
+        VP[i] = vtkProperty::New();
 
-		HullMapper[i] = vtkPolyDataMapper::New();
-		polydata[i] = vtkSmartPointer<vtkPolyData>::New();
-		delaunay[i] = vtkSmartPointer<vtkDelaunay3D>::New();
-		surfaceFilter[i] = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
-	}
+        HullMapper[i] = vtkPolyDataMapper::New();
+        polydata[i] = vtkSmartPointer<vtkPolyData>::New();
+        delaunay[i] = vtkSmartPointer<vtkDelaunay3D>::New();
+        surfaceFilter[i] = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+    }
 
     legend = vtkSmartPointer<vtkLegendBoxActor>::New();
-	renderer = vtkSmartPointer<vtkRenderer>::New();
-	renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-	renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    renderer = vtkSmartPointer<vtkRenderer>::New();
+    renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+    renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
 
     triangleFilter = new vtkTriangleFilter *[parameters.cluster_num];
     massproperties = new vtkMassProperties *[parameters.cluster_num];
@@ -589,97 +590,97 @@ void Image::Generate_Colors(int num, double **Colors)
         }
     }
 /*
-	Colors[0][0] = 0.5;
-	Colors[0][1] = 0;
-	Colors[0][2] = 0.5;
+    Colors[0][0] = 0.5;
+    Colors[0][1] = 0;
+    Colors[0][2] = 0.5;
 
-	Colors[1][0] = 0;
-	Colors[1][1] = 1;
-	Colors[1][2] = 0;
+    Colors[1][0] = 0;
+    Colors[1][1] = 1;
+    Colors[1][2] = 0;
 
-	Colors[2][0] = 0;
-	Colors[2][1] = 0;
-	Colors[2][2] = 0;
+    Colors[2][0] = 0;
+    Colors[2][1] = 0;
+    Colors[2][2] = 0;
 
-	Colors[3][0] = 0.5;
-	Colors[3][1] = 0.5;
-	Colors[3][2] = 0;
+    Colors[3][0] = 0.5;
+    Colors[3][1] = 0.5;
+    Colors[3][2] = 0;
 
-	Colors[4][0] = 1;
-	Colors[4][1] = 0;
-	Colors[4][2] = 0;
+    Colors[4][0] = 1;
+    Colors[4][1] = 0;
+    Colors[4][2] = 0;
 
-	Colors[5][0] = 0;
-	Colors[5][1] = 0.5;
-	Colors[5][2] = 0.5;
+    Colors[5][0] = 0;
+    Colors[5][1] = 0.5;
+    Colors[5][2] = 0.5;
 
-	Colors[6][0] = 1;
-	Colors[6][1] = 0;
-	Colors[6][2] = 1;
+    Colors[6][0] = 1;
+    Colors[6][1] = 0;
+    Colors[6][2] = 1;
 
-	Colors[7][0] = 0.5;
-	Colors[7][1] = 0;
-	Colors[7][2] = 0;
+    Colors[7][0] = 0.5;
+    Colors[7][1] = 0;
+    Colors[7][2] = 0;
 
-	Colors[8][0] = 0;
-	Colors[8][1] = 0;
-	Colors[8][2] = 1;
+    Colors[8][0] = 0;
+    Colors[8][1] = 0;
+    Colors[8][2] = 1;
 
-	Colors[9][0] = 0;
-	Colors[9][1] = 1;
-	Colors[9][2] = 1;
+    Colors[9][0] = 0;
+    Colors[9][1] = 1;
+    Colors[9][2] = 1;
 
-	Colors[10][0] = 0;
-	Colors[10][1] = 0;
-	Colors[10][2] = 0.5;
+    Colors[10][0] = 0;
+    Colors[10][1] = 0;
+    Colors[10][2] = 0.5;
 
-	Colors[11][0] = 0;
-	Colors[11][1] = 0.5;
-	Colors[11][2] = 0;
+    Colors[11][0] = 0;
+    Colors[11][1] = 0.5;
+    Colors[11][2] = 0;
 
-	Colors[12][0] = 1;
-	Colors[12][1] = 0.55;
-	Colors[12][2] = 0;
+    Colors[12][0] = 1;
+    Colors[12][1] = 0.55;
+    Colors[12][2] = 0;
 
-	Colors[13][0] = 1;
-	Colors[13][1] = 0.85;
-	Colors[13][2] = 0;
+    Colors[13][0] = 1;
+    Colors[13][1] = 0.85;
+    Colors[13][2] = 0;
 
-	Colors[14][0] = 0.5;
-	Colors[14][1] = 0.5;
+    Colors[14][0] = 0.5;
+    Colors[14][1] = 0.5;
     Colors[14][2] = 0.5;*/
 
 };
 
 bool Image::Load_COR(String filename)
 {
-	File fcor(filename);
-	fcor.seek(0);
-	size = fcor.lines();
-	fcor.seek(0);
-	dim = fcor.cols();
-	fcor.seek(0);
-	for(int i = 0; i < size; i++)
-	{
-		for(int j = 0; j < dim; j++)
+    File fcor(filename);
+    fcor.seek(0);
+    size = fcor.lines();
+    fcor.seek(0);
+    dim = fcor.cols();
+    fcor.seek(0);
+    for(int i = 0; i < size; i++)
+    {
+        for(int j = 0; j < dim; j++)
         {
 //            COR[dim * i + j] = (double) i;//-------
             fcor >> COR[dim * i + j];
         }
-	}
+    }
 
-	return true;
+    return true;
 };
 
 bool Image::select_Points(String filename)
 {
-	double *mean = new double [dim];
-	double var1 = 0;
+    double *mean = new double [dim];
+    double var1 = 0;
     double var2 = 0;
-	int max_n1 = 0;
-	int max_n2 = 0;
+    int max_n1 = 0;
+    int max_n2 = 0;
     int exclude_num = 0;
-	int *index = NULL;
+    int *index = NULL;
 
     index = parameters.cluster_index;
 
@@ -688,44 +689,44 @@ bool Image::select_Points(String filename)
     for(int i = 0; i < parameters.cluster_num; i++)
         numbers_in_cluster[i] = 0;
     for(int i = 0; i < parameters.index_size; i++)
-	{
-		if((int) index[i] < parameters.cluster_num && (int) index[i] >= 0)
-			numbers_in_cluster[index[i]]++;
-	}
+    {
+        if((int) index[i] < parameters.cluster_num && (int) index[i] >= 0)
+            numbers_in_cluster[index[i]]++;
+    }
 
     for(int i = 0; i < parameters.cluster_num; i++)
     {
         compute_mean(mean, index, i);
-		for(int j = 0; j < dim; j++)
-			centers[i * dim + j] = mean[j];
+        for(int j = 0; j < dim; j++)
+            centers[i * dim + j] = mean[j];
         compute_var(mean, index, i, var1, max_n1);
         selectpts[max_n1] = false;
         compute_var(mean, index, i, var2, max_n2);
-		selectpts[max_n1] = true;
-		exclude_num = 0;
+        selectpts[max_n1] = true;
+        exclude_num = 0;
         while(fabs((var2 - var1) / var1) > parameters.outlier_e && ((double) exclude_num / numbers_in_cluster[i]) < parameters.outlierpercent)
-		{
-			selectpts[max_n1] = false;
-			var1 = var2;
-			max_n1 = max_n2;
-			selectpts[max_n1] = false;
+        {
+            selectpts[max_n1] = false;
+            var1 = var2;
+            max_n1 = max_n2;
+            selectpts[max_n1] = false;
             compute_var(mean, index, i, var2, max_n2);
-			selectpts[max_n1] = true;
-			exclude_num++;
+            selectpts[max_n1] = true;
+            exclude_num++;
         }
-	}
-	delete [] mean;
-	return true;
+    }
+    delete [] mean;
+    return true;
 };
 
 void Image::compute_mean(double *mean, int *index, int i)
 {
-	int select_n = 0;
+    int select_n = 0;
 
-	for(int j = 0; j < dim; j++)
-		mean[j] = 0;
+    for(int j = 0; j < dim; j++)
+        mean[j] = 0;
 
-	select_n = 0;
+    select_n = 0;
     for(int j = 0; j < mymin(parameters.index_size, size); j++)
         if(selectpts[j] && (int) index[j] == i)
         {
@@ -734,15 +735,15 @@ void Image::compute_mean(double *mean, int *index, int i)
             select_n++;
         }
 
-	for(int j = 0; j < dim; j++)
-		mean[j] /= select_n;
+    for(int j = 0; j < dim; j++)
+        mean[j] /= select_n;
 };
 
 void Image::compute_var(double *mean, int *index, int i, double &var, int &max_n)
 {
-	double dis = 0;
-	double max = 0;
-	int select_n = 0;
+    double dis = 0;
+    double max = 0;
+    int select_n = 0;
     var = 0;
     for(int j = 0; j < mymin(parameters.index_size, size); j++)
     {
@@ -760,53 +761,53 @@ void Image::compute_var(double *mean, int *index, int i, double &var, int &max_n
             select_n++;
         }
     }
-	var /= select_n;
+    var /= select_n;
 };
 
 bool Image::Load_Points()
 {
     String filename = fname;
     File fcor(filename);
-	fcor.seek(0);
-	size = fcor.lines();
-	fcor.seek(0);
-	dim = fcor.cols();
-	fcor.seek(0);
+    fcor.seek(0);
+    size = fcor.lines();
+    fcor.seek(0);
+    dim = fcor.cols();
+    fcor.seek(0);
 
-	int *index = NULL;
+    int *index = NULL;
 
     index = parameters.cluster_index;
 
     for(int i = 0; i < parameters.cluster_num; i++)
-	{
-		points[i] = vtkSmartPointer<vtkPoints>::New();
-		Hull_points[i] = vtkSmartPointer<vtkPoints>::New();
-	}
+    {
+        points[i] = vtkSmartPointer<vtkPoints>::New();
+        Hull_points[i] = vtkSmartPointer<vtkPoints>::New();
+    }
 
-	double cor[3] = {0};
+    double cor[3] = {0};
     double away = parameters.sep_factor;
     int idx = 0;
     for(int i = 0; i < mymin(size, parameters.index_size); i++)
     {
-		if(index[i] >= 0 && selectpts[i])
+        if(index[i] >= 0 && selectpts[i])
         {
             IDMaps[idx] = i;
             idx++;
-			for(int j = 0; j < dim; j++)
-				cor[j] = COR[i * dim + j];
-			if(dim == 2)
+            for(int j = 0; j < dim; j++)
+                cor[j] = COR[i * dim + j];
+            if(dim == 2)
             {
                 points[index[i]]->InsertNextPoint(cor[0] + centers[index[i] * dim + 0] * away, cor[1] + centers[index[i] * dim + 0] * away, cor[2] + ranks[index[i]] / parameters.cluster_num);
                 Hull_points[index[i]]->InsertNextPoint(cor[0] + centers[index[i] * dim + 0] * away, cor[1] + centers[index[i] * dim + 0] * away, cor[2] + ranks[index[i]] / parameters.cluster_num);
                 Hull_points[index[i]]->InsertNextPoint(cor[0] + centers[index[i] * dim + 0] * away, cor[1] + centers[index[i] * dim + 0] * away, cor[2] + ranks[index[i]] / parameters.cluster_num + 1.0 / parameters.cluster_num);
-			} else
-			{
+            } else
+            {
                 points[index[i]]->InsertNextPoint(cor[0] + centers[index[i] * dim + 0] * away, cor[1] + centers[index[i] * dim + 1] * away, cor[2] + centers[index[i] * dim + 2] * away);
                 Hull_points[index[i]]->InsertNextPoint(cor[0] + centers[index[i] * dim + 0] * away, cor[1] + centers[index[i] * dim + 1] * away, cor[2] + centers[index[i] * dim + 2] * away);
-			}
-		}
-	}
-	return true;
+            }
+        }
+    }
+    return true;
 };
 
 void Image::Create_PointsActors()
@@ -816,7 +817,7 @@ void Image::Create_PointsActors()
     vtkSmartPointer<vtkDataSetSurfaceFilter> *SFs = new vtkSmartPointer<vtkDataSetSurfaceFilter> [parameters.cluster_num];
 
     for(int i = 0; i < parameters.cluster_num; i++)
-	{
+    {
         PSs[i] = vtkSmartPointer<PointSource>::New();
         PSs[i]->SetPoints(points + i, 1);
         PSs[i]->Update();
@@ -830,31 +831,34 @@ void Image::Create_PointsActors()
         SFs[i]->SetInputConnection(IDFs[i]->GetOutputPort());
         SFs[i]->Update();
 
-        model[i] = SFs[i]->GetOutput();
+        //model[i] = SFs[i]->GetOutput();
 
       #if VTK_MAJOR_VERSION <= 5
         pointMapper[i]->SetInputConnection(model[i]->GetProducerPort());
       #else
-        pointMapper[i]->SetInputData(model[i]);
+        //pointMapper[i]->SetInputData(model[i]);
+        pointMapper[i]->SetInputData(SFs[i]->GetOutput());
       #endif
         pointMapper[i]->ScalarVisibilityOff();
+        pointMapper[i]->Update();
+
         PointsActors[i] = vtkSmartPointer<vtkActor>::New();
         PointsActors[i]->SetMapper(pointMapper[i]);
         VP[i]->SetColor(Colors[i]);
         VP[i]->SetPointSize(parameters.point_size);
         PointsActors[i]->SetProperty(VP[i]);
 /*
-		PointsActors[i] = vtkSmartPointer<vtkActor>::New();
-		model[i]->SetPoints(points[i]);
+        PointsActors[i] = vtkSmartPointer<vtkActor>::New();
+        model[i]->SetPoints(points[i]);
         glyph[i]->SetInputData(model[i]);
         glyph[i]->SetSourceData(sphere[i]->GetOutput());
-		glyph[i]->SetVectorModeToUseNormal();
-		glyph[i]->SetScaleModeToScaleByVector();
+        glyph[i]->SetVectorModeToUseNormal();
+        glyph[i]->SetScaleModeToScaleByVector();
         glyph[i]->SetScaleFactor(parameters.point_size);
         glyph[i]->Update();
         pointMapper[i]->SetInputData(glyph[i]->GetOutput());
         pointMapper[i]->Update();
-		PointsActors[i]->SetMapper(pointMapper[i]);
+        PointsActors[i]->SetMapper(pointMapper[i]);
         VP[i]->SetColor(Colors[i]);
         PointsActors[i]->SetProperty(VP[i]);
         */
@@ -874,15 +878,15 @@ void Image::Create_HullsActors()
         delaunay[i]->SetInputData(polydata[i]);
         delaunay[i]->Update();
 
-		surfaceFilter[i]->SetInputConnection(delaunay[i]->GetOutputPort());
-		surfaceFilter[i]->Update();
+        surfaceFilter[i]->SetInputConnection(delaunay[i]->GetOutputPort());
+        surfaceFilter[i]->Update();
         HullMapper[i]->SetInputData(surfaceFilter[i]->GetOutput());
-		HullsActors[i]->SetMapper(HullMapper[i]);
-		VP[i]->SetColor(Colors[i]);
+        HullsActors[i]->SetMapper(HullMapper[i]);
+        VP[i]->SetColor(Colors[i]);
         HullsActors[i]->SetProperty(VP[i]);
 
-		triangleFilter[i]->SetInputConnection(surfaceFilter[i]->GetOutputPort());
-		massproperties[i]->SetInputConnection(triangleFilter[i]->GetOutputPort());
+        triangleFilter[i]->SetInputConnection(surfaceFilter[i]->GetOutputPort());
+        massproperties[i]->SetInputConnection(triangleFilter[i]->GetOutputPort());
         volumes[i] = massproperties[i]->GetVolume();
     }
 };
@@ -904,30 +908,30 @@ void Image::Create_LinesActors()
 
 void Image::sort_HullsActors()
 {
-	double c = 0;
+    double c = 0;
     int *order = new int[parameters.cluster_num];
 
     for(int i = 0; i < parameters.cluster_num; i++)
-		order[i] = i;
+        order[i] = i;
 
     for(int i = 0; i < parameters.cluster_num; i++)
-	{
+    {
         for(int j = i; j < parameters.cluster_num; j++)
-		{
-			if(volumes[i] < volumes[j])
-			{
-				c = volumes[i];
-				volumes[i] = volumes[j];
-				volumes[j] = c;
-				c = order[i];
-				order[i] = order[j];
-				order[j] = c;
-			}
-		}
-	}
+        {
+            if(volumes[i] < volumes[j])
+            {
+                c = volumes[i];
+                volumes[i] = volumes[j];
+                volumes[j] = c;
+                c = order[i];
+                order[i] = order[j];
+                order[j] = c;
+            }
+        }
+    }
 
     for(int i = 0; i < parameters.cluster_num; i++)
-		ranks[order[i]] = i;
+        ranks[order[i]] = i;
     delete [] order;
 };
 
@@ -982,8 +986,7 @@ void Image::Plot_Points()
 
     vtkSmartPointer<vtkAreaPicker> areaPicker =
       vtkSmartPointer<vtkAreaPicker>::New();
-    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-      vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     renderWindowInteractor->SetPicker(areaPicker);
 
     renderWindowInteractor->SetRenderWindow(renderWindow);
@@ -1018,27 +1021,27 @@ void Image::Plot_Points()
 
 void Image::Plot_Hulls()
 {
-	renderWindow->AddRenderer(renderer);
+    renderWindow->AddRenderer(renderer);
 
     renderWindow->SetSize(500, 500);
 
     renderWindow->SetPosition(100, 100);
 
-	renderWindowInteractor->SetRenderWindow(renderWindow);
+    renderWindowInteractor->SetRenderWindow(renderWindow);
 
     Create_Legend();
     renderer->AddActor(legend);
     for(int i = 0; i < parameters.cluster_num; i++)
-		renderer->AddActor(HullsActors[i]);
+        renderer->AddActor(HullsActors[i]);
 
-	renderer->SetBackground(1,1,1);
+    renderer->SetBackground(1,1,1);
 
-	renderWindow->Render();
+    renderWindow->Render();
 
     renderer->GetActiveCamera()->Zoom(parameters.zoom);
 
     if(! paras::plot_makemovie)
-	renderWindowInteractor->Start();
+    renderWindowInteractor->Start();
 };
 
 void Image::Plot_Lines()
@@ -1094,90 +1097,108 @@ void Image::Plot_Lines()
 
 void Image::make_movie()
 {
-	double el = 0;
-	double sign = 1;
-	double ratio = 0.5;
-	renderer->ResetCamera();
+    double el = 0;
+    double sign = 1;
+    double ratio = 0.5;
+    renderer->ResetCamera();
     renderWindow->SetSize(parameters.moviesizex, parameters.moviesizey);
     renderer->GetActiveCamera()->Zoom(parameters.zoom);
 
-	vtkWindowToImageFilter *filter = vtkWindowToImageFilter::New();
-	
-	filter->SetInput(renderer->GetVTKWindow());
+    vtkWindowToImageFilter *filter = vtkWindowToImageFilter::New();
+
+    filter->SetInput(renderer->GetVTKWindow());
 /*
     vtkSmartPointer<vtkMPEG2Writer> writer = vtkSmartPointer<vtkMPEG2Writer>::New();
 //    vtkSmartPointer<vtkFFMPEGWriter> writer = vtkSmartPointer<vtkFFMPEGWriter>::New();
-	writer->SetInputConnection(filter->GetOutputPort());
-	writer->SetFileName("test.avi");
+    writer->SetInputConnection(filter->GetOutputPort());
+    writer->SetFileName("test.avi");
 
-	writer->Start();
+    writer->Start();
     for(int i = 0; i < parameters.frame_num; i++)
-	{
-		renderWindow->Render();
-		renderer->GetActiveCamera()->Azimuth(3 * ratio);
-		renderer->GetActiveCamera()->Roll(ratio);
-		el = el + sign;
-		if(el > 89.5 || el < -89.5)
-		{
-			el = el - 2 * sign * ratio;
-			sign = -sign;
-		}
-		renderer->GetActiveCamera()->Elevation(sign * ratio);
+    {
+        renderWindow->Render();
+        renderer->GetActiveCamera()->Azimuth(3 * ratio);
+        renderer->GetActiveCamera()->Roll(ratio);
+        el = el + sign;
+        if(el > 89.5 || el < -89.5)
+        {
+            el = el - 2 * sign * ratio;
+            sign = -sign;
+        }
+        renderer->GetActiveCamera()->Elevation(sign * ratio);
 
-		filter->Modified();
-		writer->Write();
-	}
+        filter->Modified();
+        writer->Write();
+    }
     writer->End();
     */
 };
 
 void Image::destructor()
 {
+//    std::cout << "h1" << std::endl;//---
+    //delete [] PointsActors;
+//    std::cout << "h2" << std::endl;//---
     for(int i = 0; i < parameters.cluster_num; i++)
     {
         sphere[i]->Delete();
         model[i]->Delete();
+
 //        glyph[i]->Delete();
         pointMapper[i]->Delete();
-		VP[i]->Delete();
+        VP[i]->Delete();
 
         HullMapper[i]->Delete();
         delete [] Colors[i];
         triangleFilter[i]->Delete();
-		massproperties[i]->Delete();
+        massproperties[i]->Delete();
     }
-	for(int i = 0; i < size - 1; i++)
+//    std::cout << "h3" << std::endl;//---
+    for(int i = 0; i < size - 1; i++)
     {
         lines[i]->Delete();
         linemappers[i]->Delete();
         lineActors[i]->Delete();
-        }
-
+    }
+//    std::cout << "h4" << std::endl;//---
     delete [] lines;
     delete [] linemappers;
     delete [] lineActors;
-	delete [] points;
-	delete [] Hull_points;
-	delete [] PointsActors;
-	delete [] sphere;
+
+//    std::cout << "h5" << std::endl;//---
+    delete [] PointsActors; // in VTK 6.3.0 version, deleting this and model[i] together first causes garbage collector errors.
+    delete [] points;
+    delete [] Hull_points;
+
+//    std::cout << "h6" << std::endl;//---
+    delete [] sphere;
     delete [] model;
 //	delete [] glyph;
-	delete [] pointMapper;
-	delete [] VP;
-	delete [] HullsActors;
-	delete [] HullMapper;
+    delete [] pointMapper;
+    delete [] VP;
+    delete [] HullsActors;
+    delete [] HullMapper;
     delete [] polydata;
-	delete [] delaunay;
-	delete [] surfaceFilter;
-	delete [] Colors;
-	delete [] volumes;
+    delete [] delaunay;
+    delete [] surfaceFilter;
+//    std::cout << "h7" << std::endl;//---
+    delete [] Colors;
+    delete [] volumes;
     delete [] ranks;
-	delete [] triangleFilter;
-	delete [] massproperties;
-	delete [] COR;
-	delete [] selectpts;
+    delete [] triangleFilter;
+    delete [] massproperties;
+    delete [] COR;
+    delete [] selectpts;
     delete [] centers;
     delete [] IDMaps;
+
+
+
+//    renderer->Delete();//---
+//    renderWindow->Delete();
+//    renderWindowInteractor->Delete();//---
+//    renderWindowInteractor->UnRegister(0);//----
+//    std::cout << "h8" << std::endl;//---
 };
 
 void Image::int_to_string(int n, char *str, int length)
