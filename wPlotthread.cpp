@@ -41,7 +41,7 @@ void Plotthread::initialization(String fname, image_parameters imageparas, Array
     lpimage->Initialize_Image(filename);
 
     lpimage->Set_SelectedIDs(selected_ids);
-#if defined(_MAC) // || defined(_LINUX)
+#ifdef _MAC
     if(paras::plot_type == (String) "Points")
     {
         lpimage->Load_points_with_selection();
@@ -60,9 +60,7 @@ void Plotthread::initialization(String fname, image_parameters imageparas, Array
 
     if(paras::plot_makemovie)
         lpimage->make_movie();
-
     this->exec();
-
 //    delete lpimage;
 #endif
 };

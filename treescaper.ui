@@ -49,7 +49,7 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>350</width>
+        <width>0</width>
         <height>0</height>
        </size>
       </property>
@@ -204,7 +204,6 @@ p, li { white-space: pre-wrap; }
 &lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
 &lt;tr&gt;
 &lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -711,6 +710,12 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item>
                      <widget class="QPlainTextEdit" name="textDATAfile">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -1088,6 +1093,12 @@ p, li { white-space: pre-wrap; }
                       <property name="enabled">
                        <bool>false</bool>
                       </property>
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -1208,6 +1219,12 @@ p, li { white-space: pre-wrap; }
                      <widget class="QPlainTextEdit" name="textCOVAfile">
                       <property name="enabled">
                        <bool>true</bool>
+                      </property>
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
                       </property>
                       <property name="minimumSize">
                        <size>
@@ -1605,6 +1622,12 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item>
                      <widget class="QPlainTextEdit" name="textDATAidx1">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -1661,6 +1684,12 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item>
                      <widget class="QPlainTextEdit" name="textDATAidx2">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -1753,6 +1782,12 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item>
                      <widget class="QPlainTextEdit" name="textDATAlistfile">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -2085,6 +2120,12 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item row="0" column="1">
                      <widget class="QPlainTextEdit" name="textDISTfile_2">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -2438,6 +2479,12 @@ p, li { white-space: pre-wrap; }
                      <widget class="QPlainTextEdit" name="textAfinityfile">
                       <property name="enabled">
                        <bool>true</bool>
+                      </property>
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
                       </property>
                       <property name="minimumSize">
                        <size>
@@ -2881,7 +2928,6 @@ p, li { white-space: pre-wrap; }
 &lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
 &lt;tr&gt;
 &lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -3535,6 +3581,12 @@ p, li { white-space: pre-wrap; }
                  </item>
                  <item row="3" column="1">
                   <widget class="QPlainTextEdit" name="textNLDRdim">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -3585,6 +3637,12 @@ p, li { white-space: pre-wrap; }
                  </item>
                  <item row="4" column="1">
                   <widget class="QPlainTextEdit" name="textNLDRflag">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -3710,7 +3768,7 @@ p, li { white-space: pre-wrap; }
                        </font>
                       </property>
                       <property name="text">
-                       <string>Other Parameters</string>
+                       <string>NLDR Parameters</string>
                       </property>
                      </widget>
                     </item>
@@ -3742,6 +3800,37 @@ p, li { white-space: pre-wrap; }
                       </property>
                       <property name="text">
                        <string>Run NLDR</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="pushPlotsetting">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>25</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>35</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Arial</family>
+                        <pointsize>14</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Plot Parameters</string>
                       </property>
                      </widget>
                     </item>
@@ -4001,7 +4090,7 @@ p, li { white-space: pre-wrap; }
                  <item row="2" column="1">
                   <widget class="QPlainTextEdit" name="textdimnumber">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -4257,7 +4346,7 @@ p, li { white-space: pre-wrap; }
                  <item row="0" column="1">
                   <widget class="QTextEdit" name="textdimstart">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -4323,7 +4412,7 @@ p, li { white-space: pre-wrap; }
                  <item row="0" column="3">
                   <widget class="QTextEdit" name="textdimend">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -4392,7 +4481,7 @@ p, li { white-space: pre-wrap; }
                     <bool>true</bool>
                    </property>
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -4855,6 +4944,12 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item>
                      <widget class="QPlainTextEdit" name="textCOVAhighfreq">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -4905,6 +5000,12 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item>
                      <widget class="QPlainTextEdit" name="textCOVAlowfreq">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -5198,6 +5299,12 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item>
                      <widget class="QPlainTextEdit" name="textCOVALfixed">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -5303,6 +5410,12 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item>
                      <widget class="QPlainTextEdit" name="textCOVALstart">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -5353,6 +5466,12 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item>
                      <widget class="QPlainTextEdit" name="textCOVALend">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -5403,6 +5522,12 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item>
                      <widget class="QPlainTextEdit" name="textCOVALinterval">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -5661,7 +5786,7 @@ p, li { white-space: pre-wrap; }
                     <item row="1" column="3">
                      <widget class="QPlainTextEdit" name="textDISTlowfreq">
                       <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
@@ -5835,6 +5960,12 @@ p, li { white-space: pre-wrap; }
                        </item>
                        <item>
                         <widget class="QPlainTextEdit" name="textDISTLstart">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
                          <property name="minimumSize">
                           <size>
                            <width>0</width>
@@ -5879,6 +6010,12 @@ p, li { white-space: pre-wrap; }
                        </item>
                        <item>
                         <widget class="QPlainTextEdit" name="textDISTLend">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
                          <property name="minimumSize">
                           <size>
                            <width>0</width>
@@ -5923,6 +6060,12 @@ p, li { white-space: pre-wrap; }
                        </item>
                        <item>
                         <widget class="QPlainTextEdit" name="textDISTLinterval">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
                          <property name="minimumSize">
                           <size>
                            <width>0</width>
@@ -5977,7 +6120,7 @@ p, li { white-space: pre-wrap; }
                     <item row="1" column="1">
                      <widget class="QPlainTextEdit" name="textDISThighfreq">
                       <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>

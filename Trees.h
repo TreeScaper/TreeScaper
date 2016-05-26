@@ -26,7 +26,6 @@
 #include "wstring.h"
 #include "wfile.h"
 #include <cstring>
-#include <algorithm>
 #include "TreeOPE.h"
 #include "warray.cpp"
 #include "hash.hh"

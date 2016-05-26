@@ -16,7 +16,6 @@
 //# http://www.gnu.org/copyleft/gpl.html
 //##########################################################################
 
-
 #if VTK_MAJOR_VERSION <= 6 && VTK_MINOR_VERSION >= 3
 // for 6.0.0 VTK
 #define vtkRenderingCore_AUTOINIT 4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)

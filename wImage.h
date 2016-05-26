@@ -90,22 +90,22 @@ struct image_parameters{
 
 class Image{
 public:
-    Image(){};
+	Image(){};
 
     ~Image(){destructor();};
 
-    Image(String filename)
-    {
-        Initialize_Image(filename);
-    };
-
-    void Set_SelectedIDs(Array<int> &selected_ids){SelectedIDs = &selected_ids;}
+	Image(String filename)
+	{
+		Initialize_Image(filename);
+	};
 
     void Initialize_Image(String filename);
 
+    void Set_SelectedIDs(Array<int> &selected_ids){SelectedIDs = &selected_ids;}
+
     void Generate_Colors(int num, double **Colors);
 
-    bool Load_COR(String filename);
+	bool Load_COR(String filename);
 
     bool Load_Points();
 
@@ -115,15 +115,15 @@ public:
 
     void Create_Legend();
 
-    void Create_PointsActors();
+	void Create_PointsActors();
 
-    void Create_HullsActors();
+	void Create_HullsActors();
 
     void Create_LinesActors();
 
-    void sort_HullsActors();
+	void sort_HullsActors();
 
-    bool select_Points(String filename);
+	bool select_Points(String filename);
 
     void compute_mean(double *mean, int *index, int i);
 
@@ -131,13 +131,13 @@ public:
 
     void Plot_Points();
 
-    void Plot_Hulls();
+	void Plot_Hulls();
 
     void Plot_Lines();
 
-    void make_movie();
+	void make_movie();
 
-    void destructor();
+	void destructor();
 
     image_parameters parameters;
 
@@ -145,38 +145,38 @@ private:
     void int_to_string(int n, char *str, int length);
 
     String fname;
-    double **Colors;
-    double *COR;
-    bool *selectpts;
-    double *centers;
+	double **Colors;
+	double *COR;
+	bool *selectpts;
+	double *centers;
     Array<int> *SelectedIDs;
     int *IDMaps;
-    int dim;
-    int size;
-    vtkSmartPointer<vtkPoints> *points;
-    vtkSmartPointer<vtkPoints> *Hull_points;
+	int dim;
+	int size;
+	vtkSmartPointer<vtkPoints> *points;
+	vtkSmartPointer<vtkPoints> *Hull_points;
 
-    vtkSmartPointer<vtkActor> *PointsActors;
-    vtkSphereSource **sphere;
-    vtkPolyData **model;
+	vtkSmartPointer<vtkActor> *PointsActors;
+	vtkSphereSource **sphere;
+	vtkPolyData **model;
 //	vtkGlyph3D **glyph;
-    vtkPolyDataMapper **pointMapper;
-    vtkProperty **VP;
+	vtkPolyDataMapper **pointMapper;
+	vtkProperty **VP;
 
     vtkSmartPointer<vtkLegendBoxActor> legend;
-    vtkSmartPointer<vtkRenderer> renderer;
-    vtkSmartPointer<vtkRenderWindow> renderWindow;
+	vtkSmartPointer<vtkRenderer> renderer;
+	vtkSmartPointer<vtkRenderWindow> renderWindow;
         vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
 
-    vtkSmartPointer<vtkActor> *HullsActors;
-    vtkPolyDataMapper **HullMapper;
-    vtkSmartPointer<vtkPolyData> *polydata;
-    vtkSmartPointer<vtkDelaunay3D> *delaunay;
-    vtkSmartPointer<vtkDataSetSurfaceFilter> *surfaceFilter;
-    vtkTriangleFilter **triangleFilter;
-    vtkMassProperties **massproperties;
-    int *ranks;
-    double *volumes;
+	vtkSmartPointer<vtkActor> *HullsActors;
+	vtkPolyDataMapper **HullMapper;
+	vtkSmartPointer<vtkPolyData> *polydata;
+	vtkSmartPointer<vtkDelaunay3D> *delaunay;
+	vtkSmartPointer<vtkDataSetSurfaceFilter> *surfaceFilter;
+	vtkTriangleFilter **triangleFilter;
+	vtkMassProperties **massproperties;
+	int *ranks;
+	double *volumes;
 
     vtkLineSource **lines;
     vtkPolyDataMapper **linemappers;
