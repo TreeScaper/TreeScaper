@@ -71,7 +71,8 @@ SOURCES += main.cpp\
     SiblingPair.cpp \
     SPRLCA.cpp \
     SPRNode.cpp \
-    UndoMachine.cpp
+    UndoMachine.cpp \
+    NLDRsetting.cpp
 
 HEADERS  += treescaper.h \
     randgen.h \
@@ -126,19 +127,21 @@ HEADERS  += treescaper.h \
     SiblingPair.hpp \
     SPRLCA.hpp \
     SPRNode.cpp \
-    UndoMachine.hpp
+    UndoMachine.hpp \
+    NLDRsetting.h
 
 FORMS    += treescaper.ui \
     setting.ui \
-    plot2d.ui
+    plot2d.ui \
+    NLDRsetting.ui
     
-VTKBINPATH = /Users/GZhou/Desktop/Code-newversion/bin6.0.0
-VTKVTKPATH = /Users/GZhou/Desktop/Code-newversion/VTK6.0.0
-CLAPACKPATH = /Users/GZhou/Desktop/TreeScaper/clapack-3.2.1-CMAKE
+#VTKBINPATH = /Users/GZhou/Desktop/Code-newversion/bin6.0.0
+#VTKVTKPATH = /Users/GZhou/Desktop/Code-newversion/VTK6.0.0
+#CLAPACKPATH = /Users/GZhou/Desktop/TreeScaper/clapack-3.2.1-CMAKE
 
-#VTKBINPATH = /Users/whuang/TreeScaper_dev/bin6.0.0
-#VTKVTKPATH = /Users/whuang/TreeScaper_dev/VTK6.0.0
-#CLAPACKPATH = /Users/whuang/TreeScaper_dev/clapack-3.2.1-CMAKE
+VTKBINPATH = /Users/whuang/TreeScaper_dev/bin6.0.0
+VTKVTKPATH = /Users/whuang/TreeScaper_dev/VTK6.0.0
+CLAPACKPATH = /Users/whuang/TreeScaper_dev/clapack-3.2.1-CMAKE
 
 INCPATH += $${CLAPACKPATH}/INCLUDE
 
