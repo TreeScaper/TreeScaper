@@ -2275,7 +2275,23 @@ void TreeScaper::on_pushButtonDATAcon_clicked()
     }
 
     if(TreesData->compute_consensus_tree(MAJORITYTREE, ""))
+    {
         cout << "Successfully computed the majority consensus tree!\n\n";
+
+        QString qstr("Consensus Tree");
+
+        QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+        if(item1.empty())
+            ui->listDATAmem->addItem(qstr);
+
+        QList<QListWidgetItem *> item2 = ui->listDATAmem_2->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+        if(item2.empty())
+            ui->listDATAmem_2->addItem(qstr);
+
+        QList<QListWidgetItem *> item3 = ui->listDATAmem_3->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+        if(item3.empty())
+            ui->listDATAmem_3->addItem(qstr);
+    }
 }
 
 void TreeScaper::on_pushButtonDATAconplot_clicked()
@@ -3237,6 +3253,42 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
                 TreesData->OutputBipartitionMatrix(outBipartMatrix, FULLMATRIX);
             }
         }
+        else if (memorydata == (String) "Consensus Tree")
+        {
+            QString qtfname = ui->textDATAfile->toPlainText();
+            string stdfname = qtfname.toStdString();
+
+            int reply = QMessageBox::question(this, "Output Consensus tree", "Choose output consensus tree format", "Newick", "Nexus", "Cancel");
+
+            QString qtconvert;//--- = ui->comboBoxDATAoutformat->currentText();
+            if(reply == 0) // newick
+                qtconvert = "Newick";
+            else if(reply == 1)
+                qtconvert = "Nexus";
+            else if(reply == 2) // cancel
+                return;
+
+            string stdconvert = qtconvert.toStdString();
+            String convert(stdconvert.c_str());
+            string outName = TreesData->WriteConsensusTreeFilename(stdfname, stdconvert);
+            if(!TreesData->consensusTreeIsexisting())
+            {
+                cout << "Warning: There is no majority consensus tree in the memory!\n\n";
+                return;
+            }
+
+            if(convert == (String) "Newick")
+            {
+                TreesData->WriteConsensusTree(outName, NEWICK);
+                cout << "Successfully outputted Newick format consensus trees to file: " << outName << "\n\n";
+            }
+            else
+            if(convert == (String) "Nexus")
+            {
+                TreesData->WriteConsensusTree(outName, NEXUS);
+                cout << "Successfully outputted NEXUS format consensus trees to file: " << outName << "\n\n";
+            }
+        }
         else
         {
             TreesData->print_matrix(memorydata);
@@ -3248,6 +3300,8 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
 
         if(memorydata == (String) "Unweighted treeset" || memorydata == (String) "Weighted treeset")
         {
+            cout << "Deleting: Trees\n";
+
             int rowItm = ui->listDATAmem->row(item);
             delete ui->listDATAmem->takeItem(rowItm);
 
@@ -3260,6 +3314,23 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
                 delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(item3[i]));
 
             TreesData->deletetrees();
+        }
+        else if(memorydata == (String) "Consensus Tree")
+        {
+            cout << "Deleting: Consensus Tree\n";
+
+            int rowItm = ui->listDATAmem->row(item);
+            delete ui->listDATAmem->takeItem(rowItm);
+
+            QList<QListWidgetItem *> item2 = ui->listDATAmem_2->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
+            for (int i = 0; i < item2.size(); i++)
+                delete ui->listDATAmem_2->takeItem(ui->listDATAmem_2->row(item2[i]));
+
+            QList<QListWidgetItem *> item3 = ui->listDATAmem_3->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
+            for (int i = 0; i < item3.size(); i++)
+                delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(item3[i]));
+
+            TreesData->deleteConsensustree();
         }
         else if(memorydata == (String) "No data in memory")
         {
@@ -3413,6 +3484,42 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
                 TreesData->OutputBipartitionMatrix(outBipartMatrix, FULLMATRIX);
             }
         }
+        else if (memorydata == (String) "Consensus Tree")
+        {
+            QString qtfname = ui->textDATAfile->toPlainText();
+            string stdfname = qtfname.toStdString();
+
+            int reply = QMessageBox::question(this, "Output Consensus tree", "Choose output consensus tree format", "Newick", "Nexus", "Cancel");
+
+            QString qtconvert;//--- = ui->comboBoxDATAoutformat->currentText();
+            if(reply == 0) // newick
+                qtconvert = "Newick";
+            else if(reply == 1)
+                qtconvert = "Nexus";
+            else if(reply == 2) // cancel
+                return;
+
+            string stdconvert = qtconvert.toStdString();
+            String convert(stdconvert.c_str());
+            string outName = TreesData->WriteConsensusTreeFilename(stdfname, stdconvert);
+            if(!TreesData->consensusTreeIsexisting())
+            {
+                cout << "Warning: There is no majority consensus tree in the memory!\n\n";
+                return;
+            }
+
+            if(convert == (String) "Newick")
+            {
+                TreesData->WriteConsensusTree(outName, NEWICK);
+                cout << "Successfully outputted Newick format consensus trees to file: " << outName << "\n\n";
+            }
+            else
+            if(convert == (String) "Nexus")
+            {
+                TreesData->WriteConsensusTree(outName, NEXUS);
+                cout << "Successfully outputted NEXUS format consensus trees to file: " << outName << "\n\n";
+            }
+        }
         else
         {
             TreesData->print_matrix(memorydata);
@@ -3423,6 +3530,8 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
     {
         if(memorydata == (String) "Unweighted treeset" || memorydata == (String) "Weighted treeset")
         {
+            cout << "Deleting: Trees\n";
+
             QList<QListWidgetItem *> item2 = ui->listDATAmem->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
             for (int i = 0; i < item2.size(); i++)
                 delete ui->listDATAmem->takeItem(ui->listDATAmem->row(item2[i]));
@@ -3435,6 +3544,23 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
                 delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(item3[i]));
 
             TreesData->deletetrees();
+        }
+        else if(memorydata == (String) "Consensus Tree")
+        {
+            cout << "Deleting: Consensus Tree\n";
+
+            QList<QListWidgetItem *> item2 = ui->listDATAmem->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
+            for (int i = 0; i < item2.size(); i++)
+                delete ui->listDATAmem->takeItem(ui->listDATAmem->row(item2[i]));
+
+            int rowItm = ui->listDATAmem_2->row(item);
+            delete ui->listDATAmem_2->takeItem(rowItm);
+
+            QList<QListWidgetItem *> item3 = ui->listDATAmem_3->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
+            for (int i = 0; i < item3.size(); i++)
+                delete ui->listDATAmem_3->takeItem(ui->listDATAmem_3->row(item3[i]));
+
+            TreesData->deleteConsensustree();
         }
         else if(memorydata == (String) "No data in memory")
         {
@@ -3588,6 +3714,42 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
                 TreesData->OutputBipartitionMatrix(outBipartMatrix, FULLMATRIX);
             }
         }
+        else if (memorydata == (String) "Consensus Tree")
+        {
+            QString qtfname = ui->textDATAfile->toPlainText();
+            string stdfname = qtfname.toStdString();
+
+            int reply = QMessageBox::question(this, "Output Consensus tree", "Choose output consensus tree format", "Newick", "Nexus", "Cancel");
+
+            QString qtconvert;//--- = ui->comboBoxDATAoutformat->currentText();
+            if(reply == 0) // newick
+                qtconvert = "Newick";
+            else if(reply == 1)
+                qtconvert = "Nexus";
+            else if(reply == 2) // cancel
+                return;
+
+            string stdconvert = qtconvert.toStdString();
+            String convert(stdconvert.c_str());
+            string outName = TreesData->WriteConsensusTreeFilename(stdfname, stdconvert);
+            if(!TreesData->consensusTreeIsexisting())
+            {
+                cout << "Warning: There is no majority consensus tree in the memory!\n\n";
+                return;
+            }
+
+            if(convert == (String) "Newick")
+            {
+                TreesData->WriteConsensusTree(outName, NEWICK);
+                cout << "Successfully outputted Newick format consensus trees to file: " << outName << "\n\n";
+            }
+            else
+            if(convert == (String) "Nexus")
+            {
+                TreesData->WriteConsensusTree(outName, NEXUS);
+                cout << "Successfully outputted NEXUS format consensus trees to file: " << outName << "\n\n";
+            }
+        }
         else
         {
             TreesData->print_matrix(memorydata);
@@ -3598,6 +3760,8 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
     {
         if(memorydata == (String) "Unweighted treeset" || memorydata == (String) "Weighted treeset")
         {
+            cout << "Deleting: Trees\n";
+
             QList<QListWidgetItem *> item2 = ui->listDATAmem->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
             for (int i = 0; i < item2.size(); i++)
                 delete ui->listDATAmem->takeItem(ui->listDATAmem->row(item2[i]));
@@ -3610,6 +3774,23 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
             delete ui->listDATAmem_3->takeItem(rowItm);
 
             TreesData->deletetrees();
+        }
+        else if(memorydata == (String) "Consensus Tree")
+        {
+            cout << "Deleting: Consensus Tree\n";
+
+            QList<QListWidgetItem *> item2 = ui->listDATAmem->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
+            for (int i = 0; i < item2.size(); i++)
+                delete ui->listDATAmem->takeItem(ui->listDATAmem->row(item2[i]));
+
+            QList<QListWidgetItem *> item3 = ui->listDATAmem_2->findItems(qtmemorydata, Qt::MatchCaseSensitive | Qt::MatchExactly);
+            for (int i = 0; i < item3.size(); i++)
+                delete ui->listDATAmem_2->takeItem(ui->listDATAmem_2->row(item3[i]));
+
+            int rowItm = ui->listDATAmem_3->row(item);
+            delete ui->listDATAmem_3->takeItem(rowItm);
+
+            TreesData->deleteConsensustree();
         }
         else if(memorydata == (String) "No data in memory")
         {

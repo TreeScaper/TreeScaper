@@ -1810,7 +1810,11 @@ bool TreeOPE::Addbipart(NEWICKNODE* startNode, double freq, unsigned long long h
         for (int i = 0; i < startNode->Nchildren; i++)
         {
             if(! Addbipart(startNode->child[i], freq, hash, bitstr, NumTaxa, containrelation))
+            {
+                delete [] trueidx;
+                delete [] flaseidx;
                 return false;
+            }
             if(containrelation)
             {
                 trueidx[numtrues] = i;

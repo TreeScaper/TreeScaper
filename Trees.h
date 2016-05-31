@@ -72,6 +72,7 @@ public:
     void destructor();
     void deletetrees();
     void deleteBipartitionMatrix();
+    void deleteConsensustree();
 
     void initialTrees(string fname);
     void Settreeroottype(bool isrt);
@@ -80,6 +81,7 @@ public:
     void WriteTrees(string &outfile, Treefileformat tf); // newick nexus
     void WriteConsensusTree(string &outfile, Treefileformat tf); // newick nexus
     string WriteTreesFilename(string fname, string type);
+    string WriteConsensusTreeFilename(string fname, string type);
 
     void Printf(int *idx, int length);
 
@@ -140,6 +142,8 @@ public:
     bool bipartmatrixIsexisting();
 
     bool treesAreexisting();
+
+    bool consensusTreeIsexisting();
 
     bool compute_community_automatically(String str_matrix, int modelType, string highfreq, string lowfreq);
 
