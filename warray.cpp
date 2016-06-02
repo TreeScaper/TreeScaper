@@ -185,7 +185,11 @@ void Array<T>::resize(int size, int flag)                          // change the
 	}
 */
     T *org_vec = vec;
-    vec = new T[size];
+
+    if(size > 0)
+        vec = new T[size];
+    else
+        vec = NULL;
 
     int min = (length > size) ? size : length;
 //        std::cout << "min: " << min << std::endl;//---
