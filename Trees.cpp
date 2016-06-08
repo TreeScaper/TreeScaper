@@ -437,6 +437,8 @@ void Trees::initialTrees(string fname)
                             istringstream iss(line);
                             iss >> a >> b;
                             b.erase(remove(b.begin(),b.end(),','),b.end());
+                            b.erase(remove(b.begin(),b.end(),';'),b.end());
+
                             if(b.length() > 255)
                             {
                                 cout << "The longest name only can include 255 chars!\n\n";
