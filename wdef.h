@@ -21,6 +21,27 @@
 #ifndef WDEF_H
 #define WDEF_H
 
-#define _MAC //_MAC // COMMAND_LINE_VERSION //_WINDOWS //_LINUX //
+//#define COMMAND_LINE_VERSION
+
+#ifndef COMMAND_LINE_VERSION
+
+    #ifdef _WIN64 // The following code is compiled only when this library is compiled in Windows (64-bit only)
+        #define _WINDOWS
+    #elif _WIN32 // The following code is compiled only when this library is compiled in Windows (both 32-bit and 64-bit only)
+       //define something for Windows (32-bit and 64-bit, this part is common)
+        #define _WINDOWS
+    #elif __APPLE__ // The following code is compiled only when this library is compiled in MAC
+        #define _MAC
+    #elif __linux// The following code is compiled only when this library is compiled in Linux system
+        #define _LINUX
+    #elif __unix // all unices not caught above
+        // Unix
+        #define _LINUX
+    #elif __posix
+        // POSIX
+    #endif // end of checking platforms
+
+#endif
+
 
 #endif // WDEF_H

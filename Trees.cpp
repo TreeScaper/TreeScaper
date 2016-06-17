@@ -3243,7 +3243,7 @@ bool Trees::compute_community_manually(String str_matrix, int modelType, Array<d
                 for (int j = 0; j < communities[k]->size; j++)
                 {
                     if(communities[k]->n2c[j] == i)
-                        std::cout << j+1 << ",";
+                        std::cout << j << ",";
                 }
                 std::cout << "\n";
             }
