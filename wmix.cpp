@@ -118,7 +118,7 @@ const Mix &Mix::operator=(const Mix &right)
 	return (*this);
 }
 
-Mix Mix::operator=(int right)
+int Mix::operator=(int right)
 {
 	(*this).release_data();
 	int *ptr = new int;
@@ -262,7 +262,8 @@ void Mix::release_data()
 		int *ptr;
 		ptr = (int *) point;
 		point = NULL;
-		delete ptr;
+        if(ptr != NULL)
+    		delete ptr;
 		data_type = NONE;
 	} else
 	if(data_type == DOUBLE)
@@ -270,7 +271,8 @@ void Mix::release_data()
 		double *ptr;
 		ptr = (double *) point;
 		point = NULL;
-		delete ptr;
+        if(ptr != NULL)
+		    delete ptr;
 		data_type = NONE;
 	} else
 	if(data_type == STRING)

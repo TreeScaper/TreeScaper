@@ -227,12 +227,17 @@ void DimEst::init_parameters(String para_filename)
 	}
 
 	Array<Mapping<Mix, Mix> > para_arr;
-	Mapping<Mix, Mix> para;
-	para_arr = LPIMPORT_FORM->Read(para_filename);
+    Mapping<Mix, Mix> para;
+    para_arr = LPIMPORT_FORM->Read(para_filename);
 
 	int num = para_arr.get_length();
+    Mix Key, Value;
 	for(int i = 0; i < num; i++)
-		para[para_arr[i][(String) "name"]] = para_arr[i][(String) "value"];
+    {
+        Key = para_arr[i][(String) "name"];
+        Value = para_arr[i][(String) "value"];
+        para[Key] = Value;;
+    }
 
 	if(para.Include_Key((String) "cor_n"))
 		parameters.cor_n = para[(String) "cor_n"];
@@ -259,7 +264,7 @@ void DimEst::init_parameters(String para_filename)
 
 void DimEst::Compute_Dim()
 {
-    cout << "Start program: " << D_prefname << "_" << method << endl;
+    std::cout << "Start program: " << D_prefname << "_" << method << std::endl;
     if(method == (String) "CORR_DIM")
         return Compute_Cor_Dim();
 

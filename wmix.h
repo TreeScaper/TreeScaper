@@ -84,7 +84,7 @@ public:
 
 	const Mix &operator=(const Mix &right);
 
-	Mix operator=(int right);
+	int operator=(int right);
 
 	Mix operator=(double right);
 

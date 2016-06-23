@@ -48,7 +48,7 @@ public:
 #ifdef COMMAND_LINE_VERSION
     DimEst(String filename, String meth, String dataform, String para_fname)
     {
-        initial_DimEst(filename, method, dataform, para_fname);
+        initial_DimEst(filename, meth, dataform, para_fname);
     }
     void initial_DimEst(String filename, String meth, String dataform, String para_fname);
 

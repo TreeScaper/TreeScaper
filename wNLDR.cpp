@@ -106,7 +106,7 @@ void NLDR::init_NLDR(String fname, String ftype, String dim, String cost, String
         cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << endl;
 		exit(0);
     }
-	
+
 	D_prefname = D_file.prefix_name();
 	D_postfname = D_file.postfix_name();
 	size = D_file.lines();
@@ -196,7 +196,7 @@ void NLDR::NLDR_init_parameters(String para_filename)
 	parameters.CCA_STO_lambdan = 1;
 	parameters.CCA_STO_alpha0 = 0.5;
 	parameters.CCA_STO_alphan = 0.01;
-	
+
 	if(para_filename == (String) "")
         return;
 	Array<Mapping<Mix, Mix> > para_arr;
@@ -326,7 +326,7 @@ void NLDR::NLDR_init_parameters(String para_filename)
 	if(para.Include_Key((String) "CCA_STO_alpha0"))
 		parameters.CCA_STO_alpha0 = para[(String) "CCA_STO_alpha0"];
 	if(para.Include_Key((String) "CCA_STO_alphan"))
-		parameters.CCA_STO_alphan = para[(String) "CCA_STO_alphan"];
+        parameters.CCA_STO_alphan = para[(String) "CCA_STO_alphan"];
 }
 
 void NLDR::NLDR_load_MX()

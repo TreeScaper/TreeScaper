@@ -109,7 +109,6 @@ Array<S> Mapping<T, S>::Values() const
 template<class T, class S>
 S &Mapping<T, S>::operator[](T key)
 {
-	cout << "";
 	return mapping[key];
 };
 
