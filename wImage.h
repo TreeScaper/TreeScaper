@@ -166,7 +166,7 @@ private:
     vtkSmartPointer<vtkLegendBoxActor> legend;
 	vtkSmartPointer<vtkRenderer> renderer;
 	vtkSmartPointer<vtkRenderWindow> renderWindow;
-        vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
+    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
 
 	vtkSmartPointer<vtkActor> *HullsActors;
 	vtkPolyDataMapper **HullMapper;

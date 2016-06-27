@@ -747,6 +747,7 @@ bool Image::select_Points(String filename)
         }
     }
     delete [] mean;
+    delete [] numbers_in_cluster;
     return true;
 };
 
