@@ -45,7 +45,7 @@ void NLDR::init_NLDR(String fname, double **dist, int sizeinput, String dim, Str
     int dim_int = atoi(dim_str);
     if(dim_int < 1)
     {
-        cout << "Error: The dimension must be equal to or greater than 1! Please use command -h to see help." << endl;
+        std::cout << "Error: The dimension must be equal to or greater than 1! Please use command -h to see help." << std::endl;
         exit(0);
     }
 
@@ -53,7 +53,7 @@ void NLDR::init_NLDR(String fname, double **dist, int sizeinput, String dim, Str
     {
         if(!D_file.is_open())
         {
-            cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << endl;
+            std::cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
             exit(0);
         }
         size = D_file.lines();
@@ -76,13 +76,13 @@ void NLDR::init_NLDR(String fname, double **dist, int sizeinput, String dim, Str
                 D.matrix[i][j] = (double) dist[i][j];
     } else
     {
-        cout << "Error: Incorrect input data parameters" << endl;
+        std::cout << "Error: Incorrect input data parameters" << std::endl;
         exit(0);
     }
 
 	if(seed < -1)
 	{
-        cout << "Error: The seed of random generator must be equal to or greater than -1 and also be a integer! Please use command -h to see help." << endl;
+        std::cout << "Error: The seed of random generator must be equal to or greater than -1 and also be a integer! Please use command -h to see help." << std::endl;
 		exit(0);
     }
     this->NLDR_init_X(init_md, seed);
@@ -103,7 +103,7 @@ void NLDR::init_NLDR(String fname, String ftype, String dim, String cost, String
     File D_file(fname);
 	if(!D_file.is_open())
 	{
-        cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << endl;
+        std::cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
 		exit(0);
     }
 
@@ -115,7 +115,7 @@ void NLDR::init_NLDR(String fname, String ftype, String dim, String cost, String
 
 	if(dim_int < 1)
 	{
-        cout << "Error: The dimension must be equal to or greater than 1! Please use command -h to see help." << endl;
+        std::cout << "Error: The dimension must be equal to or greater than 1! Please use command -h to see help." << std::endl;
 		exit(0);
 	}
 
@@ -129,11 +129,11 @@ void NLDR::init_NLDR(String fname, String ftype, String dim, String cost, String
 		this->NLDR_load_MX();
 		this->NLDR_init_X(init_md, seed);
 	} else
-        cout << "Warning: Undefined matrix type" << endl;
+        std::cout << "Warning: Undefined matrix type" << std::endl;
 
 	if(seed < -1)
 	{
-        cout << "Error: The seed of random generator must be equal to or greater than -1 and also be a integer! Please use command -h to see help." << endl;
+        std::cout << "Error: The seed of random generator must be equal to or greater than -1 and also be a integer! Please use command -h to see help." << std::endl;
 		exit(0);
 	}
 }
@@ -205,14 +205,13 @@ void NLDR::NLDR_init_parameters(String para_filename)
 	File fpara(para_filename);	
 	if(!fpara.is_open())
 	{
-        cout << "Error: File \"" << para_filename << "\" cannot be opened! Please check if this file exists or is readable." << endl;
+        std::cout << "Error: File \"" << para_filename << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
 		exit(0);
 	}
 
     para_arr = LPIMPORT_FORM->Read(para_filename);
 	int num = para_arr.get_length();
 
-	Mapping<Mix, Mix> m;
 	Mix Key, Value;
 	for(int i = 0; i < num; i++)
     {
@@ -337,13 +336,13 @@ void NLDR::NLDR_load_MX()
 	File D_file(fname);	
 	if(!D_file.is_open())
 	{
-        cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << endl;
+        std::cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
         exit(0);
     }
 	int dim = D_file.cols();
 	D_file.seek(0);
 
-	cout << "size : " << size << ", dim:" << dim << endl;//-------
+    std::cout << "size : " << size << ", dim:" << dim << std::endl;//-------
 	MX.resize(size, dim);
 	for(int i = 0; i < size; i++)
 		for(int j = 0; j < dim; j++)
@@ -376,10 +375,10 @@ void NLDR::NLDR_load_MX()
 
 void NLDR::Compute_NLDR()
 {
-    cout << "Start program: " << D_prefname << "_" << dim_str << "D_" << cost_function << "_" << algorithm << endl;
+    std::cout << "Start program: " << D_prefname << "_" << dim_str << "D_" << cost_function << "_" << algorithm << std::endl;
 	long start = clock();
 	long end;
-    cout << "Compute start time:" << start << endl;
+    std::cout << "Compute start time:" << start << std::endl;
 	if(cost_function == (String) "CLASSIC_MDS")
 		this->CLASSIC_MDS();
 	else
@@ -396,15 +395,15 @@ void NLDR::Compute_NLDR()
 		this->CCA();
 	end = clock();
 	time_cost = end - start;
-    cout << "Compute end time:" << end << endl;
-    cout << "Compute time cost:" << time_cost << endl;
+    std::cout << "Compute end time:" << end << std::endl;
+    std::cout << "Compute time cost:" << time_cost << std::endl;
 }
 
 void NLDR::result_analysis()
 {
 	long start = clock();
 	long end;
-    cout << "Analysis start time:" << start << endl;
+    std::cout << "Analysis start time:" << start << std::endl;
 	Trustworthiness.resize(parameters.length_tru, 2);
 	Continuity.resize(parameters.length_con, 2);
 	for(int i = 0; i < parameters.length_tru; i++)
@@ -419,8 +418,8 @@ void NLDR::result_analysis()
 
 	oneNN_analysis();
 	end = clock();
-    cout << "Analysis end time:" << end << endl;
-    cout << "Analysis time cost:" << end - start << endl;
+    std::cout << "Analysis end time:" << end << std::endl;
+    std::cout << "Analysis time cost:" << end - start << std::endl;
 };
 
 void NLDR::output_to_files()
@@ -441,10 +440,10 @@ void NLDR::output_to_files()
 		{
 			for(int j = 0; j < atoi(dim_str); j++)
 				file_COR << COR(i, j) << "\t";
-			file_COR << "" << endl;
+            file_COR << "" << std::endl;
 		}
 	} else
-        cout << "Warning: Have not computed COR yet" << endl;
+        std::cout << "Warning: Have not computed COR yet" << std::endl;
 
 	if(DIS.get_row() > 0 && DIS.get_col() > 0)
 	{
@@ -453,24 +452,24 @@ void NLDR::output_to_files()
 		{
 			for(int j = 0; j <= i; j++)
 				file_DIS << DIS(i, j) << "\t";
-			file_DIS << "" << endl;
+            file_DIS << "" << std::endl;
 		}
 	} else
-        cout << "Warning: Have not computed DIS yet" << endl;
+        std::cout << "Warning: Have not computed DIS yet" << std::endl;
 
 	if(STRESS != -1)
 	{
 		file_STR.clean();
-		file_STR << STRESS << endl;
+        file_STR << STRESS << std::endl;
 	} else
-        cout << "Warning: Have not computed STRESS yet" << endl;
+        std::cout << "Warning: Have not computed STRESS yet" << std::endl;
 
 	if(time_cost != -1)
 	{
 		file_TIM.clean();
-		file_TIM << time_cost << endl;
+        file_TIM << time_cost << std::endl;
 	} else
-        cout << "Warning: Have not recorded time cost yet" << endl;
+        std::cout << "Warning: Have not recorded time cost yet" << std::endl;
 
 	if(Trustworthiness.get_row() > 0 && Trustworthiness.get_col() > 0)
 	{
@@ -479,7 +478,7 @@ void NLDR::output_to_files()
 		{
 			for(int j = 0; j < Trustworthiness.get_col(); j++)
 				file_TRU << Trustworthiness(i, j) << "\t";
-			file_TRU << "" << endl;
+            file_TRU << "" << std::endl;
 		}
 	}
 
@@ -490,19 +489,19 @@ void NLDR::output_to_files()
 		{
 			for(int j = 0; j < Continuity.get_col(); j++)
 				file_CON << Continuity(i, j) << "\t";
-			file_CON << "" << endl;
+            file_CON << "" << std::endl;
 		}
 	}
 
 	if(oneNN.get_row() > 0 && oneNN.get_col() > 0)
 	{
 		file_1NN.clean();
-		file_1NN << oneNN.matrix[0][0] << endl;
-		file_1NN << oneNN.matrix[1][0] << endl;
+        file_1NN << oneNN.matrix[0][0] << std::endl;
+        file_1NN << oneNN.matrix[1][0] << std::endl;
 	} else
-        cout << "Warning: Have not computed 1NN yet" << endl;
+        std::cout << "Warning: Have not computed 1NN yet" << std::endl;
 
-	cout << "Please see the help for details of the introduction of output files." << endl;
+    std::cout << "Please see the help for details of the introduction of output files." << std::endl;
 }
 
 void NLDR::make_output_file_names(String &filename_COR, String &filename_DIS, String &filename_STR, String &filename_TIM, String &filename_TRU, String &filename_CON, String &filename_1NN)
@@ -536,7 +535,7 @@ void NLDR::NLDR_load_D()
 	File D_file(fname);	
 	if(!D_file.is_open())
 	{
-        cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << endl;
+        std::cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
         exit(0);
     }
 	D_file.seek(0);
@@ -571,7 +570,7 @@ void NLDR::NLDR_load_D()
         }
     } else
     {
-        cout << "Warning: This distance file format does not exist in this program!" << endl;
+        std::cout << "Warning: This distance file format does not exist in this program!" << std::endl;
     }
 };
 
@@ -694,7 +693,7 @@ void NLDR::NLDR_init_parameters(String para_filename)
 	File fpara(para_filename);	
 	if(!fpara.is_open())
 	{
-		cout << "error: file \"" << para_filename << "\" can not be open, please check if this file exists or is readable." << endl;
+        std::cout << "error: file \"" << para_filename << "\" can not be open, please check if this file exists or is readable." << std::endl;
 		exit(0);
 	}
 
@@ -835,7 +834,7 @@ void NLDR::CLASSIC_MDS()
         {
                 if(!Scalar_Product.SVD_LIB(U, S, Vt))
                 {
-                        cout << "Error: Singular Value Decomposition failed." << endl;
+                        std::cout << "Error: Singular Value Decomposition failed." << std::endl;
                         exit(0);
                 }
 
@@ -850,9 +849,9 @@ void NLDR::CLASSIC_MDS()
 				file_U << U(i, j) << "\t";
 				file_Vt << Vt(i, j) << "\t";
 			}
-			file_S << S(i, i) << endl;
-			file_U << "" << endl;
-			file_Vt << "" << endl;
+            file_S << S(i, i) << std::endl;
+            file_U << "" << std::endl;
+            file_Vt << "" << std::endl;
 		}
 	}
 	else
@@ -921,8 +920,8 @@ void NLDR::KRUSKAL1()
         this->KRUSKAL1_METROPOLIS();
 	else
 	{
-        cout << "Error: Invalid algorithm for KRUSKAL1!" << endl;
-        cout << "For KRUSKAL1, the available algorithms are LINEAR_ITERATION, MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << endl;
+        std::cout << "Error: Invalid algorithm for KRUSKAL1!" << std::endl;
+        std::cout << "For KRUSKAL1, the available algorithms are LINEAR_ITERATION, MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << std::endl;
 		exit(0);
 	}
 
@@ -985,12 +984,12 @@ void NLDR::KRUSKAL1_LINEAR_ITERATION()
 				COR.matrix[i][j] += step_size * COR_change.matrix[i][j];
 
 		stress2 = stress_diff_accum / stress_norm_accum;
-		cout << "stress:" << stress2 << endl;
+        std::cout << "stress:" << stress2 << std::endl;
 		err = fabs((stress1 - stress2) / stress2);
-        cout << "rel error : " << err << endl;
+        std::cout << "rel error : " << err << std::endl;
 		stress1 = stress2;
 		times++;
-		cout << "times : " << times << endl;
+        std::cout << "times : " << times << std::endl;
 	}
 	DIS = COR.compute_Distance_Matrix();
 	STRESS = stress2;
@@ -1013,7 +1012,7 @@ void NLDR::KRUSKAL1_MAJORIZATION()
 	Matrix<double> DX(size, size);
 	Matrix<double> BX(size, size);
 	stress1 = this->KRUSKAL1_stress_function(DX);
-	cout << "stress:" << stress1 << endl;
+    std::cout << "stress:" << stress1 << std::endl;
 
 	this->KRUSKAL1_compute_BX(DX, BX);
 
@@ -1022,13 +1021,13 @@ void NLDR::KRUSKAL1_MAJORIZATION()
 		cur_time = clock();
 		COR = this->KRUSKAL1_compute_Z(BX);
 		stress2 = this->KRUSKAL1_rescale(DX);
-		cout << "stress:" << stress2 << endl;
+        std::cout << "stress:" << stress2 << std::endl;
 		err = fabs(((double) stress1 - stress2) / stress2);
-        cout << "rel error : " << err << endl;
+        std::cout << "rel error : " << err << std::endl;
 		stress1 = stress2;
 		this->KRUSKAL1_compute_BX(DX, BX);
 		times++;
-		cout << "times : " << times << endl;
+        std::cout << "times : " << times << std::endl;
 	}
 
 	DIS = COR.compute_Distance_Matrix();
@@ -1188,7 +1187,7 @@ void NLDR::KRUSKAL1_GAUSS_SEIDEL()
 	COR = X;
 	
 	stress2 = KRUSKAL1_stress_function(DX);
-	cout << "\nstress value : " << stress2 << endl;
+    std::cout << "\nstress value : " << stress2 << std::endl;
 
 	eta = para1;
 	eta_d = para2;
@@ -1243,7 +1242,7 @@ void NLDR::KRUSKAL1_GAUSS_SEIDEL()
 			for(int h = 0; h < dim; h++)
 			{
 				if(! this->search_first_condition(DX, stress2, - e1.matrix[h][0] / fabs(e2.matrix[h][0]), j, h, - e1.matrix[h][0] * e1.matrix[h][0] / fabs(e2.matrix[h][0]), 0, alpha, 1, 1, stress2))
-					;//---cout << "!";
+                    ;//---std::cout << "!";
 				COR.matrix[j][h] = COR.matrix[j][h] - alpha * e1.matrix[h][0] / fabs(e2.matrix[h][0]);
 				this->update_distance_matrix(DX, j, h, COR.matrix[j][h], 0);
 				eta = para1;
@@ -1270,14 +1269,14 @@ void NLDR::KRUSKAL1_GAUSS_SEIDEL()
 
 		stress2 = KRUSKAL1_stress_function(DX);
 		err = fabs((stress1 - stress2) / stress2);
-		cout << "\nstress value : " << stress2 << endl;
-		cout << "rel error : " << err << endl;
+        std::cout << "\nstress value : " << stress2 << std::endl;
+        std::cout << "rel error : " << err << std::endl;
 
 		times = times + 1;
-		cout << "times : " << times << endl;
+        std::cout << "times : " << times << std::endl;
 	}
 
-	cout << "\nstress value : " << stress2 << endl;
+    std::cout << "\nstress value : " << stress2 << std::endl;
 
 	STRESS = stress2;
 
@@ -1305,7 +1304,7 @@ void NLDR::KRUSKAL1_STOCHASTIC()
 	COR = X;
 
 	stress_value = KRUSKAL1_stress_function(DX);
-	cout << "\nstress value : " << stress_value << endl;
+    std::cout << "\nstress value : " << stress_value << std::endl;
 	eta = para1;
 	eta_d = para2;
 	rho = para3;
@@ -1353,7 +1352,7 @@ void NLDR::KRUSKAL1_STOCHASTIC()
 
 		if(i % size == 0)
 		{
-			cout << "epochs : " << (int) i / size << ", stress : " << stress_value << endl;
+            std::cout << "epochs : " << (int) i / size << ", stress : " << stress_value << std::endl;
 		}
 	}
 
@@ -1379,13 +1378,13 @@ void NLDR::KRUSKAL1_METROPOLIS()
     CORX = X;
     COR = CORX;
     str1 = KRUSKAL1_stress_function(DX);
-    cout << "start : accept stress : " << str1 << endl;
+    std::cout << "start : accept stress : " << str1 << std::endl;
     ADX = DX;
     KRUSKAL1_GRADIENT(gradient, CORX, ADX);
     delta = gradient.norm(M_FRO_NORM);
-    cout << "gradient norm:" << delta << endl;
+    std::cout << "gradient norm:" << delta << std::endl;
     delta = (double) 1 / (delta * delta);
-    cout << "delta:" << delta << endl;
+    std::cout << "delta:" << delta << std::endl;
     for(int i = 0; i < 2000; i++)
     {
         for(int j = 0; j < size; j++)
@@ -1401,7 +1400,7 @@ void NLDR::KRUSKAL1_METROPOLIS()
             ADX = DX;
             str1 = str2;
             KRUSKAL1_GRADIENT(gradient, CORX, ADX);
-            cout << i << " : accept stress : " << str1 << endl;
+            std::cout << i << " : accept stress : " << str1 << std::endl;
         }
 
         T = T * 0.99;
@@ -1449,8 +1448,8 @@ void NLDR::NORMALIZED()
         this->NORMALIZED_METROPOLIS();
 	else
 	{
-        cout << "Error: Invalid algorithm for NORMALIZED STRESS!" << endl;
-        cout << "For NORMALIZED STRESS, the available algorithms are MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << endl;
+        std::cout << "Error: Invalid algorithm for NORMALIZED STRESS!" << std::endl;
+        std::cout << "For NORMALIZED STRESS, the available algorithms are MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << std::endl;
 		exit(0);
 	}
 };
@@ -1470,7 +1469,7 @@ void NLDR::NORMALIZED_MAJORIZATION()
 	Matrix<double> DX(size, size);
 	Matrix<double> BX(size, size);
 	stress1 = this->NORMALIZED_stress_function(DX);
-	cout << "stress:" << stress1 << endl;
+    std::cout << "stress:" << stress1 << std::endl;
 
 	this->NORMALIZED_compute_BX(DX, BX);
 
@@ -1479,13 +1478,13 @@ void NLDR::NORMALIZED_MAJORIZATION()
 		cur_time = clock();
 		COR = this->NORMALIZED_compute_Z(BX);
 		stress2 = this->NORMALIZED_stress_function(DX);
-		cout << "stress:" << stress2 << endl;
+        std::cout << "stress:" << stress2 << std::endl;
 		err = fabs(((double) stress1 - stress2) / stress2);
-        cout << "rel error : " << err << endl;
+        std::cout << "rel error : " << err << std::endl;
 		stress1 = stress2;
 		this->NORMALIZED_compute_BX(DX, BX);
 		times++;
-		cout << "times : " << times << endl;
+        std::cout << "times : " << times << std::endl;
 	}
 
 	DIS = COR.compute_Distance_Matrix();
@@ -1603,7 +1602,7 @@ void NLDR::NORMALIZED_GAUSS_SEIDEL()
 			weight += D.matrix[i][j] * D.matrix[i][j];
 
 	stress2 = NORMALIZED_stress_function(DX);
-	cout << "\nstress value : " << stress2 << endl;
+    std::cout << "\nstress value : " << stress2 << std::endl;
 
 	while(err > parameters.NOR_GAU_e && (times < parameters.NOR_GAU_max_iter || !parameters.NOR_GAU_max_iter) && (cur_time - start < run_time || !run_time))
 	{
@@ -1652,7 +1651,7 @@ void NLDR::NORMALIZED_GAUSS_SEIDEL()
 			for(int h = 0; h < dim; h++)
 			{
                 if(! this->search_first_condition(DX, stress2, - e1.matrix[h][0] / fabs(e2.matrix[h][0]), j, h, - e1.matrix[h][0] * e1.matrix[h][0] / fabs(e2.matrix[h][0]), weight, alpha, 1, 1, stress2))
-                    ;//---cout << "!";
+                    ;//---std::cout << "!";
 				COR.matrix[j][h] = COR.matrix[j][h] - alpha * e1.matrix[h][0] / fabs(e2.matrix[h][0]);
 				this->update_distance_matrix(DX, j, h, COR.matrix[j][h], 0);
 			}
@@ -1676,14 +1675,14 @@ void NLDR::NORMALIZED_GAUSS_SEIDEL()
 
 		stress2 = NORMALIZED_stress_function(DX);
 		err = fabs((stress1 - stress2) / stress2);
-		cout << "\nstress value : " << stress2 << endl;
-		cout << "rel error : " << err << endl;
+        std::cout << "\nstress value : " << stress2 << std::endl;
+        std::cout << "rel error : " << err << std::endl;
 
 		times = times + 1;
-		cout << "times : " << times << endl;
+        std::cout << "times : " << times << std::endl;
 	}
 
-	cout << "\nstress value : " << stress2 << endl;
+    std::cout << "\nstress value : " << stress2 << std::endl;
 
 	STRESS = stress2;
 
@@ -1750,7 +1749,7 @@ void NLDR::NORMALIZED_STOCHASTIC()
 		if(i % size == 0)
 		{
 			stress_value = NORMALIZED_stress_function(result_dis);
-			cout << "epochs : " << (int) i / size << ", stress : " << stress_value << endl;
+            std::cout << "epochs : " << (int) i / size << ", stress : " << stress_value << std::endl;
 		}
 	}
 
@@ -1776,13 +1775,13 @@ void NLDR::NORMALIZED_METROPOLIS()
     CORX = X;
     COR = CORX;
     str1 = NORMALIZED_stress_function(DX);
-    cout << "start : accept stress : " << str1 << endl;
+    std::cout << "start : accept stress : " << str1 << std::endl;
     ADX = DX;
     NORMALIZED_GRADIENT(gradient, CORX, ADX);
     delta = gradient.norm(M_FRO_NORM);
-    cout << "gradient norm:" << delta << endl;
+    std::cout << "gradient norm:" << delta << std::endl;
     delta = (double) 1 / (delta * delta);
-    cout << "delta:" << delta << endl;
+    std::cout << "delta:" << delta << std::endl;
     for(int i = 0; i < 2000; i++)
     {
         for(int j = 0; j < size; j++)
@@ -1798,7 +1797,7 @@ void NLDR::NORMALIZED_METROPOLIS()
             ADX = DX;
             str1 = str2;
             NORMALIZED_GRADIENT(gradient, CORX, ADX);
-            cout << i << " : accept stress : " << str1 << endl;
+            std::cout << i << " : accept stress : " << str1 << std::endl;
         }
 
         T = T * 0.99;
@@ -1866,8 +1865,8 @@ void NLDR::SAMMON()
         this->SAMMON_METROPOLIS();
 	else
 	{
-        cout << "Error: Invalid algorithm for SAMMON's STRESS(NLM)!" << endl;
-        cout << "For SAMMON's STRESS, the available algorithms are MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << endl;
+        std::cout << "Error: Invalid algorithm for SAMMON's STRESS(NLM)!" << std::endl;
+        std::cout << "For SAMMON's STRESS, the available algorithms are MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << std::endl;
 		exit(0);
 	}
 };
@@ -1903,7 +1902,7 @@ void NLDR::SAMMON_MAJORIZATION()
 
 	if(! V.compute_inverse_matrix(V))
 	{
-        cout << "Inverse computation failed!" << endl;
+        std::cout << "Inverse computation failed!" << std::endl;
 		return;
 	}
 
@@ -1911,7 +1910,7 @@ void NLDR::SAMMON_MAJORIZATION()
 
 	stress1 = SAMMON_stress_function(DX);
 
-	cout << "stress : " << stress1 << endl;
+    std::cout << "stress : " << stress1 << std::endl;
 
 	SAMMON_compute_BX(DX, BX);
 
@@ -1920,13 +1919,13 @@ void NLDR::SAMMON_MAJORIZATION()
 		cur_time = clock();
 		COR = SAMMON_compute_Z(BX, V);
 		stress2 = SAMMON_stress_function(DX);
-		cout << "stress : " << stress2 << endl;
+        std::cout << "stress : " << stress2 << std::endl;
 		err = fabs(((double) stress1 - stress2) / stress2);
-        cout << "rel error : " << err << endl;
+        std::cout << "rel error : " << err << std::endl;
 		stress1 = stress2;
 		SAMMON_compute_BX(DX, BX);
 		times++;
-		cout << "times : " << times << endl;
+        std::cout << "times : " << times << std::endl;
 	}
 
 	STRESS = stress2;
@@ -2068,7 +2067,7 @@ void NLDR::SAMMON_GAUSS_SEIDEL()
 			weight += D.matrix[i][j];
 
 	stress2 = SAMMON_stress_function(DX);
-	cout << "\nstress value : " << stress2 << endl;
+    std::cout << "\nstress value : " << stress2 << std::endl;
 
 	while(err > parameters.NLM_GAU_e && (times < parameters.NLM_GAU_max_iter || !parameters.NLM_GAU_max_iter) && (cur_time - start < run_time || !run_time))
     {
@@ -2117,7 +2116,7 @@ void NLDR::SAMMON_GAUSS_SEIDEL()
 			for(int h = 0; h < dim; h++)
             {
                 if(! this->search_first_condition(DX, stress2, - e1.matrix[h][0] / fabs(e2.matrix[h][0]), j, h, - e1.matrix[h][0] * e1.matrix[h][0] / fabs(e2.matrix[h][0]), weight, alpha, 1, 1, stress2))
-                    ;//---cout << "!";
+                    ;//---std::cout << "!";
 				COR.matrix[j][h] = COR.matrix[j][h] - alpha * e1.matrix[h][0] / fabs(e2.matrix[h][0]);
 				this->update_distance_matrix(DX, j, h, COR.matrix[j][h], 0);
 			}
@@ -2141,14 +2140,14 @@ void NLDR::SAMMON_GAUSS_SEIDEL()
 
         stress2 = SAMMON_stress_function(DX);
 		err = fabs((stress1 - stress2) / stress2);
-		cout << "\nstress value : " << stress2 << endl;
-		cout << "rel error : " << err << endl;
+        std::cout << "\nstress value : " << stress2 << std::endl;
+        std::cout << "rel error : " << err << std::endl;
 
 		times = times + 1;
-        cout << "times : " << times << endl;
+        std::cout << "times : " << times << std::endl;
 	}
 
-	cout << "\nstress value : " << stress2 << endl;
+    std::cout << "\nstress value : " << stress2 << std::endl;
 
 	STRESS = stress2;
 
@@ -2221,7 +2220,7 @@ void NLDR::SAMMON_STOCHASTIC()
 		if(i % size == 0)
 		{
 			stress_value = SAMMON_stress_function(result_dis);
-			cout << "epochs : " << (int) i / size  << ", stress : " << stress_value << endl;
+            std::cout << "epochs : " << (int) i / size  << ", stress : " << stress_value << std::endl;
 		}
 	}
 
@@ -2247,13 +2246,13 @@ void NLDR::SAMMON_METROPOLIS()
     CORX = X;
     COR = CORX;
     str1 = SAMMON_stress_function(DX);
-    cout << "start : accept stress : " << str1 << endl;
+    std::cout << "start : accept stress : " << str1 << std::endl;
     ADX = DX;
     SAMMON_GRADIENT(gradient, CORX, ADX);
     delta = gradient.norm(M_FRO_NORM);
-    cout << "gradient norm:" << delta << endl;
+    std::cout << "gradient norm:" << delta << std::endl;
     delta = (double) 1 / (delta * delta);
-    cout << "delta:" << delta << endl;
+    std::cout << "delta:" << delta << std::endl;
     for(int i = 0; i < 2000; i++)
     {
         for(int j = 0; j < size; j++)
@@ -2269,7 +2268,7 @@ void NLDR::SAMMON_METROPOLIS()
             ADX = DX;
             str1 = str2;
             SAMMON_GRADIENT(gradient, CORX, ADX);
-            cout << i << " : accept stress : " << str1 << endl;
+            std::cout << i << " : accept stress : " << str1 << std::endl;
         }
 
         T = T * 0.99;
@@ -2315,8 +2314,8 @@ void NLDR::CCA()
         this->CCA_METROPOLIS();
 	else
 	{
-        cout << "Error: Invalid algorithm for CCA's STRESS!" << endl;
-        cout << "For CCA's STRESS, the available algorithms are MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << endl;
+        std::cout << "Error: Invalid algorithm for CCA's STRESS!" << std::endl;
+        std::cout << "For CCA's STRESS, the available algorithms are MAJORIZATION, GAUSS_SEIDEL and STOCHASTIC." << std::endl;
 		exit(0);
 	}
 };
@@ -2370,7 +2369,7 @@ void NLDR::CCA_MAJORIZATION()
 
 		if(!V.compute_inverse_matrix(V))
 		{
-            cout << "Inverse computation failed!" << endl;
+            std::cout << "Inverse computation failed!" << std::endl;
 			return;
 		}
 
@@ -2378,9 +2377,9 @@ void NLDR::CCA_MAJORIZATION()
 
 		COR = CCA_compute_Z(BX, V);
 		stress2 = CCA_stress_function(DX, lambda.matrix[times][0]);
-		cout << "stress : " << stress2 << endl;
+        std::cout << "stress : " << stress2 << std::endl;
 		err = fabs(((double) stress1 - stress2) / stress2);
-        cout << "rel error : " << err << endl;
+        std::cout << "rel error : " << err << std::endl;
 
 		CCA_compute_BX(DX, lambda.matrix[times][0], BX);
 
@@ -2389,7 +2388,7 @@ void NLDR::CCA_MAJORIZATION()
 
 		stress1 = stress2;
 		times = times + 1;
-		cout << "times : " << times << endl;
+        std::cout << "times : " << times << std::endl;
 	}
 
 	STRESS = stress2;
@@ -2544,7 +2543,7 @@ void NLDR::CCA_GAUSS_SEIDEL()
 			lambda.matrix[i * size + j][0] = lambda0 * pow((double) parameters.CCA_GAU_lambdan / (lambda0), (double) (i * size + j) / (train_len * size - 1));
 
 	stress2 = CCA_stress_function(DX, lambda.matrix[0][0]);
-	cout << "stress value : " << stress2 << endl;
+    std::cout << "stress value : " << stress2 << std::endl;
 
 	while(err > parameters.CCA_GAU_e && (times < train_len || !train_len) && (cur_time - start < run_time || !run_time))
 	{
@@ -2621,7 +2620,7 @@ void NLDR::CCA_GAUSS_SEIDEL()
 			{
 				
 				if(! search_first_condition(DX, stress2, - e1.matrix[h][0] / fabs(e2.matrix[h][0]), j, h, - e1.matrix[h][0] * e1.matrix[h][0] / fabs(e2.matrix[h][0]), lambda.matrix[times * size + j][0], alpha, 1, 1, stress2))
-					;//---cout << "!";
+                    ;//---std::cout << "!";
 				COR.matrix[j][h] = COR.matrix[j][h] - alpha * e1.matrix[h][0] / fabs(e2.matrix[h][0]);
 				update_distance_matrix(DX, j, h, COR.matrix[j][h], 0);
 			}
@@ -2645,11 +2644,11 @@ void NLDR::CCA_GAUSS_SEIDEL()
 
 		stress2 = CCA_stress_function_by_matrix(DX, lambda.matrix[times * size + size - 1][0]);
 		err = fabs((stress1 - stress2) / stress2);
-		cout << "stress value : " << stress2 << endl;
-		cout << "rel error : " << err << endl;
+        std::cout << "stress value : " << stress2 << std::endl;
+        std::cout << "rel error : " << err << std::endl;
 
 		times = times + 1;
-		cout << "times : " << times << endl;
+        std::cout << "times : " << times << std::endl;
 	}
 
 	STRESS = stress2;
@@ -2728,14 +2727,14 @@ void NLDR::CCA_STOCHASTIC()
 				COR.matrix[j][k] = COR.matrix[j][k] + alpha.matrix[i][0] * FY.matrix[j][0] * DY.matrix[j][k];
 			}
 		if(i % size == 0)
-			cout << "epochs : " << (int) i / size << endl;
+            std::cout << "epochs : " << (int) i / size << std::endl;
 	}
 
 	DIS = COR.compute_Distance_Matrix();
 
 	STRESS = CCA_stress_function_by_matrix(DIS, lambda.matrix[train_len - 1][0]);
 
-	cout << "stress value : " << STRESS << endl;
+    std::cout << "stress value : " << STRESS << std::endl;
 
 	return;
 };
@@ -2768,13 +2767,13 @@ void NLDR::CCA_METROPOLIS()
         lambda.matrix[i][0] = lambda0 * pow(lambdan / lambda0, (double) i / (train_len - 1));
 
     str1 = CCA_stress_function(DX, lambda.matrix[0][0]) / weight;
-    cout << "start : accept stress : " << str1 << endl;
+    std::cout << "start : accept stress : " << str1 << std::endl;
     ADX = DX;
     CCA_GRADIENT(gradient, CORX, ADX, lambda.matrix[0][0]);
     delta = gradient.norm(M_FRO_NORM) / weight;
-    cout << "gradient norm:" << delta << endl;
+    std::cout << "gradient norm:" << delta << std::endl;
     delta = (double) 1 / (delta * delta);
-    cout << "delta:" << delta << endl;
+    std::cout << "delta:" << delta << std::endl;
 
     for(int i = 0; i < train_len; i++)
     {
@@ -2795,7 +2794,7 @@ void NLDR::CCA_METROPOLIS()
         {
             CORX = candidate;
             ADX = DX;
-            cout << i << " : accept stress : " << str2 << endl;
+            std::cout << i << " : accept stress : " << str2 << std::endl;
         }
 
         T = T * 0.99;
@@ -2956,7 +2955,7 @@ void NLDR::update_distance_matrix(Matrix<double> &DX, int i, int j, double xcnew
 	if(cost_function == (String) "CCA")
 		return CCA_update_distance_matrix(DX, i, j, xcnew, para);
 
-    cout << "Warning: This cost function does not exist in this program!" << endl;
+    std::cout << "Warning: This cost function does not exist in this program!" << std::endl;
 };
 
 void NLDR::KRUSKAL1_update_distance_matrix(Matrix<double> &DX, int i, int j, double xcnew)
@@ -3069,7 +3068,7 @@ double NLDR::update_cost_function(const Matrix<double> &DX, double fxc, int i, i
 	if(cost_function == (String) "CCA")
 		return CCA_update_stress_function(DX, i, j, xcnew, fxc, para);
 
-    cout << "Warning: This cost function does not exist in this program!" << endl;
+    std::cout << "Warning: This cost function does not exist in this program!" << std::endl;
 	return 0;
 };
 
@@ -3220,7 +3219,7 @@ double NLDR::update_Ei_cost_function(double fxc, const Matrix<double> &DX, int i
 	if(cost_function == (String) "CCA_Ei")
 		return CCA_update_Ei_cost_function(fxc, DX, ind, j, para, xcnew);
 
-    cout << "Warning: No such cost function" << endl;
+    std::cout << "Warning: No such cost function" << std::endl;
 	return 0;
 }
 

@@ -25,6 +25,48 @@
 
 #include "wmix.h"
 
+Mix::Mix(const Mix &data)
+{
+  if(data.data_type == NONE)
+		data_type = data.data_type;
+	else
+	if(data.data_type == INT)
+	{
+		int *ptr = new int;
+		*ptr = *((int *) data.point);
+		point = (void *) ptr;
+		data_type = data.data_type;
+	} else
+	if(data.data_type == DOUBLE)
+	{
+		double *ptr = new double;
+		*ptr = *((double *) data.point);
+		point = (void *) ptr;
+		data_type = data.data_type;
+	} else
+	if(data.data_type == STRING)
+	{
+		String *ptr = new String;
+		*ptr = (*((String *) data.point));
+		point = (void *) ptr;
+		data_type = data.data_type;
+	} else
+	if(data.data_type == ARRAY)
+	{
+		Array<Mix> *ptr = new Array<Mix>;
+		*ptr = *((Array<Mix> *) data.point);
+		point = (void *) ptr;
+		data_type = data.data_type;
+	} else
+	if(data.data_type == MAPPING)
+	{
+		Mapping<Mix, Mix> *ptr = new Mapping<Mix, Mix>;
+		*ptr = *((Mapping<Mix, Mix> *) data.point);
+		point = (void *) ptr;
+		data_type = data.data_type;
+	}
+};
+
 Mix::Mix(int data)
 {
 	int *ptr = new int;
@@ -256,7 +298,7 @@ bool Mix::operator==(const Mix &right) const
 }
 
 void Mix::release_data()
-{
+{ 
 	if(data_type == INT)
 	{
 		int *ptr;
@@ -307,31 +349,38 @@ Mix::~Mix()
 	{
 		int *ptr = (int *) point;
 		point = NULL;
-		delete ptr;
+		if(ptr != NULL)
+		    delete ptr;
+		data_type = NONE;
 	} else
 	if(data_type == DOUBLE)
 	{
 		double *ptr = (double *) point;
 		point = NULL;
-		delete ptr;
+		if(ptr != NULL)
+		    delete ptr;
+		data_type = NONE;
 	} else
 	if(data_type == STRING)
 	{
 		String *ptr = (String *) point;
 		point = NULL;
 		delete ptr;
+		data_type = NONE;
 	} else
 	if(data_type == ARRAY)
 	{
 		Array<Mix> *ptr = (Array<Mix> *) point;
 		point = NULL;
 		delete ptr;
+		data_type = NONE;
 	} else
 	if(data_type == MAPPING)
 	{
 		Mapping<Mix, Mix> *ptr = (Mapping<Mix, Mix> *) point;
 		point = NULL;
 		delete ptr;
+		data_type = NONE;
 	}
 };
 

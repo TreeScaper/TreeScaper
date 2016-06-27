@@ -195,25 +195,25 @@ void SparseMatrix::OutputSparseMatrix(std::ostream &output, SparseMatrixOutputTy
     }
 }
 
-// added by MM: Adds name of the columns when bipartition matrix is outputted in list format
-void SparseMatrix::OutputSparseMatrix2(std::ostream &output, SparseMatrixOutputType smtype)
-{
-    if(smtype == RCVLIST)
-    {
-        output << "Bipart \t Tree \t Weight" << std::endl;
-        for (int i = 0; i < cols; i++)
-        {
-            for (int j = colptr[i]; j < colptr[i+1]; j++)
-                output << rowind[j] + 1 << "\t" << i + 1 << "\t" << vals[j] << std::endl;
-        }
-    } else
-    if(smtype == FULLMATRIX)
-    {
-        for(int i = 0; i < rows; i++)
-        {
-            for(int j = 0; j < cols; j++)
-                output << (*this)(i, j) << "\t";
-            output << std::endl;
-        }
-    }
-}
+//// added by MM: Adds name of the columns when bipartition matrix is outputted in list format
+//void SparseMatrix::OutputSparseMatrix2(std::ostream &output, SparseMatrixOutputType smtype)
+//{
+//    if(smtype == RCVLIST)
+//    {
+//        output << "Bipart \t Tree \t Weight" << std::endl;
+//        for (int i = 0; i < cols; i++)
+//        {
+//            for (int j = colptr[i]; j < colptr[i+1]; j++)
+//                output << rowind[j] + 1 << "\t" << i + 1 << "\t" << vals[j] << std::endl;
+//        }
+//    } else
+//    if(smtype == FULLMATRIX)
+//    {
+//        for(int i = 0; i < rows; i++)
+//        {
+//            for(int j = 0; j < cols; j++)
+//                output << (*this)(i, j) << "\t";
+//            output << std::endl;
+//        }
+//    }
+//}

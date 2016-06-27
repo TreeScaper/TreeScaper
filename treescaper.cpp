@@ -265,7 +265,7 @@ void TreeScaper::initialize_paras(nldr_parameters &nldrparas, image_parameters &
     File nldrfparas("nldrparas");
     if(!nldrfparas.is_open())
     {
-        msgBox.setText("error: can not open parameter file \"nldrparas\"!");
+        msgBox.setText("Error: Cannot open parameter file \"nldrparas\"!");
         msgBox.exec();
         return;
     }
@@ -273,10 +273,15 @@ void TreeScaper::initialize_paras(nldr_parameters &nldrparas, image_parameters &
     Array<String> nldrentries;
     String nldrelement;
     nldrfparas >> nldrelement;
-	while(! nldrfparas.is_end())
+    int countnldrelements = 1;      // Skip newline at the end of the file
+    while(! nldrfparas.is_end())
     {
         nldrentries.add(nldrelement);
-        nldrfparas >> nldrelement;
+        if(countnldrelements > 101)
+            break;
+        else
+            nldrfparas >> nldrelement;
+        countnldrelements += 1;
     }
 
     QString nldrqtstr[51];
@@ -344,7 +349,7 @@ void TreeScaper::initialize_paras(nldr_parameters &nldrparas, image_parameters &
     File plotfparas("plotparas");
     if(!plotfparas.is_open())
     {
-        msgBox.setText("error: can not open parameter file \"plotparas\"!");
+        msgBox.setText("Error: Cannot open parameter file \"plotparas\"!");
         msgBox.exec();
         return;
     }
@@ -352,10 +357,15 @@ void TreeScaper::initialize_paras(nldr_parameters &nldrparas, image_parameters &
     Array<String> entries;
     String element;
     plotfparas >> element;
+    int countelements = 1;      // Skip newline at the end of the file
 	while(! plotfparas.is_end())
     {
         entries.add(element);
-        plotfparas >> element;
+        if(countelements > 45)
+            break;
+        else
+            plotfparas >> element;
+        countelements += 1;
     }
 
     paras::plot_type = entries[1];
@@ -408,7 +418,7 @@ void TreeScaper::initialize_paras(nldr_parameters &nldrparas, image_parameters &
     {
         if(i * 2 + 27 >= entries.get_length())
         {
-            msgBox.setText("error : the index setting of NLDR plot is wrong, please set again.");
+            msgBox.setText("Error: The index setting of NLDR plot is wrong, please set again.");
             msgBox.exec();
             return;
         }
@@ -746,7 +756,7 @@ void TreeScaper::on_pushNLDRplot_clicked()
 
     if(! file.is_open())
     {
-        cout << "Error: The coordinates file \""<< filename << "\" can not be found! Run NLDR first!\n\n";//--- or select the coordinate file first by checking the box!" << endl;
+        cout << "Error: The coordinates file \""<< filename << "\" cannot be found! Run NLDR first!\n\n";//--- or select the coordinate file first by checking the box!" << endl;
         return;
     }
 
@@ -874,7 +884,6 @@ void TreeScaper::on_pushdimrun_clicked()
     }
     else if(DIMdata == (String) "File-coordinate")
     {
-        cout << "Here1:" << endl; //-- MMtest
         dist = TreesData->GetcoordFile();
         size = TreesData->Get_filedcoordinatesize();
         dim = TreesData->Get_filedcoordinatedim();

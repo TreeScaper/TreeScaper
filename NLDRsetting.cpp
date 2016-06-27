@@ -63,10 +63,15 @@ void NLDRsetting::loadnldrparas()
     Array<String> nldrentries;
     String nldrelement;
     nldrfparas >> nldrelement;
+    int countnldrelements = 1;      // Skip newline at the end of the file
     while(! nldrfparas.is_end())
     {
         nldrentries.add(nldrelement);
-        nldrfparas >> nldrelement;
+        if(countnldrelements > 101)
+            break;
+        else
+            nldrfparas >> nldrelement;
+        countnldrelements += 1;
     }
 
     nnldrvalues = 51;

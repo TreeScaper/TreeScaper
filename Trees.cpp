@@ -1791,7 +1791,7 @@ int ** Trees:: array_to_matrix (int* m, int rows, int cols)
 
 void Trees::OutputBipartitionMatrix(std::ostream &output, SparseMatrixOutputType smtype)
 {
-    sbipartmatrix->OutputSparseMatrix2(output, smtype);
+    sbipartmatrix->OutputSparseMatrix(output, smtype);
 }
 
 void Trees::load_distfile(string fname)
