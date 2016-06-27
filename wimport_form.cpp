@@ -73,7 +73,7 @@ Array<Mapping<Mix, Mix> > wImport_Form::Read(String filename)
 			line = EMPTY_STRING;
 		}
 	}
-
+	
 	for(int i = 0; i < lines.get_length(); i++)
 	{
 		line = lines[i];
@@ -114,8 +114,9 @@ Array<Mapping<Mix, Mix> > wImport_Form::Read(String filename)
 		{
 			key = mix_lines[0][i];
 			result[j][key] = (mix_lines[j + 1][i]);
-        }
+		}
     }
+    
 	return result;
 }
 
@@ -187,6 +188,7 @@ bool wImport_Form::String_Array(const String &line, Array<Mix> &result)
 	str = line;
 	do{
 		String_Element(str, element, rest);
+        
 		if(! To_Mix(element, m))
 		{
 			cout << "{ ERROR! file : wimport_form.cpp/String_Array(const String &line, Array<Mix> &result)\n"
@@ -210,13 +212,14 @@ bool wImport_Form::String_Element(String &str, String &element, String &rest)
 {
 	element = EMPTY_STRING;
 	rest = EMPTY_STRING;
-        bool in_one_part = false;
+    bool in_one_part = false;
 	int i = 0;
 	int begin, end, rest_begin;
 	bool is_str = false, is_arr = false, is_map = false;
 
 	// looking for begin
 	for(i = 0; i < str.get_length(); i++)
+    {
 		if(str[i] != ' ')
 		{
 			if(str[i] == '"')
@@ -228,7 +231,8 @@ bool wImport_Form::String_Element(String &str, String &element, String &rest)
 			begin = i;
 			break;
 		}
-
+    }
+    
 	if(i == str.get_length())
 		return true;
 
@@ -268,16 +272,19 @@ bool wImport_Form::String_Element(String &str, String &element, String &rest)
 
 	// looking for rest_begin
 	for(i = end; i < str.get_length(); i++)
+    {
 		if(str[i] != ' ')
 		{
 			rest_begin = i;
 			break;
 		}
+    }
 
 	if(i == str.get_length())
 		return true;
 
 	rest = str(rest_begin, str.get_length() - rest_begin);
+    
 	return true;
 }
 
