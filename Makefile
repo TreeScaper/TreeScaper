@@ -13,17 +13,6 @@ F2CLIB = $(ROOTPATH)/F2CLIBS/libf2c.a
 #CLAPLIB = $(ROOTPATH)/lapack_MAC.a
 #BLASLIB = $(ROOTPATH)/blas_MAC.a
 #F2CLIB = $(ROOTPATH)/F2CLIBS/libf2c.a
-<<<<<<< HEAD
-##BLWRLIB = $(ROOTPATH)/libcblaswr.a
-
-#WH mac path
-ROOTPATH = /Users/whuang/TreeScaper_dev/clapack-3.2.1-CMAKE
-INCDIRS = -I$(ROOTPATH)/INCLUDE
-CLAPLIB = $(ROOTPATH)/lapack_MAC.a
-BLASLIB = $(ROOTPATH)/blas_MAC.a
-F2CLIB = $(ROOTPATH)/F2CLIBS/libf2c.a
-=======
->>>>>>> refs/remotes/origin/developer
 
 #common command
 #LDLIBS  = $(CLAPLIB) $(BLASLIB) $(F2CLIB) -lm #$(BLWRLIB) -lm

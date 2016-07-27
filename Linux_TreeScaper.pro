@@ -11,8 +11,6 @@ QT += webkitwidgets
 TARGET = TreeScaper
 TEMPLATE = app
 
-<<<<<<< HEAD
-=======
 #CONFIG += debug
 #CONFIG -= app_bundle
 
@@ -20,7 +18,6 @@ TEMPLATE = app
 
 #QT -= gui
 
->>>>>>> refs/remotes/origin/developer
 SOURCES += main.cpp\
     randgen.cpp \
     treescaper.cpp \
@@ -73,12 +70,8 @@ SOURCES += main.cpp\
     SiblingPair.cpp \
     SPRLCA.cpp \
     SPRNode.cpp \
-<<<<<<< HEAD
-    UndoMachine.cpp
-=======
     UndoMachine.cpp \
     NLDRsetting.cpp
->>>>>>> refs/remotes/origin/developer
 
 HEADERS  += treescaper.h \
     randgen.h \
@@ -133,13 +126,6 @@ HEADERS  += treescaper.h \
     SiblingPair.hpp \
     SPRLCA.hpp \
     SPRNode.cpp \
-<<<<<<< HEAD
-    UndoMachine.hpp
-
-FORMS    += treescaper.ui \
-    setting.ui \
-    plot2d.ui
-=======
     UndoMachine.hpp \
     NLDRsetting.h
 
@@ -160,7 +146,6 @@ FORMS    += treescaper.ui \
 #VTKVTKPATH = /Users/whuang/TreeScaper_dev/VTK6.0.0
 #CLAPACKPATH = /Users/whuang/TreeScaper_dev/clapack-3.2.1-CMAKE
 
->>>>>>> refs/remotes/origin/developer
 
 # for WH linux system --WH
 VTKBINPATH = /home/whuang/VTK/Bin-6.3.0
@@ -418,8 +403,6 @@ LIBS += -ldl
 LIBS += -lX11
 LIBS += /usr/lib/x86_64-linux-gnu/libXt.so.6.0.0
 LIBS += /usr/lib/x86_64-linux-gnu/libX11.a
-<<<<<<< HEAD
-=======
 
 ## FOR MAC system
 #INCLUDEPATH += /Developer/SDKs/MacOSX10.8.sdk/usr/X11/include/GL
@@ -546,4 +529,3 @@ LIBS += /usr/lib/x86_64-linux-gnu/libX11.a
 #-lvtksys-6.3 \
 #-lvtkverdict-6.3 \
 #-lvtkzlib-6.3
->>>>>>> refs/remotes/origin/developer
