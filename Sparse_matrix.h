@@ -35,8 +35,8 @@ public:
     // added by WH
     void OutputSparseMatrix(std::ostream &output, SparseMatrixOutputType smtype);
 
-    // add by MM
-    void OutputSparseMatrix2(std::ostream &output, SparseMatrixOutputType smtype);
+//    // add by MM
+//    void OutputSparseMatrix2(std::ostream &output, SparseMatrixOutputType smtype);
 
 private:
 

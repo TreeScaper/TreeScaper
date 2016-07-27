@@ -68,7 +68,7 @@ public:
 
 	Mix(){data_type = NONE;};
 
-	Mix(const Mix &data){(*this) = data;};
+	Mix(const Mix &data);//	{(*this) = data;};
 
 	Mix(int data);
 
@@ -84,7 +84,7 @@ public:
 
 	const Mix &operator=(const Mix &right);
 
-	Mix operator=(int right);
+	int operator=(int right);
 
 	Mix operator=(double right);
 

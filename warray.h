@@ -124,7 +124,7 @@ public:
 		if(length > 0)
 		{
 			delete [] vec;
-		}
+        }
 	};
 
 	Array(){length = 0; };                                                     // construct a dafault Array
@@ -235,7 +235,7 @@ public:
         {
             if(left.get_length() != right.get_length())
             {
-                std::cout << "warning(warray.cpp): left bitstring and right bitstring don't have same length." << std::endl;
+                std::cout << "Warning(warray.cpp): Left bitstring and right bitstring are not the same length!" << std::endl;
                 return false;
             }
             if(length > 0)
@@ -243,18 +243,21 @@ public:
             length = left.get_length();
 
             vec = new T [length];
+            for(int i = 0; i < length; i++)
+                vec[i] = NULL;
 
             for(int i = 0; i < length; i++)
                 vec[i] = left.vec[i] | right.vec[i];
-//std::cout << "left:";
-//left.printbits(12);
-//std::cout << std::endl;
-//std::cout << "right:";
-//right.printbits(12);
-//std::cout << std::endl;
-//std::cout << "OR:";
-//this->printbits(12);
-//std::cout << std::endl;
+
+//            std::cout << "left:";
+//            left.printbits(12);
+//            std::cout << std::endl;
+//            std::cout << "right:";
+//            right.printbits(12);
+//            std::cout << std::endl;
+//            std::cout << "OR:";
+//            this->printbits(12);
+//            std::cout << std::endl;
 
             return true;
         };
@@ -264,7 +267,7 @@ public:
             int bitnum = sizeof(T) * 8;
             if(idx > bitnum * length)
             {
-                std::cout << "Warning(warray.cpp): wrong index! idx:" << idx << ", nbits:" << bitnum * length << std::endl;
+                std::cout << "Warning(warray.cpp): Wrong index! idx:" << idx << ", nbits:" << bitnum * length << std::endl;
                 return false;
             }
 

@@ -135,6 +135,31 @@ class InteractorStyle : public vtkInteractorStyleRubberBandPick
       for(vtkIdType i = 0; i < ids->GetNumberOfTuples(); i++)
       {
           new_pro = IDMaps[ids->GetValue(i)];
+          int tmpidx = -1;
+          bool break_flag = false;
+          for(int j = 0; j < cluster_num; j++)
+          {
+              for(int k = 0; k < lengthidx; k++)
+              {
+                  if(cluster_Idx[k] == j)
+                  {
+                      tmpidx++;
+                      if(tmpidx == new_pro)
+                      {
+                          break_flag = true;
+                          new_pro = k;
+                          break;
+                      }
+                  }
+              }
+              if(break_flag)
+                  break;
+          }
+
+          //double *cluster_Idx;
+          //int lengthidx;
+          //int cluster_num;
+
           for(j = 0; j < idx; j++)
           {
               if((*selected_pts)[j] == new_pro)
@@ -145,7 +170,8 @@ class InteractorStyle : public vtkInteractorStyleRubberBandPick
               (*selected_pts)[idx] = new_pro;
               idx++;
           }
-          cout << "i:" << IDMaps[ids->GetValue(i)] << ", ";
+          cout << "i:" << new_pro << ", ";
+//          cout << "i:" << IDMaps[ids->GetValue(i)] << ", ";
       }
       cout << endl;
       (*selected_pts)[idx] = -1;
@@ -190,6 +216,7 @@ class InteractorStyle : public vtkInteractorStyleRubberBandPick
     void SetPoints(vtkSmartPointer<vtkPolyData> points) {this->Points = points;}
     void SetIDMaps(int *maps){IDMaps = maps;}
     void SetOutputPts(Array<int> *Pts){selected_pts = Pts;}
+    void SetIdxSet(int *incluster_Idx, int inlengthidx, int incluster_num){cluster_Idx = incluster_Idx; lengthidx = inlengthidx; cluster_num = incluster_num;};
   private:
     vtkSmartPointer<vtkPolyData> Points;
     vtkSmartPointer<vtkPoints> *PreSelectedPoints;
@@ -201,6 +228,10 @@ class InteractorStyle : public vtkInteractorStyleRubberBandPick
     Array<int> * selected_pts;
     int idx;
     int *IDMaps;
+
+    int *cluster_Idx;
+    int lengthidx;
+    int cluster_num;
 };
 
 vtkStandardNewMacro(InteractorStyle);
@@ -716,6 +747,7 @@ bool Image::select_Points(String filename)
         }
     }
     delete [] mean;
+    delete [] numbers_in_cluster;
     return true;
 };
 
@@ -1007,6 +1039,7 @@ void Image::Plot_Points()
     allstyle->SetPoints(allinput);
     allstyle->SetIDMaps(IDMaps);
     allstyle->SetOutputPts(SelectedIDs);
+    allstyle->SetIdxSet(parameters.cluster_index, parameters.index_size, parameters.cluster_num);
     allstyle->SetSelectedPointsSize(parameters.point_size + 1);
     renderWindowInteractor->SetInteractorStyle( allstyle );
 

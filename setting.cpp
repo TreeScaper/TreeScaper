@@ -71,10 +71,15 @@ void setting::loadplotparas()
     Array<String> entries;
     String element;
     fparas >> element;
+    int countelements = 1;      // Skip newline at the end of the file
 	while(! fparas.is_end())
     {
         entries.add(element);
-        fparas >> element;
+        if(countelements > 45)
+            break;
+        else
+            fparas >> element;
+        countelements += 1;
     }
 
     if(entries[1] == (String) "Points")

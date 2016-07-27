@@ -41,7 +41,7 @@ const Array<T> &Array<T>::operator=(const Array<T> &right)
 		if(length > 0)
 			delete [] left;
 
-		length = right.length;
+        length = right.length;
 		vec = new T[length];
 
 		for(int i = 0; i < length; i++)
@@ -185,10 +185,14 @@ void Array<T>::resize(int size, int flag)                          // change the
 	}
 */
     T *org_vec = vec;
-    vec = new T[size];
+
+    if(size > 0)
+        vec = new T[size];
+    else
+        vec = NULL;
 
     int min = (length > size) ? size : length;
-//        std::cout << "min:" << min << std::endl;//---
+//        std::cout << "min: " << min << std::endl;//---
 	for(int i = 0; i < min; i++)
 	{
 		vec[i] = org_vec[i];
@@ -206,7 +210,7 @@ bool Array<T>::bitstrXOR(const Array<T> &left, const Array<T> &right, int &resul
 {
     if(left.get_length() != right.get_length())
     {
-        std::cout << "warning(warray.cpp): left bitstring and right bitstring don't have same length." << std::endl;
+        std::cout << "Warning(warray.cpp): Left bitstring and right bitstring are not the same length!" << std::endl;
         return false;
     }
 
@@ -238,7 +242,7 @@ bool Array<T>::onebitstrXOR(const Array<T> &left, int &result)
 {
     if(left.get_length() == 0)
     {
-        std::cout << "warning(warray.cpp): bitstring cannot have length zero." << std::endl;
+        std::cout << "Warning(warray.cpp): Bitstring cannot have length zero!" << std::endl;
         return false;
     }
 
@@ -266,7 +270,7 @@ bool Array<T>::ORbitOPE(const Array<T> &left, const Array<T> &right)
 {
     if(left.get_length() != right.get_length())
     {
-        std::cout << "warning(warray.cpp): left bitstring and right bitstring don't have same length." << std::endl;
+        std::cout << "Warning(warray.cpp): Left bitstring and right bitstring are not the same length!" << std::endl;
         return false;
     }
     if(length > 0)
@@ -286,7 +290,7 @@ bool Array<T>::SetBitArray(int idx)
 {
     if(idx > sizeof(T) * length)
     {
-        std::cout << "Warning(warray.cpp): wrong index!" << std::endl;
+        std::cout << "Warning(warray.cpp): Wrong index!" << std::endl;
         return false;
     }
 
@@ -308,7 +312,7 @@ bool Array<T>::SetBitArray(int idx)
 {
     if(idx > sizeof(T) * length)
     {
-        std::cout << "Warning(warray.cpp): wrong index!" << std::endl;
+        std::cout << "Warning(warray.cpp): Wrong index!" << std::endl;
         return false;
     }
 

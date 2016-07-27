@@ -115,6 +115,7 @@ Trees::Trees()
 void Trees::destructor()
 {
     deletetrees();
+    deleteConsensustree();
     delete [] numberofbipartition;
     numberofbipartition = NULL;
     delete [] bipart_count;
@@ -192,6 +193,19 @@ void Trees::deletetrees()
         delete [] treeset;
         treeset = NULL;
     }
+//    if(consensustrees.is_empty() == 0)
+//    {
+//        for(unsigned int i = 0; i < consensustrees.get_length(); i++)
+//        {
+//            TreeOPE::killnewicktree(consensustrees[i]);
+//            consensustrees[i] = NULL;
+//        }
+//        consensustrees.resize(0);
+//    }
+}
+
+void Trees::deleteConsensustree()
+{
     if(consensustrees.is_empty() == 0)
     {
         for(unsigned int i = 0; i < consensustrees.get_length(); i++)
@@ -423,6 +437,8 @@ void Trees::initialTrees(string fname)
                             istringstream iss(line);
                             iss >> a >> b;
                             b.erase(remove(b.begin(),b.end(),','),b.end());
+                            b.erase(remove(b.begin(),b.end(),';'),b.end());
+
                             if(b.length() > 255)
                             {
                                 cout << "The longest name only can include 255 chars!\n\n";
@@ -896,6 +912,32 @@ string Trees::WriteTreesFilename(string fname, string type)
         result += "weighted_";
     else
         result += "unweighted_";
+
+    type.erase(remove( type.begin(), type.end(), ' ' ), type.end() );
+    result += type;
+
+    result += ".out";
+    return result;
+}
+
+string Trees::WriteConsensusTreeFilename(string fname, string type)
+{
+    string result;
+    string rawname = fname.substr(0, fname.find_last_of("."));
+    result = rawname;
+    result += "_";
+
+    if(isrooted)
+        result += "rooted_";
+    else
+        result += "unrooted_";
+
+    if (isweighted)
+        result += "weighted_";
+    else
+        result += "unweighted_";
+
+    result += "Consensus_tree_";
 
     type.erase(remove( type.begin(), type.end(), ' ' ), type.end() );
     result += type;
@@ -1749,7 +1791,7 @@ int ** Trees:: array_to_matrix (int* m, int rows, int cols)
 
 void Trees::OutputBipartitionMatrix(std::ostream &output, SparseMatrixOutputType smtype)
 {
-    sbipartmatrix->OutputSparseMatrix2(output, smtype);
+    sbipartmatrix->OutputSparseMatrix(output, smtype);
 }
 
 void Trees::load_distfile(string fname)
@@ -2106,6 +2148,14 @@ bool Trees::bipartmatrixIsexisting()
 bool Trees::treesAreexisting()
 {
     if(treeset == NULL)
+        return false;
+
+    return true;
+}
+
+bool Trees::consensusTreeIsexisting()
+{
+    if(consensustrees.is_empty() == 1)
         return false;
 
     return true;
@@ -3193,7 +3243,7 @@ bool Trees::compute_community_manually(String str_matrix, int modelType, Array<d
                 for (int j = 0; j < communities[k]->size; j++)
                 {
                     if(communities[k]->n2c[j] == i)
-                        std::cout << j+1 << ",";
+                        std::cout << j << ",";
                 }
                 std::cout << "\n";
             }
@@ -3321,7 +3371,10 @@ const NEWICKTREE *Trees::get_tree(int idx)
 
 bool Trees::compute_consensus_tree(ConsensusTree type, const char *listname)
 {
+    deleteConsensustree();
+
     int num = idxlist.get_length();
+
     map<unsigned long long, unsigned long long> bipcount;
     for(int i = 0; i < idxlist.get_length(); i++)
     {
@@ -3369,7 +3422,7 @@ bool Trees::compute_consensus_tree(ConsensusTree type, const char *listname)
                                     conbipnum,
                                     leaveslabelsmaps.size()))
     {
-        std::cout << "Error: Uncompatible bipartitions! Unable to compute consensus tree!\n\n";
+        std::cout << "Error: Incompatible bipartitions! Unable to compute consensus tree!\n\n";
         delete [] contreebitstr;
         return false;
     }

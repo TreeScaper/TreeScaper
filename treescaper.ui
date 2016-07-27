@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1401</width>
-    <height>887</height>
+    <width>855</width>
+    <height>855</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -280,6 +280,15 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+<<<<<<< HEAD
+=======
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+>>>>>>> refs/remotes/origin/developer
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -477,7 +486,7 @@ p, li { white-space: pre-wrap; }
            <widget class="QFrame" name="frame_37">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>1</horstretch>
+              <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
@@ -553,7 +562,7 @@ p, li { white-space: pre-wrap; }
           <item row="0" column="0">
            <widget class="QComboBox" name="comboBoxTreeData">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -561,13 +570,13 @@ p, li { white-space: pre-wrap; }
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>35</height>
+              <height>25</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>35</height>
+              <height>25</height>
              </size>
             </property>
             <property name="font">
@@ -620,7 +629,7 @@ p, li { white-space: pre-wrap; }
            <widget class="QStackedWidget" name="stackedWidgetTreeData">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>1</horstretch>
+              <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
@@ -2197,7 +2206,7 @@ p, li { white-space: pre-wrap; }
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
-                        <height>35</height>
+                        <height>25</height>
                        </size>
                       </property>
                       <property name="font">
@@ -2354,7 +2363,7 @@ p, li { white-space: pre-wrap; }
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
-                        <height>35</height>
+                        <height>25</height>
                        </size>
                       </property>
                       <property name="frame">
@@ -2667,7 +2676,7 @@ p, li { white-space: pre-wrap; }
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
-                        <height>35</height>
+                        <height>25</height>
                        </size>
                       </property>
                       <item>
@@ -2749,7 +2758,7 @@ p, li { white-space: pre-wrap; }
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
-                        <height>35</height>
+                        <height>25</height>
                        </size>
                       </property>
                       <item>
@@ -2814,7 +2823,7 @@ p, li { white-space: pre-wrap; }
           <item row="0" column="1" rowspan="5">
            <widget class="QFrame" name="frame">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>5</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -3002,6 +3011,15 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+<<<<<<< HEAD
+=======
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+>>>>>>> refs/remotes/origin/developer
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -3186,69 +3204,10 @@ p, li { white-space: pre-wrap; }
             </layout>
            </widget>
           </item>
-          <item row="3" column="0" rowspan="2">
-           <widget class="QFrame" name="frame_2">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>5</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_7">
-             <item>
-              <widget class="QLabel" name="label_4">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Double click on data value to output or delete</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QListWidget" name="listDATAmem_3">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Sunken</enum>
-               </property>
-               <property name="editTriggers">
-                <set>QAbstractItemView::NoEditTriggers</set>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item row="0" column="0">
            <widget class="QComboBox" name="comboBoxDimNLDR">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -3256,13 +3215,13 @@ p, li { white-space: pre-wrap; }
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>35</height>
+              <height>25</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>35</height>
+              <height>25</height>
              </size>
             </property>
             <item>
@@ -3326,7 +3285,7 @@ p, li { white-space: pre-wrap; }
                  <item row="0" column="0">
                   <widget class="QLabel" name="labelNLDRdistance">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -3357,7 +3316,7 @@ p, li { white-space: pre-wrap; }
                  <item row="0" column="1">
                   <widget class="QComboBox" name="comboBoxNLDRdata">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -3371,7 +3330,7 @@ p, li { white-space: pre-wrap; }
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>35</height>
+                     <height>25</height>
                     </size>
                    </property>
                    <item>
@@ -3384,7 +3343,7 @@ p, li { white-space: pre-wrap; }
                  <item row="1" column="0">
                   <widget class="QLabel" name="labelNLDRmethod">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -3415,7 +3374,7 @@ p, li { white-space: pre-wrap; }
                  <item row="1" column="1">
                   <widget class="QComboBox" name="comboboxNLDRmethod">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -3429,7 +3388,7 @@ p, li { white-space: pre-wrap; }
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>35</height>
+                     <height>25</height>
                     </size>
                    </property>
                    <property name="font">
@@ -3468,7 +3427,7 @@ p, li { white-space: pre-wrap; }
                  <item row="2" column="0">
                   <widget class="QLabel" name="labelNLDRalgo">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -3499,7 +3458,7 @@ p, li { white-space: pre-wrap; }
                  <item row="2" column="1">
                   <widget class="QComboBox" name="comboBoxNLDRalgo">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -3513,7 +3472,7 @@ p, li { white-space: pre-wrap; }
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>35</height>
+                     <height>25</height>
                     </size>
                    </property>
                    <property name="font">
@@ -3691,7 +3650,7 @@ p, li { white-space: pre-wrap; }
                  <item row="5" column="1">
                   <widget class="QComboBox" name="comboBoxNLDRinit">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -3705,7 +3664,7 @@ p, li { white-space: pre-wrap; }
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>35</height>
+                     <height>25</height>
                     </size>
                    </property>
                    <property name="font">
@@ -3744,7 +3703,7 @@ p, li { white-space: pre-wrap; }
                     <item>
                      <widget class="QPushButton" name="pushNLDRsetting">
                       <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
@@ -3775,7 +3734,7 @@ p, li { white-space: pre-wrap; }
                     <item>
                      <widget class="QPushButton" name="pushNLDRrun">
                       <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
@@ -3806,7 +3765,11 @@ p, li { white-space: pre-wrap; }
                     <item>
                      <widget class="QPushButton" name="pushPlotsetting">
                       <property name="sizePolicy">
+<<<<<<< HEAD
                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+=======
+                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+>>>>>>> refs/remotes/origin/developer
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
@@ -4019,7 +3982,7 @@ p, li { white-space: pre-wrap; }
                  <item row="0" column="1">
                   <widget class="QComboBox" name="comboBoxDIMdata">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -4027,13 +3990,13 @@ p, li { white-space: pre-wrap; }
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>35</height>
+                     <height>25</height>
                     </size>
                    </property>
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>35</height>
+                     <height>25</height>
                     </size>
                    </property>
                    <property name="font">
@@ -4121,7 +4084,7 @@ p, li { white-space: pre-wrap; }
                  <item row="1" column="1">
                   <widget class="QComboBox" name="comboBoxdimestimator">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -4129,13 +4092,13 @@ p, li { white-space: pre-wrap; }
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>35</height>
+                     <height>25</height>
                     </size>
                    </property>
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>35</height>
+                     <height>25</height>
                     </size>
                    </property>
                    <property name="font">
@@ -4523,6 +4486,65 @@ p, li { white-space: pre-wrap; }
             </widget>
            </widget>
           </item>
+          <item row="3" column="0" rowspan="2">
+           <widget class="QFrame" name="frame_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>5</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <widget class="QLabel" name="label_4">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Double click on data value to output or delete</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QListWidget" name="listDATAmem_3">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Sunken</enum>
+               </property>
+               <property name="editTriggers">
+                <set>QAbstractItemView::NoEditTriggers</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>
@@ -4537,7 +4559,7 @@ p, li { white-space: pre-wrap; }
           <item row="0" column="1" rowspan="7">
            <widget class="QFrame" name="frame_54">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>3</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -4644,13 +4666,13 @@ p, li { white-space: pre-wrap; }
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>35</height>
+              <height>25</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>35</height>
+              <height>25</height>
              </size>
             </property>
             <property name="font">
@@ -4863,7 +4885,7 @@ p, li { white-space: pre-wrap; }
                     <item>
                      <widget class="QComboBox" name="comboBoxCOVAmemdata">
                       <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
@@ -4877,7 +4899,7 @@ p, li { white-space: pre-wrap; }
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
-                        <height>35</height>
+                        <height>25</height>
                        </size>
                       </property>
                       <item>
@@ -5087,7 +5109,7 @@ p, li { white-space: pre-wrap; }
                     <item>
                      <widget class="QComboBox" name="comboBoxCOVAcdmodel">
                       <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
@@ -5101,7 +5123,7 @@ p, li { white-space: pre-wrap; }
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
-                        <height>35</height>
+                        <height>25</height>
                        </size>
                       </property>
                       <property name="font">
@@ -5722,7 +5744,7 @@ p, li { white-space: pre-wrap; }
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
-                        <height>35</height>
+                        <height>25</height>
                        </size>
                       </property>
                       <item>
@@ -5736,25 +5758,6 @@ p, li { white-space: pre-wrap; }
                      <widget class="QLabel" name="labelDISTplateau">
                       <property name="text">
                        <string>Find Plateaus:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="label_2">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>35</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>Affinity in memory:</string>
                       </property>
                      </widget>
                     </item>
@@ -5862,7 +5865,7 @@ p, li { white-space: pre-wrap; }
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
-                        <height>35</height>
+                        <height>25</height>
                        </size>
                       </property>
                       <item>
@@ -6253,6 +6256,25 @@ p, li { white-space: pre-wrap; }
                       </property>
                      </widget>
                     </item>
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="label_2">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>35</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Affinity in memory:</string>
+                      </property>
+                     </widget>
+                    </item>
                    </layout>
                   </widget>
                  </item>
@@ -6377,8 +6399,8 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1401</width>
-     <height>25</height>
+     <width>855</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>
