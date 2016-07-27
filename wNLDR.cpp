@@ -69,11 +69,15 @@ void NLDR::init_NLDR(String fname, double **dist, int sizeinput, String dim, Str
             delete [] D.matrix;
         }
         D.matrix = dist;*/
+
         size = sizeinput;
         D.resize(size, size);
         for(int i = 0; i < size; i++)
-            for(int j = 0; j < size; j++)
+            for(int j = 0; j <= i; j++)
+            {
                 D.matrix[i][j] = (double) dist[i][j];
+                D.matrix[j][i] = D.matrix[i][j];
+            }
     } else
     {
         std::cout << "Error: Incorrect input data parameters" << std::endl;
@@ -140,7 +144,7 @@ void NLDR::init_NLDR(String fname, String ftype, String dim, String cost, String
 
 void NLDR::NLDR_init_parameters(String para_filename)
 {
-	parameters.distance_file_type = 0;
+	parameters.distance_file_type = 1;
 	parameters.length_tru = 11;
     parameters.interval_tru = 5;
     parameters.length_con = 11;

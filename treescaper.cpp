@@ -589,9 +589,10 @@ void TreeScaper::on_pushNLDRrun_clicked()
         for(int i = 0; i < size; i++)
             dist[i] = new double [size];
         for(int i = 0; i < size; i++)
-            for(int j = 0; j < size; j++)
+            for(int j = 0; j <= i; j++)
             {
                 dist[i][j] = (double) distint[i][j];
+                dist[j][i] = dist[i][j];
             }
     }
 

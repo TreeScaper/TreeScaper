@@ -40,7 +40,7 @@ void DimEst::initial_DimEst(String filename, double **dist, int sizeinput, int d
         {
             if(!D_file.is_open())
             {
-                cout << "Error: File \"" << filename << "\" cannot be open! Please check if this file exists or is readable." << endl;
+                std::cout << "Error: File \"" << filename << "\" cannot be open! Please check if this file exists or is readable." << std::endl;
                 exit(0);
             }
 
@@ -78,7 +78,7 @@ void DimEst::initial_DimEst(String filename, double **dist, int sizeinput, int d
                 }
             } else
             {
-                cout << "Warning: This is not a type of distance file format!" << endl;
+                std::cout << "Warning: This is not a type of distance file format!" << std::endl;
             }
         }
         else if(dist != NULL && sizeinput > 0)
@@ -93,7 +93,7 @@ void DimEst::initial_DimEst(String filename, double **dist, int sizeinput, int d
         }
         else
         {
-            cout << "Error: Incorrect input data parameters" << endl;
+            std::cout << "Error: Incorrect input data parameters" << std::endl;
             exit(0);
         }
     }
@@ -103,7 +103,7 @@ void DimEst::initial_DimEst(String filename, double **dist, int sizeinput, int d
         {
             if(!D_file.is_open())
             {
-                cout << "Error: File \"" << filename << "\" cannot be open! Please check if this file exists or is readable." << endl;
+                std::cout << "Error: File \"" << filename << "\" cannot be open! Please check if this file exists or is readable." << std::endl;
                 exit(0);
             }
 
@@ -135,13 +135,13 @@ void DimEst::initial_DimEst(String filename, double **dist, int sizeinput, int d
         }
         else
         {
-            cout << "Error: Incorrect input data parameters" << endl;
+            std::cout << "Error: Incorrect input data parameters" << std::endl;
             exit(0);
         }
     }
     else
     {
-        cout << "Warning: Undefined matrix type!\n\n";
+        std::cout << "Warning: Undefined matrix type!\n\n";
         exit(0);
     }
 };
@@ -154,7 +154,7 @@ void DimEst::initial_DimEst(String filename, String meth, String dataform, Strin
     File D_file(filename);
     if(!D_file.is_open())
     {
-        cout << "Error: File \"" << filename << "\" cannot be opened! Please check if this file exists or is readable." << endl;
+        std::cout << "Error: File \"" << filename << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
         exit(0);
     }
     size = D_file.lines();
@@ -163,7 +163,7 @@ void DimEst::initial_DimEst(String filename, String meth, String dataform, Strin
     D.resize(size, size);
     X.resize(num_r, 1);
     D_file.seek(0);
-
+    
     // get distance matrix
     if(dataform == (String) "DIS")
     {
@@ -195,7 +195,7 @@ void DimEst::initial_DimEst(String filename, String meth, String dataform, Strin
             }
         } else
         {
-            cout << "Warning: This is not a type of distance file format!" << endl;
+            std::cout << "Warning: This is not a type of distance file format!" << std::endl;
         }
     } else if(dataform == (String) "COR")
     {
@@ -208,7 +208,7 @@ void DimEst::initial_DimEst(String filename, String meth, String dataform, Strin
     }
     else
     {
-        cout << "Warning: Undefined matrix type!\n\n";
+        std::cout << "Warning: Undefined matrix type!\n\n";
         exit(0);
     }
 };
@@ -218,7 +218,7 @@ void DimEst::init_parameters(String para_filename)
 	parameters.cor_n = 200;
 	parameters.mle_n = 200;
 	parameters.nn_n = 200;
-    parameters.distance_file_type = 0;
+    parameters.distance_file_type = 1;
 
 	if(para_filename == (String) "")
 	{
@@ -236,7 +236,7 @@ void DimEst::init_parameters(String para_filename)
     {
         Key = para_arr[i][(String) "name"];
         Value = para_arr[i][(String) "value"];
-        para[Key] = Value;;
+        para[Key] = Value;
     }
 
 	if(para.Include_Key((String) "cor_n"))
@@ -256,7 +256,7 @@ void DimEst::init_parameters(String para_filename)
 		num_r = parameters.mle_n;
 	else
 	{
-        cout << "Error: This estimator does not exist in this program!!" << endl;
+        std::cout << "Error: This estimator does not exist in this program!!" << std::endl;
 		exit(0);
 	}
 };
@@ -277,7 +277,7 @@ void DimEst::Compute_Dim()
     if(method == (String) "MLE_DIM")
         return Compute_MLE_Dim();
 
-    cout << "Error: This estimator does not exist in this program!!" << endl;
+    std::cout << "Error: This estimator does not exist in this program!!" << std::endl;
 	exit(0);
 };
 
@@ -486,17 +486,17 @@ void DimEst::output_to_files()
 		if(method == (String) "CORR_DIM")
 		{
 			for(int i = 0; i < num_r; i++)
-				result1 << X.matrix[i][0] << "\t" << Dim_C.matrix[i][0] << endl;
+                result1 << X.matrix[i][0] << "\t" << Dim_C.matrix[i][0] << std::endl;
 
 			for(int i = 0; i < num_r - 2; i++)
-				result2 << X.matrix[i + 1][0] << "\t" << Dim_D.matrix[i][0] << endl;
+                result2 << X.matrix[i + 1][0] << "\t" << Dim_D.matrix[i][0] << std::endl;
 		} else
 		{
 			for(int i = 0; i < num_r; i++)
-				result1 << Dim_C.matrix[i][0] << "\t" << X.matrix[i][0] << endl;
+                result1 << Dim_C.matrix[i][0] << "\t" << X.matrix[i][0] << std::endl;
 
 			for(int i = 0; i < num_r - 2; i++)
-				result2 << X.matrix[i + 1][0] << "\t" << (double) 1 / Dim_D.matrix[i][0] << endl;
+                result2 << X.matrix[i + 1][0] << "\t" << (double) 1 / Dim_D.matrix[i][0] << std::endl;
 		}
 	} else
 	if(method == (String) "MLE_DIM")
@@ -510,11 +510,11 @@ void DimEst::output_to_files()
 		result2.clean();
 
 		for(int i = 0; i < num_r; i++)
-			result1 << X.matrix[i][0] << "\t" << Dim_C.matrix[i][0] << endl;
+            result1 << X.matrix[i][0] << "\t" << Dim_C.matrix[i][0] << std::endl;
 
-		result2 << Dim_D.matrix[0][0] << endl;
+        result2 << Dim_D.matrix[0][0] << std::endl;
 	}
-	cout << "Please see the help for details of the introduction of output files." << endl;
+    std::cout << "Please see the help for details of the introduction of output files." << std::endl;
 };
 
 String DimEst::makefilename(String output)
