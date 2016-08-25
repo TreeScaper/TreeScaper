@@ -42,6 +42,7 @@ private:
     bool isrooted;
     bool isweighted;
     const LabelMap *leaveslm;
+    String Strtitle;
 };
 
 #endif // WPLOTTHREAD_H

@@ -41,6 +41,8 @@ void PlotTreethread::initialization(image_parameters plotparas, const NEWICKTREE
     isrooted = inisrooted;
     isweighted = inisweighted;
     leaveslm = inleaveslm;
+    Strtitle = title;
+
 #ifdef _MAC
     lpplottree->Initialize_PlotTree(tree, isrooted, isweighted, leaveslm, title);
     this->exec();
@@ -50,52 +52,16 @@ void PlotTreethread::initialization(image_parameters plotparas, const NEWICKTREE
 
 void PlotTreethread::run()
 {
-    /*
 #ifdef _LINUX
-    if(paras::plot_type == (String) "Points")
-    {
-        lpimage->Load_points_with_selection();
-        if(paras::is_sort_volume)
-            lpimage->sort_volume();
-        lpimage->Create_PointsActors();
-        lpimage->Plot_Points();
-    } else
-    {
-        lpimage->Load_points_with_selection();
-        if(paras::is_sort_volume)
-            lpimage->sort_volume();
-        lpimage->Create_HullsActors();
-        lpimage->Plot_Hulls();
-    }
-
-    if(paras::plot_makemovie)
-        lpimage->make_movie();
-
-    delete lpimage;
+    lpplottree->Initialize_PlotTree(tree, isrooted, isweighted, leaveslm, Strtitle);
+    this->exec();
+    delete lpplottree;
 #endif
-
 #ifdef _WINDOWS
-    if(paras::plot_type == (String) "Points")
-    {
-        lpimage->Load_points_with_selection();
-        if(paras::is_sort_volume)
-            lpimage->sort_volume();
-        lpimage->Create_PointsActors();
-        lpimage->Plot_Points();
-    } else
-    {
-        lpimage->Load_points_with_selection();
-        if(paras::is_sort_volume)
-            lpimage->sort_volume();
-        lpimage->Create_HullsActors();
-        lpimage->Plot_Hulls();
-    }
-
-    if(paras::plot_makemovie)
-        lpimage->make_movie();
-
-    delete lpimage;
-#endif*/
+    lpplottree->Initialize_PlotTree(tree, isrooted, isweighted, leaveslm, Strtitle);
+//    this->exec();
+    delete lpplottree;
+#endif
 }
 
 #endif // WPlotTreethread_CPP
