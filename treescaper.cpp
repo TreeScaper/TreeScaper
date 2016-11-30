@@ -361,7 +361,7 @@ void TreeScaper::initialize_paras(nldr_parameters &nldrparas, image_parameters &
 	while(! plotfparas.is_end())
     {
         entries.add(element);
-        if(countelements > 45)
+        if(countelements > 1024)
             break;
         else
             plotfparas >> element;
@@ -589,9 +589,10 @@ void TreeScaper::on_pushNLDRrun_clicked()
         for(int i = 0; i < size; i++)
             dist[i] = new double [size];
         for(int i = 0; i < size; i++)
-            for(int j = 0; j < size; j++)
+            for(int j = 0; j <= i; j++)
             {
                 dist[i][j] = (double) distint[i][j];
+                dist[j][i] = dist[i][j];
             }
     }
 
@@ -1366,18 +1367,34 @@ void TreeScaper::on_pushDISTrun_clicked()
     {
         if(!TreesData->bipartmatrixIsexisting())
         {
-            cout << "Warning: There is no bipartition matrix in the memory! Please compute it first.\n\n";
-            return;
+            int Msg = QMessageBox::question(this, "Missing Data", "Warning: There is no bipartition matrix in the memory! Do you want to"
+                                        "compute it?", "OK", "Cancel");
+
+            if(Msg == 0)
+                on_pushDATApartition_clicked();
+            else
+                return;
         }
         dis = TreesData->Compute_RF_dist_by_hash(false);
     }
     else
     if(method == (String) "Weighted Robinson Foulds")
     {
+        if(! TreesData->Get_isweighted())
+        {
+            cout << "Warning: The trees in memory are unweighted! Unable to compute weighted RF distances!\n\n";
+            return;
+        }
+
         if(!TreesData->bipartmatrixIsexisting())
         {
-            cout << "Warning: There is no bipartition matrix in the memory! Please compute it first.\n\n";
-            return;
+            int Msg = QMessageBox::question(this, "Missing Data", "Warning: There is no bipartition matrix in the memory! Do you want to"
+                                        "compute it?", "OK", "Cancel");
+
+            if(Msg == 0)
+                on_pushDATApartition_clicked();
+            else
+                return;
         }
         dis = TreesData->Compute_RF_dist_by_hash(true);
     }
@@ -1511,8 +1528,14 @@ void TreeScaper::on_pushDATAcov_clicked()
 {
     if(!TreesData->bipartmatrixIsexisting())
     {
-        cout << "Warning: There is no bipartition matrix in the memory! Please compute it first.\n\n";
-        return;
+
+        int Msg = QMessageBox::question(this, "Missing Data", "Warning: There is no bipartition matrix in the memory! Do you want to"
+                                    "compute it?", "OK", "Cancel");
+
+        if(Msg == 0)
+            on_pushDATApartition_clicked();
+        else
+            return;
     }
     TreesData->Compute_Bipart_Covariance();
     QString qstr("Covariance Matrix");
@@ -2279,8 +2302,13 @@ void TreeScaper::on_pushButtonDATAcon_clicked()
 {
     if(!TreesData->bipartmatrixIsexisting())
     {
-        cout << "Warning: There is no bipartition matrix in the memory! Please compute it first.\n\n";
-        return;
+        int Msg = QMessageBox::question(this, "Missing Data", "Warning: There is no bipartition matrix in the memory! Do you want to"
+                                    "compute it?", "OK", "Cancel");
+
+        if(Msg == 0)
+            on_pushDATApartition_clicked();
+        else
+            return;
     }
 
     if(TreesData->compute_consensus_tree(MAJORITYTREE, ""))

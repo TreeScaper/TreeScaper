@@ -75,7 +75,7 @@ void setting::loadplotparas()
 	while(! fparas.is_end())
     {
         entries.add(element);
-        if(countelements > 45)
+        if(countelements > 1024)
             break;
         else
             fparas >> element;
