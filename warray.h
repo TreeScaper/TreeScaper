@@ -103,8 +103,13 @@ public:
 	template<class S>
 	Array(int size, S arr)
 	{
-		length = size;
-		vec = new S[length];
+        length = size;
+
+        if(length > 0)
+            vec = new S[length];
+        else
+            vec = NULL;
+
 		for(int i = 0; i < length; i++)
 		{
 			vec[i] = arr;

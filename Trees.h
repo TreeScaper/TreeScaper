@@ -56,7 +56,10 @@
 #ifndef COMMAND_LINE_VERSION
     #include <QString>
     #include <QStringList>
+    #include <QProgressDialog>
+    #include <QProgressBar>
 #endif
+//#include "pBar.h";
 
 enum Treefileformat{NEXUS, NEWICK};
 enum ConsensusTree{MAJORITYTREE, STRICTTREE};
@@ -95,16 +98,26 @@ public:
 
     string make_Bipart_Matrix_name(string fname, String format);
 
+#ifdef COMMAND_LINE_VERSION
     void Compute_Bipart_Covariance();
 
     // by hash table
     bool Compute_RF_dist_by_hash(bool ISWEIGHTED);
 
-    // by bipartmatrix
-    void Compute_Unweight_RF_dist_by_bipartmatrix(); // TODO...
+    bool Compute_Matching_dist();
+    bool Compute_SPR_dist();
+#else
+    void Compute_Bipart_Covariance();
+
+    // by hash table
+    bool Compute_RF_dist_by_hash(bool ISWEIGHTED);
 
     bool Compute_Matching_dist();
     bool Compute_SPR_dist();
+#endif
+
+    // by bipartmatrix
+    void Compute_Unweight_RF_dist_by_bipartmatrix(); // TODO...
 
     void pttree(struct Ptree *treeA, int node);
     int tree_mmdis(struct Ptree *tree1, struct Ptree *tree2, int num_leaf);

@@ -1520,8 +1520,6 @@ void TreeScaper::on_pushDISTrun_clicked()
         }
     }
     ui->pushDISTaffinity->setEnabled(true);
-
-    cout << "Successfully computed distance matrix.\n\n";
 }
 
 void TreeScaper::on_pushDATAcov_clicked()
@@ -3329,7 +3327,7 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
         else
         {
             TreesData->print_matrix(memorydata);
-            cout << "Successfully printed " << memorydata << " !\n\n";
+            cout << "Successfully printed " << memorydata << "!\n\n";
         }
     }
     else if(msg1 == 1) // delete
@@ -3560,7 +3558,7 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
         else
         {
             TreesData->print_matrix(memorydata);
-            cout << "Successfully printed " << memorydata << " !\n\n";
+            cout << "Successfully printed " << memorydata << "!\n\n";
         }
     }
     else if(msg1 == 1) // delete
@@ -3790,7 +3788,7 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
         else
         {
             TreesData->print_matrix(memorydata);
-            cout << "Successfully printed " << memorydata << " !\n\n";
+            cout << "Successfully printed " << memorydata << "!\n\n";
         }
     }
     else if(msg1 == 1) // delete

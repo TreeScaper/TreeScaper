@@ -39,10 +39,16 @@ const Array<T> &Array<T>::operator=(const Array<T> &right)
 	{
 		T *left = vec;
 		if(length > 0)
+        {
 			delete [] left;
+            left = NULL;
+        }
 
         length = right.length;
-		vec = new T[length];
+        if(length > 0)
+            vec = new T[length];
+        else
+            vec = NULL;
 
 		for(int i = 0; i < length; i++)
 		{
@@ -262,7 +268,6 @@ bool Array<T>::onebitstrXOR(const Array<T> &left, int &result)
 
     return true;
 }
-
 
 /*
 template<class T>

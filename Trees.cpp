@@ -1033,7 +1033,7 @@ void Trees::Compute_Bipart_Matrix()
 
     int Unique_idx = 0;
     Unique_bipart[Unique_idx] = temp[0];
-    bipart_count[Unique_idx] = 1;// the first bipartition
+    bipart_count[Unique_idx] = 1;   // the first bipartition
     for (int i = 1; i < idex; i++)
     {
         if(temp[i] > temp[i-1])
@@ -1191,68 +1191,6 @@ void Trees::Sort(unsigned long long *matrix_hv,
     }
 }
 
-
-void Trees::Compute_Bipart_Covariance()
-{
-    SparseMatrix* trans = sbipartmatrix->transpose();
-    SparseMatrix* result = sbipartmatrix->Multiply(*trans);
-    double* M = sbipartmatrix->Mean(n_trees);
-    double* Ones = new double[n_trees];
-    for (int i = 0; i < n_trees; i++)
-        Ones[i] = 1;
-    double* tmp = sbipartmatrix->Multiply_vec(Ones);
-    int Unique_idx = treecov_size;
-    double ** temp1 = Vec_multiply(tmp, M, Unique_idx);
-    double ** temp2 = Vec_multiply(M, M, Unique_idx);
-    delete_double_array(treecov, treecov_size);
-    treecov = new double*[Unique_idx];
-    for (int i = 0; i < Unique_idx; i++)
-        treecov[i] = new double[Unique_idx];
-
-    for (int i = 0; i < Unique_idx; i++)
-        for (int j = 0; j < Unique_idx; j++)
-            treecov[i][j] = 0;
-
-    for (int i = 0; i < Unique_idx; i++)
-    {
-        for (int j = 0; j < Unique_idx; j++)
-        {
-            treecov[i][j] = treecov[i][j] + (*result)(i,j) - temp1[i][j] - temp1[j][i] + n_trees * temp2[i][j];
-            treecov[i][j] = treecov[i][j] / (n_trees - 1);
-        }
-    }
-    delete [] M;
-    M = NULL;
-
-    delete [] Ones;
-    Ones = NULL;
-
-    delete [] tmp;
-    tmp = NULL;
-
-    for (int i = 0; i < Unique_idx; i++)
-    {
-            delete [] temp1[i];
-            delete [] temp2[i];
-    }
-    delete [] temp1;
-    temp1 = NULL;
-    delete [] temp2;
-    temp2 = NULL;
-
-    if(trans != NULL)
-    {
-        delete trans;
-        trans = NULL;
-    }
-    if(result != NULL)
-    {
-        delete result;
-        result = NULL;
-    }
-
-}
-
 double **Trees::Vec_multiply(const double* Vec1, const double* Vec2, int Unique_idx)
 {
     double **result = new double* [Unique_idx];
@@ -1267,249 +1205,6 @@ double **Trees::Vec_multiply(const double* Vec1, const double* Vec2, int Unique_
         }
     }
     return result;
-}
-
-bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
-{
-    if(!isweighted && ISWEIGHTED)
-    {
-        cout << "Warning: The trees in memory are unweighted! Unable to compute weighted RF distances!\n\n";
-        return false;
-    }
-
-    bool bUbid = false; // for counting the number pf unique bipartitions
-    unsigned long uBID = 0;
-
-    if (ISWEIGHTED == false)
-    {
-        delete_double_array(dist_URF, n_trees);
-        dist_URF = new double *[n_trees];
-        for (int i = 0; i < n_trees; i++)
-            dist_URF[i] = new double [n_trees];
-        for(int i = 0; i < n_trees; i++)
-            for(int j = 0; j < n_trees; j++)
-                dist_URF[i][j] = 0;
-        for (unsigned int hti = 0; hti < vec_hashrf._hashtab2.size(); ++hti)
-        {
-            unsigned int sizeVec = vec_hashrf._hashtab2[hti].size();
-            if (sizeVec)
-            {
-                uBID += sizeVec;
-                if (!bUbid)
-                {
-                    for (unsigned int i = 0; i < sizeVec; ++i)
-                    {
-                        unsigned int sizeTreeIdx = vec_hashrf._hashtab2[hti][i]._vec_treeidx.size();
-                        if (sizeTreeIdx > 1)
-                        {
-                            for (unsigned int j = 0; j < sizeTreeIdx; ++j)
-                            {
-                                for (unsigned int k = 0; k < sizeTreeIdx; ++k)
-                                {
-                                    if (j == k)
-                                        continue;
-                                    else
-                                        dist_URF[vec_hashrf._hashtab2[hti][i]._vec_treeidx[j]][vec_hashrf._hashtab2[hti][i]._vec_treeidx[k]] += 1;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        for (int i = 0; i < n_trees; i++)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                dist_URF[i][j] = (double) ((numberofbipartition[i] + numberofbipartition[j] - 2 * dist_URF[i][j]) / 2);
-                dist_URF[j][i] = dist_URF[i][j];
-            }
-        }
-    }
-    else if (ISWEIGHTED == true)
-    {
-        delete_double_array(dist_RF, n_trees);
-        dist_RF = new double *[n_trees];
-        for (int i = 0; i < n_trees; i++)
-            dist_RF[i] = new double [n_trees];
-        for(int i = 0; i < n_trees; i++)
-            for(int j = 0; j < n_trees; j++)
-                dist_RF[i][j] = 0;
-        vec_hashrf._hashtab.resize(vec_hashrf._hashtab2.size());
-        for (unsigned int hti = 0; hti < vec_hashrf._hashtab2.size(); ++hti)
-        {
-            unsigned int sizeLinkedList = vec_hashrf._hashtab2[hti].size();
-            if (sizeLinkedList > 0)
-            {
-                for (unsigned int i1 = 0; i1 < sizeLinkedList; ++i1)
-                {
-                    unsigned int bidi = vec_hashrf._hashtab2[hti][i1]._vec_treeidx.size();
-                    for (unsigned int i2 = 0; i2 < bidi; ++i2)
-                    {
-                        BUCKET_STRUCT_T bk;
-                        bk._hv2 = vec_hashrf._hashtab2[hti][i1]._hv2;
-                        bk._t_i = vec_hashrf._hashtab2[hti][i1]._vec_treeidx[i2];
-                        bk._dist = vec_hashrf._hashtab2[hti][i1]._vec_dist[i2];
-                        vec_hashrf._hashtab[hti].push_back(bk);
-                    }
-                }
-            }
-        }
-        vec_hashrf._hashtab2.clear();
-        for (unsigned int hti = 0; hti < vec_hashrf._hashtab.size(); ++hti)
-        {
-            unsigned int sizeLinkedList = vec_hashrf._hashtab[hti].size();
-            if (sizeLinkedList > 1)
-            {
-                vector<unsigned long> vec_hv2;
-                vector<unsigned long>::iterator itr_vec_hv2;
-                // Collect unique hv2 values in the linked list
-                for (unsigned int i = 0; i < sizeLinkedList; ++i)
-                {
-                    unsigned long hv2 = vec_hashrf._hashtab[hti][i]._hv2;
-                    if (vec_hv2.empty())
-                        vec_hv2.push_back(hv2);
-                    else
-                    {
-                        itr_vec_hv2 = find(vec_hv2.begin(), vec_hv2.end(), hv2);
-                        if (itr_vec_hv2 == vec_hv2.end())
-                            vec_hv2.push_back(hv2);
-                    }
-                }
-                // distance array
-                vector<vector<float> > vec_dist(vec_hv2.size(), vector<float>(n_trees, 0));
-
-                // Set the distance array with distance at proper tree index
-                for (unsigned int i = 0; i < sizeLinkedList; ++i)
-                {
-                    for (unsigned int j = 0; j < vec_hv2.size(); ++j)
-                    {
-                        if (vec_hashrf._hashtab[hti][i]._hv2 == vec_hv2[j])
-                            vec_dist[j][vec_hashrf._hashtab[hti][i]._t_i] = vec_hashrf._hashtab[hti][i]._dist;
-                    }
-                }
-                // Update floatsim matrix using vec_dist
-                for (unsigned int i = 0; i < vec_dist.size(); ++i)
-                {
-                    for (unsigned int j = 0; j < vec_dist[i].size(); ++j)
-                    {
-                        for (unsigned int k = 0; k < vec_dist[i].size(); ++k)
-                        {
-                            if (j == k)
-                                continue;
-                            else
-                                dist_RF[j][k] += (vec_dist[i][j] - vec_dist[i][k] > 0) ? (vec_dist[i][j] - vec_dist[i][k]) : (vec_dist[i][k] - vec_dist[i][j]);
-                        }
-                    }
-                }
-                vec_hv2.clear();
-                vec_dist.clear();
-            }
-            else if (sizeLinkedList == 1)
-            {
-                // propagate the dist value to other tree's distance
-                for (unsigned int i = 0; i < n_trees; ++i)
-                {
-                    if (i == vec_hashrf._hashtab[hti][0]._t_i)
-                        continue;
-                    else
-                    {
-                        dist_RF[i][vec_hashrf._hashtab[hti][0]._t_i] += vec_hashrf._hashtab[hti][0]._dist;
-                        dist_RF[vec_hashrf._hashtab[hti][0]._t_i][i] += vec_hashrf._hashtab[hti][0]._dist;
-                    }
-                }
-            }
-        }
-        for (int i = 0; i < n_trees; i++)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                dist_RF[i][j] = (dist_RF[i][j] + dist_RF[j][i]) / 4;
-                dist_RF[j][i] = dist_RF[i][j];
-            }
-        }
-    }
-    return true;
-}
-
-bool Trees::Compute_Matching_dist()
-{
-    delete_double_array(dist_match, n_trees);
-    dist_match = new int *[n_trees];
-    for (int i = 0; i < n_trees; i++)
-        dist_match[i] = new int [n_trees];
-
-    if (!bipartmatrixIsexisting())
-    {
-        cout << "Warning: There is no bipartition matrix in the memory! Please compute it first.\n\n";
-        return false;
-    }
-    int n_taxa = leaveslabelsmaps.size();
-    int max_numberofbipartition = 0;
-    int idx = 0;
-    for (int i = 0; i < n_trees; i++)
-    {
-        dist_match[i][i] = 0;
-        Array<Array<char> > bitstrofatree(numberofbipartition[i], Array<char> ());
-        idx = 0;
-        Get_bipartitionofonetree(treeset[i]->root, isrooted, 0, bitstrofatree, idx);
-
-        for (int j = 0; j < i; j++)
-        {
-            Array<Array<char> > bitstrofatreej(numberofbipartition[j], Array<char> ());
-            idx = 0;
-            Get_bipartitionofonetree(treeset[j]->root, isrooted, 0, bitstrofatreej, idx);
-
-            if (numberofbipartition[i] <= numberofbipartition[j])
-                max_numberofbipartition = numberofbipartition[j];
-            else
-                max_numberofbipartition = numberofbipartition[i];
-            int ** strdist = new int *[max_numberofbipartition];
-            for (int k = 0; k < max_numberofbipartition; k++)
-                strdist[k] = new int[max_numberofbipartition];
-            hungarian_problem_t p;
-
-            for (int k = 0; k < max_numberofbipartition; k++)
-            {
-                for (int l = 0; l < max_numberofbipartition; l++)
-                {
-                    int result = 0;
-                    if (k < numberofbipartition[i] && l < numberofbipartition[j])
-                    {
-                        if(Array<char>::bitstrXOR(bitstrofatree[k], bitstrofatreej[l], result))
-                            strdist[k][l] = result;
-                    }
-                    else if (k >= numberofbipartition[i] && l < numberofbipartition[j])
-                    {
-                        if(Array<char>::onebitstrXOR(bitstrofatreej[l], result))
-                            strdist[k][l] = result;
-                    }
-                    else
-                    {
-                        if(Array<char>::onebitstrXOR(bitstrofatree[k], result))
-                            strdist[k][l] = result;
-                    }
-
-                    if (((n_taxa % 2 == 0 && strdist[k][l] > ((int) n_taxa / 2))
-                         || (n_taxa % 2 != 0 && strdist[k][l] >= ((int) n_taxa / 2) + 1))
-                            && !isrooted)
-                        strdist[k][l] = n_taxa - strdist[k][l];
-                }
-            }
-
-            hungarian_init(&p, strdist , max_numberofbipartition, max_numberofbipartition, HUNGARIAN_MODE_MINIMIZE_COST) ;
-            int mdist = hungarian_solve(&p);
-            dist_match[i][j] = mdist;
-            dist_match[j][i] = dist_match[i][j];
-            hungarian_free(&p);
-            for(int k = 0; k < max_numberofbipartition; k++)
-            {
-                delete [] strdist[k];
-            }
-            delete [] strdist;
-        }
-    }
-    return true;
 }
 
 void Trees::print_bipartitionofonetree(NEWICKNODE*currentnode, bool isrooted, int depth)
@@ -1542,13 +1237,13 @@ void Trees::Get_bipartitionofonetree(NEWICKNODE*currentnode, bool isrooted, int 
     //int n_taxa = leaveslabelsmaps.size();
     if(depth > 1 && currentnode->Nchildren > 0 && isrooted)
     {
-         bitstrofatree[idx] = *(currentnode->bitstr);
-         idx++;
+        bitstrofatree[idx] = *(currentnode->bitstr);
+        idx++;
     }
     else if(depth > 2 && currentnode->Nchildren > 0)
     {
-         bitstrofatree[idx] = *(currentnode->bitstr);
-         idx++;
+        bitstrofatree[idx] = *(currentnode->bitstr);
+        idx++;
     }
 
     for (int i = 0; i < currentnode->Nchildren; i++)
@@ -1556,6 +1251,162 @@ void Trees::Get_bipartitionofonetree(NEWICKNODE*currentnode, bool isrooted, int 
         if(currentnode->child[i]->Nchildren > 0)
         {
             Get_bipartitionofonetree(currentnode->child[i], isrooted, depth, bitstrofatree, idx);
+        }
+    }
+}
+
+void Trees::Compute_Affinity_dist(String str_matrix, int type)
+{
+    double eps = 1000000;
+    double ratio = 0.1;
+    if (str_matrix == (String)"Unweighted RF-distance")
+    {
+        delete_double_array(affi_URF, n_trees);
+        affi_URF = new double *[n_trees];
+        for (int i = 0; i < n_trees; i++)
+            affi_URF[i] = new double [n_trees];
+        switch(type)
+        {
+        case 1:
+            for(int i = 0; i < n_trees; i++)
+                for(int j = 0; j < n_trees; j++)
+                    if(dist_URF[i][j] > 0 && eps > dist_URF[i][j])
+                        eps = dist_URF[i][j];
+            eps = eps * ratio;
+
+            for (int i = 0; i < n_trees; i++)
+            {
+                for (int j = 0; j < n_trees; j++)
+                    affi_URF[i][j] = 1.0 / (eps + dist_URF[i][j]);
+            }
+            break;
+        case 2:
+            for (int i = 0; i < n_trees; i++)
+            {
+                for (int j = 0; j < n_trees; j++)
+                    affi_URF[i][j] = exp(- dist_URF[i][j]);
+            }
+            break;
+        }
+    }
+    else if (str_matrix == (String)"Weighted RF-distance")
+    {
+        delete_double_array(affi_RF, n_trees);
+        affi_RF = new double *[n_trees];
+        for (int i = 0; i < n_trees; i++)
+            affi_RF[i] = new double [n_trees];
+        switch(type)
+        {
+        case 1:
+            for(int i = 0; i < n_trees; i++)
+                for(int j = 0; j < n_trees; j++)
+                    if(dist_RF[i][j] > 0 && eps > dist_RF[i][j])
+                        eps = dist_RF[i][j];
+            eps = eps * ratio;
+
+            for (int i = 0; i < n_trees; i++)
+            {
+                for (int j = 0; j < n_trees; j++)
+                    affi_RF[i][j] = 1.0 / (eps + dist_RF[i][j]);
+            }
+            break;
+        case 2:
+            for (int i = 0; i < n_trees; i++)
+            {
+                for (int j = 0; j < n_trees; j++)
+                    affi_RF[i][j] = exp(- dist_RF[i][j]);
+            }
+            break;
+        }
+    }
+    else if (str_matrix == (String)"Matching-distance")
+    {
+        delete_double_array(affi_match, n_trees);
+        affi_match = new double *[n_trees];
+        for (int i = 0; i < n_trees; i++)
+            affi_match[i] = new double [n_trees];
+        switch(type)
+        {
+        case 1:
+            for(int i = 0; i < n_trees; i++)
+                for(int j = 0; j < n_trees; j++)
+                    if(dist_match[i][j] > 0 && eps > dist_match[i][j])
+                        eps = dist_match[i][j];
+            eps = eps * ratio;
+
+            for (int i = 0; i < n_trees; i++)
+            {
+                for (int j = 0; j < n_trees; j++)
+                    affi_match[i][j] = 1.0 / (eps + dist_match[i][j]);
+            }
+            break;
+        case 2:
+            for (int i = 0; i < n_trees; i++)
+            {
+                for (int j = 0; j < n_trees; j++)
+                    affi_match[i][j] = exp(- dist_match[i][j]);
+            }
+            break;
+        }
+    }
+    else if (str_matrix == (String)"SPR-distance")
+    {
+        delete_double_array(affi_SPR, n_trees);
+        affi_SPR = new double *[n_trees];
+        for (int i = 0; i < n_trees; i++)
+            affi_SPR[i] = new double [n_trees];
+        switch(type)
+        {
+        case 1:
+            for(int i = 0; i < n_trees; i++)
+                for(int j = 0; j < n_trees; j++)
+                    if(dist_SPR[i][j] > 0 && eps > dist_SPR[i][j])
+                        eps = dist_SPR[i][j];
+            eps = eps * ratio;
+
+            for (int i = 0; i < n_trees; i++)
+            {
+                for (int j = 0; j < n_trees; j++)
+                    affi_SPR[i][j] = 1.0 / (eps + dist_SPR[i][j]);
+            }
+            break;
+        case 2:
+            for (int i = 0; i < n_trees; i++)
+            {
+                for (int j = 0; j < n_trees; j++)
+                    affi_SPR[i][j] = exp(- dist_SPR[i][j]);
+            }
+            break;
+        }
+    }
+    else if(str_matrix == (String)"File-distance")
+    {
+        delete_double_array(affi_file, file_distsize);
+        affi_file = new double *[file_distsize];
+        for (int i = 0; i < file_distsize; i++)
+            affi_file[i] = new double [file_distsize];
+        switch(type)
+        {
+        case 1:
+            for(int i = 0; i < file_distsize; i++)
+                for(int j = 0; j < file_distsize; j++)
+                    if(dist_file[i][j] > 0 && eps > dist_file[i][j])
+                        eps = dist_file[i][j];
+            eps = eps * ratio;
+
+            for (int i = 0; i < file_distsize; i++)
+            {
+                for (int j = 0; j < file_distsize; j++)
+                    affi_file[i][j] = 1.0 / (eps + dist_file[i][j]);
+            }
+            break;
+        case 2:
+            for (int i = 0; i < file_distsize; i++)
+            {
+                for (int j = 0; j < file_distsize; j++)
+                    affi_file[i][j] = exp(- dist_file[i][j]);
+            }
+            break;
         }
     }
 }
@@ -1981,161 +1832,7 @@ void Trees::load_covariancefile(string fname)
     }
 };
 
-void Trees::Compute_Affinity_dist(String str_matrix, int type)
-{
-    double eps = 1000000;
-    double ratio = 0.1;
-    if (str_matrix == (String)"Unweighted RF-distance")
-    {
-        delete_double_array(affi_URF, n_trees);
-        affi_URF = new double *[n_trees];
-        for (int i = 0; i < n_trees; i++)
-            affi_URF[i] = new double [n_trees];
-        switch(type)
-        {
-        case 1:
-            for(int i = 0; i < n_trees; i++)
-                for(int j = 0; j < n_trees; j++)
-                    if(dist_URF[i][j] > 0 && eps > dist_URF[i][j])
-                        eps = dist_URF[i][j];
-            eps = eps * ratio;
 
-            for (int i = 0; i < n_trees; i++)
-            {
-                for (int j = 0; j < n_trees; j++)
-                    affi_URF[i][j] = 1.0 / (eps + dist_URF[i][j]);
-            }
-            break;
-        case 2:
-            for (int i = 0; i < n_trees; i++)
-            {
-                for (int j = 0; j < n_trees; j++)
-                    affi_URF[i][j] = exp(- dist_URF[i][j]);
-            }
-            break;
-        }
-    }
-    else if (str_matrix == (String)"Weighted RF-distance")
-    {
-        delete_double_array(affi_RF, n_trees);
-        affi_RF = new double *[n_trees];
-        for (int i = 0; i < n_trees; i++)
-            affi_RF[i] = new double [n_trees];
-        switch(type)
-        {
-        case 1:
-            for(int i = 0; i < n_trees; i++)
-                for(int j = 0; j < n_trees; j++)
-                    if(dist_RF[i][j] > 0 && eps > dist_RF[i][j])
-                        eps = dist_RF[i][j];
-            eps = eps * ratio;
-
-            for (int i = 0; i < n_trees; i++)
-            {
-                for (int j = 0; j < n_trees; j++)
-                    affi_RF[i][j] = 1.0 / (eps + dist_RF[i][j]);
-            }
-            break;
-        case 2:
-            for (int i = 0; i < n_trees; i++)
-            {
-                for (int j = 0; j < n_trees; j++)
-                    affi_RF[i][j] = exp(- dist_RF[i][j]);
-            }
-            break;
-        }
-    }
-    else if (str_matrix == (String)"Matching-distance")
-    {
-        delete_double_array(affi_match, n_trees);
-        affi_match = new double *[n_trees];
-        for (int i = 0; i < n_trees; i++)
-            affi_match[i] = new double [n_trees];
-        switch(type)
-        {
-        case 1:
-            for(int i = 0; i < n_trees; i++)
-                for(int j = 0; j < n_trees; j++)
-                    if(dist_match[i][j] > 0 && eps > dist_match[i][j])
-                        eps = dist_match[i][j];
-            eps = eps * ratio;
-
-            for (int i = 0; i < n_trees; i++)
-            {
-                for (int j = 0; j < n_trees; j++)
-                    affi_match[i][j] = 1.0 / (eps + dist_match[i][j]);
-            }
-            break;
-        case 2:
-            for (int i = 0; i < n_trees; i++)
-            {
-                for (int j = 0; j < n_trees; j++)
-                    affi_match[i][j] = exp(- dist_match[i][j]);
-            }
-            break;
-        }
-    }
-    else if (str_matrix == (String)"SPR-distance")
-    {
-        delete_double_array(affi_SPR, n_trees);
-        affi_SPR = new double *[n_trees];
-        for (int i = 0; i < n_trees; i++)
-            affi_SPR[i] = new double [n_trees];
-        switch(type)
-        {
-        case 1:
-            for(int i = 0; i < n_trees; i++)
-                for(int j = 0; j < n_trees; j++)
-                    if(dist_SPR[i][j] > 0 && eps > dist_SPR[i][j])
-                        eps = dist_SPR[i][j];
-            eps = eps * ratio;
-
-            for (int i = 0; i < n_trees; i++)
-            {
-                for (int j = 0; j < n_trees; j++)
-                    affi_SPR[i][j] = 1.0 / (eps + dist_SPR[i][j]);
-            }
-            break;
-        case 2:
-            for (int i = 0; i < n_trees; i++)
-            {
-                for (int j = 0; j < n_trees; j++)
-                    affi_SPR[i][j] = exp(- dist_SPR[i][j]);
-            }
-            break;
-        }
-    }
-    else if(str_matrix == (String)"File-distance")
-    {
-        delete_double_array(affi_file, file_distsize);
-        affi_file = new double *[file_distsize];
-        for (int i = 0; i < file_distsize; i++)
-            affi_file[i] = new double [file_distsize];
-        switch(type)
-        {
-        case 1:
-            for(int i = 0; i < file_distsize; i++)
-                for(int j = 0; j < file_distsize; j++)
-                    if(dist_file[i][j] > 0 && eps > dist_file[i][j])
-                        eps = dist_file[i][j];
-            eps = eps * ratio;
-
-            for (int i = 0; i < file_distsize; i++)
-            {
-                for (int j = 0; j < file_distsize; j++)
-                    affi_file[i][j] = 1.0 / (eps + dist_file[i][j]);
-            }
-            break;
-        case 2:
-            for (int i = 0; i < file_distsize; i++)
-            {
-                for (int j = 0; j < file_distsize; j++)
-                    affi_file[i][j] = exp(- dist_file[i][j]);
-            }
-            break;
-        }
-    }
-}
 
 bool Trees::bipartmatrixIsexisting()
 {
@@ -3664,6 +3361,319 @@ string Trees::Print_selected_indices()
     return stdname;
 }
 
+
+#if COMMAND_LINE_VERSION
+void Trees::Compute_Bipart_Covariance()
+{
+    SparseMatrix* trans = sbipartmatrix->transpose();
+    SparseMatrix* result = sbipartmatrix->Multiply(*trans);
+    double* M = sbipartmatrix->Mean(n_trees);
+    double* Ones = new double[n_trees];
+    for (int i = 0; i < n_trees; i++)
+        Ones[i] = 1;
+    double* tmp = sbipartmatrix->Multiply_vec(Ones);
+    int Unique_idx = treecov_size;
+    double ** temp1 = Vec_multiply(tmp, M, Unique_idx);
+    double ** temp2 = Vec_multiply(M, M, Unique_idx);
+    delete_double_array(treecov, treecov_size);
+    treecov = new double*[Unique_idx];
+    for (int i = 0; i < Unique_idx; i++)
+        treecov[i] = new double[Unique_idx];
+
+    for (int i = 0; i < Unique_idx; i++)
+        for (int j = 0; j < Unique_idx; j++)
+            treecov[i][j] = 0;
+
+   for (int i = 0; i < Unique_idx; i++)
+    {
+        for (int j = 0; j < Unique_idx; j++)
+        {
+            treecov[i][j] = treecov[i][j] + (*result)(i,j) - temp1[i][j] - temp1[j][i] + n_trees * temp2[i][j];
+            treecov[i][j] = treecov[i][j] / (n_trees - 1);
+        }
+    }
+
+    delete [] M;
+    M = NULL;
+
+    delete [] Ones;
+    Ones = NULL;
+
+    delete [] tmp;
+    tmp = NULL;
+
+    for (int i = 0; i < Unique_idx; i++)
+    {
+            delete [] temp1[i];
+            delete [] temp2[i];
+    }
+    delete [] temp1;
+    temp1 = NULL;
+    delete [] temp2;
+    temp2 = NULL;
+
+    if(trans != NULL)
+    {
+        delete trans;
+        trans = NULL;
+    }
+    if(result != NULL)
+    {
+        delete result;
+        result = NULL;
+    }
+}
+
+
+bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
+{
+    if(!isweighted && ISWEIGHTED)
+    {
+        cout << "Warning: The trees in memory are unweighted! Unable to compute weighted RF distances!\n\n";
+        return false;
+    }
+
+    bool bUbid = false; // for counting the number pf unique bipartitions
+    unsigned long uBID = 0;
+
+    if (ISWEIGHTED == false)
+    {
+        delete_double_array(dist_URF, n_trees);
+        dist_URF = new double *[n_trees];
+        for (int i = 0; i < n_trees; i++)
+            dist_URF[i] = new double [n_trees];
+        for(int i = 0; i < n_trees; i++)
+        {
+            for(int j = 0; j < n_trees; j++)
+                dist_URF[i][j] = 0;
+        }
+        for (unsigned int hti = 0; hti < vec_hashrf._hashtab2.size(); ++hti)
+        {
+            unsigned int sizeVec = vec_hashrf._hashtab2[hti].size();
+            if (sizeVec)
+            {
+                uBID += sizeVec;
+                if (!bUbid)
+                {
+                    for (unsigned int i = 0; i < sizeVec; ++i)
+                    {
+                        unsigned int sizeTreeIdx = vec_hashrf._hashtab2[hti][i]._vec_treeidx.size();
+                        if (sizeTreeIdx > 1)
+                        {
+                            for (unsigned int j = 0; j < sizeTreeIdx; ++j)
+                            {
+                                for (unsigned int k = 0; k < sizeTreeIdx; ++k)
+                                {
+                                    if (j == k)
+                                        continue;
+                                    else
+                                        dist_URF[vec_hashrf._hashtab2[hti][i]._vec_treeidx[j]][vec_hashrf._hashtab2[hti][i]._vec_treeidx[k]] += 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < n_trees; i++)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                dist_URF[i][j] = (double) ((numberofbipartition[i] + numberofbipartition[j] - 2 * dist_URF[i][j]) / 2);
+                dist_URF[j][i] = dist_URF[i][j];
+            }
+        }
+    }
+    else if (ISWEIGHTED == true)
+    {
+        delete_double_array(dist_RF, n_trees);
+        dist_RF = new double *[n_trees];
+        for (int i = 0; i < n_trees; i++)
+            dist_RF[i] = new double [n_trees];
+        for(int i = 0; i < n_trees; i++)
+            for(int j = 0; j < n_trees; j++)
+                dist_RF[i][j] = 0;
+        vec_hashrf._hashtab.resize(vec_hashrf._hashtab2.size());
+
+        for (unsigned int hti = 0; hti < vec_hashrf._hashtab2.size(); ++hti)
+        {
+           unsigned int sizeLinkedList = vec_hashrf._hashtab2[hti].size();
+            if (sizeLinkedList > 0)
+            {
+                for (unsigned int i1 = 0; i1 < sizeLinkedList; ++i1)
+                {
+                    unsigned int bidi = vec_hashrf._hashtab2[hti][i1]._vec_treeidx.size();
+                    for (unsigned int i2 = 0; i2 < bidi; ++i2)
+                    {
+                        BUCKET_STRUCT_T bk;
+                        bk._hv2 = vec_hashrf._hashtab2[hti][i1]._hv2;
+                        bk._t_i = vec_hashrf._hashtab2[hti][i1]._vec_treeidx[i2];
+                        bk._dist = vec_hashrf._hashtab2[hti][i1]._vec_dist[i2];
+                        vec_hashrf._hashtab[hti].push_back(bk);
+                    }
+                }
+            }
+        }
+        vec_hashrf._hashtab2.clear();
+        for (unsigned int hti = 0; hti < vec_hashrf._hashtab.size(); ++hti)
+        {
+           unsigned int sizeLinkedList = vec_hashrf._hashtab[hti].size();
+            if (sizeLinkedList > 1)
+            {
+                vector<unsigned long> vec_hv2;
+                vector<unsigned long>::iterator itr_vec_hv2;
+                // Collect unique hv2 values in the linked list
+                for (unsigned int i = 0; i < sizeLinkedList; ++i)
+                {
+                    unsigned long hv2 = vec_hashrf._hashtab[hti][i]._hv2;
+                    if (vec_hv2.empty())
+                        vec_hv2.push_back(hv2);
+                    else
+                    {
+                        itr_vec_hv2 = find(vec_hv2.begin(), vec_hv2.end(), hv2);
+                        if (itr_vec_hv2 == vec_hv2.end())
+                            vec_hv2.push_back(hv2);
+                    }
+                }
+                // distance
+                vector<vector<float> > vec_dist(vec_hv2.size(), vector<float>(n_trees, 0));
+
+                // Set the distance array with distance at proper tree index
+                for (unsigned int i = 0; i < sizeLinkedList; ++i)
+                {
+                    for (unsigned int j = 0; j < vec_hv2.size(); ++j)
+                    {
+                        if (vec_hashrf._hashtab[hti][i]._hv2 == vec_hv2[j])
+                            vec_dist[j][vec_hashrf._hashtab[hti][i]._t_i] = vec_hashrf._hashtab[hti][i]._dist;
+                    }
+                }
+                // Update floatsim matrix using vec_dist
+                for (unsigned int i = 0; i < vec_dist.size(); ++i)
+                {
+                    for (unsigned int j = 0; j < vec_dist[i].size(); ++j)
+                    {
+                        for (unsigned int k = 0; k < vec_dist[i].size(); ++k)
+                        {
+                            if (j == k)
+                                continue;
+                            else
+                                dist_RF[j][k] += (vec_dist[i][j] - vec_dist[i][k] > 0) ? (vec_dist[i][j] - vec_dist[i][k]) : (vec_dist[i][k] - vec_dist[i][j]);
+                        }
+                    }
+                }
+                vec_hv2.clear();
+                vec_dist.clear();
+            }
+            else if (sizeLinkedList == 1)
+            {
+                // propagate the dist value to other tree's distance
+                for (unsigned int i = 0; i < n_trees; ++i)
+                {
+                    if (i == vec_hashrf._hashtab[hti][0]._t_i)
+                        continue;
+                    else
+                    {
+                        dist_RF[i][vec_hashrf._hashtab[hti][0]._t_i] += vec_hashrf._hashtab[hti][0]._dist;
+                        dist_RF[vec_hashrf._hashtab[hti][0]._t_i][i] += vec_hashrf._hashtab[hti][0]._dist;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < n_trees; i++)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                dist_RF[i][j] = (dist_RF[i][j] + dist_RF[j][i]) / 4;
+                dist_RF[j][i] = dist_RF[i][j];
+            }
+        }
+    }
+
+    return true;
+}
+
+bool Trees::Compute_Matching_dist()
+{
+    delete_double_array(dist_match, n_trees);
+    dist_match = new int *[n_trees];
+    for (int i = 0; i < n_trees; i++)
+        dist_match[i] = new int [n_trees];
+
+    if (!bipartmatrixIsexisting())
+    {
+        cout << "Warning: There is no bipartition matrix in the memory! Please compute it first.\n\n";
+        return false;
+    }
+    int n_taxa = leaveslabelsmaps.size();
+    int max_numberofbipartition = 0;
+    int idx = 0;
+
+    for (int i = 0; i < n_trees; i++)
+    {
+        dist_match[i][i] = 0;
+        Array<Array<char> > bitstrofatree(numberofbipartition[i], Array<char> ());
+        idx = 0;
+        Get_bipartitionofonetree(treeset[i]->root, isrooted, 0, bitstrofatree, idx);
+
+        for (int j = 0; j < i; j++)
+        {
+            Array<Array<char> > bitstrofatreej(numberofbipartition[j], Array<char> ());
+            idx = 0;
+            Get_bipartitionofonetree(treeset[j]->root, isrooted, 0, bitstrofatreej, idx);
+
+            if (numberofbipartition[i] <= numberofbipartition[j])
+                max_numberofbipartition = numberofbipartition[j];
+            else
+                max_numberofbipartition = numberofbipartition[i];
+            int ** strdist = new int *[max_numberofbipartition];
+            for (int k = 0; k < max_numberofbipartition; k++)
+                strdist[k] = new int[max_numberofbipartition];
+            hungarian_problem_t p;
+
+            for (int k = 0; k < max_numberofbipartition; k++)
+            {
+                for (int l = 0; l < max_numberofbipartition; l++)
+                {
+                    int result = 0;
+                    if (k < numberofbipartition[i] && l < numberofbipartition[j])
+                    {
+                        if(Array<char>::bitstrXOR(bitstrofatree[k], bitstrofatreej[l], result))
+                            strdist[k][l] = result;
+                    }
+                    else if (k >= numberofbipartition[i] && l < numberofbipartition[j])
+                    {
+                        if(Array<char>::onebitstrXOR(bitstrofatreej[l], result))
+                            strdist[k][l] = result;
+                    }
+                    else
+                    {
+                        if(Array<char>::onebitstrXOR(bitstrofatree[k], result))
+                            strdist[k][l] = result;
+                    }
+
+                    if (((n_taxa % 2 == 0 && strdist[k][l] > ((int) n_taxa / 2))
+                         || (n_taxa % 2 != 0 && strdist[k][l] >= ((int) n_taxa / 2) + 1))
+                            && !isrooted)
+                        strdist[k][l] = n_taxa - strdist[k][l];
+                }
+            }
+
+            hungarian_init(&p, strdist , max_numberofbipartition, max_numberofbipartition, HUNGARIAN_MODE_MINIMIZE_COST) ;
+            int mdist = hungarian_solve(&p);
+            dist_match[i][j] = mdist;
+            dist_match[j][i] = dist_match[i][j];
+            hungarian_free(&p);
+            for(int k = 0; k < max_numberofbipartition; k++)
+            {
+                delete [] strdist[k];
+            }
+            delete [] strdist;
+        }
+    }
+
+    return true;
+}
+
 bool Trees::Compute_SPR_dist()
 {
     delete_double_array(dist_SPR, n_trees);
@@ -3738,8 +3748,568 @@ bool Trees::Compute_SPR_dist()
     // clean
     for (vector<SPRNode *>::iterator T2 = sprtrees.begin(); T2 != sprtrees.end(); T2++)
         (*T2)->delete_tree();
+
+    return true;
+}
+#else
+void Trees::Compute_Bipart_Covariance()
+{
+    SparseMatrix* trans = sbipartmatrix->transpose();
+    SparseMatrix* result = sbipartmatrix->Multiply(*trans);
+    double* M = sbipartmatrix->Mean(n_trees);
+    double* Ones = new double[n_trees];
+    for (int i = 0; i < n_trees; i++)
+        Ones[i] = 1;
+    double* tmp = sbipartmatrix->Multiply_vec(Ones);
+    int Unique_idx = treecov_size;
+    double ** temp1 = Vec_multiply(tmp, M, Unique_idx);
+    double ** temp2 = Vec_multiply(M, M, Unique_idx);
+    delete_double_array(treecov, treecov_size);
+    treecov = new double*[Unique_idx];
+    for (int i = 0; i < Unique_idx; i++)
+        treecov[i] = new double[Unique_idx];
+
+    for (int i = 0; i < Unique_idx; i++)
+        for (int j = 0; j < Unique_idx; j++)
+            treecov[i][j] = 0;
+
+    /* Set up progress bar */
+    int value = 0, maxProgressSize;
+    maxProgressSize = (int) Unique_idx * Unique_idx;
+    QProgressDialog dlg;
+    dlg.setLabelText("Computing Matching distance...");
+    dlg.setWindowModality(Qt::WindowModal);
+    dlg.setCancelButton(0);
+    dlg.setMinimum(0);
+    dlg.setMaximum(maxProgressSize);
+    dlg.setMinimumDuration(500);
+    dlg.setModal(true);
+    /*---------------------*/
+
+    for (int i = 0; i < Unique_idx; i++)
+    {
+        for (int j = 0; j < Unique_idx; j++)
+        {
+            /* Update progress bar */
+            dlg.setValue(value);
+            /*---------------------*/
+
+            treecov[i][j] = treecov[i][j] + (*result)(i,j) - temp1[i][j] - temp1[j][i] + n_trees * temp2[i][j];
+            treecov[i][j] = treecov[i][j] / (n_trees - 1);
+
+            /* Update progress bar */
+            value++;
+            /*---------------------*/
+        }
+    }
+
+    delete [] M;
+    M = NULL;
+
+    delete [] Ones;
+    Ones = NULL;
+
+    delete [] tmp;
+    tmp = NULL;
+
+    for (int i = 0; i < Unique_idx; i++)
+    {
+            delete [] temp1[i];
+            delete [] temp2[i];
+    }
+    delete [] temp1;
+    temp1 = NULL;
+    delete [] temp2;
+    temp2 = NULL;
+
+    if(trans != NULL)
+    {
+        delete trans;
+        trans = NULL;
+    }
+    if(result != NULL)
+    {
+        delete result;
+        result = NULL;
+    }
+
+    /* Close Progress bar */
+    dlg.setValue(maxProgressSize);
+    dlg.reset();
+    dlg.close();
+    /*--------------------*/
+
+}
+
+
+bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
+{
+    if(!isweighted && ISWEIGHTED)
+    {
+        cout << "Warning: The trees in memory are unweighted! Unable to compute weighted RF distances!\n\n";
+        return false;
+    }
+
+    bool bUbid = false; // for counting the number pf unique bipartitions
+    unsigned long uBID = 0;
+
+    if (ISWEIGHTED == false)
+    {
+        /* Set up progress bar */
+        int value = 0, maxProgressSize;
+        maxProgressSize = (int) vec_hashrf._hashtab2.size() + n_trees*((n_trees + 1) / 2);
+        QProgressDialog dlg;
+        dlg.setLabelText("Computing Unweighted RF distance...");
+        dlg.setWindowModality(Qt::WindowModal);
+        dlg.setCancelButton(0);
+        dlg.setMinimum(0);
+        dlg.setMaximum(maxProgressSize);
+        dlg.setMinimumDuration(500);
+        dlg.setModal(true);
+        /*---------------------*/
+
+
+        delete_double_array(dist_URF, n_trees);
+        dist_URF = new double *[n_trees];
+        for (int i = 0; i < n_trees; i++)
+            dist_URF[i] = new double [n_trees];
+        for(int i = 0; i < n_trees; i++)
+        {
+            for(int j = 0; j < n_trees; j++)
+                dist_URF[i][j] = 0;
+        }
+        for (unsigned int hti = 0; hti < vec_hashrf._hashtab2.size(); ++hti)
+        {
+            /* Update progress bar */
+            dlg.setValue(value);
+            /*---------------------*/
+
+            unsigned int sizeVec = vec_hashrf._hashtab2[hti].size();
+            if (sizeVec)
+            {
+                uBID += sizeVec;
+                if (!bUbid)
+                {
+                    for (unsigned int i = 0; i < sizeVec; ++i)
+                    {
+                        unsigned int sizeTreeIdx = vec_hashrf._hashtab2[hti][i]._vec_treeidx.size();
+                        if (sizeTreeIdx > 1)
+                        {
+                            for (unsigned int j = 0; j < sizeTreeIdx; ++j)
+                            {
+                                for (unsigned int k = 0; k < sizeTreeIdx; ++k)
+                                {
+                                    if (j == k)
+                                        continue;
+                                    else
+                                        dist_URF[vec_hashrf._hashtab2[hti][i]._vec_treeidx[j]][vec_hashrf._hashtab2[hti][i]._vec_treeidx[k]] += 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* Update progress bar */
+            value++;
+            /*---------------------*/
+        }
+        for (int i = 0; i < n_trees; i++)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                /* Update progress bar */
+                dlg.setValue(value);
+                /*---------------------*/
+
+                dist_URF[i][j] = (double) ((numberofbipartition[i] + numberofbipartition[j] - 2 * dist_URF[i][j]) / 2);
+                dist_URF[j][i] = dist_URF[i][j];
+
+                /* Update progress bar */
+                value++;
+                /*---------------------*/
+            }
+        }
+
+        /* Close Progress bar */
+        dlg.setValue(maxProgressSize);
+        dlg.reset();
+        dlg.close();
+        /*--------------------*/
+    }
+    else if (ISWEIGHTED == true)
+    {
+        delete_double_array(dist_RF, n_trees);
+        dist_RF = new double *[n_trees];
+        for (int i = 0; i < n_trees; i++)
+            dist_RF[i] = new double [n_trees];
+        for(int i = 0; i < n_trees; i++)
+            for(int j = 0; j < n_trees; j++)
+                dist_RF[i][j] = 0;
+        vec_hashrf._hashtab.resize(vec_hashrf._hashtab2.size());
+
+        /* Set up progress bar */
+        int value = 0, maxProgressSize;
+        maxProgressSize = (int) vec_hashrf._hashtab2.size() + vec_hashrf._hashtab.size() + n_trees*((n_trees + 1) / 2);
+        QProgressDialog dlg;
+        dlg.setLabelText("Computing Weighted RF distance...");
+        dlg.setWindowModality(Qt::WindowModal);
+        dlg.setCancelButton(0);
+        dlg.setMinimum(0);
+        dlg.setMaximum(maxProgressSize);
+        dlg.setMinimumDuration(500);
+        dlg.setModal(true);
+        /*---------------------*/
+
+        for (unsigned int hti = 0; hti < vec_hashrf._hashtab2.size(); ++hti)
+        {
+            /* Update progress bar */
+            dlg.setValue(value);
+            /*---------------------*/
+
+            unsigned int sizeLinkedList = vec_hashrf._hashtab2[hti].size();
+            if (sizeLinkedList > 0)
+            {
+                for (unsigned int i1 = 0; i1 < sizeLinkedList; ++i1)
+                {
+                    unsigned int bidi = vec_hashrf._hashtab2[hti][i1]._vec_treeidx.size();
+                    for (unsigned int i2 = 0; i2 < bidi; ++i2)
+                    {
+                        BUCKET_STRUCT_T bk;
+                        bk._hv2 = vec_hashrf._hashtab2[hti][i1]._hv2;
+                        bk._t_i = vec_hashrf._hashtab2[hti][i1]._vec_treeidx[i2];
+                        bk._dist = vec_hashrf._hashtab2[hti][i1]._vec_dist[i2];
+                        vec_hashrf._hashtab[hti].push_back(bk);
+                    }
+                }
+            }
+
+            /* Update progress bar */
+            value++;
+            /*---------------------*/
+        }
+        vec_hashrf._hashtab2.clear();
+        for (unsigned int hti = 0; hti < vec_hashrf._hashtab.size(); ++hti)
+        {
+            /* Update progress bar */
+            dlg.setValue(value);
+            /*---------------------*/
+
+            unsigned int sizeLinkedList = vec_hashrf._hashtab[hti].size();
+            if (sizeLinkedList > 1)
+            {
+                vector<unsigned long> vec_hv2;
+                vector<unsigned long>::iterator itr_vec_hv2;
+                // Collect unique hv2 values in the linked list
+                for (unsigned int i = 0; i < sizeLinkedList; ++i)
+                {
+                    unsigned long hv2 = vec_hashrf._hashtab[hti][i]._hv2;
+                    if (vec_hv2.empty())
+                        vec_hv2.push_back(hv2);
+                    else
+                    {
+                        itr_vec_hv2 = find(vec_hv2.begin(), vec_hv2.end(), hv2);
+                        if (itr_vec_hv2 == vec_hv2.end())
+                            vec_hv2.push_back(hv2);
+                    }
+                }
+                // distance
+                vector<vector<float> > vec_dist(vec_hv2.size(), vector<float>(n_trees, 0));
+
+                // Set the distance array with distance at proper tree index
+                for (unsigned int i = 0; i < sizeLinkedList; ++i)
+                {
+                    for (unsigned int j = 0; j < vec_hv2.size(); ++j)
+                    {
+                        if (vec_hashrf._hashtab[hti][i]._hv2 == vec_hv2[j])
+                            vec_dist[j][vec_hashrf._hashtab[hti][i]._t_i] = vec_hashrf._hashtab[hti][i]._dist;
+                    }
+                }
+                // Update floatsim matrix using vec_dist
+                for (unsigned int i = 0; i < vec_dist.size(); ++i)
+                {
+                    for (unsigned int j = 0; j < vec_dist[i].size(); ++j)
+                    {
+                        for (unsigned int k = 0; k < vec_dist[i].size(); ++k)
+                        {
+                            if (j == k)
+                                continue;
+                            else
+                                dist_RF[j][k] += (vec_dist[i][j] - vec_dist[i][k] > 0) ? (vec_dist[i][j] - vec_dist[i][k]) : (vec_dist[i][k] - vec_dist[i][j]);
+                        }
+                    }
+                }
+                vec_hv2.clear();
+                vec_dist.clear();
+            }
+            else if (sizeLinkedList == 1)
+            {
+                // propagate the dist value to other tree's distance
+                for (unsigned int i = 0; i < n_trees; ++i)
+                {
+                    if (i == vec_hashrf._hashtab[hti][0]._t_i)
+                        continue;
+                    else
+                    {
+                        dist_RF[i][vec_hashrf._hashtab[hti][0]._t_i] += vec_hashrf._hashtab[hti][0]._dist;
+                        dist_RF[vec_hashrf._hashtab[hti][0]._t_i][i] += vec_hashrf._hashtab[hti][0]._dist;
+                    }
+                }
+            }
+
+            /* Update progress bar */
+            value++;
+            /*---------------------*/
+        }
+        for (int i = 0; i < n_trees; i++)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                /* Update progress bar */
+                dlg.setValue(value);
+                /*---------------------*/
+
+                dist_RF[i][j] = (dist_RF[i][j] + dist_RF[j][i]) / 4;
+                dist_RF[j][i] = dist_RF[i][j];
+
+                /* Update progress bar */
+                value++;
+                /*---------------------*/
+            }
+        }
+
+        /* Close Progress bar */
+        dlg.setValue(maxProgressSize);
+        dlg.reset();
+        dlg.close();
+        /*--------------------*/
+    }
+
     return true;
 }
 
+bool Trees::Compute_Matching_dist()
+{
+    delete_double_array(dist_match, n_trees);
+    dist_match = new int *[n_trees];
+    for (int i = 0; i < n_trees; i++)
+        dist_match[i] = new int [n_trees];
+
+    if (!bipartmatrixIsexisting())
+    {
+        cout << "Warning: There is no bipartition matrix in the memory! Please compute it first.\n\n";
+        return false;
+    }
+    int n_taxa = leaveslabelsmaps.size();
+    int max_numberofbipartition = 0;
+    int idx = 0;
+
+    /* Set up progress bar */
+    int value = 0, maxProgressSize;
+    maxProgressSize = (int) n_trees*((n_trees + 1) / 2);
+    QProgressDialog dlg;
+    dlg.setLabelText("Computing Matching distance...");
+    dlg.setWindowModality(Qt::WindowModal);
+    dlg.setCancelButton(0);
+    dlg.setMinimum(0);
+    dlg.setMaximum(maxProgressSize);
+    dlg.setMinimumDuration(500);
+    dlg.setModal(true);
+    /*---------------------*/
+
+    for (int i = 0; i < n_trees; i++)
+    {
+        dist_match[i][i] = 0;
+        Array<Array<char> > bitstrofatree(numberofbipartition[i], Array<char> ());
+        idx = 0;
+        Get_bipartitionofonetree(treeset[i]->root, isrooted, 0, bitstrofatree, idx);
+
+        for (int j = 0; j < i; j++)
+        {
+            /* Update progress bar */
+            dlg.setValue(value);
+            /*---------------------*/
+
+            Array<Array<char> > bitstrofatreej(numberofbipartition[j], Array<char> ());
+            idx = 0;
+            Get_bipartitionofonetree(treeset[j]->root, isrooted, 0, bitstrofatreej, idx);
+
+            if (numberofbipartition[i] <= numberofbipartition[j])
+                max_numberofbipartition = numberofbipartition[j];
+            else
+                max_numberofbipartition = numberofbipartition[i];
+            int ** strdist = new int *[max_numberofbipartition];
+            for (int k = 0; k < max_numberofbipartition; k++)
+                strdist[k] = new int[max_numberofbipartition];
+            hungarian_problem_t p;
+
+            for (int k = 0; k < max_numberofbipartition; k++)
+            {
+                for (int l = 0; l < max_numberofbipartition; l++)
+                {
+                    int result = 0;
+                    if (k < numberofbipartition[i] && l < numberofbipartition[j])
+                    {
+                        if(Array<char>::bitstrXOR(bitstrofatree[k], bitstrofatreej[l], result))
+                            strdist[k][l] = result;
+                    }
+                    else if (k >= numberofbipartition[i] && l < numberofbipartition[j])
+                    {
+                        if(Array<char>::onebitstrXOR(bitstrofatreej[l], result))
+                            strdist[k][l] = result;
+                    }
+                    else
+                    {
+                        if(Array<char>::onebitstrXOR(bitstrofatree[k], result))
+                            strdist[k][l] = result;
+                    }
+
+                    if (((n_taxa % 2 == 0 && strdist[k][l] > ((int) n_taxa / 2))
+                         || (n_taxa % 2 != 0 && strdist[k][l] >= ((int) n_taxa / 2) + 1))
+                            && !isrooted)
+                        strdist[k][l] = n_taxa - strdist[k][l];
+                }
+            }
+
+            hungarian_init(&p, strdist , max_numberofbipartition, max_numberofbipartition, HUNGARIAN_MODE_MINIMIZE_COST) ;
+            int mdist = hungarian_solve(&p);
+            dist_match[i][j] = mdist;
+            dist_match[j][i] = dist_match[i][j];
+            hungarian_free(&p);
+            for(int k = 0; k < max_numberofbipartition; k++)
+            {
+                delete [] strdist[k];
+            }
+            delete [] strdist;
+
+            /* Update progress bar */
+            value++;
+            /*---------------------*/
+        }
+    }
+
+    /* Close Progress bar */
+    dlg.setValue(maxProgressSize);
+    dlg.reset();
+    dlg.close();
+    /*--------------------*/
+
+    return true;
+}
+
+bool Trees::Compute_SPR_dist()
+{
+    delete_double_array(dist_SPR, n_trees);
+    dist_SPR = new int *[n_trees];
+    for (int i = 0; i < n_trees; i++)
+        dist_SPR[i] = new int [n_trees];
+
+    int NN = 10000;
+    char *gzbuff = (char*) malloc(NN);
+
+    /* Set up progress bar */
+    int value = 0, maxProgressSize;
+    maxProgressSize = (int) n_trees + n_trees*((n_trees + 1) / 2);
+    QProgressDialog dlg;
+    dlg.setLabelText("Computing SPR distance...");
+    dlg.setWindowModality(Qt::WindowModal);
+    dlg.setCancelButton(0);
+    dlg.setMinimum(0);
+    dlg.setMaximum(maxProgressSize);
+    dlg.setMinimumDuration(500);
+    dlg.setModal(true);
+    /*---------------------*/
+
+    char **taxa_str = new char*[leaveslabelsmaps.size()];
+    for (int i = 0; i < leaveslabelsmaps.size(); i++)
+    {
+        string temp = leaveslabelsmaps.name(i);
+        taxa_str[i] = new char[temp.length()+1];
+        for (int j = 0; j < temp.length(); j++)
+            taxa_str[i][j] = temp[j];
+        taxa_str[i][temp.length()] = '\0';
+    }
+
+    std::map<std::string, int> label_map = std::map<std::string, int>();
+    std::map<int, std::string> reverse_label_map = std::map<int, std::string>();
+
+    //set random seed
+    srand(unsigned(time(0)));
+    std::vector<SPRNode *> sprtrees = std::vector<SPRNode *>();
+    std::vector<std::string> names = std::vector<std::string>();
+    for(int i = 0; i < n_trees; i++)
+    {
+        /* Update progress bar */
+        dlg.setValue(value);
+        /*---------------------*/
+
+        gzbuff[0] = NULL;
+        TreeOPE::printTree_new(treeset[i]->root, taxa_str, gzbuff, 0, NN);
+        std::string s = std::string(gzbuff);
+        size_t loc = s.find_first_of("(");
+        if (loc != string::npos)
+        {
+            std::string name = "";
+            if(loc != 0)
+            {
+                name = s.substr(0, loc);
+                s.erase(0, loc);
+            }
+
+            if (!isrooted)
+                s = SPR_root(s);
+
+            SPRNode *T2 = spr_building_tree(s);
+            T2->labels_to_numbers(&label_map, &reverse_label_map);
+            names.push_back(name);
+            sprtrees.push_back(T2);
+        }
+
+        /* Update progress bar */
+        value++;
+        /*---------------------*/
+    }
+
+    for (int i = 0; i < leaveslabelsmaps.size(); i++)
+    {
+        delete[] taxa_str[i];
+        taxa_str[i] = NULL;
+    }
+    delete[] taxa_str;
+    taxa_str = NULL;
+    free(gzbuff);
+
+    for(int i = 0; i < n_trees; i++)
+    {
+        dist_SPR[i][i] = 0;
+        for(int j = 0; j < i; j++)
+        {
+            /* Update progress bar */
+            dlg.setValue(value);
+            /*---------------------*/
+
+            dist_SPR[i][j] = rSPR_branch_and_bound_simple_clustering(sprtrees[i], sprtrees[j]);
+            dist_SPR[j][i] = dist_SPR[i][j];
+
+            /* Update progress bar */
+            value++;
+            /*---------------------*/
+        }
+    }
+
+    // clean
+    for (vector<SPRNode *>::iterator T2 = sprtrees.begin(); T2 != sprtrees.end(); T2++)
+        (*T2)->delete_tree();
+
+
+    /* Close Progress Box */
+    dlg.setValue(maxProgressSize);
+    dlg.reset();
+    dlg.close();
+    /*--------------------*/
+
+    return true;
+}
+#endif
 
 #endif
