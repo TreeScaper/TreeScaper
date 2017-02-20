@@ -576,7 +576,7 @@ transformation of the distance. \label{AffMenu4}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Dimension Estimation and NLDR
 \newpage
-\subsection{Dimension Estimation and NLDR}\label{subsect:DimEstNLDR}
+\subsection{Nonlinear Dimensionality Reduction and Dimension Estimation}\label{subsect:DimEstNLDR}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -662,7 +662,8 @@ assigned to a cluster.} \\
 \noindent{\it Plot Projections Panel}\\
 
 
-\begin{enumerate}[{\bf 10-}]
+\begin{enumerate}[{\bf 1-}]
+\setcounter{enumi}{9}
 \item {\bf [Plot Result]} -- Creates a $1-$, $2-$, or $3-$dimensional representation of the NLDR projection. To the left of the figure is a legend showing the colors assigned to the clusters. On a Mac,
 clicking and dragging allows the plot to be rotated in $3$ dimensions. Holding down the
 Control key while clicking and dragging rotates the plot in $2$ dimensions. Holding down the
@@ -814,18 +815,14 @@ covariances. \\
 \item {\bf [Covariance in memory]} -- Select the covariance matrix in memory to use for community
 detection. If there is no covariance matrix in memory, the drop down box will read ``No
 covariance data".
-\end{enumerate}
 
-\begin{enumerate}[{\bf 2}]
 \item {\bf A- [High Freq] and B- [Low Freq]} -- High and low frequency bipartitions often have small
 covariances with every other bipartition in the tree set, making them very difficult to assign to
 a particular community. Because these bipartitions do not represent strongly supported
 conflicting signal, the user may want to filter these bipartitions out of the analysis. ``High
 Freq" specifies the frequency above which bipartitions are filtered out. ``Low Freq" specifies
 the frequency below which bipartitions are filtered out.
-\end{enumerate}
 
-\begin{enumerate}[{\bf 3-}]
 \item {\bf [Model type]} -- Select the model to use for community detection. Options are the
 Configuration Null Model, the Constant Potts Model, the Erd\'{o}s-R\'{e}nyi  Model, and the No
 Null Model. Each of these models is described in more detail in Appendix~\ref{appendix:CDModels}.
@@ -847,7 +844,9 @@ parameter values are to be tested. \\
 \noindent If ``Manually" is selected in the ``Find Plateaus" section: \\
 
 
-\begin{enumerate}[{\indent\bf 5-}]
+\begin{enumerate}[{\indent\bf 1-}]
+\setcounter{enumi}{4}
+
 \item {\bf [$\mathbf{\lambda1}$ fixed]} -- If the Constant Potts Model (CPM) is used, or the Configuration Null
 Model (CNM) or Erdos-RŽnyi Null Model (ERNM) are used and the trees are fully
 binary, only the difference between $\lambda^{+}$ and $\lambda^{-}$ matters for community detection.
