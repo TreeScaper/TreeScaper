@@ -20,9 +20,11 @@
 \setcounter{MaxMatrixCols}{20}% allow up to 20-column matrices
 \usepackage[margin=1.00in, paperwidth=8.5in, paperheight=11in]{geometry}
 \usepackage[square,authoryear]{natbib}
+\usepackage[nottoc]{tocbibind}
 
 % NEW COMMANDS
 \renewcommand\contentsname{TABLE OF CONTENTS}
+\renewcommand{\tocbibname}{References}
 
 \begin{document}
 
@@ -76,7 +78,7 @@ We have written TreeScaper to provide a set of visual and quantitative tools for
 {\it Utilities} -- Much of TreeScaper’s functionality requires calculating distances between trees, transforming distances into affinities, translating trees into their component bipartitions, and summarizing how these bipartitions are distributed across trees (i.e., their variances and covariances). However, this information can also be useful in its own right. Therefore, TreeScaper provides a set of built-in utilities to calculate a range of useful tree- and bipartition-related summaries. Once calculated, these values may be used for other tasks in TreeScaper or may be written to file for use in other applications. \\
 
 
-{\it NLDR} -- One way to visually explore tree sets is to plot a $2-$ or $3-$dimensional representation of treespace using non-linear dimensionality reduction (NLDR; Fig.~\ref{fig1}). This approach was first suggested for the visualization of phylogenetic trees by {\color{red}\bf (REFERENCE NEEDED: Amenta and Klingner  (2002))} and ~\citep{HHJA:2005}, and recently extended by {\color{red}\bf (REFERENCE NEEDED: Wilgenbusch et al. (2016)}. The general idea behind NLDR is to find a lower dimensional representation of the relationships among trees that best preserves the true distances between them. TreeScaper implements several different methods for calculating tree-to-tree distances [e.g., Robinson-Foulds (RF) distances, matching distances, and subtree-prune-regraft (SPR) distances], several stress functions to assess how the original tree-to-tree distances should be optimally represented in lower dimensional space [e.g., Normalized stress, Kruskal$-1$ stress, nonlinear mapping (NLM) stress, and Curvilinear Components Analysis (CCA) stress], and several optimization algorithms for finding the best low-dimensional representation given a chosen stress function (e.g., Gauss-Seidel-Newton, stochastic gradient descent, and simulated annealing). \\
+{\it NLDR} -- One way to visually explore tree sets is to plot a $2-$ or $3-$dimensional representation of treespace using non-linear dimensionality reduction (NLDR; Fig.~\ref{fig1}). This approach was first suggested for the visualization of phylogenetic trees by {\color{red}\bf (REFERENCE NEEDED: Amenta and Klingner  (2002))} and ~\citealp{HHJA:2005}, and recently extended by {\color{red}\bf (REFERENCE NEEDED: Wilgenbusch et al. (2016)}. The general idea behind NLDR is to find a lower dimensional representation of the relationships among trees that best preserves the true distances between them. TreeScaper implements several different methods for calculating tree-to-tree distances [e.g., Robinson-Foulds (RF) distances, matching distances, and subtree-prune-regraft (SPR) distances], several stress functions to assess how the original tree-to-tree distances should be optimally represented in lower dimensional space [e.g., Normalized stress, Kruskal$-1$ stress, nonlinear mapping (NLM) stress, and Curvilinear Components Analysis (CCA) stress], and several optimization algorithms for finding the best low-dimensional representation given a chosen stress function (e.g., Gauss-Seidel-Newton, stochastic gradient descent, and simulated annealing). \\
 
 
 \begin{figure}[thbp!]\centering
@@ -1249,7 +1251,7 @@ energy imposed by a given community structure. The structure with the minimum en
 represents the most natural division of nodes. Below we provide definitions of $\mathcal{H}$ for each of the methods in TreeScaper, as well as some explanation of how these definitions influence the
 detected communities, in order to help users efficiently explore parameter space and properly
 interpret model output. We also direct those interested to more in-depth explanations of
-these methods in papers by ~\citep{Fortunato:2010,RB:2006,RAK:2007,TVDN:2011}. \\
+these methods in papers by ~\citealp{Fortunato:2010,RB:2006,RAK:2007,TVDN:2011}. \\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % No Null Model
