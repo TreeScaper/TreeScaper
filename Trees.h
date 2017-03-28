@@ -106,6 +106,10 @@ public:
 
     bool Compute_Matching_dist();
     bool Compute_SPR_dist();
+
+    bool compute_community_automatically(String str_matrix, int modelType, string highfreq, string lowfreq);
+
+    bool compute_community_manually(String str_matrix, int modelType, Array<double> param1, Array<double> param2, string highfreq, string lowfreq);
 #else
     void Compute_Bipart_Covariance();
 
@@ -114,6 +118,10 @@ public:
 
     bool Compute_Matching_dist();
     bool Compute_SPR_dist();
+
+    bool compute_community_automatically(String str_matrix, int modelType, string highfreq, string lowfreq);
+
+    bool compute_community_manually(String str_matrix, int modelType, Array<double> param1, Array<double> param2, string highfreq, string lowfreq);
 #endif
 
     // by bipartmatrix
@@ -158,10 +166,6 @@ public:
 
     bool consensusTreeIsexisting();
 
-    bool compute_community_automatically(String str_matrix, int modelType, string highfreq, string lowfreq);
-
-    bool compute_community_manually(String str_matrix, int modelType, Array<double> param1, Array<double> param2, string highfreq, string lowfreq);
-
     bool compute_community_fixedlambda(String str_matrix, int modelType, double lambdapos, double lambdaneg, string highfreq, string lowfreq);
 
     bool compute_consensus_tree(ConsensusTree type, const char *listname = NULL);
@@ -175,6 +179,10 @@ public:
 #endif
 
     string Print_selected_indices();
+
+    string Print_selected_trees(Treefileformat tf); // newick nexus
+    void WriteSelectedTrees(string &outfile, Treefileformat tf); // newick nexus
+
 
     const NEWICKTREE *get_tree(int idx);
     const NEWICKTREE *get_contree(int idx)

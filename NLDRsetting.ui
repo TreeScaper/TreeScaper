@@ -29,7 +29,35 @@
       </font>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="0" colspan="8">
+      <item row="0" column="2" colspan="2">
+       <widget class="QRadioButton" name="radionldrNorButton">
+        <property name="text">
+         <string>Normalized</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5" colspan="2">
+       <widget class="QRadioButton" name="radionldrCCAButton">
+        <property name="text">
+         <string>CCA</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QRadioButton" name="radionldrKruButton">
+        <property name="text">
+         <string>Kruskal-1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="radionldrtopButton">
+        <property name="text">
+         <string>top</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="7">
        <widget class="QTableWidget" name="tablewidgetnldr">
         <property name="font">
          <font>
@@ -1084,35 +1112,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QRadioButton" name="radionldrKruButton">
-        <property name="text">
-         <string>Kruskal-1</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="radionldrtopButton">
-        <property name="text">
-         <string>top</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2" colspan="2">
-       <widget class="QRadioButton" name="radionldrNorButton">
-        <property name="text">
-         <string>Normalized</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="5" colspan="3">
-       <widget class="QRadioButton" name="radionldrCCAButton">
-        <property name="text">
-         <string>CCA</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4" colspan="2">
+      <item row="2" column="5" colspan="2">
        <widget class="QPushButton" name="pushnldrcancel">
         <property name="font">
          <font>
@@ -1123,9 +1123,12 @@
         <property name="text">
          <string>Cancel</string>
         </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
-      <item row="2" column="2" colspan="2">
+      <item row="2" column="3" colspan="2">
        <widget class="QPushButton" name="pushnldrapply">
         <property name="font">
          <font>
@@ -1138,23 +1141,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="6" colspan="2">
-       <widget class="QPushButton" name="pushnldrclose">
-        <property name="font">
-         <font>
-          <family>Arial</family>
-          <pointsize>14</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Close</string>
-        </property>
-        <property name="default">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="2">
+      <item row="2" column="1" colspan="2">
        <widget class="QPushButton" name="pushnldrreset">
         <property name="font">
          <font>

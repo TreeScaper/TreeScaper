@@ -1518,8 +1518,9 @@ void TreeScaper::on_pushDISTrun_clicked()
             int idex = ui->comboBoxDIMdata->findText("No distance/coordinate data in memory");
             ui->comboBoxDIMdata->removeItem(idex);
         }
+
+        ui->pushDISTaffinity->setEnabled(true);
     }
-    ui->pushDISTaffinity->setEnabled(true);
 }
 
 void TreeScaper::on_pushDATAcov_clicked()
@@ -1622,9 +1623,21 @@ void TreeScaper::on_pushDATApartition_clicked()
 
 void TreeScaper::on_pushDATAloadtrees_clicked()
 {
-    TreesData->destructor();
-    delete TreesData;
-    TreesData = new Trees;
+    int msg = 0;
+    if(TreesData->treesAreexisting())
+    {
+        msg = QMessageBox::question(this, "Warning", "WARNING: Loading new tree set overwrites current trees and data values in memory.\n\nDo you wish to continue?", "Yes", "No");
+    }
+
+    if(msg == 0)    // Yes, delete trees and data values
+    {
+        TreesData->destructor();
+        delete TreesData;
+        TreesData = new Trees;
+    }
+    else    // No, do not delete current data values
+        return;
+
 
     QString qtfname = ui->textDATAfile->toPlainText();
     string stdfname = qtfname.toStdString();
@@ -2640,7 +2653,29 @@ void TreeScaper::on_pushDATAButtonlistbrowse_clicked()
 
 void TreeScaper::on_pushNLDRsaveindices_clicked()
 {
-    cout << "Output selected indices to the file: " << TreesData->Print_selected_indices() << "\n\n";
+//    cout << "Output selected indices to the file: " << TreesData->Print_selected_indices() << "\n\n";
+    int reply = QMessageBox::question(this, "Output selected trees", "Choose output tree format", "Newick", "Nexus", "Cancel");
+
+    QString qtconvert;
+    if(reply == 0) // newick
+        qtconvert = "Newick";
+    else if(reply == 1)
+        qtconvert = "Nexus";
+    else if(reply == 2) // cancel
+        return;
+
+    string stdconvert = qtconvert.toStdString();
+    String convert(stdconvert.c_str());
+
+    if(convert == (String) "Newick")
+    {
+        cout << "Output selected indices to the file: " << TreesData->Print_selected_trees(NEWICK) << "\n\n";
+    }
+    else
+    if(convert == (String) "Nexus")
+    {
+        cout << "Output selected indices to the file: " << TreesData->Print_selected_trees(NEXUS) << "\n\n";
+    }
 }
 
 void TreeScaper::on_pushDISTplotcom_clicked()
@@ -2695,6 +2730,17 @@ void TreeScaper::on_pushCOVAcomm_clicked()
     {
         QMessageBox::warning(NULL, "Warning", "Community detection is running!", 0, 0);
         return;
+//        int msg;
+//        msg = QMessageBox::question(NULL, "Warning", "WARNING: Community detection is running!\n\nDo you want to stop?", "Yes", "No");
+
+//        if(msg == 0)    // Yes
+//        {
+//            communitythd.stop();
+//            communitythd.exit();
+//            return;
+//        }
+//        else            // No
+//            return;
     }
 
     QString qtcdmodel = ui->comboBoxCOVAcdmodel->currentText();

@@ -232,12 +232,12 @@ int main(int argc, char* argv[])
         std::cout << "./CLVTreeScaper -trees -f {trees.txt} -ft Trees -w {1,0} -r {1,0} -o Consensus -if IndicesFileName -ct {Majority,Strict} -cfm {Newick,Nexus}\n";
         std::cout << "\n";
         std::cout << "Compute Distance Matrix:\n";
-        std::cout << "./CLVTreeScaper -trees -f {trees.txt} -ft Trees -w {1,0} -r {1,0} -o Dist -dm {URF,RF,Mat}\n";
+        std::cout << "./CLVTreeScaper -trees -f {trees.txt} -ft Trees -w {1,0} -r {1,0} -o Dist -dm {URF,RF,Mat,SPR}\n";
         std::cout << "\n";
         std::cout << "\n";
         std::cout << "\n";
         std::cout << "Compute Affinity Matrix:\n";
-        std::cout << "./CLVTreeScaper -trees -f {trees.txt} -ft Trees -w {1,0} -r {1,0} -o Affinity -dm {URF,RF,Mat}\n";
+        std::cout << "./CLVTreeScaper -trees -f {trees.txt} -ft Trees -w {1,0} -r {1,0} -o Affinity -dm {URF,RF,Mat,SPR}\n";
         std::cout << "-am {Exp,Rec}\n";
         std::cout << "\n";
         std::cout << "Compute Covariance Matrix:\n";
@@ -365,7 +365,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
         TreesData->Compute_Hash();
         TreesData->Compute_Bipart_Matrix();
     
-        cout << "successfully computed bipartitation matrix." << endl;
+        cout << "Successfully computed bipartitation matrix." << endl;
         
         String fname = paras["-f"];
         string stdfname = (char *) fname;
@@ -386,7 +386,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
             TreesData->OutputBipartitionMatrix(outBipartMatrix, FULLMATRIX);
         } else
         {
-            cout << "error: setting of -bfm is not correct. Unable to output bipartition matrix" << endl;
+            cout << "Error: setting of -bfm is not correct. Unable to output bipartition matrix" << endl;
             return;
         }
     }
@@ -529,16 +529,16 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
         } 
         else
         {
-              cout << "error: setting of -dm is not correct. Unable to compute distance matrix" << endl;
+              cout << "Error: setting of -dm is not correct. Unable to compute distance matrix" << endl;
               return;
         }
     
         if(dis)
         {
-            std::cout << "successfully computed " << memorydata << " distance." << std::endl;
+            std::cout << "Successfully computed " << memorydata << " distance." << std::endl;
         } else
         {
-            std::cout << "error: Unable to compute " << memorydata << " distance." << std::endl;
+            std::cout << "Error: Unable to compute " << memorydata << " distance." << std::endl;
             return;
         }
         

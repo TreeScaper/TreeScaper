@@ -49,7 +49,7 @@ private slots:
     void on_radionldrNorButton_clicked();
     void on_radionldrNLMButton_clicked();
     void on_radionldrCCAButton_clicked();
-    void on_pushnldrclose_clicked();
+//    void on_pushnldrclose_clicked();
 };
 
 #endif // NLDRSETTING_H

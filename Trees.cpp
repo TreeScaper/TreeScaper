@@ -1007,6 +1007,7 @@ void Trees::Compute_Hash()
     }*/
 }
 
+
 void Trees::Compute_Bipart_Matrix()
 {
     int n_taxa = leaveslabelsmaps.size();
@@ -1072,7 +1073,7 @@ void Trees::Compute_Bipart_Matrix()
         }
     }
 
-    //============================================//
+    //==============Create Sparse Bipartition Matrix==================//
     double *Vals = new double [Unique_idx * n_trees];
     int *RowInds = new int [Unique_idx * n_trees];
     int *ColPtr = new int [n_trees+1];
@@ -1136,6 +1137,7 @@ void Trees::Compute_Bipart_Matrix()
     delete [] matrix_treeIdx;
     delete [] matrix_weight;
 }
+
 
 string Trees::make_Bipart_Matrix_name(string fname, String format)
 {
@@ -2036,6 +2038,7 @@ string Trees::create_temp_name(String str_matrix)
     return result;
  }
 
+
  bool Trees::compute_community_automatically(String str_matrix, int modelType, string highfreq, string lowfreq)
   {
      if(com_info != NULL)
@@ -2625,6 +2628,7 @@ string Trees::create_temp_name(String str_matrix)
      cout << "Output community results to file: " << outfname << " and " << fnamepla << "\n\n";
      return true;
   }
+
 
 bool Trees::compute_community_fixedlambda(String str_matrix, int modelType, double lambdapos, double lambdaneg, string highfreq, string lowfreq) // lambda negative = 0
 {
@@ -3362,7 +3366,157 @@ string Trees::Print_selected_indices()
 }
 
 
+string Trees::Print_selected_trees(Treefileformat tf)
+{
+#ifndef COMMAND_LINE_VERSION
+    QString qtname = get_treefilename_without_path();
+    string stdname = qtname.toStdString();
+#else
+    string stdname = treesfilename;
+#endif
+
+    String outputname(stdname.c_str());
+
+    int i = 0;
+    while(outputname[i] != '.' && outputname[i] != '\0')
+        i++;
+
+    outputname = outputname(0, i);
+
+    if(tf == NEWICK)
+    {
+        outputname += (String) "_selected_trees_NEWICK.out";
+        stdname = (char *) outputname;
+
+        WriteSelectedTrees(stdname, NEWICK);
+    }
+    else
+    if(tf == NEXUS)
+    {
+        outputname += (String) "_selected_trees_NEXUS.out";
+        stdname = (char *) outputname;
+
+        WriteSelectedTrees(stdname, NEXUS);
+    }
+
+    return stdname;
+}
+
+void Trees::WriteSelectedTrees(string &outfile, Treefileformat tf) // newick nexus
+{
+    if(tf == NEWICK)
+    {
+        ofstream outNewick;
+        int NN = 10000;
+        char *gzbuff = (char*) malloc(NN);
+        outNewick.open(outfile.c_str());
+
+        char **taxa_str = new char*[leaveslabelsmaps.size()];
+        for (int i = 0; i < leaveslabelsmaps.size(); i++)
+        {
+            string temp = leaveslabelsmaps.name(i);
+            taxa_str[i] = new char[temp.length()+1];
+            for (int j = 0; j < temp.length(); j++)
+                taxa_str[i][j] = temp[j];
+            taxa_str[i][temp.length()] = '\0';
+        }
+
+        for(int i = 0; i < selected_trees.get_length(); i++)
+        {
+            if(selected_trees[i] == -1)
+                break;
+
+            gzbuff[0] = NULL;
+            TreeOPE::printTree_new(treeset[selected_trees[i]]->root, taxa_str, gzbuff, 0, NN);
+            outNewick << gzbuff << ";" << endl;
+        }
+
+        for (int i = 0; i < leaveslabelsmaps.size(); i++)
+        {
+            delete[] taxa_str[i];
+            taxa_str[i] = NULL;
+        }
+        delete[] taxa_str;
+        taxa_str = NULL;
+
+        free(gzbuff);
+        outNewick.close();
+    } else
+    if(tf == NEXUS)
+    {
+        int n_subtrees;
+        for(int i = 0; i < selected_trees.get_length(); i++)
+        {
+            if(selected_trees[i] == -1)
+                break;
+            n_subtrees++;
+        }
+
+        ofstream outNexus;
+        outNexus.open(outfile.c_str());
+        outNexus << "#NEXUS" << endl;
+        outNexus << "BEGIN TAXA;" << endl;
+        outNexus << "      dimensions ntax=" << leaveslabelsmaps.size() << ";" << endl;
+        outNexus << "      taxlabels ";
+        for (int i = 0; i < leaveslabelsmaps.size(); i++)
+        {
+            outNexus<< leaveslabelsmaps.name(i) <<" ";
+        }
+        outNexus << ";" << endl;
+        outNexus << "END;" << endl;
+        outNexus << "BEGIN TREES;" << endl;
+        outNexus << "      dimension ntree=" << n_subtrees  << ";" << endl;
+        outNexus << "      " << "Translate" << endl;
+        for (int i = 0; i < leaveslabelsmaps.size(); i++)
+        {
+            if (i < leaveslabelsmaps.size() - 1)
+                outNexus << "                " << i+1 << " " << leaveslabelsmaps.name(i) << "," << endl;
+            else
+                outNexus << "                " << i+1 << " " << leaveslabelsmaps.name(i) << endl;
+        }
+        outNexus << "                ;" << endl;
+
+        char **taxa_str = new char*[leaveslabelsmaps.size()];
+        for (int i = 0; i < leaveslabelsmaps.size(); i++)
+        {
+            string temp = leaveslabelsmaps.name(i);
+            taxa_str[i] = new char[temp.length()+1];
+            for (int j = 0; j < temp.length(); j++)
+                taxa_str[i][j] = temp[j];
+            taxa_str[i][temp.length()] = NULL;
+        }
+
+        int NN = 10000;
+        char *gzbuff = (char*)malloc(NN);
+
+        for(int count = 0; count < selected_trees.get_length(); count++)
+        {
+            if(selected_trees[count] == -1)
+                break;
+
+            gzbuff[0] = NULL;
+            TreeOPE::printTree_nex(treeset[selected_trees[count]]->root, leaveslabelsmaps.size(), gzbuff, 0, NN);
+            outNexus << "TREE tree " << selected_trees[count] << " = "  << gzbuff << ";" << endl;
+        }
+
+        for (int i = 0; i < leaveslabelsmaps.size(); i++)
+        {
+            delete[] taxa_str[i];
+            taxa_str[i] = NULL;
+        }
+        delete[] taxa_str;
+        taxa_str = NULL;
+
+        free(gzbuff);
+
+        outNexus << "End;" << endl;
+        outNexus.close();
+    }
+}
+
+
 #if COMMAND_LINE_VERSION
+
 void Trees::Compute_Bipart_Covariance()
 {
     SparseMatrix* trans = sbipartmatrix->transpose();
@@ -3752,6 +3906,7 @@ bool Trees::Compute_SPR_dist()
     return true;
 }
 #else
+
 void Trees::Compute_Bipart_Covariance()
 {
     SparseMatrix* trans = sbipartmatrix->transpose();
@@ -3777,13 +3932,11 @@ void Trees::Compute_Bipart_Covariance()
     int value = 0, maxProgressSize;
     maxProgressSize = (int) Unique_idx * Unique_idx;
     QProgressDialog dlg;
-    dlg.setLabelText("Computing Matching distance...");
+    dlg.setLabelText("Computing covariance matrix...");
     dlg.setWindowModality(Qt::WindowModal);
-    dlg.setCancelButton(0);
     dlg.setMinimum(0);
     dlg.setMaximum(maxProgressSize);
     dlg.setMinimumDuration(500);
-    dlg.setModal(true);
     /*---------------------*/
 
     for (int i = 0; i < Unique_idx; i++)
@@ -3798,11 +3951,25 @@ void Trees::Compute_Bipart_Covariance()
             treecov[i][j] = treecov[i][j] / (n_trees - 1);
 
             /* Update progress bar */
-            value++;
+            if(dlg.wasCanceled())
+                goto cancelButton;
+            else
+                value++;
             /*---------------------*/
         }
     }
 
+    goto clearMemory;
+
+cancelButton:
+    /* Progress was canceled */
+
+    // Delete any values that may have been saved in treecov
+    delete_double_array(treecov, treecov_size);
+
+    goto clearMemory;
+
+clearMemory:
     delete [] M;
     M = NULL;
 
@@ -3838,7 +4005,6 @@ void Trees::Compute_Bipart_Covariance()
     dlg.reset();
     dlg.close();
     /*--------------------*/
-
 }
 
 
@@ -3853,19 +4019,18 @@ bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
     bool bUbid = false; // for counting the number pf unique bipartitions
     unsigned long uBID = 0;
 
+    QProgressDialog dlg;    // Declare progress bar
+
     if (ISWEIGHTED == false)
     {
         /* Set up progress bar */
         int value = 0, maxProgressSize;
         maxProgressSize = (int) vec_hashrf._hashtab2.size() + n_trees*((n_trees + 1) / 2);
-        QProgressDialog dlg;
         dlg.setLabelText("Computing Unweighted RF distance...");
         dlg.setWindowModality(Qt::WindowModal);
-        dlg.setCancelButton(0);
         dlg.setMinimum(0);
         dlg.setMaximum(maxProgressSize);
         dlg.setMinimumDuration(500);
-        dlg.setModal(true);
         /*---------------------*/
 
 
@@ -3911,7 +4076,10 @@ bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
             }
 
             /* Update progress bar */
-            value++;
+            if(dlg.wasCanceled())
+                goto cancelButtonURFsect1;
+            else
+                value++;
             /*---------------------*/
         }
         for (int i = 0; i < n_trees; i++)
@@ -3951,16 +4119,14 @@ bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
         /* Set up progress bar */
         int value = 0, maxProgressSize;
         maxProgressSize = (int) vec_hashrf._hashtab2.size() + vec_hashrf._hashtab.size() + n_trees*((n_trees + 1) / 2);
-        QProgressDialog dlg;
         dlg.setLabelText("Computing Weighted RF distance...");
         dlg.setWindowModality(Qt::WindowModal);
-        dlg.setCancelButton(0);
         dlg.setMinimum(0);
         dlg.setMaximum(maxProgressSize);
         dlg.setMinimumDuration(500);
-        dlg.setModal(true);
         /*---------------------*/
 
+        /* Section 1 */
         for (unsigned int hti = 0; hti < vec_hashrf._hashtab2.size(); ++hti)
         {
             /* Update progress bar */
@@ -3985,9 +4151,14 @@ bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
             }
 
             /* Update progress bar */
-            value++;
+            if(dlg.wasCanceled())
+                goto cancelButtonRFsect1;
+            else
+                value++;
             /*---------------------*/
         }
+
+        /* Section 2 */
         vec_hashrf._hashtab2.clear();
         for (unsigned int hti = 0; hti < vec_hashrf._hashtab.size(); ++hti)
         {
@@ -4058,9 +4229,14 @@ bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
             }
 
             /* Update progress bar */
-            value++;
+            if(dlg.wasCanceled())
+                goto cancelButtonRFsect2;
+            else
+                value++;
             /*---------------------*/
         }
+
+        /* Section 3 */
         for (int i = 0; i < n_trees; i++)
         {
             for (int j = 0; j < i; j++)
@@ -4073,7 +4249,10 @@ bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
                 dist_RF[j][i] = dist_RF[i][j];
 
                 /* Update progress bar */
-                value++;
+                if(dlg.wasCanceled())
+                    goto cancelButtonRFsect3;
+                else
+                    value++;
                 /*---------------------*/
             }
         }
@@ -4086,6 +4265,63 @@ bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
     }
 
     return true;
+cancelButtonURFsect1:
+    /* Progress was canceled for Unweighted RF*/
+
+    // Delete any values in dist_URF
+    delete_double_array(dist_URF, n_trees);
+
+    /* Close Progress bar */
+    dlg.reset();
+    dlg.close();
+    /*--------------------*/
+
+    return false;
+
+cancelButtonRFsect1:
+    /* Progress was canceled in section 1 for Weighted RF*/
+
+    vec_hashrf._hashtab2.clear();
+
+    // Delete any values in dist_URF
+    delete_double_array(dist_RF, n_trees);
+    vec_hashrf._hashtab.clear();
+
+    /* Close Progress bar */
+    dlg.reset();
+    dlg.close();
+    /*--------------------*/
+
+    return false;
+
+cancelButtonRFsect2:
+    /* Progress was canceled in section 2 for Weighted RF*/
+
+    // Delete any values in dist_URF
+    delete_double_array(dist_RF, n_trees);
+    vec_hashrf._hashtab.clear();
+
+    /* Close Progress bar */
+    dlg.reset();
+    dlg.close();
+    /*--------------------*/
+
+    return false;
+
+cancelButtonRFsect3:
+    /* Progress was canceled in section 3 for Weighted RF*/
+
+    // Delete any values in dist_URF
+    delete_double_array(dist_RF, n_trees);
+    vec_hashrf._hashtab.clear();
+
+    /* Close Progress bar */
+    dlg.reset();
+    dlg.close();
+    /*--------------------*/
+
+    return false;
+
 }
 
 bool Trees::Compute_Matching_dist()
@@ -4106,15 +4342,13 @@ bool Trees::Compute_Matching_dist()
 
     /* Set up progress bar */
     int value = 0, maxProgressSize;
-    maxProgressSize = (int) n_trees*((n_trees + 1) / 2);
+    maxProgressSize = (int) n_trees + n_trees*((n_trees + 1) / 2);
     QProgressDialog dlg;
     dlg.setLabelText("Computing Matching distance...");
     dlg.setWindowModality(Qt::WindowModal);
-    dlg.setCancelButton(0);
     dlg.setMinimum(0);
     dlg.setMaximum(maxProgressSize);
     dlg.setMinimumDuration(500);
-    dlg.setModal(true);
     /*---------------------*/
 
     for (int i = 0; i < n_trees; i++)
@@ -4183,7 +4417,10 @@ bool Trees::Compute_Matching_dist()
             delete [] strdist;
 
             /* Update progress bar */
-            value++;
+            if(dlg.wasCanceled())
+                goto cancelButton;
+            else
+                value++;
             /*---------------------*/
         }
     }
@@ -4195,6 +4432,20 @@ bool Trees::Compute_Matching_dist()
     /*--------------------*/
 
     return true;
+
+cancelButton:
+    /* Progress was canceled */
+
+    // Delete any values that may have been saved in dist_match
+    delete_double_array(dist_match, n_trees);
+
+    /* Close Progress bar */
+    dlg.setValue(maxProgressSize);
+    dlg.reset();
+    dlg.close();
+    /*--------------------*/
+
+    return false;
 }
 
 bool Trees::Compute_SPR_dist()
@@ -4213,11 +4464,9 @@ bool Trees::Compute_SPR_dist()
     QProgressDialog dlg;
     dlg.setLabelText("Computing SPR distance...");
     dlg.setWindowModality(Qt::WindowModal);
-    dlg.setCancelButton(0);
     dlg.setMinimum(0);
     dlg.setMaximum(maxProgressSize);
     dlg.setMinimumDuration(500);
-    dlg.setModal(true);
     /*---------------------*/
 
     char **taxa_str = new char*[leaveslabelsmaps.size()];
@@ -4233,6 +4482,7 @@ bool Trees::Compute_SPR_dist()
     std::map<std::string, int> label_map = std::map<std::string, int>();
     std::map<int, std::string> reverse_label_map = std::map<int, std::string>();
 
+    /* Section 1----------------------------------------------------------*/
     //set random seed
     srand(unsigned(time(0)));
     std::vector<SPRNode *> sprtrees = std::vector<SPRNode *>();
@@ -4266,7 +4516,10 @@ bool Trees::Compute_SPR_dist()
         }
 
         /* Update progress bar */
-        value++;
+        if(dlg.wasCanceled())
+            goto cancelButtonSect1;
+        else
+            value++;
         /*---------------------*/
     }
 
@@ -4279,6 +4532,7 @@ bool Trees::Compute_SPR_dist()
     taxa_str = NULL;
     free(gzbuff);
 
+    /* Section 2: Compute SPR----------------------------------------------------*/
     for(int i = 0; i < n_trees; i++)
     {
         dist_SPR[i][i] = 0;
@@ -4292,10 +4546,14 @@ bool Trees::Compute_SPR_dist()
             dist_SPR[j][i] = dist_SPR[i][j];
 
             /* Update progress bar */
-            value++;
+            if(dlg.wasCanceled())
+                goto cancelButtonSect2;
+            else
+                value++;
             /*---------------------*/
         }
     }
+
 
     // clean
     for (vector<SPRNode *>::iterator T2 = sprtrees.begin(); T2 != sprtrees.end(); T2++)
@@ -4309,7 +4567,823 @@ bool Trees::Compute_SPR_dist()
     /*--------------------*/
 
     return true;
+
+cancelButtonSect1:
+     /* If cancelled in section 1, release data and return false */
+    for (int i = 0; i < leaveslabelsmaps.size(); i++)
+    {
+        delete[] taxa_str[i];
+        taxa_str[i] = NULL;
+    }
+    delete[] taxa_str;
+    taxa_str = NULL;
+    free(gzbuff);
+
+
+    // clean
+    for (vector<SPRNode *>::iterator T2 = sprtrees.begin(); T2 != sprtrees.end(); T2++)
+        (*T2)->delete_tree();
+
+
+    /* Close Progress Box */
+    dlg.setValue(maxProgressSize);
+    dlg.reset();
+    dlg.close();
+    /*--------------------*/
+
+    return false;
+
+cancelButtonSect2:
+     /* If cancelled in section 2 (when computing SPR), release data and return false */
+
+    // Delete any values that may have been saved in dist_SPR
+    delete_double_array(dist_SPR, n_trees);
+
+    // clean
+    for (vector<SPRNode *>::iterator T2 = sprtrees.begin(); T2 != sprtrees.end(); T2++)
+        (*T2)->delete_tree();
+
+
+    /* Close Progress Box */
+    dlg.setValue(maxProgressSize);
+    dlg.reset();
+    dlg.close();
+    /*--------------------*/
+
+    return false;
 }
+
+//bool Trees::compute_community_automatically(String str_matrix, int modelType, string highfreq, string lowfreq)
+// {
+//    /* Set up progress bar */
+//    QProgressDialog dlg;
+//    dlg.setLabelText("Computing community detection...");
+//    dlg.setWindowModality(Qt::WindowModal);
+//    dlg.setMinimum(0);
+//    dlg.setMaximum(0);
+//    dlg.setValue(0);
+////    dlg.setMinimumDuration(500);
+//    dlg.show();
+
+//    bool cancelButtonFlag = false;
+//    /*---------------------*/
+
+//    if(com_info != NULL)
+//        delete_double_array(com_info, covariance_nonfree_id_size + 4);
+//    srand(time(NULL));
+//    covariance_freeid_size = 0;
+//    covariance_freeid = NULL;
+//    covariance_nonfree_id_size = 0;
+//    covariance_nonfree_id = NULL;
+//    string temp_file = create_temp_name(str_matrix);
+//    double highfrequence = atof(highfreq.c_str());
+//    double lowfrequence = atof(lowfreq.c_str());
+//    if ((str_matrix == (String)"Covariance Matrix" || str_matrix == (String) "File-covariance") && (highfrequence > 1.0 || highfrequence < 0.0
+//        || lowfrequence > 1.0 || lowfrequence < 0.0 || (highfrequence - lowfrequence) <= 0.0))
+//    {
+//        cout << "Warning: The high and low frequencies must be between 0 and 1!\n\n";
+//        return false;
+//    }
+//    print_community_file(str_matrix, temp_file, highfrequence, lowfrequence);
+//    char *infile = strdup(temp_file.c_str());
+//    string outf = create_out_name(str_matrix);
+//    char *outfile = strdup(outf.c_str());
+//    string nodef = create_node_name(str_matrix);
+//    char *node_map_file = strdup(nodef.c_str());
+//    string conff = create_conf_name(str_matrix);
+//    char *conf_file = strdup(conff.c_str());
+//    int is_weighted = 1;
+//    int is_directed = 1;
+//    int is_single_slice = 0;
+//    double interslice_weight = 1.0;
+
+//    int* conf = NULL;
+//    int* sign = NULL;
+//    double* lambda = NULL;
+
+//    Slicer s(infile, (double)interslice_weight, is_directed, is_weighted, is_single_slice);
+//    Graph* g = s.get_graph();
+//    g->display_binary(outfile);
+//    delete g;
+//    s.display_node_mapping(node_map_file);
+//    s.display_conf(conf_file, modelType);
+
+//    int layers = read_conf(conf_file, conf, sign);
+//    lambda = new double[layers];
+
+
+//    //----------------fixed lambda neg, find two lambda_+ ----------
+//    //----------------such that the numbers of community  ----------
+//    //----------------are minimum or maximum.             ----------
+
+//    double lambda_neg = 0;
+//    double lambda_pos_min = -1, lambda_pos_max = 1;
+//    Community * community;
+//    map<double, Community *> LamCommunities;
+//    map<double, Community *>::iterator it, it2;
+//    map<double, double> mods;
+//    int times = 0;
+//    int numNodes = 0;
+
+//    while(times <= 20)
+//    {
+//        create_resolution(lambda_pos_min, lambda_neg, layers, sign, lambda);
+//        community = new Community(outfile, conf, sign, lambda);
+//        int stochastic = 0;
+//        GreedyLouvain::iterate_randomly = stochastic;
+//        GreedyLouvain::detect_communities(community);
+//        if(community->nb_comm == 1)
+//        {
+//            numNodes = community->g->nb_nodes;
+//            mods[lambda_pos_min] = community->modularity();
+//            LamCommunities[lambda_pos_min] = community;
+//            break;
+//        } else
+//        {
+//            delete community;
+//            community = NULL;
+//            lambda_pos_min *= 2;
+//        }
+//        times++;
+
+//        if(dlg.wasCanceled())
+//        {
+//            cancelButtonFlag = true;
+//            break;
+//        }
+//    }
+//    if(times == 11)
+//    {
+//        cout << "Error: Cannot find lambda pos min!\n\n";
+//        return false;
+//    }
+
+//    if(cancelButtonFlag)
+//    {
+//        cout << "Community detection was canceled!\n\n";
+
+//        //delete temporary file
+//        free(infile);
+//        free(outfile);
+//        free(node_map_file);
+//        free(conf_file);
+
+//        free(conf);
+//        free(sign);
+//        if (lambda != NULL)
+//            delete [] lambda;
+
+//        for(it = LamCommunities.begin(); it != LamCommunities.end(); it++)
+//            delete it->second;
+
+//        const char *tempfile0 = temp_file.c_str();
+//        remove(tempfile0);
+//        const char *tempfile1 = outf.c_str();
+//        remove(tempfile1);
+//        const char *tempfile2 = nodef.c_str();
+//        remove(tempfile2);
+//        const char *tempfile3 = conff.c_str();
+//        remove(tempfile3);
+
+//        /* Close Progress Box */
+//        dlg.setValue(100);
+//        dlg.reset();
+//        dlg.close();
+//        /*--------------------*/
+
+//        return false;
+//    }
+
+//    times = 0;
+//    while(times <= 20)
+//    {
+//        create_resolution(lambda_pos_max, lambda_neg, layers, sign, lambda);
+//        community = new Community(outfile, conf, sign, lambda);
+//        int stochastic = 0;
+//        GreedyLouvain::iterate_randomly = stochastic;
+//        GreedyLouvain::detect_communities(community);
+
+//        if(str_matrix == (String) "Affinity-URF" || str_matrix == (String) "Affinity-RF" || str_matrix == (String) "Affinity-match" ||
+//                str_matrix == (String) "Affinity-SPR" || str_matrix == (String) "Affinity-geodesic" || str_matrix == (String) "Affinity-filedist"
+//                 || str_matrix == (String) "File-affinity")
+//        {
+//            bool allsametopo = true;
+//            double **affimatrix = *((double ***) StrToDist[(String) "Unweighted RF-distance"]);
+//            if(affimatrix != NULL)
+//            {
+//                double samevalue = affimatrix[0][0];
+//                for(int i = 0; i < community->nb_comm; i++)
+//                {
+//                    int repidx = -1;
+//                    for(int j = 0; j < covariance_nonfree_id_size; j++)
+//                    {
+//                        if(community->n2c[j] == i)
+//                        {
+//                            if(repidx == -1)
+//                            {
+//                                repidx = j;
+//                            } else
+//                            {
+//                                if(fabs(affimatrix[repidx][j] - samevalue) >= 1e-10)
+//                                {
+//                                    allsametopo = false;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                if(allsametopo)
+//                {
+//                    mods[lambda_pos_max] = community->modularity();
+//                    LamCommunities[lambda_pos_max] = community;
+//                    break;
+//                }
+//            }
+//        }
+//        if(community->nb_comm == covariance_nonfree_id_size)
+//        {
+//            mods[lambda_pos_max] = community->modularity();
+//            LamCommunities[lambda_pos_max] = community;
+//            break;
+//        } else
+//        {
+//            delete community;
+//            community = NULL;
+//            lambda_pos_max *= 2;
+//        }
+//        times++;
+
+//        if(dlg.wasCanceled())
+//        {
+//            cancelButtonFlag = true;
+//            break;
+//        }
+//    }
+//    if(times == 11)
+//    {
+//        cout << "Error: Cannot find lambda pos max!\n\n";
+//        return false;
+//    }
+
+//    if(cancelButtonFlag)
+//    {
+//        cout << "Community detection was canceled!\n\n";
+
+//        //delete temporary file
+//        free(infile);
+//        free(outfile);
+//        free(node_map_file);
+//        free(conf_file);
+
+//        free(conf);
+//        free(sign);
+//        if (lambda != NULL)
+//            delete [] lambda;
+
+//        for(it = LamCommunities.begin(); it != LamCommunities.end(); it++)
+//            delete it->second;
+
+//        const char *tempfile0 = temp_file.c_str();
+//        remove(tempfile0);
+//        const char *tempfile1 = outf.c_str();
+//        remove(tempfile1);
+//        const char *tempfile2 = nodef.c_str();
+//        remove(tempfile2);
+//        const char *tempfile3 = conff.c_str();
+//        remove(tempfile3);
+
+//        /* Close Progress Box */
+//        dlg.setValue(100);
+//        dlg.reset();
+//        dlg.close();
+//        /*--------------------*/
+
+//        return false;
+//    }
+
+//    cout << "lambda neg: " << lambda_neg << endl;
+//    cout << "lambda pos min: " << lambda_pos_min << ", lambda pos max: " << lambda_pos_max << endl;
+
+//    queue<pair<double, double> > qq;
+//    pair<double, double> p, pp;
+//    vector<pair<double, double> > plateausLb(0);
+//    vector<pair<double, double> > plateausUb(0);
+//    bool SameAsFirst, SameAsSecond;
+//    double lambda_pos, plateaubound = 0;
+//    int atleastsearchnum = 0;
+//    p = make_pair(lambda_pos_min, lambda_pos_max);
+//    qq.push(p);
+
+//    // width first search
+//    cout << "The testing values of lambda pos are:" << endl;
+//    cout << lambda_pos_min << ", " << lambda_pos_max << ", ";
+//    while(!qq.empty())
+//    {
+//        pp = qq.front();
+//        qq.pop();
+//        lambda_pos = (pp.first + pp.second) / 2;
+//        cout << lambda_pos << ", ";
+//        std::cout.flush();
+//        create_resolution(lambda_pos, lambda_neg, layers, sign, lambda);
+//        community = new Community(outfile, conf, sign, lambda);
+//        int stochastic = 0;
+//        GreedyLouvain::iterate_randomly = stochastic;
+//        GreedyLouvain::detect_communities(community);
+
+//        SameAsFirst = false;
+//        if(lambda_pos_min == pp.first)
+//        {
+//            if(community->nb_comm == 1)
+//            {
+//                SameAsFirst = true;
+//                lambda_pos_min = lambda_pos;
+//            }
+//        } else
+//        {
+//            it = LamCommunities.find(pp.first);
+//            if(it != LamCommunities.end())
+//            {
+//                if(Community::IsSameCommunity(community, it->second))
+//                    SameAsFirst = true;
+//            }
+//        }
+//        SameAsSecond = false;
+//        if(lambda_pos_max == pp.second)
+//        {
+//            if(community->nb_comm == covariance_nonfree_id_size)
+//            {
+//                SameAsSecond = true;
+//                lambda_pos_max = lambda_pos;
+//            }
+//        } else
+//        {
+//            it = LamCommunities.find(pp.second);
+//            if(it != LamCommunities.end())
+//            {
+//                if(Community::IsSameCommunity(community, it->second))
+//                    SameAsSecond = true;
+//            }
+//        }
+//        mods[lambda_pos] = community->modularity();
+//        LamCommunities[lambda_pos] = community;
+
+//        // added new interval for testing
+//        if(!SameAsFirst && ((lambda_pos - pp.first) > plateaubound || plateaubound == 0 || LamCommunities.size() + qq.size() < atleastsearchnum))
+//        {
+//            qq.push(make_pair(pp.first, lambda_pos));
+//        }
+//        if(!SameAsSecond && ((pp.second - lambda_pos) > plateaubound || plateaubound == 0 || LamCommunities.size() + qq.size() < atleastsearchnum))
+//        {
+//            qq.push(make_pair(lambda_pos, pp.second));
+//        }
+
+//        // find plateaus
+//        if(SameAsFirst && community->nb_comm != 1)
+//        {
+//            if(plateaubound == 0)
+//                plateaubound = (lambda_pos - pp.first) / 2;
+//            int i;
+//            for(i = 0; i < plateausLb.size(); i++)
+//            {
+//                if(plateausLb[i].second == pp.first)
+//                {
+//                    plateausLb[i].second = lambda_pos;
+//                    break;
+//                }
+//            }
+//            if(i == plateausLb.size())
+//            {
+//                plateausLb.resize(plateausLb.size() + 1);
+//                plateausLb[plateausLb.size() - 1] = make_pair(pp.first, lambda_pos);
+//            }
+//        }
+//        if(SameAsSecond && community->nb_comm != covariance_nonfree_id_size)
+//        {
+//            if(plateaubound == 0)
+//                plateaubound = (pp.second - lambda_pos) / 2;
+//            int i;
+//            for(i = 0; i < plateausLb.size(); i++)
+//            {
+//                if(plateausLb[i].first == pp.second)
+//                {
+//                    plateausLb[i].first = lambda_pos;
+//                    break;
+//                }
+//            }
+//            if(i == plateausLb.size())
+//            {
+//                plateausLb.resize(plateausLb.size() + 1);
+//                plateausLb[plateausLb.size() - 1] = make_pair(lambda_pos, pp.second);
+//            }
+//        }
+
+//        if(dlg.wasCanceled())
+//        {
+//            cancelButtonFlag = true;
+//            break;
+//        }
+//    }
+//    cout << endl;
+
+//    if(cancelButtonFlag)
+//    {
+//        cout << "Community detection was canceled!\n\n";
+
+//        //delete temporary file
+//        free(infile);
+//        free(outfile);
+//        free(node_map_file);
+//        free(conf_file);
+
+//        free(conf);
+//        free(sign);
+//        if (lambda != NULL)
+//            delete [] lambda;
+
+//        for(it = LamCommunities.begin(); it != LamCommunities.end(); it++)
+//            delete it->second;
+
+//        const char *tempfile0 = temp_file.c_str();
+//        remove(tempfile0);
+//        const char *tempfile1 = outf.c_str();
+//        remove(tempfile1);
+//        const char *tempfile2 = nodef.c_str();
+//        remove(tempfile2);
+//        const char *tempfile3 = conff.c_str();
+//        remove(tempfile3);
+
+//        /* Close Progress Box */
+//        dlg.setValue(100);
+//        dlg.reset();
+//        dlg.close();
+//        /*--------------------*/
+
+//        return false;
+//    }
+
+//    cout << "The found plateaus are:" << endl;
+//    for(int i = 0; i < plateausLb.size(); i++)
+//        cout << "[" << plateausLb[i].first << ", " << plateausLb[i].second
+//             << "], length:" << plateausLb[i].second - plateausLb[i].first << ", number of communities:" <<
+//                LamCommunities[plateausLb[i].first]->nb_comm << endl;
+
+//    cout << "Detailed check lambda pos are (if necessary):" << endl;
+
+//    plateausUb.resize(plateausLb.size());
+//    for(int i = 0; i < plateausLb.size(); i++)
+//        plateausUb[i] = make_pair(plateausLb[i].first, plateausLb[i].second);
+
+//    double extstart, extend, max_length = 0;
+//    vector<int> totestidix(0);
+
+//    do{
+//        totestidix.resize(0);
+//        for(int i = 0; i < plateausUb.size(); i++)
+//        {
+//            extstart = plateausLb[i].first - (plateausLb[i].second - plateausLb[i].first);
+//            extend = plateausLb[i].second + (plateausLb[i].second - plateausLb[i].first);
+//            for(it = LamCommunities.begin(); it != LamCommunities.end(); it++)
+//            {
+//                if(it->first > extstart && it->first < plateausLb[i].first)
+//                    extstart = it->first;
+//                if(it->first < extend && it->first > plateausLb[i].second)
+//                    extend = it->first;
+//            }
+//            plateausUb[i].first = extstart;
+//            plateausUb[i].second = extend;
+//            if(plateausLb[i].second - plateausLb[i].first > max_length)
+//            {
+//                max_length = plateausLb[i].second - plateausLb[i].first;
+//            }
+//        }
+
+//        for(int i = 0; i < plateausLb.size(); i++)
+//        {
+//            if(plateausUb[i].second - plateausUb[i].first >= max_length)
+//            {
+//                totestidix.resize(totestidix.size() + 1);
+//                totestidix[totestidix.size() - 1] = i;
+//            }
+//        }
+//        if(totestidix.size() <= 1)
+//            break;
+//        else
+//        {
+//            for(int i = 0; i < totestidix.size(); i++)
+//            {
+//                int idx = totestidix[i];
+
+//                lambda_pos = (plateausUb[idx].first + plateausLb[idx].first) / 2;
+//                if(LamCommunities.find(lambda_pos) == LamCommunities.end())
+//                {
+//                    cout << lambda_pos << ", ";
+//                    std::cout.flush();
+//                    create_resolution(lambda_pos, lambda_neg, layers, sign, lambda);
+//                    community = new Community(outfile, conf, sign, lambda);
+//                    int stochastic = 0;
+//                    GreedyLouvain::iterate_randomly = stochastic;
+//                    GreedyLouvain::detect_communities(community);
+//                    mods[lambda_pos] = community->modularity();
+//                    LamCommunities[lambda_pos] = community;
+//                }
+//                it = LamCommunities.find(lambda_pos);
+//                it2 = LamCommunities.find(plateausLb[idx].first);
+//                if(Community::IsSameCommunity(it2->second, it->second))
+//                    plateausLb[idx].first = lambda_pos;
+//                else
+//                    plateausUb[idx].first = lambda_pos;
+//                lambda_pos = (plateausLb[idx].second + plateausUb[idx].second) / 2;
+//                if(LamCommunities.find(lambda_pos) == LamCommunities.end())
+//                {
+//                    cout << lambda_pos << ", ";
+//                    std::cout.flush();
+//                    create_resolution(lambda_pos, lambda_neg, layers, sign, lambda);
+//                    community = new Community(outfile, conf, sign, lambda);
+//                    int stochastic = 0;
+//                    GreedyLouvain::iterate_randomly = stochastic;
+//                    GreedyLouvain::detect_communities(community);
+//                    mods[lambda_pos] = community->modularity();
+//                    LamCommunities[lambda_pos] = community;
+//                }
+//                it = LamCommunities.find(lambda_pos);
+//                it2 = LamCommunities.find(plateausLb[idx].second);
+//                if(Community::IsSameCommunity(it2->second, it->second))
+//                    plateausLb[idx].second = lambda_pos;
+//                else
+//                    plateausUb[idx].second = lambda_pos;
+//            }
+//            cout << endl;
+//        }
+
+//        if(dlg.wasCanceled())
+//        {
+//            cancelButtonFlag = true;
+//            break;
+//        }
+
+//    } while(true);
+
+//    if(cancelButtonFlag)
+//    {
+//        cout << "Community detection was canceled!\n\n";
+
+//        //delete temporary file
+//        free(infile);
+//        free(outfile);
+//        free(node_map_file);
+//        free(conf_file);
+
+//        free(conf);
+//        free(sign);
+//        if (lambda != NULL)
+//            delete [] lambda;
+
+//        for(it = LamCommunities.begin(); it != LamCommunities.end(); it++)
+//            delete it->second;
+
+//        const char *tempfile0 = temp_file.c_str();
+//        remove(tempfile0);
+//        const char *tempfile1 = outf.c_str();
+//        remove(tempfile1);
+//        const char *tempfile2 = nodef.c_str();
+//        remove(tempfile2);
+//        const char *tempfile3 = conff.c_str();
+//        remove(tempfile3);
+
+//        /* Close Progress Box */
+//        dlg.setValue(100);
+//        dlg.reset();
+//        dlg.close();
+//        /*--------------------*/
+
+//        return false;
+//    }
+
+//    cout << "The found plateaus are:" << endl;
+//    for(int i = 0; i < plateausLb.size(); i++)
+//        cout << "[" << plateausUb[i].first << ":" << plateausLb[i].first << ", " << plateausLb[i].second
+//             << ":" << plateausUb[i].second << "], length lower bound:" <<
+//                plateausLb[i].second - plateausLb[i].first << ", length upper bound:" <<
+//                plateausUb[i].second - plateausUb[i].first << ", number of communities:" <<
+//                LamCommunities[plateausLb[i].first]->nb_comm << endl;
+
+//    com_info_col = LamCommunities.size() + 1;
+//    com_info = new double *[covariance_nonfree_id_size + 4];
+//    for(int i = 0; i < covariance_nonfree_id_size + 4; i++)
+//        com_info[i] = new double [com_info_col];
+
+//    com_info[0][0] = numNodes;
+
+//    com_info[1][0] = lambda_neg;
+//    com_info[2][0] = 0;
+//    com_info[3][0] = 0;
+//    for(int i = 0; i < covariance_nonfree_id_size; i++)
+//        com_info[i + 4][0] = covariance_nonfree_id[i];
+
+//    // compute labels of communities
+//    int k = 0;
+//    com_info[0][1] = 0;
+//    it = LamCommunities.begin();
+//    community = it->second;
+
+//    com_info[1][1] = it->first;
+//    com_info[2][1] = it->second->nb_comm;
+//    com_info[3][1] = mods[it->first];//---it->second->modularity();
+//    for(int i = 4; i < covariance_nonfree_id_size + 4; i++)
+//        com_info[i][1] = it->second->n2c[i - 4];
+
+//    it++;
+//    for(; it != LamCommunities.end(); it++)
+//    {
+//        k++;
+//        if(Community::IsSameCommunity(community, it->second)) // problem
+//            com_info[0][k + 1] = com_info[0][k];
+//        else
+//            com_info[0][k + 1] = com_info[0][k] + 1;
+//        community = it->second;
+//        com_info[1][k + 1] = it->first;
+//        com_info[2][k + 1] = it->second->nb_comm;
+//        com_info[3][k + 1] = mods[it->first];
+//        for(int i = 4; i < covariance_nonfree_id_size + 4; i++)
+//            com_info[i][k + 1] = it->second->n2c[i - 4];
+//    }
+///*
+//    int maxcommlength = 0;
+//    int currentcommlength = 1;
+//    int plateauidx = 1;
+//    for(int i = 2; i < lambdasize + 1; i++)
+//    {
+//        if(com_info[0][i] == com_info[0][i - 1])
+//            currentcommlength++;
+//        else
+//            currentcommlength = 1;
+//        if(currentcommlength > maxcommlength)
+//        {
+//            maxcommlength = currentcommlength;
+//            plateauidx = i;
+//        }
+//    }
+//    for(int i = 0; i < covariance_nonfree_id_size + 4; i++)
+//    {
+//        com_info[i][lambdasize + 1] = com_info[i][plateauidx];
+//    }
+//*/
+
+//    // output plateaus
+//    String fnamepla = treesfilename.c_str();
+//    fnamepla = fnamepla.before('.');
+//    fnamepla += "_";
+
+//    if(isrooted)
+//        fnamepla += "rooted_";
+//    else
+//        fnamepla += "unrooted_";
+
+//    if(isweighted)
+//        fnamepla += "weighted_";
+//    else
+//        fnamepla += "unweighted_";
+
+//    if(str_matrix == (String) "Unweighted RF-distance")
+//        fnamepla += "RF-distance";
+//    else if(str_matrix == (String) "Weighted RF-distance")
+//        fnamepla += "RF-distance";
+//    else if(str_matrix == (String) "Covariance Matrix")
+//        fnamepla += "Covariance_Matrix";
+//    else
+//        fnamepla += str_matrix;
+//    fnamepla += "_communities_auto_plateaus.out";
+//    File filepla(fnamepla);
+//    filepla.clean();
+//    if(! filepla.is_open())
+//    {
+//        cout << "Unable to open the file: " << fnamepla << "\n\n";
+//        return false;
+//    }
+//    filepla << "lengthLB:\t";
+//    for(int i = 0; i < plateausLb.size(); i++)
+//        filepla << plateausLb[i].second - plateausLb[i].first << "\t";
+//    filepla << "\n";
+//    filepla << "lengthUB:\t";
+//    for(int i = 0; i < plateausLb.size(); i++)
+//        filepla << plateausUb[i].second - plateausUb[i].first << "\t";
+//    filepla << "\n";
+//    filepla << "startUB:\t";
+//    for(int i = 0; i < plateausLb.size(); i++)
+//        filepla << plateausUb[i].first << "\t";
+//    filepla << "\n";
+//    filepla << "startLB:\t";
+//    for(int i = 0; i < plateausLb.size(); i++)
+//        filepla << plateausLb[i].first << "\t";
+//    filepla << "\n";
+//    filepla << "endLB:\t";
+//    for(int i = 0; i < plateausLb.size(); i++)
+//        filepla << plateausLb[i].second << "\t";
+//    filepla << "\n";
+//    filepla << "endUB:\t";
+//    for(int i = 0; i < plateausLb.size(); i++)
+//        filepla << plateausUb[i].second << "\t";
+//    filepla << "\n";
+//    if (str_matrix == (String) "Covariance Matrix")
+//       filepla << "Bipartition index" << "\t" << "Community Index" << "\n";
+//    else
+//        filepla << "Tree index" << "\t" << "Community Index" << "\n";
+//    for(int i = 0; i < covariance_nonfree_id_size; i++)
+//    {
+//        filepla << covariance_nonfree_id[i] << "\t";
+//        for(int j = 0; j < plateausLb.size(); j++)
+//        {
+//            filepla << LamCommunities[plateausLb[j].first]->n2c[i] << "\t";
+//        }
+//        filepla << "\n";
+//    }
+
+//    // output communities information
+//    String outfname = treesfilename.c_str();
+//    outfname = outfname.before('.');
+//    outfname += "_";
+
+//    if(isrooted)
+//        outfname += "rooted_";
+//    else
+//        outfname += "unrooted_";
+
+//    if(isweighted)
+//        outfname += "weighted_";
+//    else
+//        outfname += "unweighted_";
+
+//    if(str_matrix == (String) "Unweighted RF-distance")
+//        outfname += "RF-distance";
+//    else if(str_matrix == (String) "Weighted RF-distance")
+//        outfname += "RF-distance";
+//    else if(str_matrix == (String) "Covariance Matrix")
+//        outfname += "Covariance_Matrix";
+//    else
+//       outfname += str_matrix;
+
+//    outfname += "_community_auto_results.out";
+//    File file(outfname);
+//    file.clean();
+//    if(! file.is_open())
+//    {
+//        cout << "Unable to open the file: " << outfname << "\n\n";
+//        return false;
+//    }
+
+//    for(int i = 0; i < covariance_nonfree_id_size + 4; i++)
+//    {
+//        if (i == 0)
+//        {
+//            if (str_matrix == (String) "Covariance Matrix")
+//               file << "Same community as previous or not (first number is number of bipartitions)" << "\n";
+//            else
+//               file << "Same community as previous or not (first number is number of trees)" << "\n";
+//        }
+//        else if (i == 1)
+//            file << "Value of lambda: "<< "\n";
+//        else if (i == 2)
+//            file << "Number of communities: " << "\n";
+//        else if (i == 3)
+//            file << "Value of modularity: " << "\n";
+//        else if (i == 4)
+//        {
+//            if (str_matrix == (String) "Covariance Matrix")
+//               file << "Community index (first column is bipartition index): " << "\n";
+//            else
+//                file << "Community index (first column is tree index): " << "\n";
+//        }
+//        for(int j = 0; j < com_info_col; j++)
+//            file << com_info[i][j] << "\t";
+//        file << "\n";
+//    }
+
+//    //delete temporary file
+//    free(infile);
+//    free(outfile);
+//    free(node_map_file);
+//    free(conf_file);
+
+//    free(conf);
+//    free(sign);
+//    if (lambda != NULL)
+//        delete [] lambda;
+
+//    for(it = LamCommunities.begin(); it != LamCommunities.end(); it++)
+//        delete it->second;
+
+//    const char *tempfile0 = temp_file.c_str();
+//    remove(tempfile0);
+//    const char *tempfile1 = outf.c_str();
+//    remove(tempfile1);
+//    const char *tempfile2 = nodef.c_str();
+//    remove(tempfile2);
+//    const char *tempfile3 = conff.c_str();
+//    remove(tempfile3);
+
+//    cout << "Output community results to file: " << outfname << " and " << fnamepla << "\n\n";
+//    return true;
+// }
 #endif
 
 #endif
