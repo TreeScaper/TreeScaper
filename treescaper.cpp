@@ -25,6 +25,7 @@
 #include "ui_treescaper.h"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include "wstring.h"
 #include "wNLDR.h"
 #include <QFile>
@@ -262,26 +263,46 @@ void TreeScaper::initialize_paras(nldr_parameters &nldrparas, image_parameters &
     QMessageBox msgBox;
 
 //=====================load nldrparas==================
-    File nldrfparas("nldrparas");
+//    File nldrfparas("nldrparas");
+//    if(!nldrfparas.is_open())
+//    {
+//        msgBox.setText("Error: Cannot open parameter file \"nldrparas\"!");
+//        msgBox.exec();
+//        return;
+//    }
+
+//    Array<String> nldrentries;
+//    String nldrelement;
+//    nldrfparas >> nldrelement;
+//    int countnldrelements = 1;      // Skip newline at the end of the file
+//    while(! nldrfparas.is_end())
+//    {
+//        nldrentries.add(nldrelement);
+//        if(countnldrelements > 101)
+//            break;
+//        else
+//            nldrfparas >> nldrelement;
+//        countnldrelements += 1;
+//    }
+    ifstream nldrfparas;
+    nldrfparas.open("nldrparas");
     if(!nldrfparas.is_open())
     {
         msgBox.setText("Error: Cannot open parameter file \"nldrparas\"!");
         msgBox.exec();
         return;
     }
-
+    string nldrlinefromfile;
+    string nldrelementfromline;
     Array<String> nldrentries;
-    String nldrelement;
-    nldrfparas >> nldrelement;
-    int countnldrelements = 1;      // Skip newline at the end of the file
-    while(! nldrfparas.is_end())
+    while(getline(nldrfparas, nldrlinefromfile))
     {
-        nldrentries.add(nldrelement);
-        if(countnldrelements > 101)
-            break;
-        else
-            nldrfparas >> nldrelement;
-        countnldrelements += 1;
+        std::istringstream nldriss(nldrlinefromfile);
+        while(nldriss >> nldrelementfromline)
+        {
+            String nldrelement(nldrelementfromline.c_str());
+            nldrentries.add(nldrelement);
+        }
     }
 
     QString nldrqtstr[51];
@@ -345,27 +366,26 @@ void TreeScaper::initialize_paras(nldr_parameters &nldrparas, image_parameters &
     nldrparas.CCA_STO_alpha0 = nldrqtstr[49].toDouble();
     nldrparas.CCA_STO_alphan = nldrqtstr[50].toDouble();
 
-//================plotparas========================
-    File plotfparas("plotparas");
+//================plotparas========================    
+    ifstream plotfparas;
+    plotfparas.open("plotparas");
     if(!plotfparas.is_open())
     {
         msgBox.setText("Error: Cannot open parameter file \"plotparas\"!");
         msgBox.exec();
         return;
     }
-
+    string linefromfile;
+    string elementfromline;
     Array<String> entries;
-    String element;
-    plotfparas >> element;
-    int countelements = 1;      // Skip newline at the end of the file
-	while(! plotfparas.is_end())
+    while(getline(plotfparas, linefromfile))
     {
-        entries.add(element);
-        if(countelements > 1024)
-            break;
-        else
-            plotfparas >> element;
-        countelements += 1;
+        std::istringstream iss(linefromfile);
+        while(iss >> elementfromline)
+        {
+            String element(elementfromline.c_str());
+            entries.add(element);
+        }
     }
 
     paras::plot_type = entries[1];

@@ -52,26 +52,46 @@ void NLDRsetting::loadnldrparas()
     QMessageBox msgBox;
 
 //======================load nldrparas===================
-    File nldrfparas("nldrparas");
+//    File nldrfparas("nldrparas");
+//    if(!nldrfparas.is_open())
+//    {
+//        msgBox.setText("Error: Cannot open parameter files \"nldrparas\"!");
+//        msgBox.exec();
+//        return;
+//    }
+
+//    Array<String> nldrentries;
+//    String nldrelement;
+//    nldrfparas >> nldrelement;
+//    int countnldrelements = 1;      // Skip newline at the end of the file
+//    while(! nldrfparas.is_end())
+//    {
+//        nldrentries.add(nldrelement);
+//        if(countnldrelements > 101)
+//            break;
+//        else
+//            nldrfparas >> nldrelement;
+//        countnldrelements += 1;
+//    }
+    ifstream nldrfparas;
+    nldrfparas.open("nldrparas");
     if(!nldrfparas.is_open())
     {
-        msgBox.setText("Error: Cannot open parameter files \"nldrparas\"!");
+        msgBox.setText("Error: Cannot open parameter file \"nldrparas\"!");
         msgBox.exec();
         return;
     }
-
+    string nldrlinefromfile;
+    string nldrelementfromline;
     Array<String> nldrentries;
-    String nldrelement;
-    nldrfparas >> nldrelement;
-    int countnldrelements = 1;      // Skip newline at the end of the file
-    while(! nldrfparas.is_end())
+    while(getline(nldrfparas, nldrlinefromfile))
     {
-        nldrentries.add(nldrelement);
-        if(countnldrelements > 101)
-            break;
-        else
-            nldrfparas >> nldrelement;
-        countnldrelements += 1;
+        std::istringstream nldriss(nldrlinefromfile);
+        while(nldriss >> nldrelementfromline)
+        {
+            String nldrelement(nldrelementfromline.c_str());
+            nldrentries.add(nldrelement);
+        }
     }
 
     nnldrvalues = 51;

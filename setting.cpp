@@ -60,26 +60,47 @@ void setting::loadplotparas()
     QMessageBox msgBox;
 
     //================load plotparas==================
-    File fparas("plotparas");
-    if(!fparas.is_open())
+//    File fparas("plotparas");
+//    if(!fparas.is_open())
+//    {
+//        msgBox.setText("error: can not open parameter files \"plotparas\"!");
+//        msgBox.exec();
+//        return;
+//    }
+
+//    Array<String> entries;
+//    String element;
+//    fparas >> element;
+//    int countelements = 1;      // Skip newline at the end of the file
+//	while(! fparas.is_end())
+//    {
+//        entries.add(element);
+//        if(countelements > 1024)
+//            break;
+//        else
+//            fparas >> element;
+//        countelements += 1;
+//    }
+    ifstream plotfparas;
+    plotfparas.open("plotparas");
+    if(!plotfparas.is_open())
     {
-        msgBox.setText("error: can not open parameter files \"plotparas\"!");
+        msgBox.setText("Error: Cannot open parameter file \"plotparas\"!");
         msgBox.exec();
         return;
     }
-
+    string linefromfile;
+    string elementfromline;
     Array<String> entries;
-    String element;
-    fparas >> element;
-    int countelements = 1;      // Skip newline at the end of the file
-	while(! fparas.is_end())
+    while(getline(plotfparas, linefromfile))
     {
-        entries.add(element);
-        if(countelements > 1024)
-            break;
-        else
-            fparas >> element;
-        countelements += 1;
+        std::istringstream iss(linefromfile);
+        while(iss >> elementfromline)
+        {
+            String element(elementfromline.c_str());
+            entries.add(element);
+        }
+
     }
 
     if(entries[1] == (String) "Points")
