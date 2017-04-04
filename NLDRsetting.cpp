@@ -356,14 +356,12 @@ void NLDRsetting::on_pushnldrapply_clicked()
     fparas << "CCA_STO_alphan\t" << paras::nldrparas.CCA_STO_alphan << endl;
 
 //    ui->pushnldrapply->setEnabled(false);
-    QDialog::accept();
 }
 
 void NLDRsetting::on_pushnldrcancel_clicked()
 {
     loadnldrparas();
 //    ui->pushnldrapply->setEnabled(true);
-    QDialog::accept();
 }
 
 void NLDRsetting::on_pushnldrreset_clicked()
@@ -421,9 +419,9 @@ void NLDRsetting::on_radionldrCCAButton_clicked()
     ui->tablewidgetnldr->scrollToItem(ptitem, QAbstractItemView::PositionAtTop);
 }
 
-//void NLDRsetting::on_pushnldrclose_clicked()
-//{
-//    QDialog::accept();
-//}
+void NLDRsetting::on_pushnldrclose_clicked()
+{
+    QDialog::accept();
+}
 
 #endif
