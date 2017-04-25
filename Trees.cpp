@@ -1844,6 +1844,16 @@ bool Trees::bipartmatrixIsexisting()
     return true;
 }
 
+
+bool Trees::covarianceMatrixIsexisting()
+{
+    if(treecov == NULL)
+        return false;
+
+    return true;
+}
+
+
 bool Trees::treesAreexisting()
 {
     if(treeset == NULL)

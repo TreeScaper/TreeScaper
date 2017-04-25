@@ -162,6 +162,8 @@ public:
 
     bool bipartmatrixIsexisting();
 
+    bool covarianceMatrixIsexisting();
+
     bool treesAreexisting();
 
     bool consensusTreeIsexisting();

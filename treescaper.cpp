@@ -1557,29 +1557,32 @@ void TreeScaper::on_pushDATAcov_clicked()
             return;
     }
     TreesData->Compute_Bipart_Covariance();
-    QString qstr("Covariance Matrix");
-    QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
-    if(item1.empty())
-        ui->listDATAmem->addItem(qstr);
-
-    QList<QListWidgetItem *> item2 = ui->listDATAmem_2->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
-    if(item2.empty())
-        ui->listDATAmem_2->addItem(qstr);
-
-    QList<QListWidgetItem *> item3 = ui->listDATAmem_3->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
-    if(item3.empty())
-        ui->listDATAmem_3->addItem(qstr);
-
-    if(ui->comboBoxCOVAmemdata->findText("Covariance Matrix") == -1)
-        ui->comboBoxCOVAmemdata->addItem(qstr);
-
-    if(ui->comboBoxCOVAmemdata->findText("No covariance data in memory") != -1)
+    if(TreesData->covarianceMatrixIsexisting())
     {
-        int idex = ui->comboBoxCOVAmemdata->findText("No covariance data in memory");
-        ui->comboBoxCOVAmemdata->removeItem(idex);
+        QString qstr("Covariance Matrix");
+        QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+        if(item1.empty())
+            ui->listDATAmem->addItem(qstr);
+
+        QList<QListWidgetItem *> item2 = ui->listDATAmem_2->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+        if(item2.empty())
+            ui->listDATAmem_2->addItem(qstr);
+
+        QList<QListWidgetItem *> item3 = ui->listDATAmem_3->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
+        if(item3.empty())
+            ui->listDATAmem_3->addItem(qstr);
+
+        if(ui->comboBoxCOVAmemdata->findText("Covariance Matrix") == -1)
+            ui->comboBoxCOVAmemdata->addItem(qstr);
+
+        if(ui->comboBoxCOVAmemdata->findText("No covariance data in memory") != -1)
+        {
+            int idex = ui->comboBoxCOVAmemdata->findText("No covariance data in memory");
+            ui->comboBoxCOVAmemdata->removeItem(idex);
+        }
+        ui->pushCOVAcomm->setEnabled(true);
+        cout << "Successfully computed covariance matrix of bipartitions.\n\n";
     }
-    ui->pushCOVAcomm->setEnabled(true);
-    cout << "Successfully computed covariance matrix of bipartitions.\n\n";
 }
 
 void TreeScaper::on_pushDATAButton_clicked()
