@@ -158,7 +158,7 @@ public:
 
     string make_DISToutput_name(String str_matrix);
 
-    void print_matrix(String str_matrix);
+    void print_matrix(String str_matrix, string outfile);
 
     bool bipartmatrixIsexisting();
 
@@ -183,6 +183,8 @@ public:
     string Print_selected_indices();
 
     string Print_selected_trees(Treefileformat tf); // newick nexus
+
+    string WriteSelectedTreesFilename(string type); // newick nexus
     void WriteSelectedTrees(string &outfile, Treefileformat tf); // newick nexus
 
 
@@ -213,6 +215,8 @@ public:
     map<unsigned long long, Array<char> *> hash2bitstr;
     Array<int> selected_trees;
     void Get_community_info(double ** &info, int &length){info = com_info; length = com_info_col;}
+
+    string set_commfilename(string str){commfilename = str; return commfilename;}
 
 private:
 
@@ -266,6 +270,7 @@ private:
     map<long, Array<char> > MapHashBitsString;
 
 //    double **bipartcovariance;
+    string commfilename;
     int treecov_size;
     double **treecov;
     int filecov_size;

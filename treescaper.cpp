@@ -43,6 +43,7 @@
 #include "plot2d.h"
 #include "plot2d_AWTY.h"
 #include <QDebug>
+#include <QFileInfo>
 
 /*
  "No data in memory": empty memory
@@ -488,7 +489,7 @@ void TreeScaper::on_pushNLDRrun_clicked()
 {
     if(nldrthd.isRunning())
     {
-        QMessageBox::warning(NULL, "warning", "NLDR is running!", 0, 0);
+        QMessageBox::warning(NULL, "Warning", "NLDR is running!", 0, 0);
         return;
     }
     double **dist = NULL;
@@ -559,7 +560,15 @@ void TreeScaper::on_pushNLDRrun_clicked()
 
     QString qtfname = ui->textDATAfile->toPlainText();
     string stdfname = qtfname.toStdString();
-    String fname(stdfname.c_str());
+
+    // Choose Directory
+    string rawfilename = stdfname.substr(stdfname.find_last_of("/") + 1);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), qtfname, QFileDialog::ShowDirsOnly);
+    string dirfname = dir.toStdString();
+    dirfname.append("/");
+    dirfname.append(rawfilename);
+
+    String fname(dirfname.c_str());
     File file(fname);
     CORplot = file.prefix_name();
 
@@ -592,7 +601,14 @@ void TreeScaper::on_pushNLDRrun_clicked()
 
         QString qtdistfname = ui->textDISTfile_2->toPlainText();
         string stddistfname = qtdistfname.toStdString();
-        String fdistname(stddistfname.c_str());
+
+        // Save files in chosen directory
+        string rawdistfilename = stddistfname.substr(stddistfname.find_last_of("/") + 1);
+        string dirdistfname = dirfname.substr(0, dirfname.find_last_of("/"));
+        dirdistfname.append("/");
+        dirdistfname.append(rawdistfilename);
+
+        String fdistname(dirdistfname.c_str());
         fname = fdistname;
         File filedist(fdistname);
         CORplot = filedist.prefix_name();
@@ -765,7 +781,7 @@ void TreeScaper::on_pushNLDRplot_clicked()
 
     String filename;
 //    if(!ui->checkBoxNLDRplot->isChecked())
-        filename = CORplot;
+    filename = CORplot;
 //    else
 //    {
 //        QString qtfname = ui->textNLDRplotfile->toPlainText();
@@ -856,7 +872,15 @@ void TreeScaper::on_pushdimrun_clicked()
 
     QString qtfname = ui->textDATAfile->toPlainText();
     string stdfname = qtfname.toStdString();
-    String fname(stdfname.c_str());
+
+    // Choose Directory
+    string rawfilename = stdfname.substr(stdfname.find_last_of("/") + 1);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), qtfname, QFileDialog::ShowDirsOnly);
+    string dirfname = dir.toStdString();
+    dirfname.append("/");
+    dirfname.append(rawfilename);
+
+    String fname(dirfname.c_str());
     File file(fname);
     DIMplot = file.prefix_name();
     if(DIMdata == (String) "Unweighted RF-distance")
@@ -899,7 +923,14 @@ void TreeScaper::on_pushdimrun_clicked()
 
         QString qtdistfname = ui->textDISTfile_2->toPlainText();
         string stddistfname = qtdistfname.toStdString();
-        String fdistname(stddistfname.c_str());
+
+        // Save files in chosen directory
+        string rawdistfilename = stddistfname.substr(stddistfname.find_last_of("/") + 1);
+        string dirdistfname = dirfname.substr(0, dirfname.find_last_of("/"));
+        dirdistfname.append("/");
+        dirdistfname.append(rawdistfilename);
+
+        String fdistname(dirdistfname.c_str());
         File filedist(fdistname);
         DIMplot = filedist.prefix_name();
     }
@@ -914,7 +945,14 @@ void TreeScaper::on_pushdimrun_clicked()
 
         QString qtcoordfname = ui->textDISTfile_2->toPlainText();
         string stdcoordfname = qtcoordfname.toStdString();
-        String fcoordname(stdcoordfname.c_str());
+
+        // Save files in chosen directory
+        string rawcoordfilename = stdcoordfname.substr(stdcoordfname.find_last_of("/") + 1);
+        string dircoordfname = dirfname.substr(0, dirfname.find_last_of("/"));
+        dircoordfname.append("/");
+        dircoordfname.append(rawcoordfilename);
+
+        String fcoordname(dircoordfname.c_str());
         File filecoord(fcoordname);
         DIMplot = filecoord.prefix_name();
     }
@@ -1408,7 +1446,7 @@ void TreeScaper::on_pushDISTrun_clicked()
 
         if(!TreesData->bipartmatrixIsexisting())
         {
-            int Msg = QMessageBox::question(this, "Missing Data", "Warning: There is no bipartition matrix in the memory! Do you want to"
+            int Msg = QMessageBox::question(this, "Missing Data", "Warning: There is no bipartition matrix in the memory! Do you want to "
                                         "compute it?", "OK", "Cancel");
 
             if(Msg == 0)
@@ -1548,7 +1586,7 @@ void TreeScaper::on_pushDATAcov_clicked()
     if(!TreesData->bipartmatrixIsexisting())
     {
 
-        int Msg = QMessageBox::question(this, "Missing Data", "Warning: There is no bipartition matrix in the memory! Do you want to"
+        int Msg = QMessageBox::question(this, "Missing Data", "Warning: There is no bipartition matrix in the memory! Do you want to "
                                     "compute it?", "OK", "Cancel");
 
         if(Msg == 0)
@@ -2217,11 +2255,28 @@ void TreeScaper::on_pushDISTcomm_clicked()
     if(cdmodel == (String) "Configuration Null Model")
         modelType = 3;
     else if(cdmodel == (String) "Constant Potts Model")
-            modelType = 4;
+        modelType = 4;
     else if(cdmodel == (String) "Erdos-Renyi Null Model")
-            modelType = 2;
+        modelType = 2;
     else if(cdmodel == (String) "No Null Model")
-            modelType = 1;
+        modelType = 1;
+
+    // Choose Directory
+    QString qtfname;
+    if(memorydata == (String) "Affinity-filedist")
+        qtfname = ui->textDISTfile_2->toPlainText();
+    else if(memorydata == (String) "File-affinity")
+        qtfname = ui->textAffinityfile->toPlainText();
+    else
+        qtfname = ui->textDATAfile->toPlainText();
+    string stdfname = qtfname.toStdString();
+    string rawfilename = stdfname.substr(stdfname.find_last_of("/") + 1);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), qtfname, QFileDialog::ShowDirsOnly);
+    string dirfname = dir.toStdString();
+    dirfname.append("/");
+    dirfname.append(rawfilename);
+    TreesData->set_commfilename(dirfname);
+
 
     QString qtstartlambda = ui->textDISTLstart->toPlainText();
     string stdstartlambda = qtstartlambda.toStdString();
@@ -2336,7 +2391,7 @@ void TreeScaper::on_pushButtonDATAcon_clicked()
 {
     if(!TreesData->bipartmatrixIsexisting())
     {
-        int Msg = QMessageBox::question(this, "Missing Data", "Warning: There is no bipartition matrix in the memory! Do you want to"
+        int Msg = QMessageBox::question(this, "Missing Data", "Warning: There is no bipartition matrix in the memory! Do you want to "
                                     "compute it?", "OK", "Cancel");
 
         if(Msg == 0)
@@ -2689,15 +2744,25 @@ void TreeScaper::on_pushNLDRsaveindices_clicked()
 
     string stdconvert = qtconvert.toStdString();
     String convert(stdconvert.c_str());
+    string outNameTmp = TreesData->WriteSelectedTreesFilename(stdconvert);
+
+    // Choose Directory and Filename
+    QString qtOutName = QString::fromStdString(outNameTmp);
+    QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+    string outName = output_file_name.toStdString();
+    if(outName.empty()) // cancel
+        return;
 
     if(convert == (String) "Newick")
     {
-        cout << "Output selected indices to the file: " << TreesData->Print_selected_trees(NEWICK) << "\n\n";
+        TreesData->WriteSelectedTrees(outName, NEWICK);
+        cout << "Output selected indices to the file: " << outName << "\n\n";
     }
     else
     if(convert == (String) "Nexus")
     {
-        cout << "Output selected indices to the file: " << TreesData->Print_selected_trees(NEXUS) << "\n\n";
+        TreesData->WriteSelectedTrees(outName, NEXUS);
+        cout << "Output selected indices to the file: " << outName << "\n\n";
     }
 }
 
@@ -2769,6 +2834,7 @@ void TreeScaper::on_pushCOVAcomm_clicked()
     QString qtcdmodel = ui->comboBoxCOVAcdmodel->currentText();
     string stdcdmodel = qtcdmodel.toStdString();
     String cdmodel(stdcdmodel.c_str());
+
     int modelType;
     if(cdmodel == (String) "Configuration Null Model")
         modelType = 3;
@@ -2782,6 +2848,21 @@ void TreeScaper::on_pushCOVAcomm_clicked()
     QString qtdata = ui->comboBoxCOVAmemdata->currentText();
     string stddata = qtdata.toStdString();
     String datastr(stddata.c_str());
+
+    // Choose Directory
+    QString qtfname;
+    if(datastr == (String) "File-covariance")
+        qtfname = ui->textCOVAfile->toPlainText();
+    else
+        qtfname = ui->textDATAfile->toPlainText();
+    string stdfname = qtfname.toStdString();
+    string rawfilename = stdfname.substr(stdfname.find_last_of("/") + 1);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), qtfname, QFileDialog::ShowDirsOnly);
+    string dirfname = dir.toStdString();
+    dirfname.append("/");
+    dirfname.append(rawfilename);
+    TreesData->set_commfilename(dirfname);
+
 
     QString qtfixedlambda = ui->textCOVALfixed->toPlainText();
     double fixedlambda = qtfixedlambda.toDouble();
@@ -3304,7 +3385,15 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
 
             string stdconvert = qtconvert.toStdString();
             String convert(stdconvert.c_str());
-            string outName = TreesData->WriteTreesFilename(stdfname, stdconvert);
+            string outNameTmp = TreesData->WriteTreesFilename(stdfname, stdconvert);
+
+            // Choose Directory and Filename
+            QString qtOutName = QString::fromStdString(outNameTmp);
+            QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+            string outName = output_file_name.toStdString();
+            if(outName.empty()) // cancel
+                return;
+
             if(!TreesData->treesAreexisting())
             {
                 cout << "Warning: There are no trees in the memory!\n\n";
@@ -3340,12 +3429,17 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
 
             string stdformat = qtformat.toStdString();
             String format(stdformat.c_str());
+            string namebipartmatrixTmp = TreesData->make_Bipart_Matrix_name(stdfname, format);
 
-            string namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname, format);
+            // Choose Directory and Filename
+            QString qtOutName = QString::fromStdString(namebipartmatrixTmp);
+            QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+            string namebipartmatrix = output_file_name.toStdString();
+            if(namebipartmatrix.empty()) // cancel
+                return;
 
             ofstream outBipartMatrix;
             outBipartMatrix.open(namebipartmatrix.c_str());
-
             if(format == (String) "List format")
             {
                 cout << "Outputted Bipartition matrix in list format to " << namebipartmatrix << "\n\n";
@@ -3374,7 +3468,15 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
 
             string stdconvert = qtconvert.toStdString();
             String convert(stdconvert.c_str());
-            string outName = TreesData->WriteConsensusTreeFilename(stdfname, stdconvert);
+            string outNameTmp = TreesData->WriteConsensusTreeFilename(stdfname, stdconvert);
+
+            // Choose Directory and Filename
+            QString qtOutName = QString::fromStdString(outNameTmp);
+            QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+            string outName = output_file_name.toStdString();
+            if(outName.empty()) // cancel
+                return;
+
             if(!TreesData->consensusTreeIsexisting())
             {
                 cout << "Warning: There is no majority consensus tree in the memory!\n\n";
@@ -3395,7 +3497,16 @@ void TreeScaper::on_listDATAmem_itemActivated(QListWidgetItem *item)
         }
         else
         {
-            TreesData->print_matrix(memorydata);
+            string outNameTmp = TreesData->make_DISToutput_name(memorydata);
+
+            // Choose Directory and Filename
+            QString qtOutName = QString::fromStdString(outNameTmp);
+            QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+            string outName = output_file_name.toStdString();
+            if(outName.empty()) // cancel
+                return;
+
+            TreesData->print_matrix(memorydata, outName);
             cout << "Successfully printed " << memorydata << "!\n\n";
         }
     }
@@ -3535,7 +3646,15 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
 
             string stdconvert = qtconvert.toStdString();
             String convert(stdconvert.c_str());
-            string outName = TreesData->WriteTreesFilename(stdfname, stdconvert);
+            string outNameTmp = TreesData->WriteTreesFilename(stdfname, stdconvert);
+
+            // Choose Directory and Filename
+            QString qtOutName = QString::fromStdString(outNameTmp);
+            QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+            string outName = output_file_name.toStdString();
+            if(outName.empty()) // cancel
+                return;
+
             if(!TreesData->treesAreexisting())
             {
                 cout << "Warning: There are no trees in the memory!\n\n";
@@ -3571,8 +3690,14 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
 
             string stdformat = qtformat.toStdString();
             String format(stdformat.c_str());
+            string namebipartmatrixTmp = TreesData->make_Bipart_Matrix_name(stdfname, format);
 
-            string namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname, format);
+            // Choose Directory and Filename
+            QString qtOutName = QString::fromStdString(namebipartmatrixTmp);
+            QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+            string namebipartmatrix = output_file_name.toStdString();
+            if(namebipartmatrix.empty()) // cancel
+                return;
 
             ofstream outBipartMatrix;
             outBipartMatrix.open(namebipartmatrix.c_str());
@@ -3605,7 +3730,15 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
 
             string stdconvert = qtconvert.toStdString();
             String convert(stdconvert.c_str());
-            string outName = TreesData->WriteConsensusTreeFilename(stdfname, stdconvert);
+            string outNameTmp = TreesData->WriteConsensusTreeFilename(stdfname, stdconvert);
+
+            // Choose Directory and Filename
+            QString qtOutName = QString::fromStdString(outNameTmp);
+            QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+            string outName = output_file_name.toStdString();
+            if(outName.empty()) // cancel
+                return;
+
             if(!TreesData->consensusTreeIsexisting())
             {
                 cout << "Warning: There is no majority consensus tree in the memory!\n\n";
@@ -3626,7 +3759,16 @@ void TreeScaper::on_listDATAmem_2_itemActivated(QListWidgetItem *item)
         }
         else
         {
-            TreesData->print_matrix(memorydata);
+            string outNameTmp = TreesData->make_DISToutput_name(memorydata);
+
+            // Choose Directory and Filename
+            QString qtOutName = QString::fromStdString(outNameTmp);
+            QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+            string outName = output_file_name.toStdString();
+            if(outName.empty()) // cancel
+                return;
+
+            TreesData->print_matrix(memorydata, outName);
             cout << "Successfully printed " << memorydata << "!\n\n";
         }
     }
@@ -3765,7 +3907,15 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
 
             string stdconvert = qtconvert.toStdString();
             String convert(stdconvert.c_str());
-            string outName = TreesData->WriteTreesFilename(stdfname, stdconvert);
+            string outNameTmp = TreesData->WriteTreesFilename(stdfname, stdconvert);
+
+            // Choose Directory and Filename
+            QString qtOutName = QString::fromStdString(outNameTmp);
+            QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+            string outName = output_file_name.toStdString();
+            if(outName.empty()) // cancel
+                return;
+
             if(!TreesData->treesAreexisting())
             {
                 cout << "Warning: There are no trees in the memory!\n\n";
@@ -3801,8 +3951,14 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
 
             string stdformat = qtformat.toStdString();
             String format(stdformat.c_str());
+            string namebipartmatrixTmp = TreesData->make_Bipart_Matrix_name(stdfname, format);
 
-            string namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname, format);
+            // Choose Directory and Filename
+            QString qtOutName = QString::fromStdString(namebipartmatrixTmp);
+            QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+            string namebipartmatrix = output_file_name.toStdString();
+            if(namebipartmatrix.empty()) // cancel
+                return;
 
             ofstream outBipartMatrix;
             outBipartMatrix.open(namebipartmatrix.c_str());
@@ -3835,7 +3991,15 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
 
             string stdconvert = qtconvert.toStdString();
             String convert(stdconvert.c_str());
-            string outName = TreesData->WriteConsensusTreeFilename(stdfname, stdconvert);
+            string outNameTmp = TreesData->WriteConsensusTreeFilename(stdfname, stdconvert);
+
+            // Choose Directory and Filename
+            QString qtOutName = QString::fromStdString(outNameTmp);
+            QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+            string outName = output_file_name.toStdString();
+            if(outName.empty()) // cancel
+                return;
+
             if(!TreesData->consensusTreeIsexisting())
             {
                 cout << "Warning: There is no majority consensus tree in the memory!\n\n";
@@ -3856,7 +4020,16 @@ void TreeScaper::on_listDATAmem_3_itemActivated(QListWidgetItem *item)
         }
         else
         {
-            TreesData->print_matrix(memorydata);
+            string outNameTmp = TreesData->make_DISToutput_name(memorydata);
+
+            // Choose Directory and Filename
+            QString qtOutName = QString::fromStdString(outNameTmp);
+            QString output_file_name = QFileDialog::getSaveFileName(this, tr("Save File"), qtOutName, tr("Files (*.out)"));
+            string outName = output_file_name.toStdString();
+            if(outName.empty()) // cancel
+                return;
+
+            TreesData->print_matrix(memorydata, outName);
             cout << "Successfully printed " << memorydata << "!\n\n";
         }
     }
@@ -3987,13 +4160,13 @@ void TreeScaper::on_pushButtonAffinitybrowse_clicked()
     if(fileDialog->exec() == QDialog::Accepted)
     {
         QString path = fileDialog->selectedFiles()[0];
-        ui->textAfinityfile->setPlainText(path);
+        ui->textAffinityfile->setPlainText(path);
     }
 }
 
 void TreeScaper::on_pushAffinityloaddist_clicked()
 {
-    QString qtfname = ui->textAfinityfile->toPlainText();
+    QString qtfname = ui->textAffinityfile->toPlainText();
     string stdfname = qtfname.toStdString();
     String fname(stdfname.c_str());
     File file(fname);

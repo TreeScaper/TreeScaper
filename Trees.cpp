@@ -385,10 +385,8 @@ void Trees::print_coordinate_matrix(T *** arr, int n, int m, string outfile)
         fout.close();
 }
 
-void Trees::print_matrix(String str_matrix)
+void Trees::print_matrix(String str_matrix, string outfile)
 {
-    string outfile = make_DISToutput_name(str_matrix);
-
     if (str_matrix == (String)"Covariance Matrix")
         print_double_array((double ***) StrToDist[str_matrix], treecov_size, outfile);
     else if(str_matrix == (String)"File-covariance")
@@ -2484,19 +2482,29 @@ string Trees::create_temp_name(String str_matrix)
  */
 
      // output plateaus
+#if COMMAND_LINE_VERSION
      String fnamepla = treesfilename.c_str();
+     String outfname = treesfilename.c_str();
+#else
+     String fnamepla = commfilename.c_str();
+     String outfname = commfilename.c_str();
+#endif
      fnamepla = fnamepla.before('.');
      fnamepla += "_";
 
-     if(isrooted)
-         fnamepla += "rooted_";
-     else
-         fnamepla += "unrooted_";
+     if (str_matrix != (String)"File-covariance" && str_matrix != (String) "Affinity-filedist"
+             && str_matrix != (String) "File-affinity")
+     {
+        if(isrooted)
+            fnamepla += "rooted_";
+        else
+            fnamepla += "unrooted_";
 
-     if(isweighted)
-         fnamepla += "weighted_";
-     else
-         fnamepla += "unweighted_";
+        if(isweighted)
+            fnamepla += "weighted_";
+        else
+            fnamepla += "unweighted_";
+     }
 
      if(str_matrix == (String) "Unweighted RF-distance")
          fnamepla += "RF-distance";
@@ -2506,6 +2514,16 @@ string Trees::create_temp_name(String str_matrix)
          fnamepla += "Covariance_Matrix";
      else
          fnamepla += str_matrix;
+
+     if(modelType == 3)
+         fnamepla += "_Configuration_Null_Model";
+     else if(modelType == 4)
+         fnamepla += "_Constant_Potts_Model";
+     else if(modelType == 2)
+         fnamepla += "_Erdos-Renyi_Null_Model";
+     else if(modelType == 1)
+         fnamepla += "_No_Null_Model";
+
      fnamepla += "_communities_auto_plateaus.out";
      File filepla(fnamepla);
      filepla.clean();
@@ -2553,19 +2571,23 @@ string Trees::create_temp_name(String str_matrix)
      }
 
      // output communities information
-     String outfname = treesfilename.c_str();
+
      outfname = outfname.before('.');
      outfname += "_";
 
-     if(isrooted)
-         outfname += "rooted_";
-     else
-         outfname += "unrooted_";
+     if (str_matrix != (String)"File-covariance" && str_matrix != (String) "Affinity-filedist"
+             && str_matrix != (String) "File-affinity")
+     {
+         if(isrooted)
+             outfname += "rooted_";
+         else
+             outfname += "unrooted_";
 
-     if(isweighted)
-         outfname += "weighted_";
-     else
-         outfname += "unweighted_";
+         if(isweighted)
+             outfname += "weighted_";
+         else
+             outfname += "unweighted_";
+     }
 
      if(str_matrix == (String) "Unweighted RF-distance")
          outfname += "RF-distance";
@@ -2575,6 +2597,15 @@ string Trees::create_temp_name(String str_matrix)
          outfname += "Covariance_Matrix";
      else
         outfname += str_matrix;
+
+     if(modelType == 3)
+         outfname += "_Configuration_Null_Model";
+     else if(modelType == 4)
+         outfname += "_Constant_Potts_Model";
+     else if(modelType == 2)
+         outfname += "_Erdos-Renyi_Null_Model";
+     else if(modelType == 1)
+         outfname += "_No_Null_Model";
 
      outfname += "_community_auto_results.out";
      File file(outfname);
@@ -2847,19 +2878,28 @@ bool Trees::compute_community_manually(String str_matrix, int modelType, Array<d
     double lambda_pos;// = atof(param1.c_str());
     double lambda_neg;// = atof(param2.c_str());
 
-    String outfname = treesfilename.c_str();
+#if COMMAND_LINE_VERSION
+     String outfname = treesfilename.c_str();
+#else
+     String outfname = commfilename.c_str();
+#endif
+
     outfname = outfname.before('.');
     outfname += "_";
 
-    if(isrooted)
-        outfname += "rooted_";
-    else
-        outfname += "unrooted_";
+    if (str_matrix != (String)"File-covariance" && str_matrix != (String) "Affinity-filedist"
+            && str_matrix != (String) "File-affinity")
+    {
+        if(isrooted)
+            outfname += "rooted_";
+        else
+            outfname += "unrooted_";
 
-    if(isweighted)
-        outfname += "weighted_";
-    else
-        outfname += "unweighted_";
+        if(isweighted)
+            outfname += "weighted_";
+        else
+            outfname += "unweighted_";
+    }
 
     if(str_matrix == (String) "Unweighted RF-distance")
         outfname += "RF-distance";
@@ -2869,6 +2909,15 @@ bool Trees::compute_community_manually(String str_matrix, int modelType, Array<d
         outfname += "Covariance_Matrix";
     else
        outfname += str_matrix;
+
+    if(modelType == 3)
+        outfname += "_Configuration_Null_Model";
+    else if(modelType == 4)
+        outfname += "_Constant_Potts_Model";
+    else if(modelType == 2)
+        outfname += "_Erdos-Renyi_Null_Model";
+    else if(modelType == 1)
+        outfname += "_No_Null_Model";
 
     outfname += "_community_manual_results.out";
     File file(outfname);
@@ -3408,6 +3457,30 @@ string Trees::Print_selected_trees(Treefileformat tf)
 
         WriteSelectedTrees(stdname, NEXUS);
     }
+
+    return stdname;
+}
+
+string Trees::WriteSelectedTreesFilename(string type)
+{
+#ifndef COMMAND_LINE_VERSION
+    QString qtname = get_treefilename_without_path();
+    string stdname = qtname.toStdString();
+#else
+    string stdname = treesfilename;
+#endif
+
+    String outputname(stdname.c_str());
+
+    int i = 0;
+    while(outputname[i] != '.' && outputname[i] != '\0')
+        i++;
+
+    outputname = outputname(0, i);
+    outputname += (String) "_selected_trees_";
+    outputname += (String) type.c_str();
+    outputname += ".out";
+    stdname = (char *) outputname;
 
     return stdname;
 }

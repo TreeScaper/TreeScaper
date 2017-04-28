@@ -406,8 +406,10 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
     if(paras["-ft"] == (String) "Trees")
     {
         TreesData->Compute_Bipart_Covariance();
-        cout << "Successfully computed covariance matrix of bipartition." << endl;
-        TreesData->print_matrix("Covariance Matrix");
+        cout << "Successfully computed covariance matrix of bipartition." << endl;     
+        
+        string outCovaName = TreesData->make_DISToutput_name("Covariance Matrix");
+        TreesData->print_matrix("Covariance Matrix", outCovaName);
         cout << "Successfully printed Covariance Matrix matrix!" << endl;
         if(paras["-o"] == (String) "Community")
         {
@@ -542,8 +544,8 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
             return;
         }
         
-        
-        TreesData->print_matrix(memorydata);
+        string outDistName = TreesData->make_DISToutput_name(memorydata);
+        TreesData->print_matrix(memorydata, outDistName);
         cout << "Successfully printed " << memorydata << " matrix!" << endl;
     }
     
@@ -608,7 +610,8 @@ void Compute_Affinity(Trees *TreesData, map<String, String> &paras, String memor
         return;
     }
     
-    TreesData->print_matrix(memorydata);
+    string outAffName = TreesData->make_DISToutput_name(memorydata);
+    TreesData->print_matrix(memorydata, outAffName);
     cout << "Successfully printed " << memorydata << " matrix!" << endl;
     
     if(paras["-o"] == (String) "Community")
