@@ -2482,7 +2482,7 @@ string Trees::create_temp_name(String str_matrix)
  */
 
      // output plateaus
-#if COMMAND_LINE_VERSION
+#ifdef COMMAND_LINE_VERSION
      String fnamepla = treesfilename.c_str();
      String outfname = treesfilename.c_str();
 #else
@@ -2878,7 +2878,7 @@ bool Trees::compute_community_manually(String str_matrix, int modelType, Array<d
     double lambda_pos;// = atof(param1.c_str());
     double lambda_neg;// = atof(param2.c_str());
 
-#if COMMAND_LINE_VERSION
+#ifdef COMMAND_LINE_VERSION
      String outfname = treesfilename.c_str();
 #else
      String outfname = commfilename.c_str();
@@ -3598,7 +3598,7 @@ void Trees::WriteSelectedTrees(string &outfile, Treefileformat tf) // newick nex
 }
 
 
-#if COMMAND_LINE_VERSION
+#ifdef COMMAND_LINE_VERSION
 
 void Trees::Compute_Bipart_Covariance()
 {
