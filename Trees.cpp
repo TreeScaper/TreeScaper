@@ -444,6 +444,7 @@ void Trees::initialTrees(string fname)
                             }
                             strcpy(namebuff, b.c_str());
                             namebuff[b.length()] = NULL;
+
                             leaveslabelsmaps.push(string (namebuff));
                         }
                         else if(line.find("(",0) != string::npos)
@@ -596,7 +597,14 @@ void Trees::ReadTrees() // newick nexus
                                 //----------- make it weighted string ----------------
                                 char *btree = new char[2 * line.substr(tstart).length() + 1];
                                 int idx = 0;
-                                const char *stree = line.substr(tstart).c_str();
+//                                const char *stree = line.substr(tstart).c_str();      // For Some reason this did not work for some file types in CLV (MAC)
+
+                                char *stree = new char[line.substr(tstart).length() + 1];
+                                strcpy(stree, line.substr(tstart).c_str());
+                                stree[line.substr(tstart).length()] = '\0';
+
+
+
                                 for(int i = 0; i < line.substr(tstart).length(); i++)
                                 {
                                     if((stree[i] == ')' || stree[i] == ',') && i < line.substr(tstart).length() - 1)
@@ -606,7 +614,7 @@ void Trees::ReadTrees() // newick nexus
                                     }
                                     btree[idx++] = stree[i];
                                 }
-                                btree[idx] = NULL;
+                                btree[idx] = '\0';
                                 //-------------work but not good way-------------
                                 treeset[treesetidx] = TreeOPE::parsetree(btree, &error, NULL);
                                 delete btree;

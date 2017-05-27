@@ -964,9 +964,10 @@ NEWICKTREE *TreeOPE::parsetree(char *str, int *error, NEWICKTREE *testtree)
     return answer;
 
 error_exit:
-    cout << "Qrong in parsetree()!\n\n";//----
+    cout << "Wrong in parsetree()!\n\n";//----
     free(str_copy);
     killnewicktree(answer);
+
     if (error)
         *error = err;
     return NULL;
