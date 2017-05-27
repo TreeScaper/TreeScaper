@@ -33,6 +33,7 @@ public:
     void initialization(Trees *TreesData, String in_str_matrix, int in_modelType, Array<double> in_param1, Array<double> in_param2,
                         string in_highfreq, string in_lowfreq, int in_buttonflag, bool in_isauto = true);
 
+//    void stop();
 protected:
     void run();
 
@@ -49,6 +50,8 @@ private:
     string lowfreq;
     int buttonflag;
     bool isauto;
+
+//    volatile bool stopped;
 };
 
 #endif // WCOMMUNITYTHREAD_H

@@ -2212,7 +2212,7 @@ string Trees::create_temp_name(String str_matrix)
      qq.push(p);
 
      // width first search
-     cout << "The testing values of lambda pos are:" << endl;
+     cout << "\nThe testing values of lambda pos are:" << endl;
      cout << lambda_pos_min << ", " << lambda_pos_max << ", ";
      while(!qq.empty())
      {
@@ -2316,13 +2316,13 @@ string Trees::create_temp_name(String str_matrix)
      }
      cout << endl;
 
-     cout << "The found plateaus are:" << endl;
+     cout << "\nThe found plateaus are:" << endl;
      for(int i = 0; i < plateausLb.size(); i++)
          cout << "[" << plateausLb[i].first << ", " << plateausLb[i].second
-              << "], length:" << plateausLb[i].second - plateausLb[i].first << ", number of communities:" <<
+              << "], length: " << plateausLb[i].second - plateausLb[i].first << ", number of communities: " <<
                  LamCommunities[plateausLb[i].first]->nb_comm << endl;
 
-     cout << "Detailed check lambda pos are (if necessary):" << endl;
+     cout << "\nDetailed check lambda pos are (if necessary):" << endl;
 
      plateausUb.resize(plateausLb.size());
      for(int i = 0; i < plateausLb.size(); i++)
@@ -2411,13 +2411,21 @@ string Trees::create_temp_name(String str_matrix)
          }
      } while(true);
 
-     cout << "The found plateaus are:" << endl;
+     cout << "\nThe found plateaus are:" << endl;
      for(int i = 0; i < plateausLb.size(); i++)
-         cout << "[" << plateausUb[i].first << ":" << plateausLb[i].first << ", " << plateausLb[i].second
-              << ":" << plateausUb[i].second << "], length lower bound:" <<
-                 plateausLb[i].second - plateausLb[i].first << ", length upper bound:" <<
-                 plateausUb[i].second - plateausUb[i].first << ", number of communities:" <<
-                 LamCommunities[plateausLb[i].first]->nb_comm << endl;
+     {
+//         cout << "[" << plateausUb[i].first << ":" << plateausLb[i].first << ", " << plateausLb[i].second
+//              << ":" << plateausUb[i].second << "], length lower bound:" <<
+//                 plateausLb[i].second - plateausLb[i].first << ", length upper bound:" <<
+//                 plateausUb[i].second - plateausUb[i].first << ", number of communities:" <<
+//                 LamCommunities[plateausLb[i].first]->nb_comm << endl;
+
+         cout << "Transition lower bound: [" << plateausUb[i].first << ", " << plateausLb[i].first << "]" << endl;
+         cout << "Transition upper bound: [" << plateausLb[i].second << ", " << plateausUb[i].second << "]" << endl;
+         cout << "Updated plateau: [" << plateausLb[i].first << ", " << plateausLb[i].second << "], length: " <<
+                 plateausLb[i].second - plateausLb[i].first << ", number of communities: " <<
+                 LamCommunities[plateausLb[i].first]->nb_comm << endl << endl;
+     }
 
      com_info_col = LamCommunities.size() + 1;
      com_info = new double *[covariance_nonfree_id_size + 4];
@@ -2666,7 +2674,8 @@ string Trees::create_temp_name(String str_matrix)
      const char *tempfile3 = conff.c_str();
      remove(tempfile3);
 
-     cout << "Output community results to file: " << outfname << " and " << fnamepla << "\n\n";
+     cout << "Output community results to file: " << outfname << endl;
+     cout << "and " << fnamepla << "\n\n";
      return true;
   }
 

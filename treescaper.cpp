@@ -563,8 +563,10 @@ void TreeScaper::on_pushNLDRrun_clicked()
 
     // Choose Directory
     string rawfilename = stdfname.substr(stdfname.find_last_of("/") + 1);
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), qtfname, QFileDialog::ShowDirsOnly);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     string dirfname = dir.toStdString();
+    if(dirfname.empty()) // cancel
+        return;
     dirfname.append("/");
     dirfname.append(rawfilename);
 
@@ -645,6 +647,8 @@ void TreeScaper::on_pushNLDRrun_clicked()
 
         nldrthd.initialization(ftttname, (double **) NULL, 0, dim, cost, algo, init, flag, seed, paras::nldrparas);
 */
+
+    cout << "Running NLDR..." << endl;
     nldrthd.initialization(CORplot, dist, size, dim, cost, algo, init, flag, seed, paras::nldrparas);
     nldrthd.start();
     CORplot += "_";
@@ -875,8 +879,10 @@ void TreeScaper::on_pushdimrun_clicked()
 
     // Choose Directory
     string rawfilename = stdfname.substr(stdfname.find_last_of("/") + 1);
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), qtfname, QFileDialog::ShowDirsOnly);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "", QFileDialog::ShowDirsOnly);
     string dirfname = dir.toStdString();
+    if(dirfname.empty()) // cancel
+        return;
     dirfname.append("/");
     dirfname.append(rawfilename);
 
@@ -974,7 +980,7 @@ void TreeScaper::on_pushdimrun_clicked()
             }
     }
 
-
+    cout << "Running Dimension Estimation..." << endl;
     dimestthd.initialization(DIMplot, dist, size, dim, est, type, qtnum.toInt());
     dimestthd.start();
 
@@ -2271,8 +2277,10 @@ void TreeScaper::on_pushDISTcomm_clicked()
         qtfname = ui->textDATAfile->toPlainText();
     string stdfname = qtfname.toStdString();
     string rawfilename = stdfname.substr(stdfname.find_last_of("/") + 1);
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), qtfname, QFileDialog::ShowDirsOnly);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "", QFileDialog::ShowDirsOnly);
     string dirfname = dir.toStdString();
+    if(dirfname.empty()) // cancel
+        return;
     dirfname.append("/");
     dirfname.append(rawfilename);
     TreesData->set_commfilename(dirfname);
@@ -2300,6 +2308,7 @@ void TreeScaper::on_pushDISTcomm_clicked()
     string lowfreq = qtparam4.toStdString();
 
 
+    cout << "Running community detection..." << endl;
     if(ui->radioButtonDISTauto->isChecked())
         communitythd.initialization(TreesData, memorydata, modelType, paramnonfixed, paramfixed, highfreq, lowfreq, 1);
     else
@@ -2857,8 +2866,10 @@ void TreeScaper::on_pushCOVAcomm_clicked()
         qtfname = ui->textDATAfile->toPlainText();
     string stdfname = qtfname.toStdString();
     string rawfilename = stdfname.substr(stdfname.find_last_of("/") + 1);
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), qtfname, QFileDialog::ShowDirsOnly);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "", QFileDialog::ShowDirsOnly);
     string dirfname = dir.toStdString();
+    if(dirfname.empty()) // cancel
+        return;
     dirfname.append("/");
     dirfname.append(rawfilename);
     TreesData->set_commfilename(dirfname);
@@ -2884,6 +2895,7 @@ void TreeScaper::on_pushCOVAcomm_clicked()
     QString qtparam4 = ui->textCOVAlowfreq->toPlainText();
     string lowfreq = qtparam4.toStdString();
 
+    cout << "Running community detection..." << endl;
     if(ui->radioButtonCOVAauto->isChecked())
         communitythd.initialization(TreesData, datastr, modelType, paramfixed, paramnonfixed, highfreq, lowfreq, 2);
     else

@@ -110,6 +110,9 @@
       </item>
       <item row="1" column="4" rowspan="9" colspan="4">
        <widget class="QTableWidget" name="tableWidgetplot">
+        <property name="editTriggers">
+         <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+        </property>
         <row>
          <property name="text">
           <string/>
@@ -187,7 +190,7 @@
         </item>
         <item row="2" column="1">
          <property name="text">
-          <string>seperation factor</string>
+          <string>separation factor</string>
          </property>
         </item>
         <item row="3" column="0">
@@ -334,6 +337,9 @@
         <property name="text">
          <string>Cancel</string>
         </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
       <item row="10" column="7">
@@ -341,8 +347,11 @@
         <property name="text">
          <string>Close</string>
         </property>
-        <property name="default">
+        <property name="autoDefault">
          <bool>true</bool>
+        </property>
+        <property name="default">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -358,12 +367,18 @@
         <property name="text">
          <string>Apply</string>
         </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
       <item row="10" column="3">
        <widget class="QPushButton" name="pushButton">
         <property name="text">
          <string>Reset</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
         </property>
        </widget>
       </item>

@@ -25,6 +25,7 @@
 Communitythread::Communitythread(QObject *parent)
     : QThread(parent)
 {
+//    stopped = false;
 };
 
 Communitythread::~Communitythread()
@@ -69,5 +70,11 @@ void Communitythread::run()
 
     emit sendbuttonCommunityPlotenable(buttonflag);
 }
+
+//void Communitythread::stop()
+//{
+//    stopped = true;
+//    std::cout << "Community detection was stopped!\n\n";
+//}
 
 #endif // WNLDRTHREAD_CPP
