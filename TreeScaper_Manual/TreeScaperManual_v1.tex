@@ -72,10 +72,10 @@
 Phylogenetic trees are now routinely inferred from enormous genome-scale data sets, revealing extensive variation in phylogenetic signal both within and between individual genes. This variation may result from a wide range of biological phenomena, such as recombination, horizontal gene transfer, or hybridization.  It may also indicate stochastic and/or systematic error.  However, current approaches for summarizing the variation in a tree set typically condense it into point estimates, such as consensus trees, resulting in extensive loss of information. \\
 
 
-We have written TreeScaper to provide a set of visual and quantitative tools for exploring and characterizing the full complement of phylogenetic information contained in a tree set. These tools can be broadly categorized into three types: (1) utilities for calculating basic information about topologies and bipartitions, (2) visualization of treespace in $2-$ or $3-$dimensional space through non-linear dimensionality reduction (NLDR), and (3) detection and delineation of distinct ÔcommunitiesÕ of trees. \\
+We have written TreeScaper to provide a set of visual and quantitative tools for exploring and characterizing the full complement of phylogenetic information contained in a tree set. These tools can be broadly categorized into three types: (1) utilities for calculating basic information about topologies and bipartitions, (2) visualization of treespace in $2-$ or $3-$dimensional space through non-linear dimensionality reduction (NLDR), and (3) detection and delineation of distinct ï¿½communitiesï¿½ of trees. \\
 
 
-{\it Utilities} -- Much of TreeScaperÕs functionality requires calculating distances between trees, transforming distances into affinities, translating trees into their component bipartitions, and summarizing how these bipartitions are distributed across trees (i.e., their variances and covariances). However, this information can also be useful in its own right. Therefore, TreeScaper provides a set of built-in utilities to calculate a range of useful tree- and bipartition-related summaries. Once calculated, these values may be used for other tasks in TreeScaper or may be written to file for use in other applications. \\
+{\it Utilities} -- Much of TreeScaperï¿½s functionality requires calculating distances between trees, transforming distances into affinities, translating trees into their component bipartitions, and summarizing how these bipartitions are distributed across trees (i.e., their variances and covariances). However, this information can also be useful in its own right. Therefore, TreeScaper provides a set of built-in utilities to calculate a range of useful tree- and bipartition-related summaries. Once calculated, these values may be used for other tasks in TreeScaper or may be written to file for use in other applications. \\
 
 
 {\it NLDR} -- One way to visually explore tree sets is to plot a $2-$ or $3-$dimensional representation of treespace using non-linear dimensionality reduction (NLDR; Fig.~\ref{fig1}). This approach was first suggested for the visualization of phylogenetic trees by~\citealp{AK:2002} and~\citealp{HHJA:2005}, and recently extended by~\citealp{WHG:2017}. The general idea behind NLDR is to find a lower dimensional representation of the relationships among trees that best preserves the true distances between them. TreeScaper implements several different methods for calculating tree-to-tree distances [e.g., Robinson-Foulds (RF) distances, matching distances, and subtree-prune-regraft (SPR) distances], several stress functions to assess how the original tree-to-tree distances should be optimally represented in lower dimensional space [e.g., Normalized stress, Kruskal$-1$ stress, nonlinear mapping (NLM) stress, and Curvilinear Components Analysis (CCA) stress], and several optimization algorithms for finding the best low-dimensional representation given a chosen stress function (e.g., Gauss-Seidel-Newton, stochastic gradient descent, and simulated annealing). \\
@@ -183,10 +183,10 @@ Throughout this manual, we format the text differently when referring to differe
 Starting off in {\it Trees and Bipartition Computation}, \ul{Load Tree Data} should already be selected. {\bf Browse} and select the tree file. Select ``weighted trees", but do not select ``rooted".  Click {\bf Load all Trees} to load the tree set into memory. \\
 
 
-From the dropdown menu, now select \ul{Compute Bipartition Matrix}, then click the {\bf Compute Bipartition-Tree Matrix} button.  The log window will show a list of all the bipartitions in the tree set, along with their frequency. The data structure called ``Bipartition MatrixÓ now contains all trees and the bipartitions they contain, along with all the bipartition weights (i.e., branch lengths) for each tree. These data can be printed to a file in two different forms: as a list or as a matrix. In the list format, the first column indexes the unique bipartitions (which may be present in multiple trees), the second column indexes the trees in which those bipartitions were found, and the third column gives the bipartition weights. \\
+From the dropdown menu, now select \ul{Compute Bipartition Matrix}, then click the {\bf Compute Bipartition-Tree Matrix} button.  The log window will show a list of all the bipartitions in the tree set, along with their frequency. The data structure called ``Bipartition Matrixï¿½ now contains all trees and the bipartitions they contain, along with all the bipartition weights (i.e., branch lengths) for each tree. These data can be printed to a file in two different forms: as a list or as a matrix. In the list format, the first column indexes the unique bipartitions (which may be present in multiple trees), the second column indexes the trees in which those bipartitions were found, and the third column gives the bipartition weights. \\
 
 
-Next, weÕll use the information in the bipartition-tree matrix to compute a consensus tree. To do so, select \ul{Compute Consensus Tree} from the dropdown menu. Leaving the default parameters alone, click {\bf Consensus Tree} and then {\bf Plot}. While examining the plot, you can zoom in and out by scrolling up or down. Holding down the option key while clicking and grabbing the plot will allow you to move the tree. You can see in the consensus tree that there is low bootstrap support ($< 0.7$) for several bipartitions in the consensus tree.   It is impossible to determine, from this consensus tree alone, whether the low support is due to a lack of phylogenetic signal or strong support for a few conflicting topologies. \\
+Next, weï¿½ll use the information in the bipartition-tree matrix to compute a consensus tree. To do so, select \ul{Compute Consensus Tree} from the dropdown menu. Leaving the default parameters alone, click {\bf Consensus Tree} and then {\bf Plot}. While examining the plot, you can zoom in and out by scrolling up or down. Holding down the option key while clicking and grabbing the plot will allow you to move the tree. You can see in the consensus tree that there is low bootstrap support ($< 0.7$) for several bipartitions in the consensus tree.   It is impossible to determine, from this consensus tree alone, whether the low support is due to a lack of phylogenetic signal or strong support for a few conflicting topologies. \\
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -196,13 +196,13 @@ Next, weÕll use the information in the bipartition-tree matrix to compute a cons
 First, to get an idea of what tree space looks like for this tree set, we will visualize it in 3D using a non-linear dimensionality reduction (NLDR) projection method.  In these projections, each point represents a tree in the tree set, and the distance between two points is an approximation of the actual tree-to-tree distance. From the main dropdown menu, select \ul{Load Distance/Coordinate Data or Compute Tree-to-Tree Distances}. In this case, we will calculate the tree-to-tree distances from scratch, but you could also load distances from file if they were calculated previously. If you plan on conducting many analyses with the same large tree set, storing and loading the tree distances will save considerable time. From the Method dropdown select \ul{Weighted Robinson Foulds}, then click {\bf Distance} to compute a matrix of pairwise distances between trees in your tree set. This matrix should appear as a new data structure in the bottom left pane. Also select \ul{Unweighted Robinson Foulds} and compute the distance. You will need to use this distance matrix later. We have now conducted all of the necessary preliminary calculations to conduct NLDR.\\
 
 
-In the topmost tab menu, now select {\it NLDR and Dimension Estimation}. In the main dropdown menu under this tab, \ul{Nonlinear Dimension Reduction} should already be selected. Make sure that \ul{Weighted RF-distance} is selected in the {\it Distance} dropdown, with \ul{CCA} and \ul{Stochastic} selected in {\it Method and Algorithm} drop downs, respectively. Change {\it Dimension} to $3$. Make sure that \ul{Random} is selected in the {\it Initial Projection} dropdown. \\
+In the topmost tab menu, now select {\it NLDR and Dimension Estimation}. In the main dropdown menu under this tab, \ul{Nonlinear Dimension Reduction} should already be selected. Make sure that \ul{Weighted RF-distance} is selected in the {\it Distance} dropdown, with \ul{CCA} and \ul{Stochastic} selected in {\it Method} and {\it Algorithm} drop downs, respectively. Change {\it Dimension} to $3$. Make sure that \ul{Random} is selected in the {\it Initial Projection} dropdown. \\
 
 
-Next, click the {\bf Plot Parameters} button.  A new dialogue box should appear.  \ul{Points} should be selected in the dialogueÕs dropdown menu. Set the ``Number of Clusters" to $1$, then click {\bf OK}.  $1$ cluster should appear in the ``Cluster Index" section.  Check the ``Step Size" box.  Set the step size to $100$.  The single cluster should now include all $100$ trees in the tree set (with indices $0 - 99$). Under ``Other parameters" change ``point size" to $10$, then click {\bf Apply}, followed by {\bf Close}. \\
+Next, click the {\bf Plot Parameters} button.  A new dialogue box should appear.  \ul{Points} should be selected in the dialogueï¿½s dropdown menu. Set the ``Number of Clusters" to $1$, then click {\bf OK}.  $1$ cluster should appear in the ``Cluster Index" section.  Check the ``Step Size" box.  Set the step size to $100$.  The single cluster should now include all $100$ trees in the tree set (with indices $0 - 99$). Under ``Other parameters" change ``point size" to $10$, then click {\bf Apply}, followed by {\bf Close}. \\
 
 
-Now, click the {\bf Run NLDR} button.  Once the NLDR method is finished running, click {\bf Plot Result}.  A dialogue box with the plot of tree space should appear.  Click and drag to rotate the 3D plot. Scroll up and down to zoom in and out. Hold down Shift$+$R, select a small number of points ($1-5$), then click the {\bf Plot trees} button to examine each of these trees individually. By rotating the plot, you should see what looks like three distinct groups, or communities, of points.  The NLDR projection suggests that these communities have lower tree-to-tree distances between trees in the same community and larger distances between trees in different communities.  We will later confirm that the original tree-to-tree distances support these community designations by performing a community detection analysis on the tree setÕs topological affinity network. After rotation, your NLDR plot should look something like Figure~\ref{fig4}.  In this diagram, trees are colored by affinity community, which we will find in the next step of the tutorial. TreeScaperÕs NLDR plots (e.g., Fig.~\ref{fig4}) can be saved using screen capture (or the Grab utility on Mac). Customized versions of such plots can be created by reading raw NLDR coordinates into software such as R, which have more advanced plotting capabilities. See Section~\ref{subsubsect:CompBipartMatrix} for more details on NLDR plotting options and output files. \\
+Now, click the {\bf Run NLDR} button. A dialogue box will open, prompting you to open a folder. This is the folder where output files from the NLDR analysis will be saved. Once the NLDR method is finished running, click {\bf Plot Result}.  A dialogue box with the plot of tree space should appear.  Click and drag to rotate the 3D plot. Scroll up and down to zoom in and out. Hold down Shift$+$R, select a small number of points ($1-5$), then click the {\bf Plot trees} button to examine each of these trees individually. By rotating the plot, you should see what looks like three distinct groups, or communities, of points.  The NLDR projection suggests that these communities have lower tree-to-tree distances between trees in the same community and larger distances between trees in different communities.  We will later confirm that the original tree-to-tree distances support these community designations by performing a community detection analysis on the tree setï¿½s topological affinity network. After rotation, your NLDR plot should look something like Figure~\ref{fig4}.  In this diagram, trees are colored by affinity community, which we will find in the next step of the tutorial. TreeScaperï¿½s NLDR plots (e.g., Fig.~\ref{fig4}) can be saved using screen capture (or the Grab utility on Mac). Customized versions of such plots can be created by reading raw NLDR coordinates into software such as R, which have more advanced plotting capabilities. See Section~\ref{subsubsect:CompBipartMatrix} for more details on NLDR plotting options and output files. \\
 
 \begin{figure}[thbp!]\centering
 \includegraphics[scale=0.25]{imagesForManual/Figure4.png}
@@ -236,10 +236,11 @@ measure of affinity, or similarity, between the trees. \\
 
 
 Now select the {\it Community Detection} tab at the top and \ul{Community Detection on
-Affinities} from main dropdown menu. \ul{Affinity-URF} should be selected in the Ò``ffinity in
+Affinities} from main dropdown menu. \ul{Affinity-URF} should be selected in the ``Affinity in
 memory" dropdown. In the ``Model Type" dropdown select \ul{Constant Potts Model}, and in
-``Find Plateaus" select ``Automatically". Click {\bf Community}. A variety of specific information
-about the community detection analysis is printed to the log. For now, we will ignore most of
+``Find Plateaus" select ``Automatically". Click {\bf Community}. A dialogue box will open that asks you 
+to open a directory. Output files from community detection will be written to this directory. A variety of specific information
+about the community detection analysis is also printed to the log. For now, we will ignore most of
 this information. The basic idea is to vary a tuning parameter (lambda) and see how the
 inferred community structure changes. The preferred community structure is the one that is
 most robust to changes in the tuning parameter. These naturally robust community
@@ -265,7 +266,7 @@ plots. Copy the node indices corresponding to a community (e.g., those numbers t
 ``Community $1$ includes nodes:" in the log) and create a separate index file for each
 community that has each number on its own line (see the format of ``example\_index\_aff1.txt"
 for each affinity community or use the pre-made files, ``example\_index\_aff1-3.txt"). Go back
-to \ul{Compute Consensus Tree} under {\it Trees and Bipartition Computation}, select Òindex fileÓ in
+to \ul{Compute Consensus Tree} under {\it Trees and Bipartition Computation}, select ï¿½index fileï¿½ in
 ``Considered Trees". Then, load an index file for the community of your choice. Click
 {\bf Consensus Tree}, and then {\bf Plot}. The consensus tree for each affinity community should
 provide a sense for its dominant phylogenetic signal. The files,
@@ -282,6 +283,9 @@ after pasting each set of values, then click {\bf Apply} and {\bf Close}. Once b
 click {\bf Plot result}. The new plot should have the same structure as the previous NLDR plot,
 but with points colored as in Fig.~\ref{fig4}. \\
 
+For extra practice, try redoing community detection with affinities using weighted RF distances. Does the 
+preferred number of communities differ from the analysis using unweighted RF distances? How many large
+plateaus are found? After coloring communities in the NLDR plot also based on weighted RFs, do these results make sense?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Community Detection on a Bipartition-Covariance Network
@@ -404,7 +408,7 @@ compile cmake.
 \newpage
 \section{TREESCAPER GUI MENUS}\label{sect:TreeScaperGuiMenus}
 
-TreeScaperÕs windows are arranged in a series of tabs, organized by the different types
+TreeScaperï¿½s windows are arranged in a series of tabs, organized by the different types
 of analyses that TreeScaper can perform. Each tab contains a header at the top of its window
 that specifies its features. Every tab also contains a data window at the bottom left which
 shows the data structures currently available in memory. Each data structure may be deleted
@@ -458,7 +462,7 @@ unchecked box means the tree set contains trees without branch lengths.
 along with their number of occurrences, as well as a matrix of bipartition presence/absence
 across trees. The bipartitions are specified using a binary notation, where all taxa on each side
 of the bipartition have the same digit ($0$ or $1$). The order of binary digits corresponds to the
-numbering of the taxa in the output taxa list. For example, the fifth digit in a bipartitionÕs
+numbering of the taxa in the output taxa list. For example, the fifth digit in a bipartitionï¿½s
 notation would correspond to the fifth taxon. For a six-taxon case (taxa A-F), $110000$ would
 indicate a bipartition separating taxa A and B from taxa C-F.
 \end{enumerate}
@@ -568,7 +572,7 @@ file (options~\ref{AffMenu1} and~\ref{AffMenu2} below) or to calculate affinitie
 
 \begin{enumerate}[{\bf 1-}]
 \item {\bf [Affinity File]} -- Although affinities may be calculated from a distance matrix stored in
-memory, itÕs also possible that youÕve previously calculated affinities and output that
+memory, itï¿½s also possible that youï¿½ve previously calculated affinities and output that
 information to a file. In such cases, you may select that file here using browse. \label{AffMenu1}
 
 \item {\bf [Load Affinity File]} -- Load the chosen ``Affinity File" into memory. \label{AffMenu2}
@@ -616,7 +620,7 @@ component analysis.
 
 \item {\bf [Algorithm]} -- Select the optimization algorithm. For Classic Scaling, the algorithm used is
 always ``SVD". For Kruskal$-1$, the ``Stochastic" algorithm is not recommended because it is
-slow. For Normalized, NLM and CCA, the ÒLinear Iteration MDSÓ algorithm is not available.
+slow. For Normalized, NLM and CCA, the ï¿½Linear Iteration MDSï¿½ algorithm is not available.
 Linear iteration is used in the Hillis et al. paper~\ref{HHJA:2005}. ``Stochastic" uses a stochastic gradient descent algorithm and appears to have the best performance.
 
 \item {\bf [Dimension]} -- Select the number of dimensions for the low-dimensional projection. Any
@@ -795,7 +799,7 @@ estimator, the dimension is the mean. \\
 
 \noindent {\bf $^{*}$\_NN\_DIM\_logvslog.out:} Nearest neighbor estimator output. If one plots a figure of the first column versus the second column, the slope of the curve is the nearest neighbor dimension. \\
 
-\begin{sloppypar}\noindent {\bf $^{*}$\_NN\_DIM\_deri\_logvslog.out:} Nearest neighbor estimator output. This is the slope of ``$^{*}$\_NN\_DIM\_logvslog.outÓ and is given by using the central difference method. \\ \end{sloppypar}
+\begin{sloppypar}\noindent {\bf $^{*}$\_NN\_DIM\_deri\_logvslog.out:} Nearest neighbor estimator output. This is the slope of ``$^{*}$\_NN\_DIM\_logvslog.outï¿½ and is given by using the central difference method. \\ \end{sloppypar}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Community Detection
@@ -856,7 +860,7 @@ parameter values are to be tested. \\
 \setcounter{enumi}{4}
 
 \item {\bf [$\mathbf{\lambda1}$ fixed]} -- If the Constant Potts Model (CPM) is used, or the Configuration Null
-Model (CNM) or Erdos-RŽnyi Null Model (ERNM) are used and the trees are fully
+Model (CNM) or Erdos-Rï¿½nyi Null Model (ERNM) are used and the trees are fully
 binary, only the difference between $\lambda^{+}$ and $\lambda^{-}$ matters for community detection.
 Therefore, if one wishes to vary the $\lambda$ values to see how they affect community
 detection, one can fix one of the $\lambda$ values and vary the other. This option allows the
@@ -879,7 +883,7 @@ plateau).
 
 If ``Automatically" is selected, the lambda values tested and the largest plateaus are
 output to the log. For the plateaus, the ``Lower Bound" range is a conservative estimate for
-the size of the plateau, while the ``Upper Bound" is each plateauÕs largest possible size. If the
+the size of the plateau, while the ``Upper Bound" is each plateauï¿½s largest possible size. If the
 lower bound of the largest plateau is larger than the upper bound of the second largest
 plateau, the user can be confident in the designation of a single plateau as the largest.
 Automatic search does not work for non-binary trees when the CNM or ERNM models are
@@ -949,7 +953,7 @@ about affinity. \\
 
 There are three general run modes for the command-line version of TreeScaper
 (``CLVTreeScaper"). Using one of these three flags as the first command-line argument sets
-the mode (e.g., CLVTreeScaper Ðtrees).
+the mode (e.g., CLVTreeScaper ï¿½trees).
 
 \begin{enumerate}[{\bf (1)}]
 \item {\bf -trees} 
@@ -1067,7 +1071,7 @@ When detecting communities (-o Community):
 		\begin{description}
 		\item[`CNM':] Configuration Null Model
 		\item[`CPM':] Constant Potts Model
-		\item[`ERNM':] Erdos-RŽnyi Null Model
+		\item[`ERNM':] Erdos-Rï¿½nyi Null Model
 		\item[`NNM':] No Null Model
 		\end{description}
 	
@@ -1178,19 +1182,19 @@ dimensionality reduction (NLDR). Relevant arguments include:
 	
 	\item[-c:] The chosen cost function. Options are:
 		\begin{description}
-		\item[`CLASSIC\_MDSÕ]
-		\item[`KRUSKAL1Õ]
-		\item[`NORMALIZEDÕ]
-		\item[`SAMMONÕ]
-		\item[`CCAÕ]
+		\item[`CLASSIC\_MDSï¿½]
+		\item[`KRUSKAL1ï¿½]
+		\item[`NORMALIZEDï¿½]
+		\item[`SAMMONï¿½]
+		\item[`CCAï¿½]
 		\end{description}
 		
 	\item[-a:] The chosen NLDR algorithm. Options are:
 		\begin{description}
-		\item[`LINEAR\_ITERATIONÕ]
-		\item[`MAJORIZATIONÕ]
-		\item[`GAUSS\_SEIDELÕ]
-		\item[`STOCHASTICÕ]
+		\item[`LINEAR\_ITERATIONï¿½]
+		\item[`MAJORIZATIONï¿½]
+		\item[`GAUSS\_SEIDELï¿½]
+		\item[`STOCHASTICï¿½]
 		\end{description}
 		
 	\item[-i:] The method for generating initial Euclidean coordinates. Options are:
@@ -1207,7 +1211,7 @@ dimensionality reduction (NLDR). Relevant arguments include:
 \vspace{0.5 cm}	
 	
 \ul{\bf Example command:}\\
-./CLVTreeScaper -nldr -f \{test.out\} -t \{DIS,COR\} -d \{1,2,3,É\} \\
+./CLVTreeScaper -nldr -f \{test.out\} -t \{DIS,COR\} -d \{1,2,3,ï¿½\} \\
 -c \{CLASSIC\_MDS,KRUSKAL1,NORMALIZED,SAMMON,CCA\} \\
 -a \{LINEAR\_ITERATION,MAJORIZATION,GAUSS\_SEIDEL,STOCHASTIC\} \\
 -i \{RAND,CLASSIC\_MDS\} -o \{run1\} -s 1 \\
