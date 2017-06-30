@@ -572,7 +572,8 @@ void TreeScaper::on_pushNLDRrun_clicked()
 
     String fname(dirfname.c_str());
     File file(fname);
-    CORplot = file.prefix_name();
+
+    CORplot = file.prefix_name_lastof();
 
     size = TreesData->Get_n_trees();
     if(NLDRdata == (String) "Unweighted RF-distance")
@@ -613,7 +614,7 @@ void TreeScaper::on_pushNLDRrun_clicked()
         String fdistname(dirdistfname.c_str());
         fname = fdistname;
         File filedist(fdistname);
-        CORplot = filedist.prefix_name();
+        CORplot = filedist.prefix_name_lastof();
     } else
     {
         cout << "Warning: There is no distance matrix in memory!\n\n";
@@ -648,7 +649,7 @@ void TreeScaper::on_pushNLDRrun_clicked()
         nldrthd.initialization(ftttname, (double **) NULL, 0, dim, cost, algo, init, flag, seed, paras::nldrparas);
 */
 
-    cout << "Running NLDR..." << endl;
+    cout << "\nRunning NLDR..." << endl;
     nldrthd.initialization(CORplot, dist, size, dim, cost, algo, init, flag, seed, paras::nldrparas);
     nldrthd.start();
     CORplot += "_";
@@ -888,7 +889,7 @@ void TreeScaper::on_pushdimrun_clicked()
 
     String fname(dirfname.c_str());
     File file(fname);
-    DIMplot = file.prefix_name();
+    DIMplot = file.prefix_name_lastof();
     if(DIMdata == (String) "Unweighted RF-distance")
     {
         dist = TreesData->GetdistURF();
@@ -938,7 +939,7 @@ void TreeScaper::on_pushdimrun_clicked()
 
         String fdistname(dirdistfname.c_str());
         File filedist(fdistname);
-        DIMplot = filedist.prefix_name();
+        DIMplot = filedist.prefix_name_lastof();
     }
     else if(DIMdata == (String) "File-coordinate")
     {
@@ -980,7 +981,7 @@ void TreeScaper::on_pushdimrun_clicked()
             }
     }
 
-    cout << "Running Dimension Estimation..." << endl;
+    cout << "\nRunning Dimension Estimation..." << endl;
     dimestthd.initialization(DIMplot, dist, size, dim, est, type, qtnum.toInt());
     dimestthd.start();
 
@@ -2049,9 +2050,14 @@ void TreeScaper::on_pushDISTaffinity_clicked()
     else
     {
         TreesData->Compute_Affinity_dist(memorydata, type);
+
+        QString qstr;
         if (memorydata == (String)"Unweighted RF-distance")
         {
-            QString qstr("Affinity-URF");
+            if(type == 1)
+                qstr = "Affinity-Reciprocal-URF";
+            else
+                qstr = "Affinity-Exponential-URF";
 
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
@@ -2065,12 +2071,23 @@ void TreeScaper::on_pushDISTaffinity_clicked()
             if(item3.empty())
                 ui->listDATAmem_3->addItem(qstr);
 
-            if (ui->comboBoxDISTmemdata_3->findText("Affinity-URF") == -1)
-                ui->comboBoxDISTmemdata_3->addItem(qstr);
+            if(type == 1)
+            {
+                if (ui->comboBoxDISTmemdata_3->findText("Affinity-Reciprocal-URF") == -1)
+                    ui->comboBoxDISTmemdata_3->addItem(qstr);
+            }
+            else
+            {
+                if (ui->comboBoxDISTmemdata_3->findText("Affinity-Exponential-URF") == -1)
+                    ui->comboBoxDISTmemdata_3->addItem(qstr);
+            }
         }
         else if (memorydata == (String)"Weighted RF-distance")
         {
-            QString qstr("Affinity-RF");
+            if(type == 1)
+                qstr = "Affinity-Reciprocal-RF";
+            else
+                qstr = "Affinity-Exponential-RF";
 
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
@@ -2084,13 +2101,24 @@ void TreeScaper::on_pushDISTaffinity_clicked()
             if(item3.empty())
                 ui->listDATAmem_3->addItem(qstr);
 
-            if (ui->comboBoxDISTmemdata_3->findText("Affinity-RF") == -1)
-                ui->comboBoxDISTmemdata_3->addItem(qstr);
+            if(type == 1)
+            {
+                if (ui->comboBoxDISTmemdata_3->findText("Affinity-Reciprocal-RF") == -1)
+                    ui->comboBoxDISTmemdata_3->addItem(qstr);
+            }
+            else
+            {
+                if (ui->comboBoxDISTmemdata_3->findText("Affinity-Exponential-RF") == -1)
+                    ui->comboBoxDISTmemdata_3->addItem(qstr);
+            }
 
         }
         else if (memorydata == (String)"Matching-distance")
         {
-            QString qstr("Affinity-match");
+            if(type == 1)
+                qstr = "Affinity-Reciprocal-match";
+            else
+                qstr = "Affinity-Exponential-match";
 
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
@@ -2104,13 +2132,24 @@ void TreeScaper::on_pushDISTaffinity_clicked()
             if(item3.empty())
                 ui->listDATAmem_3->addItem(qstr);
 
-            if (ui->comboBoxDISTmemdata_3->findText("Affinity-match") == -1)
-                ui->comboBoxDISTmemdata_3->addItem(qstr);
+            if(type == 1)
+            {
+                if (ui->comboBoxDISTmemdata_3->findText("Affinity-Reciprocal-match") == -1)
+                    ui->comboBoxDISTmemdata_3->addItem(qstr);
+            }
+            else
+            {
+                if (ui->comboBoxDISTmemdata_3->findText("Affinity-Exponential-match") == -1)
+                    ui->comboBoxDISTmemdata_3->addItem(qstr);
+            }
 
         }
         else if (memorydata == (String)"SPR-distance")
         {
-            QString qstr("Affinity-SPR");
+            if(type == 1)
+                qstr = "Affinity-Reciprocal-SPR";
+            else
+                qstr = "Affinity-Exponential-SPR";
 
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
@@ -2124,12 +2163,23 @@ void TreeScaper::on_pushDISTaffinity_clicked()
             if(item3.empty())
                 ui->listDATAmem_3->addItem(qstr);
 
-            if (ui->comboBoxDISTmemdata_3->findText("Affinity-SPR") == -1)
-                ui->comboBoxDISTmemdata_3->addItem(qstr);
+            if(type == 1)
+            {
+                if (ui->comboBoxDISTmemdata_3->findText("Affinity-Reciprocal-SPR") == -1)
+                    ui->comboBoxDISTmemdata_3->addItem(qstr);
+            }
+            else
+            {
+                if (ui->comboBoxDISTmemdata_3->findText("Affinity-Exponential-SPR") == -1)
+                    ui->comboBoxDISTmemdata_3->addItem(qstr);
+            }
         }
         else if (memorydata == (String)"File-distance")
         {
-            QString qstr("Affinity-filedist");
+            if(type == 1)
+                qstr = "Affinity-Reciprocal-filedist";
+            else
+                qstr = "Affinity-Exponential-filedist";
 
             QList<QListWidgetItem *> item1 = ui->listDATAmem->findItems(qstr, Qt::MatchCaseSensitive | Qt::MatchExactly);
             if(item1.empty())
@@ -2143,8 +2193,16 @@ void TreeScaper::on_pushDISTaffinity_clicked()
             if(item3.empty())
                 ui->listDATAmem_3->addItem(qstr);
 
-            if (ui->comboBoxDISTmemdata_3->findText("Affinity-filedist") == -1)
-                ui->comboBoxDISTmemdata_3->addItem(qstr);
+            if(type == 1)
+            {
+                if (ui->comboBoxDISTmemdata_3->findText("Affinity-Reciprocal-filedist") == -1)
+                    ui->comboBoxDISTmemdata_3->addItem(qstr);
+            }
+            else
+            {
+                if (ui->comboBoxDISTmemdata_3->findText("Affinity-Exponential-filedist") == -1)
+                    ui->comboBoxDISTmemdata_3->addItem(qstr);
+            }
         }
 
         int idex = ui->comboBoxDISTmemdata_3->findText("No affinity data in memory");
@@ -2269,7 +2327,9 @@ void TreeScaper::on_pushDISTcomm_clicked()
 
     // Choose Directory
     QString qtfname;
-    if(memorydata == (String) "Affinity-filedist")
+    if(memorydata == (String) "Affinity-Reciprocal-filedist")
+        qtfname = ui->textDISTfile_2->toPlainText();
+    else if(memorydata == (String) "Affinity-Exponential-filedist")
         qtfname = ui->textDISTfile_2->toPlainText();
     else if(memorydata == (String) "File-affinity")
         qtfname = ui->textAffinityfile->toPlainText();
@@ -3358,10 +3418,13 @@ void TreeScaper::on_comboBoxDISTmemdata_3_currentIndexChanged(const QString &tex
     if (text == (String) "")
         return;
 
-    if ((text == (String) "Affinity-URF")
-            || (text == (String) "Affinity-RF") || (text == (String) "Affinity-match")
-            || (text == (String) "Affinity-SPR") || (text == (String) "Affinity-geodesic")
-            || (text == (String) "Affinity-filedist") || (text == (String) "File-affinity"))
+    if ((text == (String) "Affinity-Reciprocal-URF") || (text == (String) "Affinity-Exponential-URF")
+            || (text == (String) "Affinity-Reciprocal-RF") || (text == (String) "Affinity-Exponential-RF")
+            || (text == (String) "Affinity-Reciprocal-match") || (text == (String) "Affinity-Exponential-match")
+            || (text == (String) "Affinity-Reciprocal-SPR") || (text == (String) "Affinity-Exponential-SPR")
+            || (text == (String) "Affinity-Reciprocal-geodesic") || (text == (String) "Affinity-Exponential-geodesic")
+            || (text == (String) "Affinity-Reciprocal-filedist") || (text == (String) "Affinity-Exponential-filedist")
+            || (text == (String) "File-affinity"))
     {
         ui->pushDISTcomm->setEnabled(true);
     }

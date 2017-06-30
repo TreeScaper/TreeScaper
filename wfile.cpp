@@ -114,13 +114,13 @@ bool File::clean()
 
 String File::prefix_name()
 {
-	int i = 0;
-	while(fname[i] != '.' && fname[i] != '\0')
+    int i = 0;
+    while(fname[i] != '.' && fname[i] != '\0')
     {
-		i++;
+        i++;
     }
 
-	return fname(0, i);
+    return fname(0, i);
 };
 
 String File::postfix_name()
@@ -133,6 +133,27 @@ String File::postfix_name()
 		return "";
 
 	return fname(i + 1, fname.get_length());
+};
+
+String File::prefix_name_lastof()
+{
+    int i = fname.get_length();
+    while(fname[i] != '.')
+        i--;
+
+    return fname(0, i);
+};
+
+String File::postfix_name_lastof()
+{
+    int i = fname.get_length();
+    while(fname[i] != '.')
+        i--;
+
+    if(i == 0)
+        return "";
+
+    return fname(i + 1, fname.get_length());
 };
 
 #endif

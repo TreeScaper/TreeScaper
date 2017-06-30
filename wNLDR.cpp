@@ -39,8 +39,9 @@ void NLDR::init_NLDR(String fname, double **dist, int sizeinput, String dim, Str
 	STRESS = -1;
 
     File D_file(fname);
-	D_prefname = D_file.prefix_name();
-	D_postfname = D_file.postfix_name();
+
+    D_prefname = fname;//D_file.prefix_name_lastof();
+    D_postfname = fname;//D_file.postfix_name_lastof();
 
     int dim_int = atoi(dim_str);
     if(dim_int < 1)
@@ -101,14 +102,15 @@ void NLDR::init_NLDR(String fname, String ftype, String dim, String cost, String
 	file_flag = flag;
     STRESS = -1;
     File D_file(fname);
+
 	if(!D_file.is_open())
 	{
         std::cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
 		exit(0);
     }
 
-	D_prefname = D_file.prefix_name();
-	D_postfname = D_file.postfix_name();
+    D_prefname = D_file.prefix_name_lastof();
+    D_postfname = D_file.postfix_name_lastof();
 	size = D_file.lines();
 	D_file.seek(0);
 	int dim_int = atoi(dim_str);
@@ -531,7 +533,7 @@ void NLDR::NLDR_load_D()
 {
 	String fname = D_prefname;
 	fname += ".";
-	fname += D_postfname;
+    fname += D_postfname;
 	File D_file(fname);	
 	if(!D_file.is_open())
 	{

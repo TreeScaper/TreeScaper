@@ -33,7 +33,7 @@ class String {
         char temp[1000];        // buffer to store input
 
         input >> std::setw(1000) >> temp;
-		s = temp;                 // use String class assignment operator
+        s = temp;                 // use String class assignment operator
 		return input;             // enables cascading
 	};
 
@@ -44,7 +44,7 @@ class String {
 	};
 
 public:
-	String( const char * = "");                 // constuct and default empty String
+    String( const char * s = "");                 // constuct and default empty String
 	String( const String &);                    // copy constructor
     ~String();                                  // destructor
 	const String &operator=(const String &);    // assignment

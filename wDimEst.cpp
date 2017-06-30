@@ -30,8 +30,8 @@ void DimEst::initial_DimEst(String filename, double **dist, int sizeinput, int d
     method = meth;
     num_r = parameters.cor_n;// only for this interface version
     File D_file(filename);
-    D_prefname = D_file.prefix_name();
-    D_postfname = D_file.postfix_name();
+    D_prefname = filename;//D_file.prefix_name();
+    D_postfname = filename;//D_file.postfix_name();
 
     // get distance matrix
     if(dataform == (String) "DIS")
@@ -158,8 +158,8 @@ void DimEst::initial_DimEst(String filename, String meth, String dataform, Strin
         exit(0);
     }
     size = D_file.lines();
-    D_prefname = D_file.prefix_name();
-    D_postfname = D_file.postfix_name();
+    D_prefname = D_file.prefix_name_lastof();
+    D_postfname = D_file.postfix_name_lastof();
     D.resize(size, size);
     X.resize(num_r, 1);
     D_file.seek(0);

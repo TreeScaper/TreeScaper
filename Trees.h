@@ -283,18 +283,26 @@ private:
     int **dist_match;
     int **dist_SPR;
     double **dist_geo;
-    double **affi_URF;
-    double **affi_RF;
-    double **affi_match;
-    double **affi_SPR;
-    double **affi_geo;
+
+    double **affi_Recip_URF;
+    double **affi_Recip_RF;
+    double **affi_Recip_match;
+    double **affi_Recip_SPR;
+    double **affi_Recip_geo;
+
+    double **affi_Exp_URF;
+    double **affi_Exp_RF;
+    double **affi_Exp_match;
+    double **affi_Exp_SPR;
+    double **affi_Exp_geo;
 
     int affinityfile_size;
     double **fileaffinity;
 
     int file_distsize;
     double **dist_file;
-    double **affi_file;
+    double **affi_Recip_file;
+    double **affi_Exp_file;
     int file_coordinatesize;
     int file_coordinatedim;
     double **coord_file;

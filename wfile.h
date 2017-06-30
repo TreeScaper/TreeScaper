@@ -48,8 +48,8 @@ public:
 
 	File(String name)
 	{
-		fname = name;
-		fhandle.open(name);
+        fname = name;
+        fhandle.open(name);
 	}
 
 	~File()
@@ -79,6 +79,10 @@ public:
 	String prefix_name();
 
 	String postfix_name();
+
+    String prefix_name_lastof();
+
+    String postfix_name_lastof();
 
 private:
     std::fstream fhandle;

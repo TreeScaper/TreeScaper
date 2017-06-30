@@ -34,7 +34,7 @@ String EMPTY_STRING;
 // constructor: convert char * to String
 String::String(const char *s) : length(strlen(s))
 {
-	set_String(s);            // call utility function
+    set_String(s);            // call utility function
 }
 
 // copy constructor
@@ -54,9 +54,9 @@ const String &String::operator=(const String &right)
 {
 	if(&right != this)                 // avoid self assignment
 	{
-		delete [] str_ptr;             // prevents memory leak
-		length = right.length;         // new String length
-		set_String( right.str_ptr);    // call utility function
+        delete [] str_ptr;             // prevents memory leak
+        length = right.length;         // new String length
+        set_String( right.str_ptr);    // call utility function
 	} 
 	else
         std::cout << "warning: attempted assignment of a String to itself";
@@ -153,6 +153,7 @@ String String::before(char s)                        // return a subString
     }
     return (*this);
 }
+
 
 int String::get_length() const
 {

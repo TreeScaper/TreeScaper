@@ -37,10 +37,7 @@ Trees::Trees()
     StrToDist["Matching-distance"] = (void ***) &dist_match;
     str_matrix = (String)("SPR-distance");
     StrToDist["SPR-distance"] = (void ***) &dist_SPR;
-    str_matrix = (String)("Covariance Matrix");
-    StrToDist["Covariance Matrix"] = (void ***) &treecov;
-    str_matrix = (String)("File-covariance");
-    StrToDist["File-covariance"] = (void ***) &filecov;
+
     str_matrix = (String)("Weighted RF-distance");
     StrToDist["Weighted RF-distance"] = (void ***) &dist_RF;
     str_matrix = (String) "Geodesic-distance";
@@ -49,18 +46,38 @@ Trees::Trees()
     StrToDist["File-distance"] = (void ***) &dist_file;
     str_matrix = (String) "File-coordinate";
     StrToDist["File-coordinate"] = (void ***) &coord_file;
-    str_matrix = (String) "Affinity-URF";
-    StrToDist["Affinity-URF"] = (void ***) &affi_URF;
-    str_matrix = (String) "Affinity-RF";
-    StrToDist["Affinity-RF"] = (void ***) &affi_RF;
-    str_matrix = (String) "Affinity-match";
-    StrToDist["Affinity-match"] = (void ***) &affi_match;
-    str_matrix = (String) "Affinity-SPR";
-    StrToDist["Affinity-SPR"] = (void ***) &affi_SPR;
-    str_matrix = (String) "Affinity-geodesic";
-    StrToDist["Affinity-geodesic"] = (void ***) &affi_geo;
-    str_matrix = (String) "Affinity-filedist";
-    StrToDist["Affinity-filedist"] = (void ***) &affi_file;
+
+    str_matrix = (String)("Covariance Matrix");
+    StrToDist["Covariance Matrix"] = (void ***) &treecov;
+    str_matrix = (String)("File-covariance");
+    StrToDist["File-covariance"] = (void ***) &filecov;
+
+    str_matrix = (String) "Affinity-Reciprocal-URF";
+    StrToDist["Affinity-Reciprocal-URF"] = (void ***) &affi_Recip_URF;
+    str_matrix = (String) "Affinity-Reciprocal-RF";
+    StrToDist["Affinity-Reciprocal-RF"] = (void ***) &affi_Recip_RF;
+    str_matrix = (String) "Affinity-Reciprocal-match";
+    StrToDist["Affinity-Reciprocal-match"] = (void ***) &affi_Recip_match;
+    str_matrix = (String) "Affinity-Reciprocal-SPR";
+    StrToDist["Affinity-Reciprocal-SPR"] = (void ***) &affi_Recip_SPR;
+    str_matrix = (String) "Affinity-Reciprocal-geodesic";
+    StrToDist["Affinity-Reciprocal-geodesic"] = (void ***) &affi_Recip_geo;
+    str_matrix = (String) "Affinity-Reciprocal-filedist";
+    StrToDist["Affinity-Reciprocal-filedist"] = (void ***) &affi_Recip_file;
+
+    str_matrix = (String) "Affinity-Exponential-URF";
+    StrToDist["Affinity-Exponential-URF"] = (void ***) &affi_Exp_URF;
+    str_matrix = (String) "Affinity-Exponential-RF";
+    StrToDist["Affinity-Exponential-RF"] = (void ***) &affi_Exp_RF;
+    str_matrix = (String) "Affinity-Exponential-match";
+    StrToDist["Affinity-Exponential-match"] = (void ***) &affi_Exp_match;
+    str_matrix = (String) "Affinity-Exponential-SPR";
+    StrToDist["Affinity-Exponential-SPR"] = (void ***) &affi_Exp_SPR;
+    str_matrix = (String) "Affinity-Exponential-geodesic";
+    StrToDist["Affinity-Exponential-geodesic"] = (void ***) &affi_Exp_geo;
+    str_matrix = (String) "Affinity-Exponential-filedist";
+    StrToDist["Affinity-Exponential-filedist"] = (void ***) &affi_Exp_file;
+
     str_matrix = (String)("File-affinity");
     StrToDist["File-affinity"] = (void ***) &fileaffinity;
 
@@ -85,18 +102,26 @@ Trees::Trees()
     dist_match = NULL;
     dist_SPR = NULL;
     dist_geo = NULL;
-    affi_URF = NULL;
-    affi_RF = NULL;
-    affi_match = NULL;
-    affi_SPR = NULL;
-    affi_geo = NULL;
+
+    affi_Recip_URF = NULL;
+    affi_Recip_RF = NULL;
+    affi_Recip_match = NULL;
+    affi_Recip_SPR = NULL;
+    affi_Recip_geo = NULL;
+
+    affi_Exp_URF = NULL;
+    affi_Exp_RF = NULL;
+    affi_Exp_match = NULL;
+    affi_Exp_SPR = NULL;
+    affi_Exp_geo = NULL;
 
     affinityfile_size = 0;
     fileaffinity = NULL;
 
     file_distsize = 0;
     dist_file = NULL;
-    affi_file = NULL;
+    affi_Recip_file = NULL;
+    affi_Exp_file = NULL;
     file_coordinatesize = 0;
     file_coordinatedim = 0;
     coord_file = NULL;
@@ -129,15 +154,23 @@ void Trees::destructor()
     delete_double_array(dist_match, n_trees);
     delete_double_array(dist_SPR, n_trees);
     delete_double_array(dist_geo, n_trees);
-    delete_double_array(affi_URF, n_trees);
-    delete_double_array(affi_RF, n_trees);
-    delete_double_array(affi_match, n_trees);
-    delete_double_array(affi_SPR, n_trees);
-    delete_double_array(affi_geo, n_trees);
+
+    delete_double_array(affi_Recip_URF, n_trees);
+    delete_double_array(affi_Recip_RF, n_trees);
+    delete_double_array(affi_Recip_match, n_trees);
+    delete_double_array(affi_Recip_SPR, n_trees);
+    delete_double_array(affi_Recip_geo, n_trees);
+
+    delete_double_array(affi_Exp_URF, n_trees);
+    delete_double_array(affi_Exp_RF, n_trees);
+    delete_double_array(affi_Exp_match, n_trees);
+    delete_double_array(affi_Exp_SPR, n_trees);
+    delete_double_array(affi_Exp_geo, n_trees);
 
     delete_double_array(coord_file, file_coordinatesize);
     delete_double_array(dist_file, file_distsize);
-    delete_double_array(affi_file, file_distsize);
+    delete_double_array(affi_Recip_file, file_distsize);
+    delete_double_array(affi_Exp_file, file_distsize);
     delete_double_array(fileaffinity, affinityfile_size);
     delete_double_array(com_info, covariance_nonfree_id_size + 4);
 
@@ -303,8 +336,10 @@ void Trees::delete_matrix(String str_matrix)
 
 string Trees::make_DISToutput_name(String str_matrix)
 {
-    String result = treesfilename.c_str();
-    result = result.before('.');
+    string tmpfilename = treesfilename.c_str();
+    tmpfilename = tmpfilename.substr(0, tmpfilename.find_last_of("."));
+
+    String result = tmpfilename.c_str();
     result += "_";
 
     if(treesfilename != "")
@@ -321,7 +356,7 @@ string Trees::make_DISToutput_name(String str_matrix)
     }
 
     if(str_matrix == (String) "Unweighted RF-distance")
-        result += "RF-distance";
+        result += "URF-distance";
     else if(str_matrix == (String) "Weighted RF-distance")
         result += "RF-distance";
     else if(str_matrix == (String) "Covariance Matrix")
@@ -1269,13 +1304,14 @@ void Trees::Compute_Affinity_dist(String str_matrix, int type)
     double ratio = 0.1;
     if (str_matrix == (String)"Unweighted RF-distance")
     {
-        delete_double_array(affi_URF, n_trees);
-        affi_URF = new double *[n_trees];
-        for (int i = 0; i < n_trees; i++)
-            affi_URF[i] = new double [n_trees];
         switch(type)
         {
         case 1:
+            delete_double_array(affi_Recip_URF, n_trees);
+            affi_Recip_URF = new double *[n_trees];
+            for (int i = 0; i < n_trees; i++)
+                affi_Recip_URF[i] = new double [n_trees];
+
             for(int i = 0; i < n_trees; i++)
                 for(int j = 0; j < n_trees; j++)
                     if(dist_URF[i][j] > 0 && eps > dist_URF[i][j])
@@ -1285,27 +1321,33 @@ void Trees::Compute_Affinity_dist(String str_matrix, int type)
             for (int i = 0; i < n_trees; i++)
             {
                 for (int j = 0; j < n_trees; j++)
-                    affi_URF[i][j] = 1.0 / (eps + dist_URF[i][j]);
+                    affi_Recip_URF[i][j] = 1.0 / (eps + dist_URF[i][j]);
             }
             break;
         case 2:
+            delete_double_array(affi_Exp_URF, n_trees);
+            affi_Exp_URF = new double *[n_trees];
+            for (int i = 0; i < n_trees; i++)
+                affi_Exp_URF[i] = new double [n_trees];
+
             for (int i = 0; i < n_trees; i++)
             {
                 for (int j = 0; j < n_trees; j++)
-                    affi_URF[i][j] = exp(- dist_URF[i][j]);
+                    affi_Exp_URF[i][j] = exp(- dist_URF[i][j]);
             }
             break;
         }
     }
     else if (str_matrix == (String)"Weighted RF-distance")
     {
-        delete_double_array(affi_RF, n_trees);
-        affi_RF = new double *[n_trees];
-        for (int i = 0; i < n_trees; i++)
-            affi_RF[i] = new double [n_trees];
         switch(type)
         {
         case 1:
+            delete_double_array(affi_Recip_RF, n_trees);
+            affi_Recip_RF = new double *[n_trees];
+            for (int i = 0; i < n_trees; i++)
+                affi_Recip_RF[i] = new double [n_trees];
+
             for(int i = 0; i < n_trees; i++)
                 for(int j = 0; j < n_trees; j++)
                     if(dist_RF[i][j] > 0 && eps > dist_RF[i][j])
@@ -1315,27 +1357,33 @@ void Trees::Compute_Affinity_dist(String str_matrix, int type)
             for (int i = 0; i < n_trees; i++)
             {
                 for (int j = 0; j < n_trees; j++)
-                    affi_RF[i][j] = 1.0 / (eps + dist_RF[i][j]);
+                    affi_Recip_RF[i][j] = 1.0 / (eps + dist_RF[i][j]);
             }
             break;
         case 2:
+            delete_double_array(affi_Exp_RF, n_trees);
+            affi_Exp_RF = new double *[n_trees];
+            for (int i = 0; i < n_trees; i++)
+                affi_Exp_RF[i] = new double [n_trees];
+
             for (int i = 0; i < n_trees; i++)
             {
                 for (int j = 0; j < n_trees; j++)
-                    affi_RF[i][j] = exp(- dist_RF[i][j]);
+                    affi_Exp_RF[i][j] = exp(- dist_RF[i][j]);
             }
             break;
         }
     }
     else if (str_matrix == (String)"Matching-distance")
     {
-        delete_double_array(affi_match, n_trees);
-        affi_match = new double *[n_trees];
-        for (int i = 0; i < n_trees; i++)
-            affi_match[i] = new double [n_trees];
         switch(type)
         {
         case 1:
+            delete_double_array(affi_Recip_match, n_trees);
+            affi_Recip_match = new double *[n_trees];
+            for (int i = 0; i < n_trees; i++)
+                affi_Recip_match[i] = new double [n_trees];
+
             for(int i = 0; i < n_trees; i++)
                 for(int j = 0; j < n_trees; j++)
                     if(dist_match[i][j] > 0 && eps > dist_match[i][j])
@@ -1345,27 +1393,33 @@ void Trees::Compute_Affinity_dist(String str_matrix, int type)
             for (int i = 0; i < n_trees; i++)
             {
                 for (int j = 0; j < n_trees; j++)
-                    affi_match[i][j] = 1.0 / (eps + dist_match[i][j]);
+                    affi_Recip_match[i][j] = 1.0 / (eps + dist_match[i][j]);
             }
             break;
         case 2:
+            delete_double_array(affi_Exp_match, n_trees);
+            affi_Exp_match = new double *[n_trees];
+            for (int i = 0; i < n_trees; i++)
+                affi_Exp_match[i] = new double [n_trees];
+
             for (int i = 0; i < n_trees; i++)
             {
                 for (int j = 0; j < n_trees; j++)
-                    affi_match[i][j] = exp(- dist_match[i][j]);
+                    affi_Exp_match[i][j] = exp(- dist_match[i][j]);
             }
             break;
         }
     }
     else if (str_matrix == (String)"SPR-distance")
     {
-        delete_double_array(affi_SPR, n_trees);
-        affi_SPR = new double *[n_trees];
-        for (int i = 0; i < n_trees; i++)
-            affi_SPR[i] = new double [n_trees];
         switch(type)
         {
         case 1:
+            delete_double_array(affi_Recip_SPR, n_trees);
+            affi_Recip_SPR = new double *[n_trees];
+            for (int i = 0; i < n_trees; i++)
+                affi_Recip_SPR[i] = new double [n_trees];
+
             for(int i = 0; i < n_trees; i++)
                 for(int j = 0; j < n_trees; j++)
                     if(dist_SPR[i][j] > 0 && eps > dist_SPR[i][j])
@@ -1375,27 +1429,33 @@ void Trees::Compute_Affinity_dist(String str_matrix, int type)
             for (int i = 0; i < n_trees; i++)
             {
                 for (int j = 0; j < n_trees; j++)
-                    affi_SPR[i][j] = 1.0 / (eps + dist_SPR[i][j]);
+                    affi_Recip_SPR[i][j] = 1.0 / (eps + dist_SPR[i][j]);
             }
             break;
         case 2:
+            delete_double_array(affi_Exp_SPR, n_trees);
+            affi_Exp_SPR = new double *[n_trees];
+            for (int i = 0; i < n_trees; i++)
+                affi_Exp_SPR[i] = new double [n_trees];
+
             for (int i = 0; i < n_trees; i++)
             {
                 for (int j = 0; j < n_trees; j++)
-                    affi_SPR[i][j] = exp(- dist_SPR[i][j]);
+                    affi_Exp_SPR[i][j] = exp(- dist_SPR[i][j]);
             }
             break;
         }
     }
     else if(str_matrix == (String)"File-distance")
     {
-        delete_double_array(affi_file, file_distsize);
-        affi_file = new double *[file_distsize];
-        for (int i = 0; i < file_distsize; i++)
-            affi_file[i] = new double [file_distsize];
         switch(type)
         {
         case 1:
+            delete_double_array(affi_Recip_file, file_distsize);
+            affi_Recip_file = new double *[file_distsize];
+            for (int i = 0; i < file_distsize; i++)
+                affi_Recip_file[i] = new double [file_distsize];
+
             for(int i = 0; i < file_distsize; i++)
                 for(int j = 0; j < file_distsize; j++)
                     if(dist_file[i][j] > 0 && eps > dist_file[i][j])
@@ -1405,14 +1465,19 @@ void Trees::Compute_Affinity_dist(String str_matrix, int type)
             for (int i = 0; i < file_distsize; i++)
             {
                 for (int j = 0; j < file_distsize; j++)
-                    affi_file[i][j] = 1.0 / (eps + dist_file[i][j]);
+                    affi_Recip_file[i][j] = 1.0 / (eps + dist_file[i][j]);
             }
             break;
         case 2:
+            delete_double_array(affi_Exp_file, file_distsize);
+            affi_Exp_file = new double *[file_distsize];
+            for (int i = 0; i < file_distsize; i++)
+                affi_Exp_file[i] = new double [file_distsize];
+
             for (int i = 0; i < file_distsize; i++)
             {
                 for (int j = 0; j < file_distsize; j++)
-                    affi_file[i][j] = exp(- dist_file[i][j]);
+                    affi_Exp_file[i][j] = exp(- dist_file[i][j]);
             }
             break;
         }
@@ -1970,7 +2035,9 @@ string Trees::create_temp_name(String str_matrix)
         print_comm_array((double ***) StrToDist[str_matrix], treecov_size, outfile, true, highfreq, lowfreq);
      else if (str_matrix == (String)"File-covariance")
         print_comm_array((double ***) StrToDist[str_matrix], filecov_size, outfile, true, highfreq, lowfreq);
-     else if(str_matrix == (String)"Affinity-filedist")
+     else if(str_matrix == (String)"Affinity-Reciprocal-filedist")
+        print_comm_array((double ***) StrToDist[str_matrix], file_distsize, outfile, false, highfreq, lowfreq);
+     else if(str_matrix == (String)"Affinity-Exponential-filedist")
         print_comm_array((double ***) StrToDist[str_matrix], file_distsize, outfile, false, highfreq, lowfreq);
      else if(str_matrix == (String)"File-affinity")
         print_comm_array((double ***) StrToDist[str_matrix], affinityfile_size, outfile, false, highfreq, lowfreq);
@@ -2061,8 +2128,12 @@ string Trees::create_temp_name(String str_matrix)
          delete_double_array(com_info, covariance_nonfree_id_size + 4);
      srand(time(NULL));
      covariance_freeid_size = 0;
+     if(covariance_freeid != NULL)
+         delete [] covariance_freeid;
      covariance_freeid = NULL;
      covariance_nonfree_id_size = 0;
+     if(covariance_nonfree_id != NULL)
+         delete [] covariance_nonfree_id;
      covariance_nonfree_id = NULL;
      string temp_file = create_temp_name(str_matrix);
      double highfrequence = atof(highfreq.c_str());
@@ -2150,8 +2221,12 @@ string Trees::create_temp_name(String str_matrix)
          GreedyLouvain::iterate_randomly = stochastic;
          GreedyLouvain::detect_communities(community);
 
-         if(str_matrix == (String) "Affinity-URF" || str_matrix == (String) "Affinity-RF" || str_matrix == (String) "Affinity-match" ||
-                 str_matrix == (String) "Affinity-SPR" || str_matrix == (String) "Affinity-geodesic" || str_matrix == (String) "Affinity-filedist"
+         if(str_matrix == (String) "Affinity-Reciprocal-URF" || str_matrix == (String) "Affinity-Exponential-URF"
+                 || str_matrix == (String) "Affinity-Reciprocal-RF" || str_matrix == (String) "Affinity-Exponential-RF"
+                 || str_matrix == (String) "Affinity-Reciprocal-match" || str_matrix == (String) "Affinity-Exponential-match"
+                 || str_matrix == (String) "Affinity-Reciprocal-SPR" || str_matrix == (String) "Affinity-Exponential-SPR"
+                 || str_matrix == (String) "Affinity-Reciprocal-geodesic" || str_matrix == (String) "Affinity-Exponential-geodesic"
+                 || str_matrix == (String) "Affinity-Reciprocal-filedist" || str_matrix == (String) "Affinity-Exponential-filedist"
                   || str_matrix == (String) "File-affinity")
          {
              bool allsametopo = true;
@@ -2499,48 +2574,50 @@ string Trees::create_temp_name(String str_matrix)
 
      // output plateaus
 #ifdef COMMAND_LINE_VERSION
-     String fnamepla = treesfilename.c_str();
-     String outfname = treesfilename.c_str();
+     string stdnamepla = treesfilename.c_str();
+     string stdoutfname = treesfilename.c_str();
 #else
-     String fnamepla = commfilename.c_str();
-     String outfname = commfilename.c_str();
+     string stdnamepla = commfilename.c_str();
+     string stdoutfname = commfilename.c_str();
 #endif
-     fnamepla = fnamepla.before('.');
-     fnamepla += "_";
+     stdnamepla = stdnamepla.substr(0, stdnamepla.find_last_of("."));
+     stdnamepla += "_";
 
-     if (str_matrix != (String)"File-covariance" && str_matrix != (String) "Affinity-filedist"
-             && str_matrix != (String) "File-affinity")
+     if (str_matrix != (String)"File-covariance" && str_matrix != (String) "Affinity-Reciprocal-filedist"
+             && str_matrix != (String) "Affinity-Exponential-filedist" && str_matrix != (String) "File-affinity")
      {
         if(isrooted)
-            fnamepla += "rooted_";
+            stdnamepla += "rooted_";
         else
-            fnamepla += "unrooted_";
+            stdnamepla += "unrooted_";
 
         if(isweighted)
-            fnamepla += "weighted_";
+            stdnamepla += "weighted_";
         else
-            fnamepla += "unweighted_";
+            stdnamepla += "unweighted_";
      }
 
      if(str_matrix == (String) "Unweighted RF-distance")
-         fnamepla += "RF-distance";
+         stdnamepla += "RF-distance";
      else if(str_matrix == (String) "Weighted RF-distance")
-         fnamepla += "RF-distance";
+         stdnamepla += "RF-distance";
      else if(str_matrix == (String) "Covariance Matrix")
-         fnamepla += "Covariance_Matrix";
+         stdnamepla += "Covariance_Matrix";
      else
-         fnamepla += str_matrix;
+         stdnamepla += str_matrix;
 
      if(modelType == 3)
-         fnamepla += "_Configuration_Null_Model";
+         stdnamepla += "_Configuration_Null_Model";
      else if(modelType == 4)
-         fnamepla += "_Constant_Potts_Model";
+         stdnamepla += "_Constant_Potts_Model";
      else if(modelType == 2)
-         fnamepla += "_Erdos-Renyi_Null_Model";
+         stdnamepla += "_Erdos-Renyi_Null_Model";
      else if(modelType == 1)
-         fnamepla += "_No_Null_Model";
+         stdnamepla += "_No_Null_Model";
 
-     fnamepla += "_communities_auto_plateaus.out";
+     stdnamepla += "_communities_auto_plateaus.out";
+
+     String fnamepla(stdnamepla.c_str());
      File filepla(fnamepla);
      filepla.clean();
      if(! filepla.is_open())
@@ -2587,43 +2664,44 @@ string Trees::create_temp_name(String str_matrix)
      }
 
      // output communities information
-
-     outfname = outfname.before('.');
-     outfname += "_";
+     stdoutfname = stdoutfname.substr(0, stdoutfname.find_last_of("."));
+     stdoutfname += "_";
 
      if (str_matrix != (String)"File-covariance" && str_matrix != (String) "Affinity-filedist"
              && str_matrix != (String) "File-affinity")
      {
          if(isrooted)
-             outfname += "rooted_";
+             stdoutfname += "rooted_";
          else
-             outfname += "unrooted_";
+             stdoutfname += "unrooted_";
 
          if(isweighted)
-             outfname += "weighted_";
+             stdoutfname += "weighted_";
          else
-             outfname += "unweighted_";
+             stdoutfname += "unweighted_";
      }
 
      if(str_matrix == (String) "Unweighted RF-distance")
-         outfname += "RF-distance";
+         stdoutfname += "RF-distance";
      else if(str_matrix == (String) "Weighted RF-distance")
-         outfname += "RF-distance";
+         stdoutfname += "RF-distance";
      else if(str_matrix == (String) "Covariance Matrix")
-         outfname += "Covariance_Matrix";
+         stdoutfname += "Covariance_Matrix";
      else
-        outfname += str_matrix;
+        stdoutfname += str_matrix;
 
      if(modelType == 3)
-         outfname += "_Configuration_Null_Model";
+         stdoutfname += "_Configuration_Null_Model";
      else if(modelType == 4)
-         outfname += "_Constant_Potts_Model";
+         stdoutfname += "_Constant_Potts_Model";
      else if(modelType == 2)
-         outfname += "_Erdos-Renyi_Null_Model";
+         stdoutfname += "_Erdos-Renyi_Null_Model";
      else if(modelType == 1)
-         outfname += "_No_Null_Model";
+         stdoutfname += "_No_Null_Model";
 
-     outfname += "_community_auto_results.out";
+     stdoutfname += "_community_auto_results.out";
+
+     String outfname(stdoutfname.c_str());
      File file(outfname);
      file.clean();
      if(! file.is_open())
@@ -2896,47 +2974,48 @@ bool Trees::compute_community_manually(String str_matrix, int modelType, Array<d
     double lambda_neg;// = atof(param2.c_str());
 
 #ifdef COMMAND_LINE_VERSION
-     String outfname = treesfilename.c_str();
+     string stdoutfname = treesfilename.c_str();
 #else
-     String outfname = commfilename.c_str();
+     string stdoutfname = stdoutfname.c_str();
 #endif
+    stdoutfname = stdoutfname.substr(0, stdoutfname.find_last_of("."));
+    stdoutfname += "_";
 
-    outfname = outfname.before('.');
-    outfname += "_";
-
-    if (str_matrix != (String)"File-covariance" && str_matrix != (String) "Affinity-filedist"
-            && str_matrix != (String) "File-affinity")
+    if (str_matrix != (String)"File-covariance" && str_matrix != (String) "Affinity-Reciprocal-filedist"
+            && str_matrix != (String) "Affinity-Exponential-filedist" && str_matrix != (String) "File-affinity")
     {
         if(isrooted)
-            outfname += "rooted_";
+            stdoutfname += "rooted_";
         else
-            outfname += "unrooted_";
+            stdoutfname += "unrooted_";
 
         if(isweighted)
-            outfname += "weighted_";
+            stdoutfname += "weighted_";
         else
-            outfname += "unweighted_";
+            stdoutfname += "unweighted_";
     }
 
     if(str_matrix == (String) "Unweighted RF-distance")
-        outfname += "RF-distance";
+        stdoutfname += "RF-distance";
     else if(str_matrix == (String) "Weighted RF-distance")
-        outfname += "RF-distance";
+        stdoutfname += "RF-distance";
     else if(str_matrix == (String) "Covariance Matrix")
-        outfname += "Covariance_Matrix";
+        stdoutfname += "Covariance_Matrix";
     else
-       outfname += str_matrix;
+       stdoutfname += str_matrix;
 
     if(modelType == 3)
-        outfname += "_Configuration_Null_Model";
+        stdoutfname += "_Configuration_Null_Model";
     else if(modelType == 4)
-        outfname += "_Constant_Potts_Model";
+        stdoutfname += "_Constant_Potts_Model";
     else if(modelType == 2)
-        outfname += "_Erdos-Renyi_Null_Model";
+        stdoutfname += "_Erdos-Renyi_Null_Model";
     else if(modelType == 1)
-        outfname += "_No_Null_Model";
+        stdoutfname += "_No_Null_Model";
 
-    outfname += "_community_manual_results.out";
+    stdoutfname += "_community_manual_results.out";
+
+    String outfname(stdoutfname.c_str());
     File file(outfname);
     file.clean();
     if(! file.is_open())
@@ -3482,24 +3561,24 @@ string Trees::WriteSelectedTreesFilename(string type)
 {
 #ifndef COMMAND_LINE_VERSION
     QString qtname = get_treefilename_without_path();
-    string stdname = qtname.toStdString();
+    string outputname = qtname.toStdString();
 #else
-    string stdname = treesfilename;
+    string outputname = treesfilename;
 #endif
 
-    String outputname(stdname.c_str());
+    outputname = outputname.substr(0, outputname.find_last_of("."));
 
-    int i = 0;
-    while(outputname[i] != '.' && outputname[i] != '\0')
-        i++;
+//    int i = 0;
+//    while(outputname[i] != '.' && outputname[i] != '\0')
+//        i++;
 
-    outputname = outputname(0, i);
-    outputname += (String) "_selected_trees_";
-    outputname += (String) type.c_str();
+//    outputname = outputname(0, i);
+    outputname += "_selected_trees_";
+    outputname += type.c_str();
     outputname += ".out";
-    stdname = (char *) outputname;
+//    stdname = (char *) outputname;
 
-    return stdname;
+    return outputname;
 }
 
 void Trees::WriteSelectedTrees(string &outfile, Treefileformat tf) // newick nexus
@@ -4713,777 +4792,6 @@ cancelButtonSect2:
     return false;
 }
 
-//bool Trees::compute_community_automatically(String str_matrix, int modelType, string highfreq, string lowfreq)
-// {
-//    /* Set up progress bar */
-//    QProgressDialog dlg;
-//    dlg.setLabelText("Computing community detection...");
-//    dlg.setWindowModality(Qt::WindowModal);
-//    dlg.setMinimum(0);
-//    dlg.setMaximum(0);
-//    dlg.setValue(0);
-////    dlg.setMinimumDuration(500);
-//    dlg.show();
-
-//    bool cancelButtonFlag = false;
-//    /*---------------------*/
-
-//    if(com_info != NULL)
-//        delete_double_array(com_info, covariance_nonfree_id_size + 4);
-//    srand(time(NULL));
-//    covariance_freeid_size = 0;
-//    covariance_freeid = NULL;
-//    covariance_nonfree_id_size = 0;
-//    covariance_nonfree_id = NULL;
-//    string temp_file = create_temp_name(str_matrix);
-//    double highfrequence = atof(highfreq.c_str());
-//    double lowfrequence = atof(lowfreq.c_str());
-//    if ((str_matrix == (String)"Covariance Matrix" || str_matrix == (String) "File-covariance") && (highfrequence > 1.0 || highfrequence < 0.0
-//        || lowfrequence > 1.0 || lowfrequence < 0.0 || (highfrequence - lowfrequence) <= 0.0))
-//    {
-//        cout << "Warning: The high and low frequencies must be between 0 and 1!\n\n";
-//        return false;
-//    }
-//    print_community_file(str_matrix, temp_file, highfrequence, lowfrequence);
-//    char *infile = strdup(temp_file.c_str());
-//    string outf = create_out_name(str_matrix);
-//    char *outfile = strdup(outf.c_str());
-//    string nodef = create_node_name(str_matrix);
-//    char *node_map_file = strdup(nodef.c_str());
-//    string conff = create_conf_name(str_matrix);
-//    char *conf_file = strdup(conff.c_str());
-//    int is_weighted = 1;
-//    int is_directed = 1;
-//    int is_single_slice = 0;
-//    double interslice_weight = 1.0;
-
-//    int* conf = NULL;
-//    int* sign = NULL;
-//    double* lambda = NULL;
-
-//    Slicer s(infile, (double)interslice_weight, is_directed, is_weighted, is_single_slice);
-//    Graph* g = s.get_graph();
-//    g->display_binary(outfile);
-//    delete g;
-//    s.display_node_mapping(node_map_file);
-//    s.display_conf(conf_file, modelType);
-
-//    int layers = read_conf(conf_file, conf, sign);
-//    lambda = new double[layers];
-
-
-//    //----------------fixed lambda neg, find two lambda_+ ----------
-//    //----------------such that the numbers of community  ----------
-//    //----------------are minimum or maximum.             ----------
-
-//    double lambda_neg = 0;
-//    double lambda_pos_min = -1, lambda_pos_max = 1;
-//    Community * community;
-//    map<double, Community *> LamCommunities;
-//    map<double, Community *>::iterator it, it2;
-//    map<double, double> mods;
-//    int times = 0;
-//    int numNodes = 0;
-
-//    while(times <= 20)
-//    {
-//        create_resolution(lambda_pos_min, lambda_neg, layers, sign, lambda);
-//        community = new Community(outfile, conf, sign, lambda);
-//        int stochastic = 0;
-//        GreedyLouvain::iterate_randomly = stochastic;
-//        GreedyLouvain::detect_communities(community);
-//        if(community->nb_comm == 1)
-//        {
-//            numNodes = community->g->nb_nodes;
-//            mods[lambda_pos_min] = community->modularity();
-//            LamCommunities[lambda_pos_min] = community;
-//            break;
-//        } else
-//        {
-//            delete community;
-//            community = NULL;
-//            lambda_pos_min *= 2;
-//        }
-//        times++;
-
-//        if(dlg.wasCanceled())
-//        {
-//            cancelButtonFlag = true;
-//            break;
-//        }
-//    }
-//    if(times == 11)
-//    {
-//        cout << "Error: Cannot find lambda pos min!\n\n";
-//        return false;
-//    }
-
-//    if(cancelButtonFlag)
-//    {
-//        cout << "Community detection was canceled!\n\n";
-
-//        //delete temporary file
-//        free(infile);
-//        free(outfile);
-//        free(node_map_file);
-//        free(conf_file);
-
-//        free(conf);
-//        free(sign);
-//        if (lambda != NULL)
-//            delete [] lambda;
-
-//        for(it = LamCommunities.begin(); it != LamCommunities.end(); it++)
-//            delete it->second;
-
-//        const char *tempfile0 = temp_file.c_str();
-//        remove(tempfile0);
-//        const char *tempfile1 = outf.c_str();
-//        remove(tempfile1);
-//        const char *tempfile2 = nodef.c_str();
-//        remove(tempfile2);
-//        const char *tempfile3 = conff.c_str();
-//        remove(tempfile3);
-
-//        /* Close Progress Box */
-//        dlg.setValue(100);
-//        dlg.reset();
-//        dlg.close();
-//        /*--------------------*/
-
-//        return false;
-//    }
-
-//    times = 0;
-//    while(times <= 20)
-//    {
-//        create_resolution(lambda_pos_max, lambda_neg, layers, sign, lambda);
-//        community = new Community(outfile, conf, sign, lambda);
-//        int stochastic = 0;
-//        GreedyLouvain::iterate_randomly = stochastic;
-//        GreedyLouvain::detect_communities(community);
-
-//        if(str_matrix == (String) "Affinity-URF" || str_matrix == (String) "Affinity-RF" || str_matrix == (String) "Affinity-match" ||
-//                str_matrix == (String) "Affinity-SPR" || str_matrix == (String) "Affinity-geodesic" || str_matrix == (String) "Affinity-filedist"
-//                 || str_matrix == (String) "File-affinity")
-//        {
-//            bool allsametopo = true;
-//            double **affimatrix = *((double ***) StrToDist[(String) "Unweighted RF-distance"]);
-//            if(affimatrix != NULL)
-//            {
-//                double samevalue = affimatrix[0][0];
-//                for(int i = 0; i < community->nb_comm; i++)
-//                {
-//                    int repidx = -1;
-//                    for(int j = 0; j < covariance_nonfree_id_size; j++)
-//                    {
-//                        if(community->n2c[j] == i)
-//                        {
-//                            if(repidx == -1)
-//                            {
-//                                repidx = j;
-//                            } else
-//                            {
-//                                if(fabs(affimatrix[repidx][j] - samevalue) >= 1e-10)
-//                                {
-//                                    allsametopo = false;
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                if(allsametopo)
-//                {
-//                    mods[lambda_pos_max] = community->modularity();
-//                    LamCommunities[lambda_pos_max] = community;
-//                    break;
-//                }
-//            }
-//        }
-//        if(community->nb_comm == covariance_nonfree_id_size)
-//        {
-//            mods[lambda_pos_max] = community->modularity();
-//            LamCommunities[lambda_pos_max] = community;
-//            break;
-//        } else
-//        {
-//            delete community;
-//            community = NULL;
-//            lambda_pos_max *= 2;
-//        }
-//        times++;
-
-//        if(dlg.wasCanceled())
-//        {
-//            cancelButtonFlag = true;
-//            break;
-//        }
-//    }
-//    if(times == 11)
-//    {
-//        cout << "Error: Cannot find lambda pos max!\n\n";
-//        return false;
-//    }
-
-//    if(cancelButtonFlag)
-//    {
-//        cout << "Community detection was canceled!\n\n";
-
-//        //delete temporary file
-//        free(infile);
-//        free(outfile);
-//        free(node_map_file);
-//        free(conf_file);
-
-//        free(conf);
-//        free(sign);
-//        if (lambda != NULL)
-//            delete [] lambda;
-
-//        for(it = LamCommunities.begin(); it != LamCommunities.end(); it++)
-//            delete it->second;
-
-//        const char *tempfile0 = temp_file.c_str();
-//        remove(tempfile0);
-//        const char *tempfile1 = outf.c_str();
-//        remove(tempfile1);
-//        const char *tempfile2 = nodef.c_str();
-//        remove(tempfile2);
-//        const char *tempfile3 = conff.c_str();
-//        remove(tempfile3);
-
-//        /* Close Progress Box */
-//        dlg.setValue(100);
-//        dlg.reset();
-//        dlg.close();
-//        /*--------------------*/
-
-//        return false;
-//    }
-
-//    cout << "lambda neg: " << lambda_neg << endl;
-//    cout << "lambda pos min: " << lambda_pos_min << ", lambda pos max: " << lambda_pos_max << endl;
-
-//    queue<pair<double, double> > qq;
-//    pair<double, double> p, pp;
-//    vector<pair<double, double> > plateausLb(0);
-//    vector<pair<double, double> > plateausUb(0);
-//    bool SameAsFirst, SameAsSecond;
-//    double lambda_pos, plateaubound = 0;
-//    int atleastsearchnum = 0;
-//    p = make_pair(lambda_pos_min, lambda_pos_max);
-//    qq.push(p);
-
-//    // width first search
-//    cout << "The testing values of lambda pos are:" << endl;
-//    cout << lambda_pos_min << ", " << lambda_pos_max << ", ";
-//    while(!qq.empty())
-//    {
-//        pp = qq.front();
-//        qq.pop();
-//        lambda_pos = (pp.first + pp.second) / 2;
-//        cout << lambda_pos << ", ";
-//        std::cout.flush();
-//        create_resolution(lambda_pos, lambda_neg, layers, sign, lambda);
-//        community = new Community(outfile, conf, sign, lambda);
-//        int stochastic = 0;
-//        GreedyLouvain::iterate_randomly = stochastic;
-//        GreedyLouvain::detect_communities(community);
-
-//        SameAsFirst = false;
-//        if(lambda_pos_min == pp.first)
-//        {
-//            if(community->nb_comm == 1)
-//            {
-//                SameAsFirst = true;
-//                lambda_pos_min = lambda_pos;
-//            }
-//        } else
-//        {
-//            it = LamCommunities.find(pp.first);
-//            if(it != LamCommunities.end())
-//            {
-//                if(Community::IsSameCommunity(community, it->second))
-//                    SameAsFirst = true;
-//            }
-//        }
-//        SameAsSecond = false;
-//        if(lambda_pos_max == pp.second)
-//        {
-//            if(community->nb_comm == covariance_nonfree_id_size)
-//            {
-//                SameAsSecond = true;
-//                lambda_pos_max = lambda_pos;
-//            }
-//        } else
-//        {
-//            it = LamCommunities.find(pp.second);
-//            if(it != LamCommunities.end())
-//            {
-//                if(Community::IsSameCommunity(community, it->second))
-//                    SameAsSecond = true;
-//            }
-//        }
-//        mods[lambda_pos] = community->modularity();
-//        LamCommunities[lambda_pos] = community;
-
-//        // added new interval for testing
-//        if(!SameAsFirst && ((lambda_pos - pp.first) > plateaubound || plateaubound == 0 || LamCommunities.size() + qq.size() < atleastsearchnum))
-//        {
-//            qq.push(make_pair(pp.first, lambda_pos));
-//        }
-//        if(!SameAsSecond && ((pp.second - lambda_pos) > plateaubound || plateaubound == 0 || LamCommunities.size() + qq.size() < atleastsearchnum))
-//        {
-//            qq.push(make_pair(lambda_pos, pp.second));
-//        }
-
-//        // find plateaus
-//        if(SameAsFirst && community->nb_comm != 1)
-//        {
-//            if(plateaubound == 0)
-//                plateaubound = (lambda_pos - pp.first) / 2;
-//            int i;
-//            for(i = 0; i < plateausLb.size(); i++)
-//            {
-//                if(plateausLb[i].second == pp.first)
-//                {
-//                    plateausLb[i].second = lambda_pos;
-//                    break;
-//                }
-//            }
-//            if(i == plateausLb.size())
-//            {
-//                plateausLb.resize(plateausLb.size() + 1);
-//                plateausLb[plateausLb.size() - 1] = make_pair(pp.first, lambda_pos);
-//            }
-//        }
-//        if(SameAsSecond && community->nb_comm != covariance_nonfree_id_size)
-//        {
-//            if(plateaubound == 0)
-//                plateaubound = (pp.second - lambda_pos) / 2;
-//            int i;
-//            for(i = 0; i < plateausLb.size(); i++)
-//            {
-//                if(plateausLb[i].first == pp.second)
-//                {
-//                    plateausLb[i].first = lambda_pos;
-//                    break;
-//                }
-//            }
-//            if(i == plateausLb.size())
-//            {
-//                plateausLb.resize(plateausLb.size() + 1);
-//                plateausLb[plateausLb.size() - 1] = make_pair(lambda_pos, pp.second);
-//            }
-//        }
-
-//        if(dlg.wasCanceled())
-//        {
-//            cancelButtonFlag = true;
-//            break;
-//        }
-//    }
-//    cout << endl;
-
-//    if(cancelButtonFlag)
-//    {
-//        cout << "Community detection was canceled!\n\n";
-
-//        //delete temporary file
-//        free(infile);
-//        free(outfile);
-//        free(node_map_file);
-//        free(conf_file);
-
-//        free(conf);
-//        free(sign);
-//        if (lambda != NULL)
-//            delete [] lambda;
-
-//        for(it = LamCommunities.begin(); it != LamCommunities.end(); it++)
-//            delete it->second;
-
-//        const char *tempfile0 = temp_file.c_str();
-//        remove(tempfile0);
-//        const char *tempfile1 = outf.c_str();
-//        remove(tempfile1);
-//        const char *tempfile2 = nodef.c_str();
-//        remove(tempfile2);
-//        const char *tempfile3 = conff.c_str();
-//        remove(tempfile3);
-
-//        /* Close Progress Box */
-//        dlg.setValue(100);
-//        dlg.reset();
-//        dlg.close();
-//        /*--------------------*/
-
-//        return false;
-//    }
-
-//    cout << "The found plateaus are:" << endl;
-//    for(int i = 0; i < plateausLb.size(); i++)
-//        cout << "[" << plateausLb[i].first << ", " << plateausLb[i].second
-//             << "], length:" << plateausLb[i].second - plateausLb[i].first << ", number of communities:" <<
-//                LamCommunities[plateausLb[i].first]->nb_comm << endl;
-
-//    cout << "Detailed check lambda pos are (if necessary):" << endl;
-
-//    plateausUb.resize(plateausLb.size());
-//    for(int i = 0; i < plateausLb.size(); i++)
-//        plateausUb[i] = make_pair(plateausLb[i].first, plateausLb[i].second);
-
-//    double extstart, extend, max_length = 0;
-//    vector<int> totestidix(0);
-
-//    do{
-//        totestidix.resize(0);
-//        for(int i = 0; i < plateausUb.size(); i++)
-//        {
-//            extstart = plateausLb[i].first - (plateausLb[i].second - plateausLb[i].first);
-//            extend = plateausLb[i].second + (plateausLb[i].second - plateausLb[i].first);
-//            for(it = LamCommunities.begin(); it != LamCommunities.end(); it++)
-//            {
-//                if(it->first > extstart && it->first < plateausLb[i].first)
-//                    extstart = it->first;
-//                if(it->first < extend && it->first > plateausLb[i].second)
-//                    extend = it->first;
-//            }
-//            plateausUb[i].first = extstart;
-//            plateausUb[i].second = extend;
-//            if(plateausLb[i].second - plateausLb[i].first > max_length)
-//            {
-//                max_length = plateausLb[i].second - plateausLb[i].first;
-//            }
-//        }
-
-//        for(int i = 0; i < plateausLb.size(); i++)
-//        {
-//            if(plateausUb[i].second - plateausUb[i].first >= max_length)
-//            {
-//                totestidix.resize(totestidix.size() + 1);
-//                totestidix[totestidix.size() - 1] = i;
-//            }
-//        }
-//        if(totestidix.size() <= 1)
-//            break;
-//        else
-//        {
-//            for(int i = 0; i < totestidix.size(); i++)
-//            {
-//                int idx = totestidix[i];
-
-//                lambda_pos = (plateausUb[idx].first + plateausLb[idx].first) / 2;
-//                if(LamCommunities.find(lambda_pos) == LamCommunities.end())
-//                {
-//                    cout << lambda_pos << ", ";
-//                    std::cout.flush();
-//                    create_resolution(lambda_pos, lambda_neg, layers, sign, lambda);
-//                    community = new Community(outfile, conf, sign, lambda);
-//                    int stochastic = 0;
-//                    GreedyLouvain::iterate_randomly = stochastic;
-//                    GreedyLouvain::detect_communities(community);
-//                    mods[lambda_pos] = community->modularity();
-//                    LamCommunities[lambda_pos] = community;
-//                }
-//                it = LamCommunities.find(lambda_pos);
-//                it2 = LamCommunities.find(plateausLb[idx].first);
-//                if(Community::IsSameCommunity(it2->second, it->second))
-//                    plateausLb[idx].first = lambda_pos;
-//                else
-//                    plateausUb[idx].first = lambda_pos;
-//                lambda_pos = (plateausLb[idx].second + plateausUb[idx].second) / 2;
-//                if(LamCommunities.find(lambda_pos) == LamCommunities.end())
-//                {
-//                    cout << lambda_pos << ", ";
-//                    std::cout.flush();
-//                    create_resolution(lambda_pos, lambda_neg, layers, sign, lambda);
-//                    community = new Community(outfile, conf, sign, lambda);
-//                    int stochastic = 0;
-//                    GreedyLouvain::iterate_randomly = stochastic;
-//                    GreedyLouvain::detect_communities(community);
-//                    mods[lambda_pos] = community->modularity();
-//                    LamCommunities[lambda_pos] = community;
-//                }
-//                it = LamCommunities.find(lambda_pos);
-//                it2 = LamCommunities.find(plateausLb[idx].second);
-//                if(Community::IsSameCommunity(it2->second, it->second))
-//                    plateausLb[idx].second = lambda_pos;
-//                else
-//                    plateausUb[idx].second = lambda_pos;
-//            }
-//            cout << endl;
-//        }
-
-//        if(dlg.wasCanceled())
-//        {
-//            cancelButtonFlag = true;
-//            break;
-//        }
-
-//    } while(true);
-
-//    if(cancelButtonFlag)
-//    {
-//        cout << "Community detection was canceled!\n\n";
-
-//        //delete temporary file
-//        free(infile);
-//        free(outfile);
-//        free(node_map_file);
-//        free(conf_file);
-
-//        free(conf);
-//        free(sign);
-//        if (lambda != NULL)
-//            delete [] lambda;
-
-//        for(it = LamCommunities.begin(); it != LamCommunities.end(); it++)
-//            delete it->second;
-
-//        const char *tempfile0 = temp_file.c_str();
-//        remove(tempfile0);
-//        const char *tempfile1 = outf.c_str();
-//        remove(tempfile1);
-//        const char *tempfile2 = nodef.c_str();
-//        remove(tempfile2);
-//        const char *tempfile3 = conff.c_str();
-//        remove(tempfile3);
-
-//        /* Close Progress Box */
-//        dlg.setValue(100);
-//        dlg.reset();
-//        dlg.close();
-//        /*--------------------*/
-
-//        return false;
-//    }
-
-//    cout << "The found plateaus are:" << endl;
-//    for(int i = 0; i < plateausLb.size(); i++)
-//        cout << "[" << plateausUb[i].first << ":" << plateausLb[i].first << ", " << plateausLb[i].second
-//             << ":" << plateausUb[i].second << "], length lower bound:" <<
-//                plateausLb[i].second - plateausLb[i].first << ", length upper bound:" <<
-//                plateausUb[i].second - plateausUb[i].first << ", number of communities:" <<
-//                LamCommunities[plateausLb[i].first]->nb_comm << endl;
-
-//    com_info_col = LamCommunities.size() + 1;
-//    com_info = new double *[covariance_nonfree_id_size + 4];
-//    for(int i = 0; i < covariance_nonfree_id_size + 4; i++)
-//        com_info[i] = new double [com_info_col];
-
-//    com_info[0][0] = numNodes;
-
-//    com_info[1][0] = lambda_neg;
-//    com_info[2][0] = 0;
-//    com_info[3][0] = 0;
-//    for(int i = 0; i < covariance_nonfree_id_size; i++)
-//        com_info[i + 4][0] = covariance_nonfree_id[i];
-
-//    // compute labels of communities
-//    int k = 0;
-//    com_info[0][1] = 0;
-//    it = LamCommunities.begin();
-//    community = it->second;
-
-//    com_info[1][1] = it->first;
-//    com_info[2][1] = it->second->nb_comm;
-//    com_info[3][1] = mods[it->first];//---it->second->modularity();
-//    for(int i = 4; i < covariance_nonfree_id_size + 4; i++)
-//        com_info[i][1] = it->second->n2c[i - 4];
-
-//    it++;
-//    for(; it != LamCommunities.end(); it++)
-//    {
-//        k++;
-//        if(Community::IsSameCommunity(community, it->second)) // problem
-//            com_info[0][k + 1] = com_info[0][k];
-//        else
-//            com_info[0][k + 1] = com_info[0][k] + 1;
-//        community = it->second;
-//        com_info[1][k + 1] = it->first;
-//        com_info[2][k + 1] = it->second->nb_comm;
-//        com_info[3][k + 1] = mods[it->first];
-//        for(int i = 4; i < covariance_nonfree_id_size + 4; i++)
-//            com_info[i][k + 1] = it->second->n2c[i - 4];
-//    }
-///*
-//    int maxcommlength = 0;
-//    int currentcommlength = 1;
-//    int plateauidx = 1;
-//    for(int i = 2; i < lambdasize + 1; i++)
-//    {
-//        if(com_info[0][i] == com_info[0][i - 1])
-//            currentcommlength++;
-//        else
-//            currentcommlength = 1;
-//        if(currentcommlength > maxcommlength)
-//        {
-//            maxcommlength = currentcommlength;
-//            plateauidx = i;
-//        }
-//    }
-//    for(int i = 0; i < covariance_nonfree_id_size + 4; i++)
-//    {
-//        com_info[i][lambdasize + 1] = com_info[i][plateauidx];
-//    }
-//*/
-
-//    // output plateaus
-//    String fnamepla = treesfilename.c_str();
-//    fnamepla = fnamepla.before('.');
-//    fnamepla += "_";
-
-//    if(isrooted)
-//        fnamepla += "rooted_";
-//    else
-//        fnamepla += "unrooted_";
-
-//    if(isweighted)
-//        fnamepla += "weighted_";
-//    else
-//        fnamepla += "unweighted_";
-
-//    if(str_matrix == (String) "Unweighted RF-distance")
-//        fnamepla += "RF-distance";
-//    else if(str_matrix == (String) "Weighted RF-distance")
-//        fnamepla += "RF-distance";
-//    else if(str_matrix == (String) "Covariance Matrix")
-//        fnamepla += "Covariance_Matrix";
-//    else
-//        fnamepla += str_matrix;
-//    fnamepla += "_communities_auto_plateaus.out";
-//    File filepla(fnamepla);
-//    filepla.clean();
-//    if(! filepla.is_open())
-//    {
-//        cout << "Unable to open the file: " << fnamepla << "\n\n";
-//        return false;
-//    }
-//    filepla << "lengthLB:\t";
-//    for(int i = 0; i < plateausLb.size(); i++)
-//        filepla << plateausLb[i].second - plateausLb[i].first << "\t";
-//    filepla << "\n";
-//    filepla << "lengthUB:\t";
-//    for(int i = 0; i < plateausLb.size(); i++)
-//        filepla << plateausUb[i].second - plateausUb[i].first << "\t";
-//    filepla << "\n";
-//    filepla << "startUB:\t";
-//    for(int i = 0; i < plateausLb.size(); i++)
-//        filepla << plateausUb[i].first << "\t";
-//    filepla << "\n";
-//    filepla << "startLB:\t";
-//    for(int i = 0; i < plateausLb.size(); i++)
-//        filepla << plateausLb[i].first << "\t";
-//    filepla << "\n";
-//    filepla << "endLB:\t";
-//    for(int i = 0; i < plateausLb.size(); i++)
-//        filepla << plateausLb[i].second << "\t";
-//    filepla << "\n";
-//    filepla << "endUB:\t";
-//    for(int i = 0; i < plateausLb.size(); i++)
-//        filepla << plateausUb[i].second << "\t";
-//    filepla << "\n";
-//    if (str_matrix == (String) "Covariance Matrix")
-//       filepla << "Bipartition index" << "\t" << "Community Index" << "\n";
-//    else
-//        filepla << "Tree index" << "\t" << "Community Index" << "\n";
-//    for(int i = 0; i < covariance_nonfree_id_size; i++)
-//    {
-//        filepla << covariance_nonfree_id[i] << "\t";
-//        for(int j = 0; j < plateausLb.size(); j++)
-//        {
-//            filepla << LamCommunities[plateausLb[j].first]->n2c[i] << "\t";
-//        }
-//        filepla << "\n";
-//    }
-
-//    // output communities information
-//    String outfname = treesfilename.c_str();
-//    outfname = outfname.before('.');
-//    outfname += "_";
-
-//    if(isrooted)
-//        outfname += "rooted_";
-//    else
-//        outfname += "unrooted_";
-
-//    if(isweighted)
-//        outfname += "weighted_";
-//    else
-//        outfname += "unweighted_";
-
-//    if(str_matrix == (String) "Unweighted RF-distance")
-//        outfname += "RF-distance";
-//    else if(str_matrix == (String) "Weighted RF-distance")
-//        outfname += "RF-distance";
-//    else if(str_matrix == (String) "Covariance Matrix")
-//        outfname += "Covariance_Matrix";
-//    else
-//       outfname += str_matrix;
-
-//    outfname += "_community_auto_results.out";
-//    File file(outfname);
-//    file.clean();
-//    if(! file.is_open())
-//    {
-//        cout << "Unable to open the file: " << outfname << "\n\n";
-//        return false;
-//    }
-
-//    for(int i = 0; i < covariance_nonfree_id_size + 4; i++)
-//    {
-//        if (i == 0)
-//        {
-//            if (str_matrix == (String) "Covariance Matrix")
-//               file << "Same community as previous or not (first number is number of bipartitions)" << "\n";
-//            else
-//               file << "Same community as previous or not (first number is number of trees)" << "\n";
-//        }
-//        else if (i == 1)
-//            file << "Value of lambda: "<< "\n";
-//        else if (i == 2)
-//            file << "Number of communities: " << "\n";
-//        else if (i == 3)
-//            file << "Value of modularity: " << "\n";
-//        else if (i == 4)
-//        {
-//            if (str_matrix == (String) "Covariance Matrix")
-//               file << "Community index (first column is bipartition index): " << "\n";
-//            else
-//                file << "Community index (first column is tree index): " << "\n";
-//        }
-//        for(int j = 0; j < com_info_col; j++)
-//            file << com_info[i][j] << "\t";
-//        file << "\n";
-//    }
-
-//    //delete temporary file
-//    free(infile);
-//    free(outfile);
-//    free(node_map_file);
-//    free(conf_file);
-
-//    free(conf);
-//    free(sign);
-//    if (lambda != NULL)
-//        delete [] lambda;
-
-//    for(it = LamCommunities.begin(); it != LamCommunities.end(); it++)
-//        delete it->second;
-
-//    const char *tempfile0 = temp_file.c_str();
-//    remove(tempfile0);
-//    const char *tempfile1 = outf.c_str();
-//    remove(tempfile1);
-//    const char *tempfile2 = nodef.c_str();
-//    remove(tempfile2);
-//    const char *tempfile3 = conff.c_str();
-//    remove(tempfile3);
-
-//    cout << "Output community results to file: " << outfname << " and " << fnamepla << "\n\n";
-//    return true;
-// }
 #endif
 
 #endif
