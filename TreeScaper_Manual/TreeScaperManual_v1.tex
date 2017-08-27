@@ -1271,7 +1271,7 @@ method), $\mathcal{H}$ is defined for the set of all communities, $\{\sigma\}$, 
 \begin{equation}\label{eq:NoNullModel}
 \mathcal{H}(\{\sigma\}) = - \displaystyle\sum_{i,j} A_{i,j} \delta(\sigma_{i}, \sigma{j}),
 \end{equation}
-where the sum is over all nodes $i$ and $j$, $A_{i,j}$ is the adjacency between nodes $i$ and $j$ (i.e., is there exists an edge connecting nodes $i$ and $j$), and $\sigma_{i}$ is the community to which bipartition $i$ belongs. $\delta(?_{i}, \sigma_{j})$ is defined as $1$ when $i$ and $j$ are in the same community, and $0$ otherwise. The NNM contains no tunable parameters and is generally of the least interest, since its Hamiltonian has only one global optimum with all nodes in a single community. However, local optima could be of some interest. \\
+where the sum is over all nodes $i$ and $j$, $A_{i,j}$ is the adjacency between nodes $i$ and $j$ (i.e., is there exists an edge connecting nodes $i$ and $j$), and $\sigma_{i}$ is the community to which bipartition $i$ belongs. $\delta(\sigma_{i}, \sigma_{j})$ is defined as $1$ when $i$ and $j$ are in the same community, and $0$ otherwise. The NNM contains no tunable parameters and is generally of the least interest, since its Hamiltonian has only one global optimum with all nodes in a single community. However, local optima could be of some interest. \\
 
 
 One way to refine our approach to community detection beyond the NNM involves first
@@ -1338,7 +1338,7 @@ For the Constant Potts Model (CPM), $\mathcal{H}$ is given by
 \begin{equation}\label{eq:CNModel2}
 \mathcal{H}(\{\sigma\}) = - \displaystyle\sum_{i,j} \left[A_{i,j} -  c^{2}\left(\lambda^{+} - \lambda^{-}\right)\right]\delta(\sigma_{i}, \sigma{j}),
 \end{equation}
-where all terms are as above. As with the other models, changing the values of the ? tuning
+where all terms are as above. As with the other models, changing the values of the $\lambda$ tuning
 parameters affects the preferred community size. If $\lambda^{+} > \lambda^{-}$, small communities are preferred. If $\lambda^{-} > \lambda^{+}$, large communities are preferred. \\
 
 
