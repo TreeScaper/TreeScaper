@@ -336,10 +336,8 @@ void Trees::delete_matrix(String str_matrix)
 
 string Trees::make_DISToutput_name(String str_matrix)
 {
-    string tmpfilename = treesfilename.c_str();
-    tmpfilename = tmpfilename.substr(0, tmpfilename.find_last_of("."));
-
-    String result = tmpfilename.c_str();
+    String result = treesfilename.c_str();
+    result = result.before('.');
     result += "_";
 
     if(treesfilename != "")
@@ -356,7 +354,7 @@ string Trees::make_DISToutput_name(String str_matrix)
     }
 
     if(str_matrix == (String) "Unweighted RF-distance")
-        result += "URF-distance";
+        result += "RF-distance";
     else if(str_matrix == (String) "Weighted RF-distance")
         result += "RF-distance";
     else if(str_matrix == (String) "Covariance Matrix")
@@ -435,7 +433,9 @@ void Trees::print_matrix(String str_matrix, string outfile)
     else if(str_matrix == (String)"File-affinity")
         print_double_array((double ***) StrToDist[str_matrix], affinityfile_size, outfile);
     else
+    {
         print_double_array((double ***) StrToDist[str_matrix], n_trees, outfile);
+    }
 }
 
 void Trees::initialTrees(string fname)
@@ -2416,6 +2416,7 @@ string Trees::create_temp_name(String str_matrix)
 
      do{
          totestidix.resize(0);
+
          for(int i = 0; i < plateausUb.size(); i++)
          {
              extstart = plateausLb[i].first - (plateausLb[i].second - plateausLb[i].first);
@@ -2429,6 +2430,7 @@ string Trees::create_temp_name(String str_matrix)
              }
              plateausUb[i].first = extstart;
              plateausUb[i].second = extend;
+
              if(plateausLb[i].second - plateausLb[i].first > max_length)
              {
                  max_length = plateausLb[i].second - plateausLb[i].first;
@@ -2437,7 +2439,7 @@ string Trees::create_temp_name(String str_matrix)
 
          for(int i = 0; i < plateausLb.size(); i++)
          {
-             if(plateausUb[i].second - plateausUb[i].first >= max_length)
+             if(((plateausUb[i].second - plateausUb[i].first) - max_length) >= 0.000001)
              {
                  totestidix.resize(totestidix.size() + 1);
                  totestidix[totestidix.size() - 1] = i;

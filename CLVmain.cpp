@@ -309,7 +309,7 @@ int main(int argc, char* argv[])
         std::cout << "./CLVTreeScaper -dimest -f {test.out} -i {DIS,COR} -e {CORR_DIM,NN_DIM,MLE_DIM}\n";
     } else
     {
-        cout << "Error: Input error!" << endl;
+        cout << "Error: input error!" << endl;
     }
     
     return 0;
@@ -319,14 +319,24 @@ void trees_driver(map<String, String> &paras)
 {
     String fname = paras["-f"];
     string stdfname = (char *) fname;
+    
+//     std::cout << "\nTest1: fname = " << stdname << std::endl;
         
     File file(fname);
     if(! file.is_open())
     {
-        cout << "Error: Cannot open the data file!" << endl;
+        cout << "Error: can not open the data file!" << endl;
         return;
     }
 
+// 	ifstream file;
+//     file.open(stdfname);
+//     if(!file.is_open())
+//     {
+//         cout << "Error: can not open the data file!" << endl;
+//         return;
+//     }
+    
     Trees *TreesData = new Trees;
     if(paras["-ft"] == (String) "Trees")
     {
@@ -366,7 +376,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
         TreesData->Compute_Hash();
         TreesData->Compute_Bipart_Matrix();
     
-        cout << "Successfully computed bipartition matrix." << endl;
+        cout << "Successfully computed bipartitation matrix." << endl;
         
         String fname = paras["-f"];
         string stdfname = (char *) fname;
@@ -387,7 +397,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
             TreesData->OutputBipartitionMatrix(outBipartMatrix, FULLMATRIX);
         } else
         {
-            cout << "Error: Setting of -bfm is not correct. Unable to output bipartition matrix" << endl;
+            cout << "Error: setting of -bfm is not correct. Unable to output bipartition matrix" << endl;
             return;
         }
     }
@@ -532,7 +542,7 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
         } 
         else
         {
-              cout << "Error: Setting of -dm is not correct. Unable to compute distance matrix" << endl;
+              cout << "Error: setting of -dm is not correct. Unable to compute distance matrix" << endl;
               return;
         }
     
@@ -576,14 +586,38 @@ void Compute_Affinity(Trees *TreesData, map<String, String> &paras, String memor
         TreesData->Compute_Affinity_dist(memorydata, 1);
     } else
     {
-        std::cout << "Error: Setting of -am is not correct. Unable to compute Affinity matrix" << std::endl;
+        std::cout << "Error: setting of -am is not correct. Unable to compute Affinity matrix" << std::endl;
         return;
     }
     cout << "Succeed in computing affinity matrix" << endl;
-    if(paras["-am"] == (String) "Exp")
+    
+    if(paras["-ft"] == (String) "Trees")
     {
-    	if(paras["-ft"] == (String) "Trees")
+    	if(paras["-am"] == (String) "Rec")
     	{
+    		if(paras["-dm"] == (String) "URF")
+        	{
+            	memorydata = (String) "Affinity--Reciprocal-URF";
+        	}
+        	else
+        	if(paras["-dm"] == (String) "RF")
+        	{
+            	memorydata = (String) "Affinity--Reciprocal-RF";
+        	}
+        	else
+        	if(paras["-dm"] == (String) "Mat")
+        	{
+            	memorydata = (String) "Affinity--Reciprocal-match";
+        	}
+        	else
+        	if(paras["-dm"] == (String) "SPR")
+        	{
+            	memorydata = (String) "Affinity--Reciprocal-SPR";
+        	}
+        }
+        else
+        if(paras["-am"] == (String) "Exp")
+        {
         	if(paras["-dm"] == (String) "URF")
         	{
             	memorydata = (String) "Affinity-Exponential-URF";
@@ -602,49 +636,16 @@ void Compute_Affinity(Trees *TreesData, map<String, String> &paras, String memor
         	if(paras["-dm"] == (String) "SPR")
         	{
             	memorydata = (String) "Affinity-Exponential-SPR";
-        	} 
-    	} else
-    	if(paras["-ft"] == (String) "Dist")
-    	{
-        	memorydata = (String) "Affinity-Exponential-filedist";
-    	} else
-    	{
-        	cout << "Error: Incorrect affinity matrix." << endl;
-        	return;
-    	}
-    }
-    else if(paras["-am"] == (String) "Rec")
+        	}
+        }
+    } else
+    if(paras["-ft"] == (String) "Dist")
     {
-    	if(paras["-ft"] == (String) "Trees")
-    	{
-        	if(paras["-dm"] == (String) "URF")
-        	{
-            	memorydata = (String) "Affinity-Reciprocal-URF";
-        	}
-        	else
-        	if(paras["-dm"] == (String) "RF")
-        	{
-            	memorydata = (String) "Affinity-Reciprocal-RF";
-        	}
-        	else
-        	if(paras["-dm"] == (String) "Mat")
-        	{
-            	memorydata = (String) "Affinity-Reciprocal-match";
-        	}
-        	else
-        	if(paras["-dm"] == (String) "SPR")
-        	{
-            	memorydata = (String) "Affinity-Reciprocal-SPR";
-        	} 
-    	} else
-    	if(paras["-ft"] == (String) "Dist")
-    	{
-        	memorydata = (String) "Affinity-Reciprocal-filedist";
-    	} else
-    	{
-        	cout << "Error: Incorrect affinity matrix." << endl;
-        	return;
-    	}
+        memorydata = (String) "Affinity-filedist";
+    } else
+    {
+        cout << "Error: incorrect affinity matrix." << endl;
+        return;
     }
     
     string outAffName = TreesData->make_DISToutput_name(memorydata);
@@ -670,7 +671,7 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
         File file(idxfname);
         if(! file.is_open())
         {
-            cout << "Error: Cannot open the data file!" << endl;
+            cout << "Error: can not open the data file!" << endl;
             return;
         }
         file.seek(0);
@@ -688,15 +689,15 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
     if(paras["-ct"] == (String) "Majority")
     {
         if(TreesData->compute_consensus_tree(MAJORITYTREE, ""))
-            std::cout << "Successfully computed the majority consensus tree!" << std::endl;
+            std::cout << "successfully computed the majority consensus tree!" << std::endl;
     } else
     if(paras["-ct"] == (String) "Strict")
     {
         if(TreesData->compute_consensus_tree(STRICTTREE, ""))
-            std::cout << "Successfully computed the strict consensus tree!" << std::endl;
+            std::cout << "successfully computed the strict consensus tree!" << std::endl;
     } else
     {
-          cout << "Error: Setting of -ct is not correct. Unable to compute consensus tree." << endl;
+          cout << "error: setting of -ct is not correct. Unable to compute consensus tree." << endl;
           return;
     }
     
@@ -717,18 +718,18 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
     if(paras["-cfm"] == (String) "Newick")
     {
         TreesData->WriteConsensusTree(outName, NEWICK);
-        cout << "Successfully outputted Newick format trees to file: " << confname << endl;
+        cout << "successfully outputted Newick format trees to file: " << confname << endl;
     }
     else
     if(paras["-cfm"] == (String) "Nexus")
     {
         TreesData->WriteConsensusTree(outName, NEXUS);
-        cout << "Successfully outputted Nexus format trees to file: " << confname << endl;
+        cout << "successfully outputted Nexus format trees to file: " << confname << endl;
     } else
     {
-          cout << "Warning: Setting of -cfm is not correct. Output consensus tree to Nexus format." << endl;
+          cout << "warning: setting of -cfm is not correct. output consensus tree to Nexus format." << endl;
         TreesData->WriteConsensusTree(outName, NEXUS);
-        cout << "Successfully outputted Nexus format trees to file: " << confname << endl;
+        cout << "successfully outputted Nexus format trees to file: " << confname << endl;
           return;
     }
 }
