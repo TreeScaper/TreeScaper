@@ -31,6 +31,12 @@ PlotTreethread::PlotTreethread(QObject *parent)
 
 PlotTreethread::~PlotTreethread()
 {
+#ifdef _LINUX
+    delete lpplottree;
+#endif
+#ifdef _WINDOWS
+    delete lpplottree;
+#endif
 };
 
 void PlotTreethread::initialization(image_parameters plotparas, const NEWICKTREE *intree, bool inisrooted, bool inisweighted, const LabelMap *inleaveslm, String title)
@@ -46,13 +52,20 @@ void PlotTreethread::initialization(image_parameters plotparas, const NEWICKTREE
     this->exec();
     delete lpplottree;
 #endif
+#ifdef _LINUX
+    lpplottree->Initialize_PlotTree(tree, isrooted, isweighted, leaveslm, title);
+#endif
+#ifdef _WINDOWS
+    lpplottree->Initialize_PlotTree(tree, isrooted, isweighted, leaveslm, title);
+#endif
 };
 
 void PlotTreethread::run()
 {
-    /*
+
 #ifdef _LINUX
-    if(paras::plot_type == (String) "Points")
+    this->exec();
+/*    if(paras::plot_type == (String) "Points")
     {
         lpimage->Load_points_with_selection();
         if(paras::is_sort_volume)
@@ -71,10 +84,14 @@ void PlotTreethread::run()
     if(paras::plot_makemovie)
         lpimage->make_movie();
 
-    delete lpimage;
+    delete lpimage;*/
 #endif
 
 #ifdef _WINDOWS
+    this->exec();
+/*    lpplottree->Initialize_PlotTree(tree, isrooted, isweighted, leaveslm, title);
+    this->exec();
+    delete lpplottree;
     if(paras::plot_type == (String) "Points")
     {
         lpimage->Load_points_with_selection();
@@ -94,8 +111,8 @@ void PlotTreethread::run()
     if(paras::plot_makemovie)
         lpimage->make_movie();
 
-    delete lpimage;
-#endif*/
+    delete lpimage;*/
+#endif
 }
 
 #endif // WPlotTreethread_CPP
