@@ -4191,11 +4191,11 @@ clearMemory:
 
 bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
 {
-    if(!isweighted && ISWEIGHTED)
-    {
-        cout << "Warning: The trees in memory are unweighted! Unable to compute weighted RF distances!\n\n";
-        return false;
-    }
+//    if(!isweighted && ISWEIGHTED)
+//    {
+//        cout << "Warning: The trees in memory are unweighted! Unable to compute weighted RF distances!\n\n";
+//        return false;
+//    }
 
     bool bUbid = false; // for counting the number pf unique bipartitions
     unsigned long uBID = 0;

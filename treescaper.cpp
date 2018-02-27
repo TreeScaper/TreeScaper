@@ -550,7 +550,7 @@ void TreeScaper::on_pushNLDRrun_clicked()
 
     if(nldrthd.isRunning())
     {
-        cout << "Warning : NLDR is running already!\n\n";
+        cout << "Warning: NLDR is running already!\n\n";
         return;
     }
 
@@ -1430,6 +1430,12 @@ void TreeScaper::on_pushDISTrun_clicked()
     else
     if(method == (String) "Unweighted Robinson Foulds")
     {
+        if(TreesData->Get_isweighted())
+        {
+            cout << "Warning: The trees in memory are weighted! Unable to compute unweighted RF distances!\n\n";
+            return;
+        }
+
         if(!TreesData->bipartmatrixIsexisting())
         {
             int Msg = QMessageBox::question(this, "Missing Data", "Warning: There is no bipartition matrix in the memory! Do you want to"
