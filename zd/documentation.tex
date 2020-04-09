@@ -1,0 +1,723 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc} \usepackage{lmodern}
+
+\usepackage{amsmath}
+\usepackage{mathrsfs}
+%\usepackage{eufrak}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{a4wide}
+\usepackage{color}
+\usepackage{verbatim}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, calc}
+
+\usepackage{contour}
+\usepackage{ulem}
+
+\renewcommand{\ULdepth}{1.6pt}
+\contourlength{0.8pt}
+
+\newcommand{\myuline}[1]{%
+	\uline{\phantom{#1}}%
+	\llap{\contour{white}{#1}}%
+}
+
+
+
+
+\newcommand{\RNum}[1]{\uppercase\expandafter{\romannumeral #1\relax}}
+
+\newcommand{\mrref}[1]{\texttt{#1}\label{#1}}
+\newcommand{\mmemref}[2]{\texttt{#1}\label{#2#1}}
+\newcommand{\mtref}[2]{\texttt{#1}\label{#2}}
+\newcommand{\rref}[1]{\hyperref[#1]{\textcolor{blue}{\myuline{\texttt{#1}}}}}
+\newcommand{\tref}[2]{\hyperref[#2]{\textcolor{blue}{\myuline{\texttt{#1}}}}}
+\newcommand{\memref}[2]{\hyperref[#2#1]{\textcolor{blue}{\myuline{#2::\texttt{#1}}}}}
+
+
+
+
+\usepackage{graphicx}
+\graphicspath{ {figures/} }
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{bm}
+\usepackage{mathtools}
+\usepackage{amsthm}
+%\usepackage{enumerate}
+%\usepackage{algorithm}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+%\usepackage{algorithmic}
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[section]
+
+\theoremstyle{definition}
+\newtheorem{remark}[defn]{Remark}
+
+
+\numberwithin{equation}{section}
+
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+
+\title{Comments for TreeScaper}
+\author{Zhifeng Deng}
+
+	
+		
+
+\begin{document}
+	\maketitle
+	
+	\section*{Data structure}
+	
+	\begin{enumerate}
+		\item \mrref{Ptree}
+		
+			\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.6\textwidth}}
+				Description & \multicolumn{2}{p{0.8\textwidth}}{Index base array-type unweighted tree with adjacency matrix.} \\
+				Member & \mtref{leaf\_number}{leafnumber} &\\
+				&*\mmemref{parent}{Ptree} & Array of indices of the parent.\\
+				&*\mmemref{lchild}{Ptree} & Array of indices of the right child.\\
+				&*\mmemref{rchild}{Ptree} & Array of indices of the left child.\\
+				&**\mmemref{edge}{Ptree}  & Adjacency matrix.\\
+				Member function& none &  \\
+			\end{tabular}
+		
+		\item \mrref{NEWICKNODE}
+		
+			\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+				Description & \multicolumn{2}{p{0.6\textwidth}}{Linked node pointed to its children and parent.} \\
+				Member & \mmemref{Nchildren}{NEWICKNODE}  & Number of children.\\
+				& \mmemref{label}{NEWICKNODE} &\\
+				& \mmemref{weight}{NEWICKNODE} &\\
+				& *\mmemref{child}{NEWICKNODE} & List of children.\\
+				& \mmemref{hv1}{NEWICKNODE} & Hash value for unknown use.\\
+				& \mmemref{hv2}{NEWICKNODE} & Hash value that identifies the bipartition.\\
+				& \mmemref{bitstr}{NEWICKNODE} & Bit string that represents the leaves contained in the (sub-)tree.\\
+				& \mmemref{parent}{NEWICKNODE} & \\
+				Member function& none  &  \\
+			\end{tabular}
+
+		
+		\item \mrref{NEWICKTREE}
+		
+			\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+				Description & \multicolumn{2}{p{0.6\textwidth}}{A \rref{NEWICKNODE} that represents the root.} \\
+				Member & \mmemref{root}{NEWICKTREE}  & A \rref{NEWICKNODE}.\\
+				Member function& none  &  \\
+			\end{tabular}
+
+		
+		\item \mrref{TreeOPE}
+		
+			\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+				Description & \multicolumn{2}{p{0.6\textwidth}}{Operation associated to one \rref{NEWICKTREE}. Note that most of the method are implemented in recursive preorder.} \\
+				Member &   & \\
+				&   &\\
+				Member function& \rref{loadnewicktree} &  Read \rref{NEWICKTREE}.\\
+				& \rref{loadnewicktree2} & Read \rref{NEWICKTREE}.\\
+				& \rref{floadnewicktree} & Read \rref{NEWICKTREE}.\\
+				& \rref{loadnode} & Read \rref{NEWICKTREE}.\\
+				& \rref{loadleaf} & Read \rref{NEWICKTREE}.\\
+				& \rref{parsetree} & Read \rref{NEWICKTREE}.\\
+				& \rref{parsenode} & Read \rref{NEWICKTREE}.\\
+				& \rref{parseleaf} & Read \rref{NEWICKTREE}.\\		
+				& \rref{addchild} & Link child to the parent.\\
+				& \tref{dfs\_compute\_hash}{dfscomputehash}  &  Assigned hash values to all (sub-)tree which identifies the structure and therefore the bipartition.\\
+				& \rref{bipart} & Store hash values in one big array for computing RF distance.\\
+				& \rref{findleaf} & Find a leaf by the \memref{label}{NEWICKNODE}.\\
+				& \rref{normalizedTree} & Lift a unrooted tree to a rooted tree.\\
+				& \rref{newick2lcbb} & Convert \rref{NEWICKTREE} to \rref{Ptree} for computing matching distance.\\
+				& \rref{newick2ptree} & Implementation of \rref{newick2lcbb}.\\
+				& \rref{sumofdegree} & \\
+				& \rref{bipartcount} & Count the occurrence of particular bipartition.\\
+				& \rref{Addbipart} & Insert nodes to the current tree so that there exist a (sub-)tree that contains only a given set of leaves.
+				
+			\end{tabular}
+
+		\item \mrref{Trees}
+		
+			\begin{tabular}{>{\bfseries}lp{0.3\textwidth}p{0.3\textwidth}}
+				Description & \multicolumn{2}{p{0.6\textwidth}}{Multiple \rref{NEWICKTREE}s with member function that computes different distances.} \\
+				Member &   & \\
+				Member function & \rref{initialTrees} & Read trees from file. \\
+				& \rref{ReadTrees} & Read trees from file. \\
+				& \tref{compute\_numofbipart}{computenumofbipart} & \\
+				& \tref{Compute\_Hash}{ComputeHash} & Generate hash table for computing hash values in a tree.\\
+				& \tref{Compute\_Bipart\_Matrix}{ComputeBipartMatrix} & Generate a sparse matrix that stores the weight of bipartition, its frequency of occurrence.\\
+				& \tref{Compute\_Bipart\_Covariance}{ComputeBipartCovariance} & Generate the covariance matrix according to the formula.\\
+				& \tref{Compute\_RF\_dist\_by\_hash}{ComputeRFdistbyhash} & Generate the RF-distance matrix according to the formula.\\
+				& \rref{pttree} & Construct the adjacency matrix of a \rref{Ptree}.\\
+				& \tref{compute\_matrix}{computematrix} & Generate matrix for computing matching distance by accumulating common edges from two \rref{Ptree}s.\\
+				& \tref{Compute\_Matching\_dist}{ComputeMatchingdist} & Compute the matching distance between two trees by the XOR table created from all possible bipartitions.\\ 
+				& \tref{Compute\_Affinity\_dist}{ComputeAffinitydist} & Compute the affinity distance from the given distance matrix.\\
+			\end{tabular}
+	
+		
+	\end{enumerate}
+
+	
+	\section*{Implications of some routines}
+	
+	\subsection*{\texttt{\texttt{TreeOPE}} related routines.}
+	\begin{enumerate}
+		\item \rref{TreeOPE}::\mrref{loadnewicktree}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(char *fname, int *error)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Read tree from formatted string that stores bipartition. The implementation is given in \rref{floadnewicktree}. Same level of the node is paired by "()" and separated by ",".
+			} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \rref{floadnewicktree} & Implementation by recursive processing the string in preorder.\\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{This routine is better implemented by stack structure. It can only process unweighted tree. Also this routine takes the file name as input while the duplication version \rref{loadnewicktree2} takes FILE type, customized fstream type. This routine seems to be insecure and redundant.} \\
+			\hline
+			Error code & -1 & Out of memory.\\
+			& -2 & Parse error, the parentheses in string does not match.\\
+			\hline
+		\end{tabular}
+	
+		\item \rref{TreeOPE}::\mrref{loadnewicktree2}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.3\textwidth}p{0.3\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(FILE *fp, int *error)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Duplication version of \rref{loadnewicktree} but with customized fstream. Actual implementation is not given in here, but in \rref{floadnewicktree}} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routines & \rref{floadnewicktree} & Implementation by recursive processing the string in preorder.\\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{This routine also seems to be redundant since the main thread of TreeScaper never called it. There is another input routine \rref{parsetree}, which can handle both weighted and unweighted tree, is used in TreeScaper.} \\
+			\hline
+			Error code & -1 & Out of memory.\\
+			& -2 & Parse error, the parentheses in string does not match.\\
+			\hline
+		\end{tabular}
+		
+		
+		\item \rref{TreeOPE}::\mrref{floadnewicktree}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(FILE *fp, int *error)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{A pair of nodes are created by \rref{loadnode} when "(" is encountered.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \rref{loadnode} & \\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{This routine also seems to be redundant since the main thread of TreeScaper never called it. There is another input routine \rref{parsetree}, which can handle both weighted and unweighted tree, is used in TreeScaper.} \\
+			\hline
+			Error code & -1 & Out of memory.\\
+			& -2 & Parse error, the parentheses in string does not match.\\
+			\hline
+		\end{tabular}
+	
+		\item \rref{TreeOPE}::\mrref{loadnode}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.25\textwidth}p{0.35\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(FILE *fp, int *error)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Create internal nodes. When this function is called, a "(" has been read, if \texttt{fp} continue to read "(", next pair of nodes should be generated, i.e., \rref{loadnode} is called again, otherwise a leaf is encountered and \rref{loadleaf} will be called. When ")" is encountered, it is at the end of the current pair of nodes and should exit the routine to returned to previous level of node.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \mrref{loadleaf} & Add a leaf and return to previous level.\\
+			& \mrref{addchild} & Add the new pair of nodes to their parent.\\
+			& \mrref{readlabelandweight} & Read additional information from string.\\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{This is better implemented by stack structure. Also note that this method read leaves in preorder traversal.} \\
+			\hline
+			Error code & -1 & Out of memory.\\
+			& -2 & Parse error, the parentheses in string does not match.\\
+			\hline
+		\end{tabular}
+		
+		\item \rref{TreeOPE}::\mrref{parsetree}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(char *str, int *error, NEWICKTREE *testtree)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Duplicate version of \rref{floadnewicktree}.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \rref{parsenode} & \\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{This is the routine used in TreeScaper.} \\
+			\hline
+			Error code & -1 & Out of memory.\\
+			& -2 & Parse error, the parentheses in string does not match.\\
+			\hline
+		\end{tabular}
+	
+		\item \rref{TreeOPE}::\mrref{parsenode}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.25\textwidth}p{0.35\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(FILE *fp, int *error)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Duplicated version \rref{loadnode}.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \mrref{parseleaf} & Add a leaf and return to previous level.\\
+			& \mrref{addchild} & Add the new pair of nodes to their parent.\\
+			& \mrref{parselabelandweight} & Read additional information from string.\\
+			\hline
+			Error code & -1 & Out of memory.\\
+			& -2 & Parse error, the parentheses in string does not match.\\
+			\hline
+		\end{tabular}
+		
+		\item \rref{TreeOPE}::\mtref{dfs\_compute\_hash}{dfscomputehash}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(
+					NEWICKNODE* startNode,
+					LabelMap \&lm,
+					HashRFMap \&vec\_hashrf,
+					unsigned treeIdx,
+					unsigned \&numBitstr,
+					unsigned long long m1,
+					unsigned long long m2,
+					bool WEIGHTED,
+					unsigned int NUM\_Taxa,
+					map<unsigned long long, Array<char> *> \&hash2bitstr,
+					int numofbipartions)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{It assigned hash value to all leaves set, for internal node, the hash values are computed by the sum of its children's hash values (and mod \texttt{m1} or \texttt{m2}). For each internal node, it determines a sub-tree rooted by itself from the current tree. 
+				
+			Such subtree is uniquely represented by the hash value of its root. The leaves contained in the subtree are also represented by the bit string. For example, $01001100$ represents that the subtree contains leaf 2, 5 and 6. The mapping from hash values to the leaves it contain is stored in \texttt{hash2bitstr}.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \rref{Array}::\mrref{SetBitArray} & Set the some positions, the index of leaves, of a bit array to $1$.\\
+			& \rref{Array}::\mrref{OrbitOPE} & OR operation of bit array, it realizes the functionality of making the bit string of the root having $1$ in every leaf's index that the subtree has.\\
+			& \mtref{add\_of}{addof} & Bit-wise addition for hash values.\\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{Note that hash value to subtree is bijection and subtree to leaves it contains is subjection. Therefore, the mapping \texttt{hash2bitstr} is subjection. Also note that the operations, addition and modulus, on hash values are done in bit-wise manner.} \\
+			\hline
+			Error code & none & Terminate with specific error message (overflow in hash value additions).\\
+			\hline
+		\end{tabular}
+	
+		\item \rref{TreeOPE}::\mrref{bipart}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(NEWICKNODE *const startnode, unsigned int \&treeIdx,
+					unsigned long long *matrix\_hv,
+					unsigned int *matrix\_treeIdx,
+					double *matrix\_weight, int \&idx, int depth, bool isrooted)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Store hash values, TreeIdx and weights in the given arrays.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine&   & \\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{Note that the "TreeIdx" is an identical array. Each tree will generate one set of such arrays and these arrays from different trees are pasted together and sorted by the hash values. By comparing hash values, identical bipartitions among different trees can be easily found.} \\
+			\hline
+			Error code & -1 & Out of memory.\\
+			& -2 & Parse error, the parentheses in string does not match.\\
+			\hline
+		\end{tabular}
+	
+		\item \rref{TreeOPE}::\mrref{findleaf}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(std::string leafname, NEWICKNODE *currentnode, NEWICKNODE *parent, int *icpt)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Find leaf \texttt{leafname} and return it. \text{icpt} also record which subtree under root the leaf lies in.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& none & \\
+			\hline
+		\end{tabular}
+	
+		\item \rref{TreeOPE}::\mrref{normalizedTree}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(NEWICKNODE *lrpt, NEWICKTREE *newickTree, int indexchild)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Lift a unrooted tree to a rooted tree.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \mrref{normalizedNode} & It's implementation.\\
+			\hline
+		\end{tabular}
+	
+		\item \rref{TreeOPE}::\mrref{newick2lcbb}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(const NEWICKTREE *nwtree, int num\_leaves, struct Ptree *tree)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Convert \rref{NEWICKTREE} to \rref{Ptree}, which is used to compute matching distance.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \mrref{newick2ptree} & Implementation of \rref{newick2lcbb}.\\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{Note that \rref{Ptree} does not stored hash values and weights, i.e., the bipartition and weight information are lost. Also note that the edges matrix of \rref{Ptree} is not computed here.}  \\
+			\hline
+		\end{tabular}
+	
+		\item \rref{TreeOPE}::\mrref{sumofdegree}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(NEWICKNODE *node, bool isrooted, int depth)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Return the sum of degrees of all nodes.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine&   & \\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{ } \\
+			\hline
+			Error code & -1 & Out of memory.\\
+			& -2 & Parse error, the parentheses in string does not match.\\
+			\hline
+		\end{tabular}
+	
+		\item \rref{TreeOPE}::\mrref{bipartcount}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(NEWICKNODE *node, bool isrooted, map<unsigned long long, unsigned long long> \&bipcount, int depth)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Count the occurrence of particular subtree, bipartition, by its hash value and store the result in the external mapping \texttt{bipcount}} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine&   & \\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{ } \\
+			\hline
+		\end{tabular}
+	
+		\item \rref{TreeOPE}::\mrref{Addbipart}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(NEWICKNODE* startNode, double freq, unsigned long long hash, Array<char> \&bitstr, int NumTaxa, bool \&iscontained)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Given \texttt{bitstr} that represents a set of leaves. Insert internal nodes from leaf-set to root that collects those leaves lie in \texttt{bitstr} so that there is a subtree containing exactly the same set of leaves in the resulting new tree.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& none & \\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{There is a better way to implement this functionality.} \\
+			\hline
+		\end{tabular}
+	
+		
+	\end{enumerate}
+
+	\subsection*{\rref{Trees} related routines.}
+	
+	
+	\begin{enumerate}
+		
+		\item \rref{Trees}::\mrref{initialTrees}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(string fname)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Initialize a set of \rref{NEWICKEDTREE}s by calling \rref{loadnewickedtree2}. For Nexus trees, it only create a \texttt{leaveslabelsmaps} that stores the labels of leaf set.}\\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \rref{loadnewicktree2} & Create each tree.\\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{Complicated string operations are done here, which is unnecessary. } \\
+			\hline
+			Error code & -1 & Out of memory.\\
+			& -2 & Parse error, the parentheses in string does not match.\\
+			& -3 & Failure of opening file.\\
+			\hline
+		\end{tabular}
+	
+		\item \rref{Trees}::\mrref{ReadTrees}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{none} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{A duplicated version of \rref{initialTrees} except it calls \rref{parsetree} for both Newicked and NEXUS type of tree. Also lifted the tree if it is unrooted.}\\
+				\hline
+				Complexity&   &  \\
+				Memory space&   &  \\
+				\hline
+				Associated routine& \rref{parsetree} & Create each tree.\\
+				& \rref{normalizedTree}& Lift a unrooted tree. \\
+				\hline
+				Comments & \multicolumn{2}{p{0.6\textwidth}}{Very complicated string operations are done here, which is really unnecessary. } \\
+				\hline
+				Error code & -1 & Out of memory.\\
+				& -2 & Parse error, the parentheses in string does not match.\\
+				& -3 & Failure of opening file.\\
+				\hline
+			\end{tabular}
+
+		
+		\item \rref{Trees}::\mtref{compute\_numofbipart}{computenumofbipart}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{none} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{It computes the numbers of bipartition for all trees and stores them in the array \rref{numberofbipartition}. The formula is given by $$s/2-n$$ where $s$ is the sum of degrees and $n$ is the number of leaf.}\\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \rref{sumofdegree} & \\
+			\hline
+		\end{tabular}
+	
+		\item \rref{Trees}::\mtref{Compute\_Hash}{ComputeHash}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{none}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Generate the hash table for computing the hash values in a tree.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \tref{dfs\_compute\_hash}{dfscomputehash} & \\
+			\hline
+		\end{tabular}
+	
+		\item \rref{Trees}::\mtref{Compute\_Bipart\_Matrix}{ComputeBipartMatrix}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{none}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{The arrays of indivial tree's hashvalue, tree index and weight created from \rref{bipart} were combined and sorted. Since the hash value represents the unique subtree structure, i.e.. a bipartition, the number of unique bipartion can be counted via checking the hash value. As a result, a sparse bipartition matrix that stores weight of unique bipartition versus trees is created.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \rref{bipart} & Create arrays of hash values, weights with tree index of one tree.\\
+			& \mrref{Sort} & Sort the 3 arrays attached from all trees by the hash values, so that we can easily count the occurrence for each hash value, i.e., bipartition.\\
+			& \mrref{sort} & Seems to be built-in sort for array that sort a temperate hash value array for certain later operation.\\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{The \texttt{sort} which is different then \rref{Sort} is confusing here. Is it the default sort in c++?} \\
+			\hline
+		\end{tabular}
+	
+		
+	
+		\item \rref{Trees}::\mtref{Vec\_multiply}{Vecmultiply}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(const double* Vec1, const double* Vec2, int Unique\_idx)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{It return a rank-1 matrix $$M = v_1v_2^T.$$} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& none & \\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{It is confusing with the \rref{SparseMatrix}::\tref{Multiply\_vec}{Multiplyvec} and should be integrated in \rref{Vector} class.} \\
+			\hline
+		\end{tabular}
+	
+		\item \rref{Trees}::\mtref{Compute\_Bipart\_Covariance}{ComputeBipartCovariance}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.3\textwidth}p{0.3\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(bool ISWEIGHTED)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Compute the bipartition covariance matrix from the matrix, \texttt{C}, created by \tref{Compute\_Bipart\_Matrix}{ComputeBipartMatrix}, \texttt{M}. Let $M_1 = MM^T$, $v_1 = mean(M)$, $v_2 = sum(M)$, $M_2=v2v1^T$ and $M_3 = v1v1^T$, then $$C = (M_1-M_2-M_2^T+n*M_3)/(n-1).$$} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \rref{SparseMatrix}::\rref{transpose} & \\
+			& \rref{SparseMatrix}::\rref{Multiply} & Matrix-Matrix multiplication.\\
+			& \rref{SparseMatrix}::\rref{Mean} & Matrix mean.\\
+			& \rref{SparseMatrix}::\tref{Multiply\_vec}{Multiplyvec} & Matrix-vector multiplication.\\
+			& \rref{Trees}::\tref{Vec\_Multiply}{Vecmultiply} & Rank-1 matrix.\\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{Note that it is implemented via sparse matrix-vector multiplication.} \\
+			\hline
+		\end{tabular}
+		
+		
+	
+		\item \rref{Trees}::\mtref{Compute\_RF\_dist\_by\_hash}{ComputeRFdistbyhash}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(bool ISWEIGHTED)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{Compute the unweighted/weighted RF distance. For the unweighted distance, accumulate the number of each unique bipartition's occurrencein each tree, $f_{ij}$, and the number of bipartitions, $n_i$, then $$d_{ij} = \frac{n_i+n_j-2f_{ij}}{2}.$$ For weighted case, it is more complicated. The result is stored in the matrix \texttt{dist\_URF} or \texttt{dist\_RF}.}\\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& none & \\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{none} \\
+			\hline
+		\end{tabular}
+	
+	
+		\item \rref{Trees}::\mrref{pttree}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(struct Ptree *treeA, int node)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{It constructs the edge matrix of \texttt{treeA} which should be implemented in \rref{Ptree}.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& none & \\
+			\hline
+			\hline
+		\end{tabular}
+	
+		\item \rref{Trees}::\mtref{compute\_matrix}{computematrix}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(int *r, int range, struct Ptree *tree1, struct Ptree *tree2)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{It accumulates the number common edges from two trees and store in a vectorized matrix, \texttt{r}.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& none & \\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{For $n$ trees, there are $\binom{n}{2}=n(n-1)$ comparisons and this function will be called $n(n-1)$ times.} \\
+			\hline
+		\end{tabular}
+	
+		\item \rref{Trees}::\mtref{tree\_mmdis}{treemmdis}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{none}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{This distance is given by the solution of Hungarian algorithm of the cost matrix, \texttt{r}, given by \tref{compute\_matrix}{computematrix}.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \mtref{array\_to\_matrix}{arraytomatrix} & Recover \texttt{r} to a matrix.\\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{\texttt{r} is an $(k-3)\times(k-3)$ matrix where $k$ is the number of leaves. The main complexity goes into generating distance matrix and running Hungarian algorithm.} \\
+			\hline
+		\end{tabular}
+	
+		
+	
+		
+	
+		\item \rref{Trees}::\mtref{Compute\_Matching\_dist}{ComputeMatchingdist}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{none}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{The matching distance is given by the solution to Hungarian algorithm on the table with entries of number of XOR element in \texttt{bitstrofatree}, which are all possible bipartitions of one tree.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& \tref{Get\_bipartitionofonetree}{Getbipartitionofonetree} & \\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{Line 1415 may have a bug.} \\
+
+			\hline
+		\end{tabular}
+	
+	
+		\item \rref{Trees}::\mtref{Compute\_Affinity\_dist}{ComputeAffinitydist}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{(String str\_matrix, int type)}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{This routine compute the affinity distance, $d_a$, from the given distance ,$d$. The formula is either $$d_a=\frac{1}{\varepsilon_{rel} + d}$$ or $$d_a=e^{-d},$$ depending on the flag \texttt{type}. It accepts unweighted/weighted RF-distance, Matching-distance, SPR-distance or distance given in file.} \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine& none & \\
+			\hline
+		\end{tabular}
+		
+	
+		\item \rref{Trees}::\mtref{temp}{temp}.
+		
+		\begin{tabular}{>{\bfseries}lp{0.2\textwidth}p{0.4\textwidth}}
+			\hline
+			Argument & \multicolumn{2}{p{0.6\textwidth}}{\texttt{none}} \\
+			\hline
+			Description & \multicolumn{2}{p{0.6\textwidth}}{ } \\
+			\hline
+			Complexity&   &  \\
+			Memory space&   &  \\
+			\hline
+			Associated routine&   & \\
+			\hline
+			Comments & \multicolumn{2}{p{0.6\textwidth}}{ } \\
+			\hline
+			Error code & -1 & Out of memory.\\
+			& -2 & Parse error, the parentheses in string does not match.\\
+			\hline
+		\end{tabular}
+	
+	\end{enumerate}
+	
+	
+\end{document}
