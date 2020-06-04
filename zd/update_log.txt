@@ -1,0 +1,21 @@
+-- 5/21/20
+
+	- Fix core dump issue of NLDR routine with method "CLASSIC_MDS" when d > 5. See the modified code NLDR::CLASSIC_MDS() in "wNLDR.cpp".
+
+	It is cause by the memory leakage in extracting COR matrix from SVD of distance matrix. The issue has been fixed. 
+
+	Note that this happens when distance matrix is indefinite and the largest d-th eigenvalues have at least one negative value. When this happened, one column or more of COR matrix would be all zeros.
+
+	It has been seen that, occasionally, the code is still functioning with the leak happened. Therefore, it is recommanded to double check the COR matrix output of previous results and see if there was abnormal zero column.
+
+	- Fix an operation of extracting a substring which cause small memory leak. See the modified codes File::postfix_name() and File::postfix_name_lastof() in "wfile.cpp" and String::operator()() in "wstring.cpp".
+
+	The operator() of a String object extracts a substring from the objects and it accepts two interpretations of two-integer-parameter: they are starting and ending indices of the substring; the first one is the beginning index and the second one is the length of the substring. The first implementation has bug. Since the first implementation is only called in a File objects to extract prefix and postfix of a file name, it is abandoned now and we stick with the second interpretation, meaning it takes the beginning index and the length of a substring as parameters.
+
+	Note that this is different than the operator() of an Array, which takes the beginning and ending indices of the substring being extracted as parameters. We will modify the code later to make sure parameter interpretation of similar operator stay consistent.
+
+-- 6/4/20
+
+	- The core dump issue of "CLASSIC_MDS" method has been found to be related to theoretical side of the algorithm. Classical MDS is not supposed to be used for non-Euclidean space. When applying it to tree space, the classical sacling of squared distance matrix produces indefinite matrix which makes little sense in the later process. The resulting n-points in R^k space also not guarantee to minimize the classic stress function. A more general, but difficult, metric MDS method may apply to tree space.
+
+	

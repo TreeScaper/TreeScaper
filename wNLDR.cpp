@@ -1,9 +1,9 @@
 
 //##########################################################################
 //# This software is part of the Treescaper i
-//# -- Version 0.1   
+//# -- Version 0.1
 //# Copyright (C) 2010 Wen Huang
-//# 
+//#
 //# This program is free software; you can redistribute it and/or
 //# modify it under the terms of the GNU General Public License
 //# as published by the Free Software Foundation; either version 2
@@ -12,8 +12,8 @@
 //# This program is distributed in the hope that it will be useful,
 //# but WITHOUT ANY WARRANTY; without even the implied warranty of
 //# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//# GNU General Public License for more details. 
-//# http://www.gnu.org/copyleft/gpl.html 
+//# GNU General Public License for more details.
+//# http://www.gnu.org/copyleft/gpl.html
 //##########################################################################
 
 // wNLDR.cpp
@@ -203,8 +203,8 @@ void NLDR::NLDR_init_parameters(String para_filename)
         return;
 	Array<Mapping<Mix, Mix> > para_arr;
 	Mapping<Mix, Mix> para;
-	
-	File fpara(para_filename);	
+
+	File fpara(para_filename);
 	if(!fpara.is_open())
 	{
         std::cout << "Error: File \"" << para_filename << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
@@ -335,7 +335,7 @@ void NLDR::NLDR_load_MX()
 	String fname = D_prefname;
 	fname += ".";
 	fname += D_postfname;
-	File D_file(fname);	
+	File D_file(fname);
 	if(!D_file.is_open())
 	{
         std::cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
@@ -534,7 +534,7 @@ void NLDR::NLDR_load_D()
 	String fname = D_prefname;
 	fname += ".";
     fname += D_postfname;
-	File D_file(fname);	
+	File D_file(fname);
 	if(!D_file.is_open())
 	{
         std::cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
@@ -685,14 +685,14 @@ void NLDR::NLDR_init_parameters(String para_filename)
 	parameters.CCA_STO_lambdan = 1;
 	parameters.CCA_STO_alpha0 = 0.5;
 	parameters.CCA_STO_alphan = 0.01;
-	
+
 	if(para_filename == (String) "")
 		return;
 
 	Array<Mapping<Mix, Mix> > para_arr;
 	Mapping<Mix, Mix> para;
-	
-	File fpara(para_filename);	
+
+	File fpara(para_filename);
 	if(!fpara.is_open())
 	{
         std::cout << "error: file \"" << para_filename << "\" can not be open, please check if this file exists or is readable." << std::endl;
@@ -819,6 +819,9 @@ void NLDR::NLDR_init_parameters(String para_filename)
 		parameters.CCA_STO_alphan = para[(String) "CCA_STO_alphan"];
 }
 */
+
+// zd_coded: the code for extracting COR from SVD is causing memory leak.
+// It has been fixed now. zd --2/21/20
 void NLDR::CLASSIC_MDS()
 {
 	String filename_U = make_filename(D_prefname, "ALL",cost_function, "U", "SVD", "");
@@ -874,14 +877,15 @@ void NLDR::CLASSIC_MDS()
 	for(int i = 0; i < atoi(dim_str); i++)
 	{
 		flag++;
-		while(flag < size && Vt(flag, 0) * U(0, flag) < 0)
+		while(flag < size && Vt(flag, 0) * U(0, flag) < 0) // Skip eigenvectors associated to negative eigenvalues.
 			flag++;
 		if(flag >= size)
 			break;
 		for(int j = 0; j < size; j++)
 		{
-			COR(j, flag) = sqrt(S(flag, flag)) * Vt(flag, j);
+			COR(j, i) = sqrt(S(flag, flag)) * Vt(flag, j);
 		}
+		col_index++;
 	}
 
 	DIS = COR.compute_Distance_Matrix();
@@ -1187,7 +1191,7 @@ void NLDR::KRUSKAL1_GAUSS_SEIDEL()
 	long cur_time = start;
 	long run_time = parameters.KRU_GAU_run_time;
 	COR = X;
-	
+
 	stress2 = KRUSKAL1_stress_function(DX);
     std::cout << "\nstress value : " << stress2 << std::endl;
 
@@ -1346,7 +1350,7 @@ void NLDR::KRUSKAL1_STOCHASTIC()
 			{
 				COR.matrix[j][k] = COR.matrix[j][k] - alpha.matrix[i][0] * DE.matrix[j][k];
 			}
-		
+
 		stress_value = KRUSKAL1_stress_function(DX);
 		eta = para1;
 		eta_d = para2;
@@ -1598,7 +1602,7 @@ void NLDR::NORMALIZED_GAUSS_SEIDEL()
 	long cur_time = start;
 	long run_time = parameters.NOR_GAU_run_time;
 	COR = X;
-	
+
 	for(int i = 0; i < size; i++)
 		for(int j = 0; j < i; j++)
 			weight += D.matrix[i][j] * D.matrix[i][j];
@@ -2063,7 +2067,7 @@ void NLDR::SAMMON_GAUSS_SEIDEL()
 	long cur_time = start;
 	long run_time = parameters.NLM_GAU_run_time;
 	COR = X;
-	
+
 	for(int i = 0; i < size; i++)
 		for(int j = 0; j < i; j++)
 			weight += D.matrix[i][j];
@@ -2620,7 +2624,7 @@ void NLDR::CCA_GAUSS_SEIDEL()
 
 			for(int h = 0; h < dim; h++)
 			{
-				
+
 				if(! search_first_condition(DX, stress2, - e1.matrix[h][0] / fabs(e2.matrix[h][0]), j, h, - e1.matrix[h][0] * e1.matrix[h][0] / fabs(e2.matrix[h][0]), lambda.matrix[times * size + j][0], alpha, 1, 1, stress2))
                     ;//---std::cout << "!";
 				COR.matrix[j][h] = COR.matrix[j][h] - alpha * e1.matrix[h][0] / fabs(e2.matrix[h][0]);
@@ -2862,7 +2866,7 @@ bool NLDR::search_first_condition(const Matrix<double> &DX, double fxc, const Ma
 			{
 				a = ((fxnew - fxc - step_size * initslope) / step_size / step_size - (fxnew_pre - fxc - pre_step_size * initslope) / pre_step_size / pre_step_size) / (step_size - pre_step_size);
 				b = (- pre_step_size * (fxnew - fxc - step_size * initslope) / step_size / step_size + step_size * (fxnew_pre - fxc - pre_step_size * initslope) / pre_step_size / pre_step_size) / (step_size - pre_step_size);
-				
+
 				disc = b * b - 3 * a * initslope;
 				if(fabs(a) < 0.0000001)
 					sizetemp = - initslope / (2 * b);
@@ -2881,7 +2885,7 @@ bool NLDR::search_first_condition(const Matrix<double> &DX, double fxc, const Ma
 				step_size = sizetemp;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -2920,7 +2924,7 @@ bool NLDR::search_first_condition(const Matrix<double> &DX, double fxc, double d
 			{
 				a = ((fxnew - fxc - step_size * initslope) / step_size / step_size - (fxnew_pre - fxc - pre_step_size * initslope) / pre_step_size / pre_step_size) / (step_size - pre_step_size);
 				b = (- pre_step_size * (fxnew - fxc - step_size * initslope) / step_size / step_size + step_size * (fxnew_pre - fxc - pre_step_size * initslope) / pre_step_size / pre_step_size) / (step_size - pre_step_size);
-				
+
 				disc = b * b - 3 * a * initslope;
 				if(fabs(a) < 0.0000001)
 					sizetemp = - initslope / (2 * b);
@@ -3427,7 +3431,7 @@ void NLDR::oneNN_analysis()
 		index = salshu_index;
 	else
 		return;
-	
+
 	i_index = 0;
 	correct_num = 0;
 	for(int i = 0; i < size; i++)
@@ -3457,7 +3461,7 @@ void NLDR::oneNN_analysis()
 			correct_num++;
 	}
 	oneNN.matrix[1][0] = (double) correct_num / size;
-	
+
 	i_index = 0;
 	correct_num = 0;
 	for(int i = 0; i < size; i++)

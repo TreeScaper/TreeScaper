@@ -1359,7 +1359,7 @@ void Trees::Get_bipartitionofonetree(NEWICKNODE*currentnode, bool isrooted, int 
 //########################ZD comment########################################
 //# This routine compute the affinity distance, a,
 //# from the given distance ,d. The formula is either
-//#1/(rel_eps + d)
+//# 1/(rel_eps + d)
 //# or e^(-d),
 //# depending on the flag "type". It accepts unweighted/weighted
 //# RF-distance, Matching-distance, SPR-distance or

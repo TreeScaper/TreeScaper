@@ -1,9 +1,9 @@
 
 //##########################################################################
 //# This software is part of the Treescaper i
-//# -- Version 0.1   
+//# -- Version 0.1
 //# Copyright (C) 2010 Wen Huang
-//# 
+//#
 //# This program is free software; you can redistribute it and/or
 //# modify it under the terms of the GNU General Public License
 //# as published by the Free Software Foundation; either version 2
@@ -12,8 +12,8 @@
 //# This program is distributed in the hope that it will be useful,
 //# but WITHOUT ANY WARRANTY; without even the implied warranty of
 //# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//# GNU General Public License for more details. 
-//# http://www.gnu.org/copyleft/gpl.html 
+//# GNU General Public License for more details.
+//# http://www.gnu.org/copyleft/gpl.html
 //##########################################################################
 
 // wfile.h
@@ -132,7 +132,7 @@ String File::postfix_name()
 	if(i == fname.get_length())
 		return "";
 
-	return fname(i + 1, fname.get_length());
+	return fname(i + 1, fname.get_length() - i - 1);
 };
 
 String File::prefix_name_lastof()
@@ -153,7 +153,7 @@ String File::postfix_name_lastof()
     if(i == 0)
         return "";
 
-    return fname(i + 1, fname.get_length());
+    return fname(i + 1, fname.get_length() - i - 1);
 };
 
 #endif
