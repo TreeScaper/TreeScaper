@@ -885,7 +885,6 @@ void NLDR::CLASSIC_MDS()
 		{
 			COR(j, i) = sqrt(S(flag, flag)) * Vt(flag, j);
 		}
-		col_index++;
 	}
 
 	DIS = COR.compute_Distance_Matrix();
