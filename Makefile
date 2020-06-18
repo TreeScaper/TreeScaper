@@ -1,18 +1,12 @@
 CC = g++
 
-#Linux path
-ROOTPATH = /home/whuang/CLAPACK-3.2.1
-INCDIRS = -I$(ROOTPATH)/INCLUDE
-CLAPLIB = $(ROOTPATH)/lapack_LINUX.a
-BLASLIB = $(ROOTPATH)/blas_LINUX.a
-F2CLIB = $(ROOTPATH)/F2CLIBS/libf2c.a
-
-#Mac path
-#ROOTPATH = /home/vestige/Downloads/clapack-3.2.1-CMAKE
-#INCDIRS = -I$(ROOTPATH)/INCLUDE
-#CLAPLIB = $(ROOTPATH)/lapack_MAC.a
-#BLASLIB = $(ROOTPATH)/blas_MAC.a
-#F2CLIB = $(ROOTPATH)/F2CLIBS/libf2c.a
+#CLAPACK path
+CLAPPATH = ./CLAPACK-3.2.1
+include $(CLAPPATH)/make.inc
+INCDIRS = -I$(CLAPPATH)/INCLUDE
+CLAPLIB = $(CLAPPATH)/lapack$(PLAT).a
+BLASLIB = $(CLAPPATH)/blas$(PLAT).a
+F2CLIB = $(CLAPPATH)/F2CLIBS/libf2c.a
 
 #common command
 #LDLIBS  = $(CLAPLIB) $(BLASLIB) $(F2CLIB) -lm #$(BLWRLIB) -lm

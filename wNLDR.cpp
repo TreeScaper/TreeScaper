@@ -142,7 +142,7 @@ void NLDR::init_NLDR(String fname, String ftype, String dim, String cost, String
 
 void NLDR::NLDR_init_parameters(String para_filename)
 {
-	parameters.distance_file_type = 0;
+	parameters.distance_file_type = 1;
 	parameters.length_tru = 11;
     parameters.interval_tru = 5;
     parameters.length_con = 11;
