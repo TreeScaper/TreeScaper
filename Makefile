@@ -1,10 +1,7 @@
 CC = g++
 
-# Postfix of platform used in CLAPACK
-PLAT = _MAC
+include make.inc
 
-#CLAPACK path
-CLAPPATH = ./CLAPACK-3.2.1
 INCDIRS = -I$(CLAPPATH)/INCLUDE
 CLAPLIB = $(CLAPPATH)/lapack$(PLAT).a
 BLASLIB = $(CLAPPATH)/blas$(PLAT).a
