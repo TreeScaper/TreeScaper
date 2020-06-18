@@ -409,7 +409,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 			namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname);
 			outBipartMatrix.open(namebipartmatrix.c_str());
 			outBipartMatrix << "---\n";
-			outBipartMatrix << " created: " << timeStruct->tm_year << "-";
+			outBipartMatrix << " created: " << 1900 + timeStruct->tm_year << "-";
 			outBipartMatrix << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
 			outBipartMatrix << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
 			outBipartMatrix << timeStruct->tm_sec << ".\n";
@@ -432,7 +432,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 			namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname);
 			outBipartMatrix.open(namebipartmatrix.c_str());
 			outBipartMatrix << "---\n";
-			outBipartMatrix << " created: " << timeStruct->tm_year << "-";
+			outBipartMatrix << " created: " << 1900 + timeStruct->tm_year << "-";
 			outBipartMatrix << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
 			outBipartMatrix << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
 			outBipartMatrix << timeStruct->tm_sec << ".\n";
@@ -485,7 +485,7 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
 		ofstream outCova;
 		outCova.open(outCovaName2, ios::trunc);
 		outCova << "---\n";
-		outCova << " created: " << timeStruct->tm_year << "-";
+		outCova << " created: " << 1900 + timeStruct->tm_year << "-";
 		outCova << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
 		outCova << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
 		outCova << timeStruct->tm_sec << ".\n";
@@ -522,7 +522,7 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
 		ofstream outCova;
 		outCova.open(outCovaName2, ios::trunc);
 		outCova << "---\n";
-		outCova << " created: " << timeStruct->tm_year << "-";
+		outCova << " created: " << 1900 + timeStruct->tm_year << "-";
 		outCova << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
 		outCova << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
 		outCova << timeStruct->tm_sec << ".\n";
@@ -673,7 +673,7 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
 		ofstream outDist;
 		outDist.open(outDistName2, ios::trunc);
 		outDist << "---\n";
-		outDist << " created: " << timeStruct->tm_year << "-";
+		outDist << " created: " << 1900 + timeStruct->tm_year << "-";
 		outDist << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
 		outDist << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
 		outDist << timeStruct->tm_sec << ".\n";
@@ -888,7 +888,7 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
 
 		outConf.open(outName2, ios::trunc);
 		outConf << "---\n";
-		outConf << " created: " << timeStruct->tm_year << "-";
+		outConf << " created: " << 1900 + timeStruct->tm_year << "-";
 		outConf << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
 		outConf << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
 		outConf << timeStruct->tm_sec << ".\n";
@@ -910,7 +910,7 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
 
 			outConf.open(outName2, ios::trunc);
 			outConf << "---\n";
-			outConf << " created: " << timeStruct->tm_year << "-";
+			outConf << " created: " << 1900 + timeStruct->tm_year << "-";
 			outConf << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
 			outConf << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
 			outConf << timeStruct->tm_sec << ".\n";
@@ -932,7 +932,7 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
 
 			outConf.open(outName2, ios::trunc);
 			outConf << "---\n";
-			outConf << " created: " << timeStruct->tm_year << "-";
+			outConf << " created: " << 1900 + timeStruct->tm_year << "-";
 			outConf << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
 			outConf << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
 			outConf << timeStruct->tm_sec << ".\n";
