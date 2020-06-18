@@ -97,6 +97,7 @@ public:
     void Compute_Bipart_Matrix();
 
     string make_Bipart_Matrix_name(string fname, String format);
+	string make_Bipart_Matrix_name(string fname);
 
 #ifdef COMMAND_LINE_VERSION
     void Compute_Bipart_Covariance();
@@ -159,6 +160,8 @@ public:
     string make_DISToutput_name(String str_matrix);
 
     void print_matrix(String str_matrix, string outfile);
+
+	void print_matrix2(String str_matrix, string outfile);
 
     bool bipartmatrixIsexisting();
 
@@ -227,6 +230,8 @@ private:
     void delete_double_array(T *** arr, int n);
     template<class T>
     void print_double_array(T *** arr, int n, string outfile);
+	template<class T>
+	void print_double_array2(T *** arr, int n, string outfile);
     template<class T>
     void print_coordinate_matrix(T *** arr, int n, int m, string outfile);
 

@@ -409,6 +409,29 @@ void Trees::print_double_array(T *** arr, int n, string outfile)
 }
 
 template<class T>
+void Trees::print_double_array2(T *** arr, int n, string outfile)
+{
+	ofstream fout;
+	if (outfile != "")
+		fout.open(outfile.c_str(), ios::app);
+
+	if ((*arr) != NULL)
+	{
+
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j <= i; j++)
+			{
+				fout << setw(5) << (*arr)[i][j] << "\t" << ' ';
+			}
+			fout << endl;
+		}
+	}
+	if (outfile != "")
+		fout.close();
+}
+
+template<class T>
 void Trees::print_coordinate_matrix(T *** arr, int n, int m, string outfile)
 {
     ofstream fout;
@@ -448,6 +471,26 @@ void Trees::print_matrix(String str_matrix, string outfile)
     {
         print_double_array((double ***) StrToDist[str_matrix], n_trees, outfile);
     }
+}
+
+void Trees::print_matrix2(String str_matrix, string outfile)
+{
+	if (str_matrix == (String)"Covariance Matrix")
+		print_double_array2((double ***)StrToDist[str_matrix], treecov_size, outfile);
+	else if (str_matrix == (String)"File-covariance")
+		print_double_array2((double ***)StrToDist[str_matrix], filecov_size, outfile);
+	else if (str_matrix == (String)"Matching-distance" || str_matrix == (String)"SPR-distance")
+		print_double_array2((int ***)StrToDist[str_matrix], n_trees, outfile);
+	else if (str_matrix == (String)"File-distance" || str_matrix == (String)"Affinity-filedist")
+		print_double_array2((double ***)StrToDist[str_matrix], file_distsize, outfile);
+	else if (str_matrix == (String)"File-coordinate")
+		print_coordinate_matrix((double ***)StrToDist[str_matrix], file_coordinatesize, file_coordinatedim, outfile);
+	else if (str_matrix == (String)"File-affinity")
+		print_double_array2((double ***)StrToDist[str_matrix], affinityfile_size, outfile);
+	else
+	{
+		print_double_array2((double ***)StrToDist[str_matrix], n_trees, outfile);
+	}
 }
 
 //########################ZD comment########################################
@@ -880,7 +923,7 @@ void Trees::WriteConsensusTree(string &outfile, Treefileformat tf)
         ofstream outNewick;
         int NN = 10000;
         char *gzbuff = (char*) malloc(NN);
-        outNewick.open(outfile.c_str());
+        outNewick.open(outfile.c_str(), ios::app);
 
         char **taxa_str = new char*[leaveslabelsmaps.size()];
         for (int i = 0; i < leaveslabelsmaps.size(); i++)
@@ -913,7 +956,7 @@ void Trees::WriteConsensusTree(string &outfile, Treefileformat tf)
     if(tf == NEXUS)
     {
         ofstream outNexus;
-        outNexus.open(outfile.c_str());
+        outNexus.open(outfile.c_str(), ios::app);
         outNexus << "#NEXUS" << endl;
         outNexus << "BEGIN TAXA;" << endl;
         outNexus << "      dimensions ntax=" << leaveslabelsmaps.size() << ";" << endl;
@@ -1254,7 +1297,30 @@ string Trees::make_Bipart_Matrix_name(string fname, String format)
     result += "bipartition.out";
     return result;
 }
+string Trees::make_Bipart_Matrix_name(string fname)
+{
+	string result;
+	size_t loc_slash = fname.find_last_of("/");
 
+	if (loc_slash != string::npos)
+		result = fname.substr(0, loc_slash + 1);
+	else
+		result = "";
+
+	result += "Bipartition";
+	time_t t = time(0);
+	struct tm * timeStruct = localtime(&t);
+	result += "_";
+	result += to_string(timeStruct->tm_mon);
+	result += "_";
+	result += to_string(timeStruct->tm_mday);
+	result += "_";
+	result += to_string(timeStruct->tm_hour);
+	result += "_";
+	result += to_string(timeStruct->tm_min);
+	result += ".txt";
+	return result;
+}
 //########################ZD comment########################################
 //# Sort weighted edges from the same tree by hash value.
 //########################ZD comment########################################
