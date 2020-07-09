@@ -4,7 +4,7 @@
 #  June 2009
 #
 
-include make.inc
+include ./make.inc
 
 all: f2clib lapack_install lib lapack_testing blas_testing
 #all: f2clib lapack_install lib lapack_testing blas_testing variants_testing
