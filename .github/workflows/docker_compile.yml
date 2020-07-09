@@ -8,14 +8,18 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-18.04
-
+    env:
+      working-directory: ./src
     steps:
     - uses: actions/checkout@v2
+    
     - name: make
-      run: ./src/make
+      run: make
+      working-directory: ${{env.working-directory}}
+    
     - name: Archive CLI
+      working-directory: ${{env.working-directory}}
       uses: actions/upload-artifact@v1
       with:
         name: CLVTreeScaper
