@@ -4,4 +4,7 @@ MAC and Linux binary files of GUI and command-line versions with a manual and tu
 
 
 
+![CLI_Docker CI](https://github.com/TreeScaper/TreeScaper/workflows/CLI_Docker%20CI/badge.svg)
+
+
 
