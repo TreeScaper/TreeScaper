@@ -1,6 +1,7 @@
 CC = g++
 
-include ./makeCLVTreeScaper.inc
+CLAPPATH = ./CLAPACK-3.2.1
+PLAT = _LINUX
 
 INCDIRS = -I$(CLAPPATH)/INCLUDE
 CLAPLIB = $(CLAPPATH)/lapack$(PLAT).a
