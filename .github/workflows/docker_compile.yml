@@ -22,7 +22,5 @@ jobs:
     - name: Archive CLI
       uses: actions/upload-artifact@v1
       with:
-        name: CLVTreeScaper
+        name: ./src/CLVTreeScaper
         path: CLVTreeScaper
-        working-directory: ${{env.working-directory}}
-      
