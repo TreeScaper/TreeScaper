@@ -12,7 +12,7 @@ jobs:
     env:
       working-directory: ./src
     
-      steps:
+    steps:
     - uses: actions/checkout@v2
     
     - name: make
