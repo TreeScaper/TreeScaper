@@ -18,4 +18,8 @@
 
 	- The core dump issue of "CLASSIC_MDS" method has been found to be related to theoretical side of the algorithm. Classical MDS is not supposed to be used for non-Euclidean space. When applying it to tree space, the classical sacling of squared distance matrix produces indefinite matrix which makes little sense in the later process. The resulting n-points in R^k space also not guarantee to minimize the classic stress function. A more general, but difficult, metric MDS method may apply to tree space.
 
+
+-- 7/16/20
+
+	- New keyword and command structure proposed on developer manual. The actual changed has not been merged yet.
 	

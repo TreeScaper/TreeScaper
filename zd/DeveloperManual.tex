@@ -13,6 +13,7 @@
 \usepackage{hyperref}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, calc}
+\usepackage{makecell}
 
 \usepackage{contour}
 \usepackage{ulem}
@@ -72,10 +73,187 @@
 \begin{document}
 	\maketitle
 
-	\tableofcontents
+	%\tableofcontents
 	
 	
-	\section{Introduction}
+	\section{Installation}
+	
+
+	CLVTreeScaper requires a CLAPACK properly installed and linked on your machine. 
+	CLAPACK-3.2.1 has been attached to this repository. You may also download \href{https://www.netlib.org/clapack/}{here}.
+	
+	
+	
+	See detailed instruction on using BLAS library optimized for your machine in 
+	CLAPACK/README.install at step (4).
+	
+	
+	
+	For a fast default installation, you will need to
+	\begin{table}[!h]
+		\begin{tabular}{ll}
+			- Clone TreeScaper repository from GitHub                   &(see step 1 below)\\
+			- Relocate CLAPACK-3.2.1 and modify CLAPACK make.inc file   &(see step 2 below)\\
+			- Modify TreeScaper makeCLVTreeScaper.inc file              &(see step 2 below)\\
+			- Make CLAPACK library                                      &(see step 3 below)\\
+			- Make CLVTreeScaper binary                                 &(see step 3 below)\\
+		\end{tabular}
+	\end{table}
+	
+	
+	
+	\textbf{Procedure for installing CLAPACK.}
+	
+	
+	
+	\begin{enumerate}[label = (\arabic*)]
+		\item \texttt{git clone -b zdver https://github.com/TreeScaper/TreeScaper.git} to build 
+		the following directory structure:
+		
+		\begin{table}[!h]
+			\begin{tabular}{ll}
+				\texttt{TreeScaper/README.install}           &this file\\
+
+				\texttt{TreeScaper/makeCLVTreeScaper.inc}    &compiler, compile flags and library\\ 
+				&definitions for TreeScaper.\\
+				\texttt{TreeScaper/CLAPACK-3.2.1/}           &CLAPACK attached in TreeScaper.\\
+				\texttt{TreeScaper/CLAPACK-3.2.1/make.inc}   &compiler, compile flags and library\\
+				&definitions, for TreeScaper.\\
+			\end{tabular}
+		\end{table} 
+		
+		\item Move \texttt{/CLAPACK-3.2.1} outside TreeScaper and modify 
+		\texttt{/CLAPACK-3.2.1/make.inc}.
+		For default installation, you need to only modify the OS postfix name
+		\texttt{PLAT} in \texttt{/CLAPACK-3.2.1/make.inc}.
+		For advanced installation, please refer to \texttt{/CLAPACK-3.2.1/README.install}
+		
+		Update the path of CLAPACK:
+		\texttt{CLAPPATH} in \texttt{makeCLVTreeScaper.inc}
+		and make sure the OS postfix name is consistent with \texttt{CLAPACK} setting,
+		i.e. \texttt{PLAT} in \texttt{/CLAPACK-3.2.1/make.inc} and in \texttt{makeCLVTreeScaper.inc}
+		must be the same.
+		
+		=============================================================================
+		
+		(2)' If there is a \texttt{CLAPACK} already built in your machine. Make sure it has
+		the following directory structure:
+		
+		\begin{table}[!h]
+			\begin{tabular}{ll}
+				\texttt{CLAPACK/BLAS/}       &C source for BLAS\\
+				\texttt{CLAPACK/F2CLIBS/}    &f2c I/O functions (libI77) and math functions (libF77)\\
+				\texttt{CLAPACK/INSTALL/}    &Testing functions and pre-tested make.inc files\\
+				&for various platforms.\\
+				\texttt{CLAPACK/INCLUDE/}    &header files - clapack.h is including C prototypes \\
+				&of all the CLAPACK routines.\\
+				\texttt{CLAPACK/SRC/}        &C source of LAPACK routines\\
+			\end{tabular}
+		\end{table} 
+		
+		
+		
+		
+		Update the path of \texttt{CLAPACK}:
+		\texttt{CLAPPATH} in \texttt{makeCLVTreeScaper.inc}
+		and check the OS postfix name of \texttt{lapack\_XXX.a} and \texttt{blas\_XXX.a} and modify
+		\texttt{PLAT} in \texttt{makeCLVTreeScaper.inc}
+		
+		For example, if the naming is lapack\_MAC.a and lapack\_MAC.a then, modify\\
+		\texttt{PLAT = \_LINUX}\\
+		in \texttt{makeCLVTreeScaper.inc}. If the naming is \texttt{lapack.a} and \texttt{blas.a}, modify\\
+		\texttt{PLAT =}\\
+		in \texttt{makeCLVTreeScaper.inc}.
+		
+		=============================================================================
+		
+		\item Go to TreeScaper directory. To install the CLAPACK,
+		run \texttt{make CLAPACK}
+		
+		To compile the TreeScaper, run \texttt{make} or \texttt{make CLVTreeScaper}.
+		
+		You may move the binary CLVTreeScaper to other location for your,
+		convenience. Make sure you also move the default parameters files 
+		nldr\_parameters.csv and dimest\_parameters.csv to maintain the structure:
+		
+		\begin{table}[!h]
+			\begin{tabular}{ll}
+				\texttt{/CLVTreeScaper}           &the CLVTreeScaper binary\\
+				\texttt{/nldr\_parameters.csv}    &parameters for nldr routines\\
+				\texttt{/dimest\_parameters.csv}  &parameters for dimension estimation routines\\
+			\end{tabular}
+		\end{table} 
+		
+		
+	\end{enumerate}
+	
+	
+	
+	
+
+	To update the 'zdver' GitHub branch,
+	\begin{enumerate}[label = \arabic*)]
+		\item Keep your customized makeCLVTreeScaper.inc file.
+		\item  Run \texttt{git pull}
+		\item If the makeCLVTreeScaper.inc got overwritten, restore your
+		customized version.
+		\item If there is no change on CLAPACK side, which is usually the case,
+		run \texttt{make CLVTreeScaper} to get the new binary.
+	\end{enumerate}
+	
+	Warning: you are not suggested to comment any local modification on this 
+	branch. 
+	
+
+	
+	\section{Command line arguments list}
+	
+	The command line version binary file accept a long list of arguments for particular tasks, especially for complicated tasks on trees. Figure \ref{fig:argumentcurrent} shows the structure of keywords \texttt{-dimest}, \texttt{-nldr} and \texttt{-trees} with their outputs and possible dependency between these output. In this figure, solid arrowed line represents output file of routine and dashed arrowed line represents possible dependency between files and routines.
+	
+	\begin{figure}[!h]
+		\includegraphics[width=\textwidth]{ArgumentList1.jpg}
+		\caption{Argument List and routine structure of the current version.}
+		\label{fig:argumentcurrent}
+	\end{figure}
+	
+	TreeScaper binary takes a long command to execute a complicated task like performing community detection on a set of trees. The typical procedures TreeScaper is going to perform are
+	\begin{enumerate}
+		\item compute bipartition matrix of trees;
+		\item compute trees distance matrix and affinity matrix or compute bipartition covariance matrix;
+		\item perform community detection methods.
+	\end{enumerate}
+	
+
+	These procedures are specified with one command like\\
+	\texttt{./CLVTreeScaper -trees -f test.tre -ft trees -r 1 -w 1 -o Community -t Affinity -dm RF -cm CNM -lm auto}\\
+	and produce bipartition matrix, affinity/covariance matrix and CD results, which is what the dashed line between output files from keyword \texttt{-trees}. Since these dependency happen internally in one command, we have no control over the intermediate results, i.e., modifications like manually setting threshold for affinity before CD is not possible.
+	
+	Such commands are inconvenient and also difficult to cooperate with the GUI system we are building on CloudForest. Therefore, keyword and command structure shown in Fig.\ref{fig:argumentnew} is proposed, while the old structure will remain in the TreeScaper binary until the new system become reliable. 
+	
+
+	\begin{figure}[!h]
+		\includegraphics[width=\textwidth]{ArgumentList2.jpg}
+		\caption{Argument List and routine structure of the new version.}
+		\label{fig:argumentnew}
+	\end{figure}
+
+	New key arguments \texttt{-format}, \texttt{-comm} and \texttt{-aff} are added to TreeScaper. The new structure is centered at files with header information (in order to simplify file names and shorten argument list). \texttt{-format} takes care of converting files from other source with different format to files consistent with TreeScaper.
+	
+	\texttt{-aff} and \texttt{-comm} which stand for affinity and community detection are separated from \texttt{-tree}, which now only takes care of computing bipartition matrix, distance matrix and covariance matrix from tree file. Users are now able to perform any modification on output files from \texttt{-tree}, for example, send them to \texttt{-nldr}. Then \texttt{-comm} will take these (modified) files and other necessary information to perform CD methods.
+	
+	\subsection{\texttt{-dimest} arguments}
+	
+	\subsection{\texttt{-nldr} arguments}
+	
+	\subsection{\texttt{-trees} arguments}
+	
+	\subsection{\texttt{-aff} arguments}
+	
+	\subsection{\texttt{-comm} arguments}
+	
+	\subsection{\texttt{-format} arguments}
+	
+	
 	
 	\section{Basic data structures}
 	
@@ -222,7 +400,9 @@
 		
 		Error: The invariance of transformation seems to be only true for Euclidean space. For more abstract $D^{(2)}$ generated from more general metric on Riemannian manifold, the scaling $-\frac{1}{2}JD^{(2)}J$ does not preserves positive definiteness of the squared distance matrix, which further causes negative eigenvalues in the following PCA, the eigendecomposition, process.
 		
-		Warning: The squared distance matrix $D^{(2)}$ used in here is inconsistent with the distance matrix $D$ computed in \mmemref{compute\_Distance\_Matrix}{computeDistanceMatrix}, in difference of entry-wise squared or not. 
+		Warning: The squared distance matrix $D^{(2)}$ used in here is inconsistent with the distance matrix $D$ computed in 
+		%\mmemref{compute\_Distance\_Matrix}{computeDistanceMatrix},
+		\texttt{compute\_Distance\_Matrix} in difference of entry-wise squared or not. 
 		
 		\item \texttt{Matrix<double> compute\_Distance\_Matrix()}
 		
