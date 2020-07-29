@@ -123,26 +123,21 @@ const char &String::operator[](int subscript) const
 String String::operator()(int index, int sub_length)
 {
 	//ensure index is in range and subString length >= 0
-	assert( index >= 0 && index < length && sub_length >=0 );
+	assert(index >= 0 && index < length && sub_length >= 0);
 	String str;
 	String *sub_ptr = &str;       //empty String
 	assert(sub_ptr != 0);               // ensure new String allocated
 
-	// determin length of subString
-	//if( ( sub_length == 0) || ( index + sub_length > length ) )
-		//sub_ptr->length = length - index + 1;
-	//else
-		//sub_ptr->length = sub_length;
+										// throw when the sub_string went beyond the string
+	assert((sub_length != 0) && (index + sub_length <= length + 1));
 
-  assert((sub_length != 0) && (index + sub_length <= length + 1));
-  // throw when the sub_string went beyond the string
-  sub_ptr->length = sub_length;
+	sub_ptr->length = sub_length;
 	// allocate memory for subString
-	delete [] sub_ptr->str_ptr;         // delete character array from object
+	delete[] sub_ptr->str_ptr;         // delete character array from object
 	sub_ptr->str_ptr = new char[sub_ptr->length + 1];
 	assert(sub_ptr->str_ptr != 0);      // ensure space allocated
 
-	// copy subString into new String
+										// copy subString into new String
 	strncpy(sub_ptr->str_ptr, &str_ptr[index], sub_ptr->length);
 	sub_ptr->str_ptr[sub_ptr->length] = '\0';       // terminate String
 
@@ -182,6 +177,25 @@ void String::set_String( const char *String2)
 	str_ptr = new char[length + 1];    // allocate storage
 	assert( str_ptr != 0);             // terminate if memory not allocated
 	strcpy( str_ptr, String2);         // copy literal to object
+}
+
+String time_stamp(char filler) {
+	time_t t = time(0);
+	struct tm * timeStruct = localtime(&t);
+	char temp[10];
+	String result;
+	itoa(timeStruct->tm_mon, temp, 10);
+	result += temp;
+	result.add(filler);
+	itoa(timeStruct->tm_mday, temp, 10);
+	result += temp;
+	result.add(filler);
+	itoa(timeStruct->tm_hour, temp, 10);
+	result += temp;
+	result.add(filler);
+	itoa(timeStruct->tm_min, temp, 10);
+	result += temp;
+	return result;
 }
 
 #endif

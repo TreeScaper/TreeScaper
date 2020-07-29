@@ -113,7 +113,15 @@ public:
 		init_NLDR(fname, ftype, dim, cost, algo, init_md, flag, seed, para_fname);
 	}
 
+	NLDR(map<String, String> &p) {
+		paras = p;
+		init_NLDR();
+	}
+
 	void init_NLDR(String fname, String ftype, String dim, String cost, String algo = (String) "", String init_md = (String) "CLASSIC_MDS", String flag = (String) "", long seed = -1, String para_fname = "");
+
+	void init_NLDR();
+
 #endif
 
 	void Compute_NLDR();
@@ -131,13 +139,19 @@ private:
 	void NLDR_init_parameters(String para_filename);
 
 	void NLDR_load_MX();
+
+	void NLDR_load_MX(String fname);
 #endif
 
 	void make_output_file_names(String &filename_COR, String &filename_DIS, String &filename_STR, String &filename_TIM, String &filename_TRU, String &filename_CON, String &filename_1NN);
 
 	void NLDR_load_D();
 
+	void NLDR_load_D(String fname);
+
 	void NLDR_init_X(String init_md, long seed);
+
+	void NLDR_init_X();
 
 	String make_filename(String name_D, String dimension, String cost_f, String output, String algorithm, String flag);
 
@@ -295,13 +309,15 @@ private:
 	Matrix<double> DIS;
 	long time_cost;
 	double STRESS;
-	// result analysis
+//result analysis
 	Matrix<double> Trustworthiness;
 	Matrix<double> Continuity;
 	Matrix<double> oneNN;
 	double para1;
 	double para2;
     double para3;
+//parameters
+	map<String, String> paras;
 };
 
 #endif

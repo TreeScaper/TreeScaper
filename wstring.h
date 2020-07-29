@@ -81,6 +81,8 @@ private:
 	void set_String(const char *);          // utility function
 };
 
+String time_stamp(char filler = '_');
+
 extern String EMPTY_STRING;
 
 #endif

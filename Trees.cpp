@@ -1308,17 +1308,17 @@ string Trees::make_Bipart_Matrix_name(string fname)
 		result = "";
 
 	result += "Bipartition";
-	time_t t = time(0);
-	struct tm * timeStruct = localtime(&t);
-	result += "_";
-	result += to_string(timeStruct->tm_mon);
-	result += "_";
-	result += to_string(timeStruct->tm_mday);
-	result += "_";
-	result += to_string(timeStruct->tm_hour);
-	result += "_";
-	result += to_string(timeStruct->tm_min);
-	result += ".txt";
+	//time_t t = time(0);
+	//struct tm * timeStruct = localtime(&t);
+	//result += "_";
+	//result += to_string(timeStruct->tm_mon);
+	//result += "_";
+	//result += to_string(timeStruct->tm_mday);
+	//result += "_";
+	//result += to_string(timeStruct->tm_hour);
+	//result += "_";
+	//result += to_string(timeStruct->tm_min);
+	result += ".out";
 	return result;
 }
 //########################ZD comment########################################

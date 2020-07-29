@@ -84,6 +84,18 @@ public:
 
     String postfix_name_lastof();
 
+	int end_header();
+	// Return the end position of header information (return 0 if no header information existed).
+
+	void insert_header(String ** info, int lines);
+	// Insert header information stored in info.
+
+	bool check_header(String content);
+	// Return true if "content" presents in header informaion of the file.
+
+	int load_header(String** info);
+	// Return lines of header information and store them in info.
+
 private:
     std::fstream fhandle;
 	String fname;
