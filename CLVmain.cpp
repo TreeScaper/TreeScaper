@@ -53,6 +53,8 @@ void dimest_driver(String fname, String Est, String Init, String para_fname);
 void driver(String fname, String ftype, String dim, String cost, String algo, String init_md, String flag, long seed, String para_fname);
 void nldr_driver(map<String, String> &paras);
 void aff_driver(map<String, String> &paras);
+String get_path(String fname)；
+
 
 int main(int argc, char* argv[])
 {
@@ -101,7 +103,7 @@ int main(int argc, char* argv[])
 		paras["-path"] = get_path(paras[String("-f")]);
         cout << "loading all parameters" << endl;
         //driver(default_paras[0], default_paras[1], default_paras[2], default_paras[3], default_paras[4], default_paras[5], default_paras[6], atoi(default_paras[7]), default_paras[8]);
-        nldr_driver(paras)
+		nldr_driver(paras);
 		return 0;
     } else
     if(argc > 1 && (String) argv[1] == (String) "-trees")
@@ -437,7 +439,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 			outBipartMatrix.close();
 
 			namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname);
-			File file_Bipart(namebipartmatrix);
+			File file_Bipart(namebipartmatrix.c_str());
 			file_Bipart.clean();
 			info[2][1] = "List format";
 			file_Bipart.insert_header(info, 4);
@@ -498,7 +500,7 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
         TreesData->print_matrix("Covariance Matrix", outCovaName);
         cout << "Successfully printed Covariance Matrix matrix!" << endl;
 
-		String outCovaName2 = paras["-path"]
+		String outCovaName2 = paras["-path"];
 		outCovaName2 += "Covariance.out";
 
 
@@ -508,7 +510,7 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
 		file_Cova.insert_header(info, 4);
 		file_Cova.close();
 
-		TreesData->print_matrix2("Covariance Matrix", outCovaName2);
+		TreesData->print_matrix2("Covariance Matrix", (char *)outCovaName2);
 
         if(paras["-o"] == (String) "Community")
         {
@@ -531,7 +533,7 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
 		file_Cova.insert_header(info, 4);
 		file_Cova.close();
 
-		TreesData->print_matrix2("Covariance Matrix", outCovaName2);
+		TreesData->print_matrix2("Covariance Matrix", (char *)outCovaName2);
 
         if(paras["-o"] == (String) "Community")
         {
@@ -680,7 +682,7 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
 		file_Dist.clean();
 		file_Dist.insert_header(info, 6);
 		file_Dist.close();
-		TreesData->print_matrix2(memorydata, outDistName2);
+		TreesData->print_matrix2(memorydata, (char *)outDistName2);
     }
     
     if(paras["-ft"] == (String) "Dist")
@@ -1031,4 +1033,16 @@ void aff_driver(map<String, String> & paras) {
 			file_Aff << aff_mat(i, j) << "\t";
 		file_Aff << "" << std::endl;
 	}
+}
+
+
+String get_path(String fname) {
+	String path = fname;
+	std::string temp = (char*)path;
+	size_t loc_slash = temp.find_last_of('/');
+	if (loc_slash != string::npos)
+		path = path(0, loc_slash + 1);
+	else
+		path = "";
+	return path;
 }
