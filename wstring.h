@@ -44,8 +44,9 @@ class String {
 	};
 
 public:
-    String( const char * s = "");                 // constuct and default empty String
-	String( const String &);                    // copy constructor
+    String( const char * s = "");               // constuct and default empty String
+	String( const String &);					// copy constructor
+	String(const std::string &src);
     ~String();                                  // destructor
 	const String &operator=(const String &);    // assignment
 	const String &operator+=(const String &);   // concatenation

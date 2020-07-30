@@ -43,6 +43,12 @@ String::String(const String &copy) : length(copy.length)
 	set_String(copy.str_ptr);           // call utility function
 }
 
+//Cast from std::string
+String::String(const std::string &src) : length(src.length())
+{
+	set_String(src.data());
+}
+
 // destructor
 String::~String()
 {
@@ -182,18 +188,18 @@ void String::set_String( const char *String2)
 String time_stamp(char filler) {
 	time_t t = time(0);
 	struct tm * timeStruct = localtime(&t);
-	std::string temp;
+	String temp;
 	String result;
-	temp = std::to_string(timeStruct->tm_mon);
+	temp = String(std::to_string(timeStruct->tm_mon));
 	result += temp;
 	result.add(filler);
-	temp = std::to_string(timeStruct->tm_mday);
+	temp = String(std::to_string(timeStruct->tm_mday));
 	result += temp;
 	result.add(filler);
-	temp = std::to_string(timeStruct->tm_hour);
+	temp = String(std::to_string(timeStruct->tm_hour));
 	result += temp;
 	result.add(filler);
-	temp = std::to_string(timeStruct->tm_min);
+	temp = String(std::to_string(timeStruct->tm_min));
 	result += temp;
 	return result;
 }

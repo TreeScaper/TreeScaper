@@ -863,6 +863,7 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
 
 
 	File file_Conf(outName2);
+	fstream outConf();
 	
 
 	if (paras["-cfm"] == (String) "Newick")
@@ -876,7 +877,7 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
 		file_Conf.clean();
 		file_Conf.insert_header(info, 6);
 		file_Conf.close();
-		TreesData->WriteConsensusTree(outName2, NEWICK);
+		TreesData->WriteConsensusTree((char *)outName2, NEWICK);
 	}
 	else
 		if (paras["-cfm"] == (String) "Nexus")
@@ -890,7 +891,7 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
 			file_Conf.clean();
 			file_Conf.insert_header(info, 6);
 			file_Conf.close();
-			TreesData->WriteConsensusTree(outName2, NEXUS);
+			TreesData->WriteConsensusTree((char *)outName2, NEXUS);
 		}
 		else
 		{
