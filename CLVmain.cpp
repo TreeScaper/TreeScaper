@@ -55,7 +55,6 @@ void nldr_driver(map<String, String> &paras);
 void aff_driver(map<String, String> &paras);
 String get_path(String fname);
 
-
 int main(int argc, char* argv[])
 {
     if(argc > 1 && (String) argv[1] == (String) "-dimest")

@@ -182,18 +182,18 @@ void String::set_String( const char *String2)
 String time_stamp(char filler) {
 	time_t t = time(0);
 	struct tm * timeStruct = localtime(&t);
-	string temp;
+	std::string temp;
 	String result;
-	temp = to_string(timeStruct->tm_mon);
+	temp = std::to_string(timeStruct->tm_mon);
 	result += temp;
 	result.add(filler);
-	temp = to_string(timeStruct->tm_mday);
+	temp = std::to_string(timeStruct->tm_mday);
 	result += temp;
 	result.add(filler);
-	temp = to_string(timeStruct->tm_hour);
+	temp = std::to_string(timeStruct->tm_hour);
 	result += temp;
 	result.add(filler);
-	temp = to_string(timeStruct->tm_min);
+	temp = std::to_string(timeStruct->tm_min);
 	result += temp;
 	return result;
 }
