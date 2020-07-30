@@ -907,7 +907,7 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
 			file_Conf.clean();
 			file_Conf.insert_header(info, 6);
 			file_Conf.close();
-			TreesData->WriteConsensusTree(outName2, NEXUS);
+			TreesData->WriteConsensusTree(outName3, NEXUS);
 			return;
 		}
 }
@@ -972,16 +972,9 @@ void aff_driver(map<String, String> & paras) {
 	//		D_file >> D.matrix[i][j];
 	//		D.matrix[j][i] = D.matrix[i][j];
 	//	}
-	String tree;
-	double index;
-	size--;
 	dist_mat.resize(size, size);
-	D_file >> tree;
-	for (int i = 0; i < size; i++)
-		D_file >> index;
 	for (int i = 0; i < size; i++)
 	{
-		D_file >> index;
 		for (int j = 0; j <= i; j++)
 		{
 			D_file >> dist_mat.matrix[i][j];
@@ -1002,7 +995,7 @@ void aff_driver(map<String, String> & paras) {
 	aff_mat.resize(size, size);
 
 
-	if (paras["-am"] == (String) "Exp")
+	if (paras["-am"] == (String) "Rec")
 	{
 		for (int i = 0; i < size; i++)
 			for (int j = 0; j < size; j++)
@@ -1016,7 +1009,7 @@ void aff_driver(map<String, String> & paras) {
 				aff_mat.matrix[i][j] = 1.0 / (eps + dist_mat(i, j));
 		}
 	}
-	else if ((paras["-am"] == (String) "Rec")) {
+	else if ((paras["-am"] == (String) "Exp")) {
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
