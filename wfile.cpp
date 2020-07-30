@@ -158,7 +158,6 @@ String File::postfix_name_lastof()
     return fname(i + 1, fname.get_length() - i - 1);
 };
 
-
 int File::end_header() {
 	(*this).seek(0);
 	int pos = 0;
@@ -167,15 +166,14 @@ int File::end_header() {
 	if (c != '<')
 		return 0;
 	else {
-		while (c != '>' && !(*this).is_end()) {
-			(*this) >> c;
-			pos++;
-		}
+		while (c != '>' && !(*this).is_end())
+			fhandle.get(c);
 		if ((*this).is_end()) {
 			std::cout << "Error! Wrong header information format.\n";
 			throw(1);
 		}
-		pos++;
+		else
+			pos = fhandle.tellp();
 	}
 
 	return pos;
