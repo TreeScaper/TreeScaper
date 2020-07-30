@@ -53,7 +53,7 @@ void dimest_driver(String fname, String Est, String Init, String para_fname);
 void driver(String fname, String ftype, String dim, String cost, String algo, String init_md, String flag, long seed, String para_fname);
 void nldr_driver(map<String, String> &paras);
 void aff_driver(map<String, String> &paras);
-String get_path(String fname)；
+String get_path(String fname);
 
 
 int main(int argc, char* argv[])
@@ -456,7 +456,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 			outBipartMatrix.close();
 
 			namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname);
-			File file_Bipart(namebipartmatrix);
+			File file_Bipart(namebipartmatrix.c_str());
 			file_Bipart.clean();
 			info[2][1] = "Matrix format";
 			file_Bipart.insert_header(info, 4);
@@ -857,7 +857,7 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
 	confname += paras["-ct"];
 	confname += "_consensus_tree.out";
 	string outName = (char *)confname;
-	string outName2 = (char *)paras["-f"];
+	//string outName2 = (char *)paras["-f"];
 
 	String outName2 = paras["-path"];
 	outName2 += "Consensus.out";
