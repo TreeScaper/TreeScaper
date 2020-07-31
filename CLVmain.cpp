@@ -53,6 +53,7 @@ void dimest_driver(String fname, String Est, String Init, String para_fname);
 void driver(String fname, String ftype, String dim, String cost, String algo, String init_md, String flag, long seed, String para_fname);
 void nldr_driver(map<String, String> &paras);
 void aff_driver(map<String, String> &paras);
+void comm_driver(map<String, String> &paras);
 String get_path(String fname);
 
 int main(int argc, char* argv[])
@@ -161,6 +162,34 @@ int main(int argc, char* argv[])
 
 		aff_driver(paras);
 		return 0;
+	else if (argc > 1 && (String)argv[1] == (String) "-comm") {
+		String default_paras[14] = { "Covariance", "CNM", "1", "0", "1",
+			"0", "1", "0", "1", "0", "1", "0", "auto", "Trees" };
+		String options[14] = { "-t", "-cm", "-lp", "-lps", "-lpe", 
+			"-lpiv", "-ln", "-lns", "-lne", "-lniv", "-hf", "-lf", "-lm", "-ft" };
+		for (int i = 1; i < argc; i++)
+		{
+			for (int j = 0; j < 2; j++)
+			{
+				if ((String)argv[i] == options[j] && i + 1 < argc && argv[i + 1][0] != '-')
+				{
+					i++;
+					default_paras[j] = argv[i];
+					break;
+				}
+			}
+		}
+		map<String, String> paras;
+		for (int i = 0; i < 14; i++)
+		{
+			paras[options[i]] = default_paras[i];
+		}
+		paras["-path"] = get_path(paras[String("-f")]);
+		cout << "loading all parameters" << endl;
+
+		comm_driver(paras);
+		return 0;
+	}
 	}else
     if(argc == 2 && ((String) argv[1] == (String) "-h" || (String) argv[1] == (String) "-help"))
     {
@@ -352,6 +381,30 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+int check_info(String** info, String content, int &lines) {
+	int ind = lines;
+	for (int i = 0; i < lines; i++) {
+		if (info[i][0] == content) {
+			ind = i;
+			break;
+		}
+	}
+	if (ind == lines)
+		lines++;
+	return ind;
+}
+
+String get_path(String fname) {
+	String path = fname;
+	std::string temp = (char*)path;
+	size_t loc_slash = temp.find_last_of('/');
+	if (loc_slash != string::npos)
+		path = path(0, loc_slash + 1);
+	else
+		path = "";
+	return path;
+}
+
 void trees_driver(map<String, String> &paras)
 {
     String fname = paras["-f"];
@@ -443,7 +496,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 			info[2][1] = "List format";
 			file_Bipart.insert_header(info, 4);
 			file_Bipart.close();
-			outBipartMatrix.open(namebipartmatrix.c_str());
+			outBipartMatrix.open(namebipartmatrix.c_str(), ios::app);
 			TreesData->OutputBipartitionMatrix(outBipartMatrix, RCVLIST);
 		}
 		else if (paras["-bfm"] == (String) "matrix")
@@ -460,7 +513,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 			info[2][1] = "Matrix format";
 			file_Bipart.insert_header(info, 4);
 			file_Bipart.close();
-			outBipartMatrix.open(namebipartmatrix.c_str());
+			outBipartMatrix.open(namebipartmatrix.c_str(), ios::app);
 			TreesData->OutputBipartitionMatrix(outBipartMatrix, FULLMATRIX);
 			}
 		else
@@ -505,7 +558,7 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
 
 		File file_Cova(outCovaName2);
 		file_Cova.clean();
-		info[2][1] = "Trees";
+		info[2][1] = "Bipartitions";
 		file_Cova.insert_header(info, 4);
 		file_Cova.close();
 
@@ -528,7 +581,7 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
 
 		File file_Cova(outCovaName2);
 		file_Cova.clean();
-		info[2][1] = "Bipartition";
+		info[2][1] = "Unknown from file";
 		file_Cova.insert_header(info, 4);
 		file_Cova.close();
 
@@ -813,9 +866,10 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
 			cout << "Error: Can not open the data file!" << endl;
 			return;
 		}
-		file.seek(0);
+		int pos_header = file.end_header();
+		file.seek(pos_header);
 		int num = file.lines();
-		file.seek(0);
+		file.seek(pos_header);
 		treeidx->resize(num);
 
 		for (int i = 0; i < num; i++)
@@ -931,21 +985,6 @@ void nldr_driver(map<String, String> &paras)
 	nLdr.output_to_files();
 }
 
-
-
-int check_info(String** info, String content, int &lines) {
-	int ind = lines;
-	for (int i = 0; i < lines; i++) {
-		if (info[i][0] == content) {
-			ind = i;
-			break;
-		}
-	}
-	if (ind == lines)
-		lines++;
-	return ind;
-}
-
 void aff_driver(map<String, String> & paras) {
 	Matrix<double> dist_mat;
 	Matrix<double> aff_mat;
@@ -1030,14 +1069,79 @@ void aff_driver(map<String, String> & paras) {
 	}
 }
 
+//void comm_driver(map<String, String> &paras)
+//{
+//	int modelType = 0;
+//	if (paras["-cm"] == (String) "CNM")
+//		modelType = 3;
+//	else
+//		if (paras["-cm"] == (String) "CPM")
+//			modelType = 4;
+//		else
+//			if (paras["-cm"] == (String) "ERNM")
+//				modelType = 2;
+//			else
+//				if (paras["-cm"] == (String) "NNM")
+//					modelType = 1;
+//
+//	string stdparam3 = (char *)paras["-hf"];
+//	string stdparam4 = (char *)paras["-lf"];
+//
+//	if (paras["-lm"] == (String) "auto")
+//	{
+//		if (TreesData->compute_community_automatically(memorydata, modelType, stdparam3, stdparam4))
+//		{
+//			cout << "Successfully detected communities of " << memorydata << " by model: " << paras["-cm"] << " with high freq. bound:" << stdparam3 << ", low freq. bound:" << stdparam4 << "!" << endl;
+//			cout << "Lambdas are chosen automatically." << endl;
+//		}
+//		return;
+//	}
+//
+//	Array<double> param1;
+//	double lpiv = atof((char *)paras["-lpiv"]);
+//	double lp = atof((char *)paras["-lp"]);
+//	double lps = atof((char *)paras["-lps"]);
+//	double lpe = atof((char *)paras["-lpe"]);
+//
+//	if (0 == lpiv)
+//	{
+//		param1.resize(1);
+//		param1[0] = lp;
+//	}
+//	else
+//	{
+//		int size = (int)((lpe - lps) / lpiv + 1);
+//		param1.resize(size);
+//		for (int i = 0; i < size; i++)
+//			param1[i] = lps + i * lpiv;
+//	}
+//
+//	Array<double> param2;
+//	double lniv = atof((char *)paras["-lniv"]);
+//	double ln = atof((char *)paras["-ln"]);
+//	double lns = atof((char *)paras["-lns"]);
+//	double lne = atof((char *)paras["-lne"]);
+//
+//	if (0 == lniv)
+//	{
+//		param2.resize(1);
+//		param2[0] = ln;
+//	}
+//	else
+//	{
+//		int size = (int)((lne - lns) / lniv + 1);
+//		param2.resize(size);
+//		for (int i = 0; i < size; i++)
+//			param2[i] = lns + i * lniv;
+//	}
+//
+//	if (TreesData->compute_community_manually(memorydata, modelType, param1, param2, stdparam3, stdparam4))
+//	{
+//		cout << "Successfully detected communities of " << memorydata << " by model: " << paras["-cm"] << " with high freq. bound:" << stdparam3 << ", low freq. bound:" << stdparam4 << "!" << endl;
+//		cout << "Lambda positive: " << param1 << endl;
+//		cout << "Lambda negative: " << param2 << endl;
+//	}
+//}
 
-String get_path(String fname) {
-	String path = fname;
-	std::string temp = (char*)path;
-	size_t loc_slash = temp.find_last_of('/');
-	if (loc_slash != string::npos)
-		path = path(0, loc_slash + 1);
-	else
-		path = "";
-	return path;
-}
+
+void comm_driver(map<String, String> &paras) {}

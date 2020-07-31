@@ -243,11 +243,113 @@
 	
 	\subsection{\texttt{-dimest} arguments}
 	
+	\clearpage
+	
 	\subsection{\texttt{-nldr} arguments}
+	
+	The key \texttt{-nldr} takes in a distance matrix of $n$ points $p_i, i =1,\cdots, n$ on certain metric space and return coordinates of $\title{p}_i$, lies on Euclidean space $\mathbb{R}^k$ along with other useful information. In particular, the coordinates matrix $\tilde{C}$ of $\tilde{p}_i$ stores in \texttt{NLDR\_COR.out} and the Euclidean distance matrix $\tilde{D}$ stores in \texttt{NLDR\_DIS.out}.
+	
+	\begin{table}[!h]
+		\centering
+		\begin{tabular}{cll}
+			\hline
+			Arguments & Description & options\\
+			\hline
+			\texttt{-f}& Source file &  \\
+			\hline
+			\texttt{-t}& Data type & \texttt{COR}, \texttt{DIS}\\
+			\hline
+			\texttt{-d}& Target dimension, $k$&\\
+			\hline
+			\texttt{-c}& Cost function& \texttt{CCA}, \texttt{SAMMON}, \texttt{CLASSIC\_MDS}\\
+			&&\texttt{KRUSKAL1}, \texttt{NORMALIZED}\\
+			\hline
+			\texttt{-a}& Algorithm & \texttt{STOCHASTIC}, \texttt{METROPOLIS}, \texttt{GAUSS\_SEIDEL}\\
+			&&\texttt{LINEAR\_ITERATION}, \texttt{MAJORIZATION}\\
+			\hline
+			\texttt{-i}& Initial guess & \texttt{RAND}, \texttt{CLASSIC\_MDS}\\
+			\hline
+			\texttt{-o}& Output postfix&\\
+			\hline
+			\texttt{-p}& Parameter file&\\
+			\hline
+		\end{tabular}
+	\end{table}
+	
+	\clearpage
 	
 	\subsection{\texttt{-trees} arguments}
 	
+	The key \texttt{-trees} is able to accomplish multiple tasks:
+	\begin{enumerate}
+		\item Distance: it takes in $n$ trees and return a distance matrix $D\in \mathbb{R}^{n \times n}$
+		\item Affinity: it takes in $n$ trees or a distance matrix $D$ and return an affinity matrix $A$ computed from $D$ or certain distance matrix from the input trees set.
+		\item Consensus tree: it takes in $n$ trees and return the consensus tree from input trees set.
+		\item Covariance: it takes in $n$ trees and return the covariance matrix $Cov\in \mathbb{R}^{m\times m}$ of $m$ bipartition appeared in the trees set.
+		\item Community: it takes in affinity matrix or covariance matrix and perform the community detection method.
+	\end{enumerate}
+
+	Note that all tasks are coupled with each other if there is mathematical dependence. For example, when \texttt{-o Affinity} appears, \texttt{-trees} computes and outputs bipartition matrix, distance matrix and affinity matrix; when \texttt{-o Community -t Covariance} appears, \texttt{-trees} computes and outputs bipartition matrix, covariance matrix and community detection results.
+	
+	\begin{table}[!h]
+		\centering
+		\begin{tabular}{cll}
+			\hline
+			Arguments & Description & options\\
+			\hline
+			\texttt{-f}& Source file &  \\
+			\hline
+			\texttt{-ft}& Data type & \texttt{Trees}, \texttt{Cova}\\
+			\hline
+			\texttt{-w}& Weighted tree flag&\\
+			\hline
+			\texttt{-r}& Rooted tree flag& \\
+			\hline
+			\texttt{-o}& Output type & \texttt{DIS}, \texttt{Affinity}, \texttt{Consensus}\\
+			&&\texttt{Covariance}, \texttt{Community}\\
+			\hline
+			\texttt{-bfm}& Bipartition output format & \texttt{list}, \texttt{matrix}\\
+			\hline
+			\texttt{-if}& Tree id file&\\
+			\hline
+			\texttt{-ct}& Consensus Tree type& \texttt{Majority}, \texttt{Strict}\\
+			\hline
+			\texttt{-ctm}& Consensus Tree format& \texttt{Nexus}, \texttt{Newick}\\
+			\hline
+			\texttt{-dm}& Distance type& \texttt{RF}, \texttt{URF}, \texttt{Mat}, \texttt{SPR}\\
+			\hline
+			\texttt{-am}& Affinity type& \texttt{Rec}, \texttt{Exp}\\
+			\hline
+			\texttt{-cm}& Community detection method& \texttt{CNM}, \texttt{CPN}, \texttt{ERNM}, \texttt{NNM}\\
+			\hline
+			\texttt{-lm}& Community detection & \texttt{auto}\\
+			& parameter setting&\\
+			\hline
+			\texttt{-t}& Type of label used in & \texttt{Affinity}, \texttt{Covariance}\\
+			& community detection&\\
+			\hline
+		\end{tabular}
+	\end{table}
+	
+	\clearpage
+	
 	\subsection{\texttt{-aff} arguments}
+	
+	The key \texttt{-aff} takes in any distance matrix $D$ and return affinity matrix $A$ computed from $D$.
+	
+	
+	\begin{table}[!h]
+		\centering
+		\begin{tabular}{cll}
+			\hline
+			Arguments & Description & options\\
+			\hline
+			\texttt{-f}& Source file &  \\
+			\hline
+			\texttt{-am}& Affinity type & \texttt{Rec}, \texttt{Exp}\\
+			\hline
+		\end{tabular}
+	\end{table}
 	
 	\subsection{\texttt{-comm} arguments}
 	

@@ -2021,6 +2021,9 @@ void Trees::load_affinityfile(string fname)
 
 void Trees::load_covariancefile(string fname)
 {
+	File file_Cova(fname);
+	int pos_header = file_Cova.end_header();
+	file_Cova.close();
     ifstream covfile(fname.c_str(), ios::binary);
 
     if (!covfile)
@@ -2028,6 +2031,8 @@ void Trees::load_covariancefile(string fname)
         cout << "Unable to open the file!\n\n";
         exit(0);
     }
+
+	covfile.seekg(pos_header);
 
     filecov_size = 0;
     string line;
@@ -2045,7 +2050,7 @@ void Trees::load_covariancefile(string fname)
     filecov = new double *[filecov_size];
     double index;
     covfile.clear();
-    covfile.seekg(0, ios::beg);
+    covfile.seekg(pos_header, ios::beg);
     covfile >> line;
     for (int i = 0; i < filecov_size; i++)
         covfile >> index;
