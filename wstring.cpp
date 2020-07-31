@@ -1,9 +1,9 @@
 
 //##########################################################################
 //# This software is part of the Treescaper i
-//# -- Version 0.1   
+//# -- Version 0.1
 //# Copyright (C) 2010 Wen Huang
-//# 
+//#
 //# This program is free software; you can redistribute it and/or
 //# modify it under the terms of the GNU General Public License
 //# as published by the Free Software Foundation; either version 2
@@ -12,8 +12,8 @@
 //# This program is distributed in the hope that it will be useful,
 //# but WITHOUT ANY WARRANTY; without even the implied warranty of
 //# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//# GNU General Public License for more details. 
-//# http://www.gnu.org/copyleft/gpl.html 
+//# GNU General Public License for more details.
+//# http://www.gnu.org/copyleft/gpl.html
 //##########################################################################
 
 // wstring.cpp
@@ -57,7 +57,7 @@ const String &String::operator=(const String &right)
         delete [] str_ptr;             // prevents memory leak
         length = right.length;         // new String length
         set_String( right.str_ptr);    // call utility function
-	} 
+	}
 	else
         std::cout << "warning: attempted assignment of a String to itself";
 
@@ -116,6 +116,10 @@ const char &String::operator[](int subscript) const
 
 // return a subString beginning at index and
 // of length sublength as a reference to a String object.
+
+// zd_coded: abandoned the interpretation of the parameters
+// so the second interger always represents the length of the substring.
+// - 5/21/20
 String String::operator()(int index, int sub_length)
 {
 	//ensure index is in range and subString length >= 0
@@ -125,10 +129,14 @@ String String::operator()(int index, int sub_length)
 	assert(sub_ptr != 0);               // ensure new String allocated
 
 	// determin length of subString
-	if( ( sub_length == 0) || ( index + sub_length > length ) )
-		sub_ptr->length = length - index + 1;
-	else
-		sub_ptr->length = sub_length;
+	//if( ( sub_length == 0) || ( index + sub_length > length ) )
+		//sub_ptr->length = length - index + 1;
+	//else
+		//sub_ptr->length = sub_length;
+
+  assert((sub_length != 0) && (index + sub_length <= length + 1));
+  // throw when the sub_string went beyond the string
+  sub_ptr->length = sub_length;
 	// allocate memory for subString
 	delete [] sub_ptr->str_ptr;         // delete character array from object
 	sub_ptr->str_ptr = new char[sub_ptr->length + 1];

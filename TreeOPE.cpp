@@ -1,9 +1,9 @@
 
 //##########################################################################
 //# This software is part of the Treescaper i
-//# -- Version 0.1   
+//# -- Version 0.1
 //# Copyright (C) 2010 Wen Huang
-//# 
+//#
 //# This program is free software; you can redistribute it and/or
 //# modify it under the terms of the GNU General Public License
 //# as published by the Free Software Foundation; either version 2
@@ -12,18 +12,29 @@
 //# This program is distributed in the hope that it will be useful,
 //# but WITHOUT ANY WARRANTY; without even the implied warranty of
 //# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//# GNU General Public License for more details. 
-//# http://www.gnu.org/copyleft/gpl.html 
+//# GNU General Public License for more details.
+//# http://www.gnu.org/copyleft/gpl.html
 //##########################################################################
 
 // TreeOPE.cpp
 // Member function definitions for class TreeOPE.h
 //              by whuang gzhou
 
+
+//########################ZD comment########################################
+//# This structure stores a tree by a set of linked nodes.
+//# Most of the routines are implemented as recursive algorithms
+//# in preorder traversal.
+//########################ZD comment########################################
+
 #ifndef TREEOPE_CPP
 #define TREEOPE_CPP
 
 #include "TreeOPE.h"
+
+//########################ZD comment########################################
+//# This is bit-wise addition and assignment macro-routines.
+//########################ZD comment########################################
 
 #define __HALF_MAX_SIGNED(type) ((type)1 << (sizeof(type)*8-2))
 #define __MAX_SIGNED(type) (__HALF_MAX_SIGNED(type) - 1 + __HALF_MAX_SIGNED(type))
@@ -72,6 +83,8 @@
 //    })
 //#endif
 
+
+
 /*
   load a  newick tree from a file
   Params: fname - path to file
@@ -81,6 +94,15 @@
                -2 parse error
                -3 can't open file
  */
+
+ //########################ZD comment########################################
+ //# Read newicktree from file "fname". The tree is stored
+ //# as string, formatted by "()", same level a pair, ",",
+ //# separator of same level of pairs and "\\" for quoted
+ //# informations. Note that this routine only handles
+ //# UNWEIGHTED tree.
+ //########################ZD comment########################################
+
 NEWICKTREE *TreeOPE::loadnewicktree(char *fname, int *error)
 {
   NEWICKTREE *answer = NULL;
@@ -107,6 +129,10 @@ NEWICKTREE *TreeOPE::loadnewicktree(char *fname, int *error)
 
 }
 
+//########################ZD comment########################################
+//# This seems to be a duplicated loadnewicktree.
+//# Both routines are not actually called in TreeScaper.
+//########################ZD comment########################################
 
 NEWICKTREE *TreeOPE::loadnewicktree2(FILE *fp, int *error)
 {
@@ -143,6 +169,13 @@ NEWICKTREE *TreeOPE::loadnewicktree2(FILE *fp, int *error)
               -2 parse error
   Notes: format allows several trees to be stored in a file
  */
+
+ //########################ZD comment########################################
+ //# The implementation of the loadnewicktree. It process
+ //# the string by calling subroutine loadnode in preorder
+ //# recursively. This can be implemented by stack.
+ //########################ZD comment########################################
+
 NEWICKTREE *TreeOPE::floadnewicktree(FILE *fp, int *error)
 {
   NEWICKTREE *answer = NULL;
@@ -186,6 +219,7 @@ NEWICKTREE *TreeOPE::floadnewicktree(FILE *fp, int *error)
 /*
   newick tree destructor
  */
+
 void TreeOPE::killnewicktree(NEWICKTREE *tree)
 {
 
@@ -319,6 +353,15 @@ char *TreeOPE::makenewicklabel(const char *str)
   Returns: node loaded.
   Notes: recursive. Expects the opening parenthesis to have been eaten
  */
+
+//########################ZD comment########################################
+//# Recursive subroutine for floadnewicktree. "(" indicates
+//# next level of pair, "," indicates the other node of the
+//# current pair, ")" indicates returning to the previous
+//# level. Note that when the string does not start with "(",
+//# it means a leaf is reached and loadleaf should be called.
+//########################ZD comment########################################
+
 NEWICKNODE *TreeOPE::loadnode(FILE *fp, int *error)
 {
   NEWICKNODE *answer = NULL;
@@ -744,6 +787,19 @@ void TreeOPE::GetTaxaLabels(NEWICKNODE *node, LabelMap &lm)
             GetTaxaLabels(node->child[i], lm);
 };
 
+//########################ZD comment########################################
+//# Assigned hash values of computed from its sub-trees,
+//# in recursive way. For leaves, hv1 and hv2 are read
+//# from the hash table directly. For internal nodes,
+//# the hash values are the sum of its children's hash
+//# values. The implementation here is unnecessarily
+//# complicated. Also note that the sum of hash values
+//# is done by the bit-wise marco addition defined earlier.
+//# The particular hash value hv2 is associated to
+//# this string representation of the bipartition and
+//# stored in hash2bitstr.
+//########################ZD comment########################################
+
 void TreeOPE::dfs_compute_hash(
                             NEWICKNODE* startNode,
                             LabelMap &lm,
@@ -876,6 +932,17 @@ void TreeOPE::dfs_compute_hash(
     }
 };
 
+//########################ZD comment########################################
+//# Create the arrays that store hash values,
+//# TreeIdx and weight in preorder. Note that
+//# the "TreeIdx" is an identical array.
+//# Each tree will generate one set of such
+//# arrays and arrays from different trees
+//# are pasted together and sorted by the hash
+//# values. By comparing hash values, identical
+//# bipartitions are found.
+//########################ZD comment########################################
+
 void TreeOPE::bipart(NEWICKNODE * const startnode, unsigned int &treeIdx,
                          unsigned long long *matrix_hv,
                          unsigned int *matrix_treeIdx,
@@ -906,6 +973,11 @@ void TreeOPE::bipart(NEWICKNODE * const startnode, unsigned int &treeIdx,
         if(startnode->child[i]->Nchildren > 0)
             bipart(startnode->child[i], treeIdx, matrix_hv, matrix_treeIdx, matrix_weight, idx, depth, isrooted);
 };
+
+//########################ZD comment########################################
+//# This is a duplicated code for reading weighted binary
+//# tree, which is actually called by TreeScaper.
+//########################ZD comment########################################
 
 NEWICKTREE *TreeOPE::parsetree(char *str, int *error, NEWICKTREE *testtree)
 {
@@ -1449,6 +1521,13 @@ NEWICKNODE *TreeOPE::findleaf(std::string leafname, NEWICKNODE *currentnode, NEW
     return resultnode;
 };
 
+//########################ZD comment########################################
+//# Lift the unrooted tree to rooted tree.  When a tree
+//# is lifted, the node that become parent node does not
+//# free from the memory.
+//########################ZD comment########################################
+
+
 void TreeOPE::normailzedTree(NEWICKNODE *lrpt, NEWICKTREE *newickTree, int indexchild)
 {
     if(newickTree->root->Nchildren == 2)
@@ -1487,6 +1566,10 @@ void TreeOPE::normailzedTree(NEWICKNODE *lrpt, NEWICKTREE *newickTree, int index
 
     normalizedNode(newickTree->root, NULL, 0);
 }
+
+//########################ZD comment########################################
+//# Recursive step of normailzedTree.
+//########################ZD comment########################################
 
 void TreeOPE::normalizedNode(NEWICKNODE *currentnode, NEWICKNODE *parent, double currentweight)
 {
@@ -1548,6 +1631,17 @@ void TreeOPE::Label_strint(NEWICKNODE *node, LabelMap &lm)
     }
 }
 
+//########################ZD comment########################################
+//# Convert Newicktree to Ptree, which is a index-
+//# based tree structure, which does not stored the
+//# the hash value and weight, i.e., the bipartition
+//# and weight information are lost. This is used to
+//# compute match distance. Recall that Ptree has
+//# 3 arrays, indices of left child, indices of right
+//# child and indices of parent and edges matrix,
+//# which is not computed here.
+//########################ZD comment########################################
+
 bool TreeOPE::newick2lcbb(const NEWICKTREE *nwtree, int num_leaves, struct Ptree *tree)
 {
     tree->leaf_number = num_leaves;
@@ -1598,6 +1692,15 @@ bool TreeOPE::newick2lcbb(const NEWICKTREE *nwtree, int num_leaves, struct Ptree
     tree->rchild[num_leaves] = tree->rchild[2 * num_leaves - 1];
     return true;
 }
+
+//########################ZD comment########################################
+//# Implementation of newick2lcbb. Leaves are
+//# labeled with the additional information, taxa#
+//# I assumed, and then tree is reconstructed in
+//# array structure that stored left, right child
+//# and parent label. Note that the edge matrix
+//# is not updated here.
+//########################ZD comment########################################
 
 bool TreeOPE::newick2ptree(NEWICKNODE *node, struct Ptree *tree, bool &currentnode, int &vidx, int &curidx)
 {
@@ -1660,11 +1763,21 @@ int TreeOPE::sumofdegree(NEWICKNODE *node, bool isrooted, int depth)
     return result;
 }
 
+//########################ZD comment########################################
+//# Redundant function
+//########################ZD comment########################################
+
 void TreeOPE::obtainbipartcount(NEWICKTREE *nwtree, bool isrooted, map<unsigned long long, unsigned long long> &bipcount)
 {
 
     bipartcount(nwtree->root, isrooted, bipcount);
 }
+
+//########################ZD comment########################################
+//# Use hash values to count bipartition. Recall that
+//# hv2 represents a bipartition, accumulate the occurance
+//# each hv2 and stored it in bipcount.
+//########################ZD comment########################################
 
 void TreeOPE::bipartcount(NEWICKNODE *node, bool isrooted, map<unsigned long long, unsigned long long> &bipcount, int depth)
 {

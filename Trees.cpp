@@ -20,10 +20,22 @@
 // Member function definitions for class Trees.h
 //              by whuang gzhou
 
+
 #ifndef TREES_CPP
 #define TREES_CPP
 
 #include "Trees.h"
+
+
+
+//########################ZD comment########################################
+//# This structure stores a set of trees and
+//# associated data structure for 4 distances,
+//# which is implemented by a void pointer.
+//# Unless the particular routine for computing
+//# distance is called, the cooresponding pointer
+//# will be empty by default.
+//########################ZD comment########################################
 
 std::map<String, void ***> StrToDist;
 //std::map<String, int ***> StrToIntDist;
@@ -397,6 +409,29 @@ void Trees::print_double_array(T *** arr, int n, string outfile)
 }
 
 template<class T>
+void Trees::print_double_array2(T *** arr, int n, string outfile)
+{
+	ofstream fout;
+	if (outfile != "")
+		fout.open(outfile.c_str(), ios::app);
+
+	if ((*arr) != NULL)
+	{
+
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j <= i; j++)
+			{
+				fout << setw(5) << (*arr)[i][j] << "\t" << ' ';
+			}
+			fout << endl;
+		}
+	}
+	if (outfile != "")
+		fout.close();
+}
+
+template<class T>
 void Trees::print_coordinate_matrix(T *** arr, int n, int m, string outfile)
 {
     ofstream fout;
@@ -437,6 +472,33 @@ void Trees::print_matrix(String str_matrix, string outfile)
         print_double_array((double ***) StrToDist[str_matrix], n_trees, outfile);
     }
 }
+
+void Trees::print_matrix2(String str_matrix, string outfile)
+{
+	if (str_matrix == (String)"Covariance Matrix")
+		print_double_array2((double ***)StrToDist[str_matrix], treecov_size, outfile);
+	else if (str_matrix == (String)"File-covariance")
+		print_double_array2((double ***)StrToDist[str_matrix], filecov_size, outfile);
+	else if (str_matrix == (String)"Matching-distance" || str_matrix == (String)"SPR-distance")
+		print_double_array2((int ***)StrToDist[str_matrix], n_trees, outfile);
+	else if (str_matrix == (String)"File-distance" || str_matrix == (String)"Affinity-filedist")
+		print_double_array2((double ***)StrToDist[str_matrix], file_distsize, outfile);
+	else if (str_matrix == (String)"File-coordinate")
+		print_coordinate_matrix((double ***)StrToDist[str_matrix], file_coordinatesize, file_coordinatedim, outfile);
+	else if (str_matrix == (String)"File-affinity")
+		print_double_array2((double ***)StrToDist[str_matrix], affinityfile_size, outfile);
+	else
+	{
+		print_double_array2((double ***)StrToDist[str_matrix], n_trees, outfile);
+	}
+}
+
+//########################ZD comment########################################
+//# Initialize a set of trees by calling constructer
+//# (parsetree) from TreeOPE for Newick tree, creating
+//# leaveslabelsmaps for NEXUS tree. Complicated string
+//#operations are involved here, which is unnecessary.
+//########################ZD comment########################################
 
 void Trees::initialTrees(string fname)
 {
@@ -588,6 +650,15 @@ Treefileformat Trees::CheckTreeFormat()
     return format;
 };
 
+//########################ZD comment########################################
+//# Another constructor that seems to be duplicated
+//# version of initialTrees. This constructer manipulate
+//# the string in a complicated way to add weighted 1
+//# as default for trees that is unweighted. Also note
+//# that for both NEXUS and Newic trees, they are now
+//# stored in parsetree.
+//########################ZD comment########################################
+
 void Trees::ReadTrees() // newick nexus
 {
     deletetrees();
@@ -729,6 +800,12 @@ void Trees::ReadTrees() // newick nexus
     }
 }
 
+//########################ZD comment########################################
+//# This is associated to the sum of the degrees, s,
+//# of all nodes and the number of leaves, n, :
+//# s/2-n
+//########################ZD comment########################################
+
 void Trees::compute_numofbipart()
 {
     if(numberofbipartition != NULL)
@@ -846,7 +923,7 @@ void Trees::WriteConsensusTree(string &outfile, Treefileformat tf)
         ofstream outNewick;
         int NN = 10000;
         char *gzbuff = (char*) malloc(NN);
-        outNewick.open(outfile.c_str());
+        outNewick.open(outfile.c_str(), ios::app);
 
         char **taxa_str = new char*[leaveslabelsmaps.size()];
         for (int i = 0; i < leaveslabelsmaps.size(); i++)
@@ -879,7 +956,7 @@ void Trees::WriteConsensusTree(string &outfile, Treefileformat tf)
     if(tf == NEXUS)
     {
         ofstream outNexus;
-        outNexus.open(outfile.c_str());
+        outNexus.open(outfile.c_str(), ios::app);
         outNexus << "#NEXUS" << endl;
         outNexus << "BEGIN TAXA;" << endl;
         outNexus << "      dimensions ntax=" << leaveslabelsmaps.size() << ";" << endl;
@@ -996,6 +1073,11 @@ void Trees::Printf(int *idx, int length)
     }
 }
 
+//########################ZD comment########################################
+//# Generate the hash table and compute the
+//# hash value in tree.
+//########################ZD comment########################################
+
 void Trees::Compute_Hash()
 {
     // Set a random number for m1 (= Initial size of hash table)
@@ -1048,6 +1130,16 @@ void Trees::Compute_Hash()
     }*/
 }
 
+//########################ZD comment########################################
+//# The arrays of indivial tree's hashvalue, tree index
+//# and weight were combined and sorted. Since the hash
+//# value represents the unique bipartition, the number
+//# of unique bipartion can be counted via checking the
+//# hash value. As a result, a sparse bipartition matrix
+//# that stores weight of unique bipartition versus
+//# trees is created. The "sort" which is different then
+//# "Sort" is confusing here. Is it the default sort in c++?
+//########################ZD comment########################################
 
 void Trees::Compute_Bipart_Matrix()
 {
@@ -1205,7 +1297,33 @@ string Trees::make_Bipart_Matrix_name(string fname, String format)
     result += "bipartition.out";
     return result;
 }
+string Trees::make_Bipart_Matrix_name(string fname)
+{
+	string result;
+	size_t loc_slash = fname.find_last_of("/");
 
+	if (loc_slash != string::npos)
+		result = fname.substr(0, loc_slash + 1);
+	else
+		result = "";
+
+	result += "Bipartition";
+	time_t t = time(0);
+	struct tm * timeStruct = localtime(&t);
+	result += "_";
+	result += to_string(timeStruct->tm_mon);
+	result += "_";
+	result += to_string(timeStruct->tm_mday);
+	result += "_";
+	result += to_string(timeStruct->tm_hour);
+	result += "_";
+	result += to_string(timeStruct->tm_min);
+	result += ".txt";
+	return result;
+}
+//########################ZD comment########################################
+//# Sort weighted edges from the same tree by hash value.
+//########################ZD comment########################################
 
 void Trees::Sort(unsigned long long *matrix_hv,
                        unsigned int *matrix_treeIdx,
@@ -1233,6 +1351,12 @@ void Trees::Sort(unsigned long long *matrix_hv,
         }
     }
 }
+
+//########################ZD comment########################################
+//# This is rank-1 matrix given by two vectors.
+//# It is confusing with the SparseMatrix::Multiply_vec
+//# and should be integrated in Vector class.
+//########################ZD comment########################################
 
 double **Trees::Vec_multiply(const double* Vec1, const double* Vec2, int Unique_idx)
 {
@@ -1297,6 +1421,16 @@ void Trees::Get_bipartitionofonetree(NEWICKNODE*currentnode, bool isrooted, int 
         }
     }
 }
+
+//########################ZD comment########################################
+//# This routine compute the affinity distance, a,
+//# from the given distance ,d. The formula is either
+//# 1/(rel_eps + d)
+//# or e^(-d),
+//# depending on the flag "type". It accepts unweighted/weighted
+//# RF-distance, Matching-distance, SPR-distance or
+//# distance given in file.
+//########################ZD comment########################################
 
 void Trees::Compute_Affinity_dist(String str_matrix, int type)
 {
@@ -1561,6 +1695,11 @@ void Trees::Compute_Affinity_dist(String str_matrix, int type)
     return true;
 }*/
 
+//########################ZD comment########################################
+//# It constructs the edge matrix of a Ptree,
+//# which should be implemented in TreeOPE.
+//########################ZD comment########################################
+
 void Trees:: pttree(struct Ptree *treeA, int node)
 {
     if (((*treeA).lchild[node] == -1) &&  ((*treeA).rchild[node] == -1))
@@ -1595,6 +1734,12 @@ void Trees:: pttree(struct Ptree *treeA, int node)
     }
 }
 
+//########################ZD comment########################################
+//# This distance is given by the solution
+//# of Hungarian algorithm of the cost matrix,
+//# r, given by compute_matrix.
+//########################ZD comment########################################
+
 int Trees::tree_mmdis(struct Ptree *tree1, struct Ptree *tree2, int num_leaf)
 {
     int* r;
@@ -1625,6 +1770,12 @@ int Trees::tree_mmdis(struct Ptree *tree1, struct Ptree *tree2, int num_leaf)
     free(r);
     return(mmdis);
 }
+
+
+//########################ZD comment########################################
+//# It accumulates the number common edges from
+//# two trees and store in a vectorized matrix, r.
+//########################ZD comment########################################
 
 void Trees::compute_matrix(int *r, int range, struct Ptree *tree1, struct Ptree *tree2)
 {
@@ -1686,6 +1837,11 @@ void Trees::compute_matrix(int *r, int range, struct Ptree *tree1, struct Ptree 
         getchar();
     }
 }
+
+//########################ZD comment########################################
+//# Convert a vectorizerd matrix to 2 dimensional
+//# array, which should not be here.
+//########################ZD comment########################################
 
 int ** Trees:: array_to_matrix (int* m, int rows, int cols)
 {
@@ -3696,7 +3852,17 @@ void Trees::WriteSelectedTrees(string &outfile, Treefileformat tf) // newick nex
 }
 
 
+
 #ifdef COMMAND_LINE_VERSION
+
+//########################ZD comment########################################
+//# Compute the bipartition covariance matrix from
+//# the matrix, C, created by Compute_Bipart_Matrix,
+//# M: M1 = MM^T, v1 = mean(M), v2 = sum(M),
+//# M2=v2v1^T, M3 = v1v1^T, C = (M1-M2-M2^T+n*M3)/(n-1).
+//# Note that it is implemented via sparse matrix-vector
+//# multiplication.
+//########################ZD comment########################################
 
 void Trees::Compute_Bipart_Covariance()
 {
@@ -3758,6 +3924,15 @@ void Trees::Compute_Bipart_Covariance()
         result = NULL;
     }
 }
+
+//########################ZD comment########################################
+//# Compute the unweighted/weighted RF distance.
+//# For the unweighted distance, accumulate the
+//# number of each unique bipartition's presence
+//# in each tree, f_ij, and the # of bipartitions,
+//# n_i,then d_ij = (n_i+n_j-2f_ij)/2. For weighted
+//# case, it is more complicated.
+//########################ZD comment########################################
 
 
 bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
@@ -3926,6 +4101,14 @@ bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
 
     return true;
 }
+
+//########################ZD comment########################################
+//# The matching distance is given by the solution
+//# to Hungarian algorithm on the table with entries
+//# of number of XOR element in "bitstrofatree",
+//# which is all possible bipartition of one tree.
+//# Line 1415 may have a bug.
+//########################ZD comment########################################
 
 bool Trees::Compute_Matching_dist()
 {

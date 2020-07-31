@@ -51,6 +51,20 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras);
 void trees_driver(map<String, String> &paras);
 void dimest_driver(String fname, String Est, String Init, String para_fname);
 void driver(String fname, String ftype, String dim, String cost, String algo, String init_md, String flag, long seed, String para_fname);
+std::string AttachTime2FName(std::string fname, time_t t) {
+	string result = fname;
+	struct tm * timeStruct = localtime(&t);
+	result += "_";
+	result += to_string(timeStruct->tm_mon);
+	result += "_";
+	result += to_string(timeStruct->tm_mday);
+	result += "_";
+	result += to_string(timeStruct->tm_hour);
+	result += "_";
+	result += to_string(timeStruct->tm_min);
+	result += ".txt";
+	return result;
+}
 
 int main(int argc, char* argv[])
 {
@@ -382,24 +396,57 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
         string stdfname = (char *) fname;
         string namebipartmatrix;
         ofstream outBipartMatrix;
-        if(paras["-bfm"] == (String) "list")
-        {
-            string namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname, (String) "List format");
-            outBipartMatrix.open(namebipartmatrix.c_str());
-            cout << "Output bipartition matrix in list format to " << namebipartmatrix << endl;
-            TreesData->OutputBipartitionMatrix(outBipartMatrix, RCVLIST);
-        } else
-        if(paras["-bfm"] == (String) "matrix")
-        {
-            string namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname, (String) "Matrix format");
-            outBipartMatrix.open(namebipartmatrix.c_str());
-            cout << "Output bipartition matrix in matrix format to " << namebipartmatrix << endl;
-            TreesData->OutputBipartitionMatrix(outBipartMatrix, FULLMATRIX);
-        } else
-        {
-            cout << "Error: setting of -bfm is not correct. Unable to output bipartition matrix" << endl;
-            return;
-        }
+		if (paras["-bfm"] == (String) "list")
+		{
+			string namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname, (String) "List format");
+			outBipartMatrix.open(namebipartmatrix.c_str());
+			cout << "Output bipartition matrix in list format to " << namebipartmatrix << endl;
+			TreesData->OutputBipartitionMatrix(outBipartMatrix, RCVLIST);
+			outBipartMatrix.close();
+
+			time_t t = time(0);
+			struct tm * timeStruct = localtime(&t);
+			namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname);
+			outBipartMatrix.open(namebipartmatrix.c_str());
+			outBipartMatrix << "---\n";
+			outBipartMatrix << " created: " << 1900 + timeStruct->tm_year << "-";
+			outBipartMatrix << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
+			outBipartMatrix << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
+			outBipartMatrix << timeStruct->tm_sec << ".\n";
+			outBipartMatrix << " output_type: bipartition matrix\n";
+			outBipartMatrix << " output_format: list form\n";
+			outBipartMatrix << " source: " << fname << "\n";
+			outBipartMatrix << "---\n";
+			TreesData->OutputBipartitionMatrix(outBipartMatrix, RCVLIST);
+		}
+		else if (paras["-bfm"] == (String) "matrix")
+		{
+			string namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname, (String) "Matrix format");
+			outBipartMatrix.open(namebipartmatrix.c_str());
+			cout << "Output bipartition matrix in matrix format to " << namebipartmatrix << endl;
+			TreesData->OutputBipartitionMatrix(outBipartMatrix, FULLMATRIX);
+			outBipartMatrix.close();
+
+			time_t t = time(0);
+			struct tm * timeStruct = localtime(&t);
+			namebipartmatrix = TreesData->make_Bipart_Matrix_name(stdfname);
+			outBipartMatrix.open(namebipartmatrix.c_str());
+			outBipartMatrix << "---\n";
+			outBipartMatrix << " created: " << 1900 + timeStruct->tm_year << "-";
+			outBipartMatrix << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
+			outBipartMatrix << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
+			outBipartMatrix << timeStruct->tm_sec << ".\n";
+			outBipartMatrix << " output_type: bipartition matrix\n";
+			outBipartMatrix << " output_format: matrix form\n";
+			outBipartMatrix << " source: " << fname << "\n";
+			outBipartMatrix << "---\n";
+			TreesData->OutputBipartitionMatrix(outBipartMatrix, FULLMATRIX);
+			}
+		else
+		{
+			cout << "Error: setting of -bfm is not correct. Unable to output bipartition matrix" << endl;
+			return;
+		}
     }
       
     if(paras["-o"] == (String) "Consensus")
@@ -422,6 +469,33 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
         string outCovaName = TreesData->make_DISToutput_name("Covariance Matrix");
         TreesData->print_matrix("Covariance Matrix", outCovaName);
         cout << "Successfully printed Covariance Matrix matrix!" << endl;
+
+		string outCovaName2 = (char *)paras["-f"];
+		size_t loc_slash = outCovaName2.find_last_of("/");
+		if (loc_slash != string::npos)
+			outCovaName2 = outCovaName2.substr(0, loc_slash + 1);
+		else
+			outCovaName2 = "";
+		time_t t = time(0);
+		struct tm * timeStruct = localtime(&t);
+		outCovaName2 += "Covariance";
+		outCovaName2 = AttachTime2FName(outCovaName2, t);
+
+
+		ofstream outCova;
+		outCova.open(outCovaName2, ios::trunc);
+		outCova << "---\n";
+		outCova << " created: " << 1900 + timeStruct->tm_year << "-";
+		outCova << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
+		outCova << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
+		outCova << timeStruct->tm_sec << ".\n";
+		outCova << " output_type: covariance matrix\n";
+		outCova << " label_type: tree";
+		outCova << " source: " << paras["-f"] << "\n";
+		outCova << "---\n";
+		outCova.close();
+		TreesData->print_matrix2("Covariance Matrix", outCovaName2);
+
         if(paras["-o"] == (String) "Community")
         {
             Compute_Community(TreesData, paras, "Covariance Matrix");
@@ -432,6 +506,33 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
         String fname = paras["-f"];
         string stdfname = (char *) fname;
         TreesData->load_covariancefile(stdfname);
+
+		string outCovaName2 = (char *)paras["-f"];
+		size_t loc_slash = outCovaName2.find_last_of("/");
+		if (loc_slash != string::npos)
+			outCovaName2 = outCovaName2.substr(0, loc_slash + 1);
+		else
+			outCovaName2 = "";
+		time_t t = time(0);
+		struct tm * timeStruct = localtime(&t);
+		outCovaName2 += "Covariance";
+		outCovaName2 = AttachTime2FName(outCovaName2, t);
+
+
+		ofstream outCova;
+		outCova.open(outCovaName2, ios::trunc);
+		outCova << "---\n";
+		outCova << " created: " << 1900 + timeStruct->tm_year << "-";
+		outCova << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
+		outCova << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
+		outCova << timeStruct->tm_sec << ".\n";
+		outCova << " output_type: covariance matrix\n";
+		outCova << " label_type: bipartition";
+		outCova << " source: " << paras["-f"] << "\n";
+		outCova << "---\n";
+		outCova.close();
+		TreesData->print_matrix2("Covariance Matrix", outCovaName2);
+
         if(paras["-o"] == (String) "Community")
         {
             Compute_Community(TreesData, paras, "File-covariance");
@@ -558,6 +659,42 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
         string outDistName = TreesData->make_DISToutput_name(memorydata);
         TreesData->print_matrix(memorydata, outDistName);
         cout << "Successfully printed " << memorydata << " matrix!" << endl;
+
+		string outDistName2 = (char *)paras["-f"];
+		size_t loc_slash = outDistName2.find_last_of("/");
+		if (loc_slash != string::npos)
+			outDistName2 = outDistName2.substr(0, loc_slash + 1);
+		else
+			outDistName2 = "";
+		time_t t = time(0);
+		struct tm * timeStruct = localtime(&t);
+		outDistName2 += "Distance";
+		outDistName2 = AttachTime2FName(outDistName2, t);
+		ofstream outDist;
+		outDist.open(outDistName2, ios::trunc);
+		outDist << "---\n";
+		outDist << " created: " << 1900 + timeStruct->tm_year << "-";
+		outDist << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
+		outDist << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
+		outDist << timeStruct->tm_sec << ".\n";
+		outDist << " output_type: distance matrix\n";
+		outDist << " arg: ";
+		if (paras["-r"] == (String) "1")
+			outDist << "rooted, ";
+		else
+			outDist << "unrooted, ";
+		if (paras["-dm"] == (String) "URF")
+			outDist << "unweighted, RF-distance\n";
+		else if (paras["-dm"] == (String) "RF")
+			outDist << "weighted, RF-distance\n";
+		else if (paras["-dm"] == (String) "Mat")
+			outDist << "Matching-distance\n";
+		else if (paras["-dm"] == (String) "SPR")
+			outDist << "SPR-distance\n";
+		outDist << " source: " << paras["-f"] << "\n";
+		outDist << "---\n";
+		outDist.close();
+		TreesData->print_matrix2(memorydata, outDistName2);
     }
     
     if(paras["-ft"] == (String) "Dist")
@@ -662,80 +799,151 @@ void Compute_Affinity(Trees *TreesData, map<String, String> &paras, String memor
 
 void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
 {
-    Array<int> *treeidx = TreesData->getidxlist();
-    if(paras["-if"] == (String) "")
-    {
-        treeidx->resize(TreesData->Get_n_trees());
-        for(int i = 0; i < TreesData->Get_n_trees(); i++)
-            (*treeidx)[i] = i;
-        std::cout << "Consider all trees to compute the consensus tree." << std::endl;
-    } else
-    {
-        String idxfname = paras["-if"];
-        File file(idxfname);
-        if(! file.is_open())
-        {
-            cout << "Error: Can not open the data file!" << endl;
-            return;
-        }
-        file.seek(0);
-        int num = file.lines();
-        file.seek(0);
-        treeidx->resize(num);
+	Array<int> *treeidx = TreesData->getidxlist();
+	if (paras["-if"] == (String) "")
+	{
+		treeidx->resize(TreesData->Get_n_trees());
+		for (int i = 0; i < TreesData->Get_n_trees(); i++)
+			(*treeidx)[i] = i;
+		std::cout << "Consider all trees to compute the consensus tree." << std::endl;
+	}
+	else
+	{
+		String idxfname = paras["-if"];
+		File file(idxfname);
+		if (!file.is_open())
+		{
+			cout << "Error: Can not open the data file!" << endl;
+			return;
+		}
+		file.seek(0);
+		int num = file.lines();
+		file.seek(0);
+		treeidx->resize(num);
 
-        for(int i = 0; i < num; i++)
-        {
-            file >> (*treeidx)[i];
-        }
-        std::cout << "Consider indices from file: " << idxfname << "; " << num << " trees." << std::endl;
-    }
-    
-    if(paras["-ct"] == (String) "Majority")
-    {
-        if(TreesData->compute_consensus_tree(MAJORITYTREE, ""))
-            std::cout << "Successfully computed the majority consensus tree!" << std::endl;
-    } else
-    if(paras["-ct"] == (String) "Strict")
-    {
-        if(TreesData->compute_consensus_tree(STRICTTREE, ""))
-            std::cout << "Successfully computed the strict consensus tree!" << std::endl;
-    } else
-    {
-          cout << "Error: Setting of -ct is not correct. Unable to compute consensus tree." << endl;
-          return;
-    }
-    
-    String confname = paras["-f"].before('.');
-    confname += "_";
-    if(paras["-if"] == (String) "")
-    {
-        confname += "All_";
-    } else
-    {
-        confname += paras["-if"].before('.');
-        confname += "_";
-    }
-    confname += paras["-ct"];
-    confname += "_consensus_tree.out";
-    string outName = (char *) confname;
+		for (int i = 0; i < num; i++)
+		{
+			file >> (*treeidx)[i];
+		}
+		std::cout << "Consider indices from file: " << idxfname << "; " << num << " trees." << std::endl;
+	}
 
-    if(paras["-cfm"] == (String) "Newick")
-    {
-        TreesData->WriteConsensusTree(outName, NEWICK);
-        cout << "Successfully outputted Newick format trees to file: " << confname << endl;
-    }
-    else
-    if(paras["-cfm"] == (String) "Nexus")
-    {
-        TreesData->WriteConsensusTree(outName, NEXUS);
-        cout << "Successfully outputted Nexus format trees to file: " << confname << endl;
-    } else
-    {
-          cout << "warning: setting of -cfm is not correct. output consensus tree to Nexus format." << endl;
-        TreesData->WriteConsensusTree(outName, NEXUS);
-        cout << "Successfully outputted Nexus format trees to file: " << confname << endl;
-          return;
-    }
+	if (paras["-ct"] == (String) "Majority")
+	{
+		if (TreesData->compute_consensus_tree(MAJORITYTREE, ""))
+			std::cout << "Successfully computed the majority consensus tree!" << std::endl;
+	}
+	else
+		if (paras["-ct"] == (String) "Strict")
+		{
+			if (TreesData->compute_consensus_tree(STRICTTREE, ""))
+				std::cout << "Successfully computed the strict consensus tree!" << std::endl;
+		}
+		else
+		{
+			cout << "Error: Setting of -ct is not correct. Unable to compute consensus tree." << endl;
+			return;
+		}
+
+	String confname = paras["-f"].before('.');
+	confname += "_";
+	if (paras["-if"] == (String) "")
+	{
+		confname += "All_";
+	}
+	else
+	{
+		confname += paras["-if"].before('.');
+		confname += "_";
+	}
+	confname += paras["-ct"];
+	confname += "_consensus_tree.out";
+	string outName = (char *)confname;
+	string outName2 = (char *)paras["-f"];
+	size_t loc_slash = outName2.find_last_of("/");
+	if (loc_slash != string::npos)
+		outName2 = outName2.substr(0, loc_slash + 1);
+	else
+		outName2 = "";
+	time_t t = time(0);
+	struct tm * timeStruct = localtime(&t);
+	outName2 += "ConsensusTree_";
+	outName2 += to_string(timeStruct->tm_mon);
+	outName2 += "_";
+	outName2 += to_string(timeStruct->tm_mday);
+	outName2 += "_";
+	outName2 += to_string(timeStruct->tm_hour);
+	outName2 += "_";
+	outName2 += to_string(timeStruct->tm_min);
+	outName2 += ".txt";
+	ofstream outConf;
+
+	if (paras["-cfm"] == (String) "Newick")
+	{
+		outConf.open(outName, ios::trunc);
+		outConf.close();
+		TreesData->WriteConsensusTree(outName, NEWICK);
+		cout << "Successfully outputted Newick format trees to file: " << confname << endl;
+
+
+		outConf.open(outName2, ios::trunc);
+		outConf << "---\n";
+		outConf << " created: " << 1900 + timeStruct->tm_year << "-";
+		outConf << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
+		outConf << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
+		outConf << timeStruct->tm_sec << ".\n";
+		outConf << " output_type: consensus trees\n";
+		outConf << " output_format: NEWICK\n";
+		outConf << " source: " << paras["-f"] << "\n";
+		outConf << "---\n";
+		outConf.close();
+		TreesData->WriteConsensusTree(outName2, NEWICK);
+	}
+	else
+		if (paras["-cfm"] == (String) "Nexus")
+		{
+			outConf.open(outName, ios::trunc);
+			outConf.close();
+			TreesData->WriteConsensusTree(outName, NEXUS);
+			cout << "Successfully outputted Newick format trees to file: " << confname << endl;
+
+
+			outConf.open(outName2, ios::trunc);
+			outConf << "---\n";
+			outConf << " created: " << 1900 + timeStruct->tm_year << "-";
+			outConf << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
+			outConf << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
+			outConf << timeStruct->tm_sec << ".\n";
+			outConf << " output_type: consensus trees\n";
+			outConf << " output_format: NEXUS\n";
+			outConf << " source: " << paras["-f"] << "\n";
+			outConf << "---\n";
+			outConf.close();
+			TreesData->WriteConsensusTree(outName2, NEXUS);
+		}
+		else
+		{
+			cout << "warning: setting of -cfm is not correct. output consensus tree to Nexus format." << endl;
+			outConf.open(outName, ios::trunc);
+			outConf.close();
+			TreesData->WriteConsensusTree(outName, NEXUS);
+			cout << "Successfully outputted Newick format trees to file: " << confname << endl;
+
+
+			outConf.open(outName2, ios::trunc);
+			outConf << "---\n";
+			outConf << " created: " << 1900 + timeStruct->tm_year << "-";
+			outConf << timeStruct->tm_mon << "-" << timeStruct->tm_mday << ".";
+			outConf << timeStruct->tm_hour << ":" << timeStruct->tm_min << ":";
+			outConf << timeStruct->tm_sec << ".\n";
+			outConf << " output_type: consensus trees\n";
+			outConf << " output_format: NEXUS\n";
+			outConf << " source: " << paras["-f"] << "\n";
+			outConf << "---\n";
+			outConf.close();
+			TreesData->WriteConsensusTree(outName2, NEXUS);
+			return;
+		}
 }
 
 void dimest_driver(String fname, String Est, String Init, String para_fname)
