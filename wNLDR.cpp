@@ -824,6 +824,9 @@ void NLDR::NLDR_init_parameters(String para_filename)
 // It has been fixed now. zd --2/21/20
 void NLDR::CLASSIC_MDS()
 {
+	cout << "Warning: Optimizing classical scaling cost function. The solution is only"
+		<< " legit for Eucludean space data or for the use of initial guess. For general"
+		<< " metric space, please infer to other cost function like CCA.\n";
 	String filename_U = make_filename(D_prefname, "ALL",cost_function, "U", "SVD", "");
 	String filename_S = make_filename(D_prefname, "ALL", cost_function, "S", "SVD", "");
 	String filename_Vt = make_filename(D_prefname, "ALL", cost_function, "Vt", "SVD", "");
