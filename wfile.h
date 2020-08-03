@@ -27,6 +27,7 @@
 #include <iostream>
 #include <fstream>
 #include "wstring.h"
+#include <map>
 
 class File{
 	template<class T>
@@ -54,6 +55,7 @@ public:
 
 	~File()
 	{
+		//fname.~String();
 		if(fhandle.is_open())
 			fhandle.close();
 	};
@@ -76,6 +78,12 @@ public:
 
 	bool clean();
 
+	String get_filename() { return fname; };
+
+	void getline(char* s, int n) {
+		fhandle.getline(s, n);
+	};
+
 	String prefix_name();
 
 	String postfix_name();
@@ -95,10 +103,38 @@ public:
 
 	int load_header(String** info);
 	// Return lines of header information and store them in info.
-
+	
 private:
     std::fstream fhandle;
 	String fname;
 };
 
+
+class Header_info {
+public:
+	Header_info() {};
+
+	Header_info(File &input);
+
+	Header_info(String* option, String* content, int length);
+
+	~Header_info() {};
+
+	int size() { return list.size(); };
+
+	void insert(String &option, String &content) {
+		list[option] = content;
+	};
+
+	friend std::istream &operator>>(std::istream &input, Header_info &info);
+
+	friend std::ostream &operator<<(std::ostream &output, Header_info &info);
+
+	friend File &operator>>(File &input, Header_info &info);
+
+	friend File &operator<<(File &output, Header_info &info);
+private:
+	std::map<String, String> list;
+
+};
 #endif
