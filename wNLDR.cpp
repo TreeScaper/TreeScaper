@@ -3733,4 +3733,18 @@ void NLDR::oneNN_analysis()
 	oneNN.matrix[0][0] = (double) correct_num / size;
 };
 
+String make_stdname3(String s, std::map<String, String> &paras) {
+	String Ans = paras["-path"];
+	Ans += s;
+	if (paras["-post"] != String("none")) {
+		Ans += "_";
+		if (paras["-post"] != String("time"))
+			Ans += paras["-post"];
+		else
+			Ans += time_stamp();
+	}
+	Ans += ".out";
+	return Ans;
+}
+
 #endif
