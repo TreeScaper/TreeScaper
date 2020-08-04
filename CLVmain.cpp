@@ -1090,8 +1090,20 @@ void comm_driver(map<String, String> &paras) {
 		}
 	}
 
-	if (paras["-lm"] == String("auto")) {
-		community_detection_automatically(mat, paras);
+	if (paras["-lm"] == (String) "manu") {
+		if (community_detection_manually(mat, paras)) {
+			cout << "Successfully detected communities of adjacency matrix /" << paras["-f"] << "/ by model: " << paras["-cm"] << ".\n";
+			cout << "Lambdas are chosen manually." << endl;
+		}
+	} else if (paras["-lm"] == (String) "auto") {
+		if (community_detection_automatically(mat, paras)) {
+			cout << "Successfully detected communities of adjacency matrix /" << paras["-f"] << "/ by model: " << paras["-cm"] << " with high freq. bound:" << paras["-hf"] << ", low freq. bound:" << paras["-lf"] << "!" << endl;
+			cout << "Lambdas are chosen automatically." << endl;
+		}
 	}
+	else {
+		cout << "Error! Set parameter -lm only have options: auto, manu\n";
+	}
+	
 
 }

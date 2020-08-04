@@ -61,4 +61,4 @@ void create_resolution(double lp, double ln, int nb_layers, int* sign, double* &
 
 bool community_detection_automatically(Matrix<double> &mat, map<String, String> &paras);
 
-
+bool community_detection_manually(Matrix<double> &mat, map<String, String> &paras);

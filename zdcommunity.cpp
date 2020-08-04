@@ -1051,8 +1051,6 @@ bool community_detection_manually(Matrix<double> &mat, map<String, String> &para
 	if (lambda != NULL)
 		delete[] lambda;
 
-	for (it = LamCommunities.begin(); it != LamCommunities.end(); it++)
-		delete it->second;
 
 	const char *tempfile0 = (char*)temp_file;
 	remove(tempfile0);
@@ -1064,6 +1062,5 @@ bool community_detection_manually(Matrix<double> &mat, map<String, String> &para
 	remove(tempfile3);
 
 	cout << "Output community results to file: " << outname_CD << endl;
-	cout << "and " << outname_Pla << "\n\n";
 	return true;
 }
