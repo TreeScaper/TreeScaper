@@ -559,7 +559,7 @@ void NLDR::output_to_files()
 	std::string feature_cstr;
 	if (info.count("node_feature")) {
 		feature_cstr = info["node_feature"];
-		if (feature_cstr.find("NLDR") == std::ios::npos) {
+		if (feature_cstr.find("NLDR") == std::string::npos) {
 			String feature_str = feature_cstr;
 			feature_str += ", ";
 			feature_str += "NLDR";

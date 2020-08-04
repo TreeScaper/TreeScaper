@@ -683,7 +683,7 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
 	file_src >> info;
 	info.insert("created", time_stamp());
 	info.insert("output_type", "Distance matrix");
-	info.insert("label_type", "Tree");
+	info.insert("node_type", "Tree");
 	info.insert("source", paras["-f"]);
 	String dis_str;
 	if (paras["-dm"] == (String) "URF")
@@ -703,11 +703,11 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
 	else
 		feature_str = "unweighted";
 	feature_str += ", ";
-	if (paras["-r"]) == (String) "1"
+	if (paras["-r"] == (String) "1")
 		feature_str += "rooted";
 	else
 		feature_str += "unrooted";
-	info.insert("label_feature", feature_str);
+	info.insert("node_feature", feature_str);
 
 
 	if (paras["-ft"] == (String) "Trees")
@@ -1104,7 +1104,7 @@ void comm_driver(map<String, String> &paras) {
 		size = finput.lines();
 	paras["-size"] = to_string(size);
 	if (info.count("distance_type") && !paras.count("-dm")) {
-		std::string dm = info["distance_type"];
+		std::string dm = (char*) info["distance_type"];
 		if (dm.find("Unweighted Robinson-Foulds") != std::string::npos || dm.find("URF") != std::string::npos)
 			paras["-dm"] = "URF";
 		else if (dm.find("Robinson-Foulds") != std::string::npos || dm.find("RF") != std::string::npos)
@@ -1119,7 +1119,7 @@ void comm_driver(map<String, String> &paras) {
 
 	if (!paras.count("-node")) {
 		if (info.count("node_type")) {
-			std::string ft = info["node_type"];
+			std::string ft = (char*) info["node_type"];
 			if (ft.find("Tree") != std::string::npos)
 				paras["-node"] = "Tree";
 			else if (ft.find("Bipartition") != std::string::npos)
