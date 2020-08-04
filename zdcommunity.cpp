@@ -15,7 +15,8 @@ String make_stdname2(String s, std::map<String, String> &paras) {
 }
 
 template<class T>
-void print_comm_array(Matrix<T> &arr, int n, File &output, bool arr_is_covariance, double highfreq, double lowfreq)
+void print_comm_array(Matrix<T> &arr, int n, File &output, bool arr_is_covariance, double highfreq, double lowfreq,
+					int &covariance_freeid_size, int &covariance_nonfree_id_size, int *covariance_freeid, int *covariance_nonfree_id)
 {
 	int *covariance_freeid = new int[n];
 	int covariance_freeid_size = 0;
@@ -184,7 +185,8 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		cout << "Warning: The high and low frequencies must be between 0 and 1!\n\n";
 		return false;
 	}
-	print_comm_array(mat, size, file_Comm_temp, label_flag, highfrequence, lowfrequence);
+	print_comm_array(mat, size, file_Comm_temp, label_flag, highfrequence, lowfrequence
+		covariance_freeid_size, covariance_nonfree_id_size, covariance_freeid, covariance_nonfree_id);
 
 	char *infile = strdup((char*)temp_file);
 
@@ -268,7 +270,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		GreedyLouvain::iterate_randomly = stochastic;
 		GreedyLouvain::detect_communities(community);
 
-		if (paras["-dm"] == String("URF"))//Affinity matrix from Unweighted RF distance is read.
+		if (paras["-dm"] == (String) "URF")//Affinity matrix from Unweighted RF distance is read.
 		{
 			bool allsametopo = true;
 			double samevalue = mat(0, 0);
