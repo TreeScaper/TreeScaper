@@ -165,7 +165,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	Header_info info;
 	File file_src(paras["-f"]);
 	file_src >> info;
-	String adj_src_file = info["-source"];
+	String adj_src_file = info["source"];
 	info.insert("created", time_stamp());
 	info.insert("size", paras["-size"]);
 	info.insert("source", paras["-f"]);
@@ -618,11 +618,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	String outname_Pla = make_stdname2("CD_Plateaus", paras);
 	info.insert("output_type", "Plateaus of Community detection result");
 	
-	if (label_flag)
-		info.insert("label_type", "Bipartition");
-	else
-		info.insert("label_type", "Tree");
-	info.insert("label_feature", "todo");
+	info.insert("node_type", paras["-node"]);
 
 	if (modelType == 3)
 		info.insert("CD_model","Configuration Null Model");
@@ -686,12 +682,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	for (int i = 0; i < covariance_nonfree_id_size + 4; i++)
 	{
 		if (i == 0)
-		{
-			if (label_flag)
-				file_CD << "Same community as previous or not (first number is number of bipartitions)" << "\n";
-			else
-				file_CD << "Same community as previous or not (first number is number of trees)" << "\n";
-		}
+			file_CD << "Same community as previous or not (first number is number of " << paras["-node"] << ")\n";
 		else if (i == 1)
 			file_CD << "Value of lambda: " << "\n";
 		else if (i == 2)
@@ -699,12 +690,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		else if (i == 3)
 			file_CD << "Value of modularity: " << "\n";
 		else if (i == 4)
-		{
-			if (label_flag)
-				file_CD << "Community index (first column is bipartition index): " << "\n";
-			else
-				file_CD << "Community index (first column is tree index): " << "\n";
-		}
+			file_CD << "Community index (first column is " << paras["-node"] << " index):\n";
 		for (int j = 0; j < com_info_col; j++)
 			file_CD << com_info[i][j] << "\t";
 		file_CD << "\n";
@@ -754,7 +740,7 @@ bool community_detection_manually(Matrix<double> &mat, map<String, String> &para
 				if (paras["-cm"] == (String) "NNM")
 					modelType = 1;
 	int size = atoi((char*)paras["-size"]);
-	bool label_flag = (paras["-ft"] == String("Cova"));
+	bool label_flag = (paras["-node"] == String("Bipartition"));
 	Array<double> lambda_pos_list;
 	double lpiv = atof((char *)paras["-lpiv"]);
 	double lp = atof((char *)paras["-lp"]);
@@ -858,11 +844,7 @@ bool community_detection_manually(Matrix<double> &mat, map<String, String> &para
 	double lambda_pos;// = atof(lambda_pos_list.c_str());
 	double lambda_neg;// = atof(lambda_neg_list.c_str());
 
-	if (label_flag)
-		info.insert("label_type", "Bipartition");
-	else
-		info.insert("label_type", "Tree");
-	info.insert("label_feature", "todo");
+	info.insert("node_type", paras["-node"]);
 
 	if (modelType == 3)
 		info.insert("CD_model", "Configuration Null Model");
@@ -1018,10 +1000,7 @@ bool community_detection_manually(Matrix<double> &mat, map<String, String> &para
 	{
 		if (i == 0)
 		{
-			if (label_flag)
-				file_CD << "Same community as previous or not (first number is number of bipartitions)" << "\n";
-			else
-				file_CD << "Same community as previous or not (first number is number of trees)" << "\n";
+			file_CD << "Same community as previous or not (first number is number of "<< paras["-node"] <<")\n";
 		}
 		else if (i == 1)
 			file_CD << "Value of lambda: " << "\n";
@@ -1031,10 +1010,7 @@ bool community_detection_manually(Matrix<double> &mat, map<String, String> &para
 			file_CD << "Value of modularity: " << "\n";
 		else if (i == 4)
 		{
-			if (label_flag)
-				file_CD << "Community index (first column is bipartition index): " << "\n";
-			else
-				file_CD << "Community index (first column is tree index): " << "\n";
+			file_CD << "Community index (first column is " << paras["-node"] << " index): \n";
 		}
 		for (int j = 0; j < lambdasize + 1; j++)
 			file_CD << com_info[i][j] << "\t";

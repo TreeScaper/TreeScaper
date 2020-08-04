@@ -556,6 +556,27 @@ void NLDR::output_to_files()
 	info.insert("source", paras["-f"]);
 	info.insert("nldr_algorithm", paras["-a"]);
 	info.insert("nldr_cost_function", paras["-c"]);
+	std::string feature_cstr;
+	if (info.count("node_feature")) {
+		feature_cstr = info["node_feature"];
+		if (feature_cstr.find("NLDR") == std::ios::npos) {
+			String feature_str = feature_cstr;
+			feature_str += ", ";
+			feature_str += "NLDR";
+			feature_str += "(";
+			feature_str += paras["-d"];
+			feature_str += ")";
+			info["node_feature"] = feature_str;
+		}
+	}
+	else {
+		String feature_str = "NLDR";
+		feature_str += "(";
+		feature_str += paras["-d"];
+		feature_str += ")";
+		info["node_feature"] = feature_str;
+	}
+	
 
 	if (COR.get_row() > 0 && COR.get_col() > 0)
 	{

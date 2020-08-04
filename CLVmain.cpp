@@ -678,10 +678,36 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
 {
 	String memorydata;
 
-
-	String info_item[6] = { "created", "output_type", "rooted", "weighted", "distance_type", "source" };
-	String info_content[6] = { time_stamp(),"Distance matrix of trees", paras["-r"], paras["-w"], paras["-dm"], paras["-f"] };
-	Header_info info(info_item, info_content, 6);
+	Header_info info;
+	File file_src(paras["-f"]);
+	file_src >> info;
+	info.insert("created", time_stamp());
+	info.insert("output_type", "Distance matrix");
+	info.insert("label_type", "Tree");
+	info.insert("source", paras["-f"]);
+	String dis_str;
+	if (paras["-dm"] == (String) "URF")
+		dis_str = "Unweighted Robinson-Foulds";
+	else if (paras["-dm"] == (String) "RF")
+		dis_str = "Robinson-Foulds";
+	else if (paras["-dm"] == (String) "Mat")
+		dis_str = "Matching";
+	else if (paras["-dm"] == (String) "SPR")
+		dis_str = "SPR";
+	else
+		dis_str = "Unknown";
+	info.insert("distance_type", dis_str);
+	String feature_str;
+	if (paras["-w"] == (String) "1")
+		feature_str = "weighted";
+	else
+		feature_str = "unweighted";
+	feature_str += ", ";
+	if (paras["-r"]) == (String) "1"
+		feature_str += "rooted";
+	else
+		feature_str += "unrooted";
+	info.insert("label_feature", feature_str);
 
 
 	if (paras["-ft"] == (String) "Trees")
@@ -991,7 +1017,7 @@ void aff_driver(map<String, String> & paras) {
 	if (info.count("size"))
 		size = atoi(info["size"]);
 	else
-		size = file_Dis.lines();
+		size = file_Dis.lines() + 1;
 	file_Dis.seek(pos);
 
 	//D.resize(size, size);
@@ -1077,6 +1103,35 @@ void comm_driver(map<String, String> &paras) {
 	else 
 		size = finput.lines();
 	paras["-size"] = to_string(size);
+	if (info.count("distance_type") && !paras.count("-dm")) {
+		std::string dm = info["distance_type"];
+		if (dm.find("Unweighted Robinson-Foulds") != std::string::npos || dm.find("URF") != std::string::npos)
+			paras["-dm"] = "URF";
+		else if (dm.find("Robinson-Foulds") != std::string::npos || dm.find("RF") != std::string::npos)
+			paras["-dm"] = "RF";
+		else if (dm.find("Matching") != std::string::npos || dm.find("Mat") != std::string::npos)
+			paras["-dm"] = "Mat";
+		else if (dm.find("SPR") != std::string::npos)
+			paras["-dm"] = "SPR";
+		else
+			paras["-dm"] = "";
+	}
+
+	if (!paras.count("-node")) {
+		if (info.count("node_type")) {
+			std::string ft = info["node_type"];
+			if (ft.find("Tree") != std::string::npos)
+				paras["-node"] = "Tree";
+			else if (ft.find("Bipartition") != std::string::npos)
+				paras["-node"] = "Bipartition";
+			else
+				paras["-node"] = "Unknown_node";
+		}
+		else {
+			paras["-node"] = "Unknown_node";
+		}
+	}
+
 	finput.seek(pos_header);
 
 	Matrix<double> mat;
