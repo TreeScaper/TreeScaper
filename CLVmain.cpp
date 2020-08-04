@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
     } else
     if(argc > 1 && (String) argv[1] == (String) "-nldr")
     {
-        String default_paras[10] = {"trajectory1.out", "COR", "2", "CCA", "STOCHASTIC", "RAND", "", "1", "nldr_parameters.csv","time"};
+        String default_paras[10] = {"trajectory1.out", "COR", "2", "CCA", "STOCHASTIC", "RAND", "", "1", "nldr_parameters.csv","NLDR"};
         String options[10] = {"-f", "-t", "-d", "-c", "-a", "-i", "-o", "-s", "-p","-post"};
     
         for(int i = 1; i < argc; i++)

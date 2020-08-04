@@ -531,13 +531,13 @@ void NLDR::output_to_files()
 {
 	String filename_COR, filename_DIS, filename_STR, filename_TIM, filename_TRU, filename_CON, filename_1NN;
 	//this->make_output_file_names(filename_COR, filename_DIS, filename_STR, filename_TIM, filename_TRU, filename_CON, filename_1NN);
-	filename_COR = paras["-path"]; filename_COR += "NLDR_COR.out";
-	filename_DIS = paras["-path"]; filename_DIS += "NLDR_DIS.out";
-	filename_STR = paras["-path"]; filename_STR += "NLDR_STR.out";
-	filename_TIM = paras["-path"]; filename_TIM += "NLDR_TIM.out";
-	filename_TRU = paras["-path"]; filename_TRU += "NLDR_TRU.out";
-	filename_CON = paras["-path"]; filename_CON += "NLDR_CON.out";
-	filename_1NN = paras["-path"]; filename_1NN += "NLDR_1NN.out";
+	filename_COR = make_stdname3("Coordinates", paras);
+	filename_DIS = make_stdname3("Distance", paras);
+	filename_STR = make_stdname3("Stress", paras);
+	filename_TIM = make_stdname3("Time", paras);
+	filename_TRU = make_stdname3("Trustworthiness", paras);
+	filename_CON = make_stdname3("Connectivity", paras);
+	filename_1NN = make_stdname3("1NN", paras);
 
 	File file_COR(filename_COR);
 	File file_DIS(filename_DIS);
@@ -547,20 +547,21 @@ void NLDR::output_to_files()
 	File file_CON(filename_CON);
 	File file_1NN(filename_1NN);
 
-	String** info = new String*[5];
-	for (int i = 0; i < 5; i++)
-		info[i] = new String[2];
-	info[0][0] = "created";			info[0][1] = time_stamp();
-	info[1][0] = "output_type";		info[1][1] = "";
-	info[2][0] = "distance_matrix";	info[2][1] = paras["-f"];
-	info[3][0] = "Algorithm";		info[3][1] = paras["-a"];
-	info[4][0] = "Cost function";	info[4][1] = paras["-c"];
+	Header_info info;
+	File finput(paras["-f"]);
+	finput >> info;
+	finput.close();
+	
+	info.insert("created", time_stamp());
+	info.insert("source", paras["-f"]);
+	info.insert("nldr_algorithm", paras["-a"]);
+	info.insert("nldr_cost_function", paras["-c"]);
 
 	if (COR.get_row() > 0 && COR.get_col() > 0)
 	{
 		file_COR.clean();
-		info[1][1] = "Coordinates of points in reduced space";
-		file_COR.insert_header(info, 5);
+		info.insert("output_type", "Coordinates of points in reduced space");
+		file_COR << info;
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < atoi(dim_str); j++)
@@ -576,8 +577,8 @@ void NLDR::output_to_files()
 	if (DIS.get_row() > 0 && DIS.get_col() > 0)
 	{
 		file_DIS.clean();
-		info[1][1] = "Distance matrix of points in reduced space";
-		file_DIS.insert_header(info, 5);
+		info.insert("output_type", "Distance matrix in reduced space");
+		file_DIS << info;
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j <= i; j++)
@@ -592,8 +593,8 @@ void NLDR::output_to_files()
 	if (STRESS != -1)
 	{
 		file_STR.clean();
-		info[1][1] = "Stress value";
-		file_STR.insert_header(info, 5);
+		info.insert("output_type", "Stress value of the result");
+		file_STR << info;
 		file_STR << STRESS << std::endl;
 
 	}
@@ -603,8 +604,8 @@ void NLDR::output_to_files()
 	if (time_cost != -1)
 	{
 		file_TIM.clean();
-		info[1][1] = "Time used";
-		file_TIM.insert_header(info, 5);
+		info.insert("output_type", "Time used");
+		file_TIM << info;
 		file_TIM << time_cost << std::endl;
 
 	}
@@ -614,8 +615,8 @@ void NLDR::output_to_files()
 	if (Trustworthiness.get_row() > 0 && Trustworthiness.get_col() > 0)
 	{
 		file_TRU.clean();
-		info[1][1] = "Trustworthiness analysis result";
-		file_TRU.insert_header(info, 5);
+		info.insert("output_type", "Trustworthiness analysis result");
+		file_TRU << info;
 		for (int i = 0; i < Trustworthiness.get_row(); i++)
 		{
 			for (int j = 0; j < Trustworthiness.get_col(); j++)
@@ -628,8 +629,8 @@ void NLDR::output_to_files()
 	if (Continuity.get_row() > 0 && Continuity.get_col() > 0)
 	{
 		file_CON.clean();
-		info[1][1] = "Continuity analysis result";
-		file_CON.insert_header(info, 5);
+		info.insert("output_type", "Connectivity analysis reuslt");
+		file_CON << info;
 		for (int i = 0; i < Continuity.get_row(); i++)
 		{
 			for (int j = 0; j < Continuity.get_col(); j++)
@@ -642,8 +643,8 @@ void NLDR::output_to_files()
 	if (oneNN.get_row() > 0 && oneNN.get_col() > 0)
 	{
 		file_1NN.clean();
-		info[1][1] = "1NN result";
-		file_1NN.insert_header(info, 5);
+		info.insert("output_type", "1NN result");
+		file_1NN << info;
 		file_1NN << oneNN.matrix[0][0] << std::endl;
 		file_1NN << oneNN.matrix[1][0] << std::endl;
 
