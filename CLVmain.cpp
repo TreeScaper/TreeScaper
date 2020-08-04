@@ -554,7 +554,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
     if(paras["-o"] == (String) "Dist" || paras["-o"] == (String) "Affinity" || (paras["-o"] == (String) "Community" && paras["-t"] == (String) "Affinity"))
         Compute_Distance(TreesData, paras);
     else
-    if(paras["-o"] == (String) "Covariance" || (paras["-o"] == (String) "Community" && paras["-t"] == (String) "Covariance"))
+    if(paras["-o"] == (String) "Cova" || (paras["-o"] == (String) "Community" && paras["-t"] == (String) "Covariance"))
         Compute_Covariance(TreesData, paras);
 }
 
@@ -564,6 +564,7 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
 	String info_item[3] = { "created", "output_type", "source" };
 	String info_content[3] = { time_stamp(), "Covariance Matrix", paras["-f"] };
 	Header_info info(info_item, info_content, 3);
+	info.insert("node_type", "Bipartition");
 
 	if (paras["-ft"] == (String) "Trees")
 	{
@@ -577,7 +578,6 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
 		String outname_cova = make_stdname("Covariance", paras);
 		File file_Cova(outname_cova);
 		file_Cova.clean();
-		info.insert("label_type", "Bipartition");
 		file_Cova << info;
 		file_Cova.close();
 		TreesData->print_matrix2("Covariance Matrix", (char *)outname_cova);
