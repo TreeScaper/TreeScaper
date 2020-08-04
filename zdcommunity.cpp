@@ -1043,28 +1043,27 @@ bool community_detection_manually(Matrix<double> &mat, map<String, String> &para
 
 	//delete temporary file
 	free(infile);
-	free(outfile);
-	free(node_map_file);
-	free(conf_file);
 
 	free(conf);
 	free(sign);
+	free(covariance_freeid);
+	free(covariance_nonfree_id);
 	if (lambda != NULL)
 		delete[] lambda;
-	for (int i = 0; i < lambdasize; i++)
-	{
-		delete communities[i];
-	}
-	delete communities;
-	const char *tempfile0 = temp_file.c_str();
+
+	for (it = LamCommunities.begin(); it != LamCommunities.end(); it++)
+		delete it->second;
+
+	const char *tempfile0 = (char*)temp_file;
 	remove(tempfile0);
-	const char *tempfile1 = outf.c_str();
+	const char *tempfile1 = outfile;
 	remove(tempfile1);
-	const char *tempfile2 = nodef.c_str();
+	const char *tempfile2 = node_map_file;
 	remove(tempfile2);
-	const char *tempfile3 = conff.c_str();
+	const char *tempfile3 = conf_file;
 	remove(tempfile3);
 
-	cout << "Output community results to file: " << outfname << "\n\n";
+	cout << "Output community results to file: " << outname_CD << endl;
+	cout << "and " << outname_Pla << "\n\n";
 	return true;
 }
