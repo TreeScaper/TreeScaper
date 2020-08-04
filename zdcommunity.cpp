@@ -274,7 +274,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 			{
 				for (int j = 0; j <= i; j++)
 				{
-					finput >> mat_adj.matrix[i][j];
+					file_Adj >> mat_adj.matrix[i][j];
 					mat_adj.matrix[j][i] = mat_adj.matrix[i][j];
 				}
 			}
@@ -891,9 +891,9 @@ bool community_detection_manually(Matrix<double> &mat, map<String, String> &para
 	File file_CD(outname_CD);
 	file_CD.clean();
 	file_CD << info;
-	if (!file.is_open())
+	if (!file_CD.is_open())
 	{
-		cout << "Unable to open the file: " << outfname << "\n\n";
+		cout << "Unable to open the file: /" << outname_CD << "/\n\n";
 		return false;
 	}
 	int lambdasize = 0;
@@ -907,9 +907,9 @@ bool community_detection_manually(Matrix<double> &mat, map<String, String> &para
 		cout << "Error: The length of the array of lambda negative or the length of the array lambda positive should be one!\n\n";
 		return false;
 	};
-	com_info_col = lambdasize + 1;
+	int com_info_col = lambdasize + 1;
 
-	com_info = new double *[covariance_nonfree_id_size + 4];
+	double **com_info = new double *[covariance_nonfree_id_size + 4];
 	for (int i = 0; i < covariance_nonfree_id_size + 4; i++)
 		com_info[i] = new double[com_info_col];
 
