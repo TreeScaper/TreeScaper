@@ -1,11 +1,11 @@
 #include "zdcommunity.h"
 
-String make_stdname(String s, std::map<String, String> &paras) {
+String make_stdname2(String s, std::map<String, String> &paras) {
 	String Ans = paras["-path"];
 	Ans += s;
-	if (paras["-post"] != "none") {
+	if (paras["-post"] != String("none")) {
 		Ans += "_";
-		if (paras["-post"] != "time")
+		if (paras["-post"] != String("time"))
 			Ans += paras["-post"];
 		else
 			Ans += time_stamp();
@@ -153,7 +153,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 				if (paras["-cm"] == (String) "NNM")
 					modelType = 1;
 	int size = atoi((char*)paras["-size"]);
-	bool label_flag = (paras["-ft"] == "Cova"); 
+	bool label_flag = (paras["-ft"] == String("Cova")); 
 	// label_flag is true when labels are bipartition and false when labels are trees.
 	
 
@@ -170,7 +170,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	String info_content[4] = { time_stamp(),"Comminty detection temp file", paras["-size"], paras["-f"] };
 	Header_info info(info_item, info_content, 3);
 
-	String temp_file = make_stdname("Community_temp", paras);
+	String temp_file = make_stdname2("CDtemp", paras);
 	paras["-post"] = temp;
 	File file_Comm_temp(temp_file);
 	file_Comm_temp.clean();
@@ -187,12 +187,16 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	print_comm_array(mat, size, file_Comm_temp, label_flag, highfrequence, lowfrequence);
 
 	char *infile = strdup((char*)temp_file);
-	String outname_Graph = make_stdname("CD_Graph", paras);
+
+	String outname_Graph = paras["-path"];
+	outname_Graph += "CDtemp.bin";
 	char *outfile = (char*)outname_Graph;
 
-	String outname_Node = make_stdname("CD_Node", paras);
+	String outname_Node = paras["-path"];
+	outname_Node += "CDtemp_node_map.txt";
 	char *node_map_file = (char*)outname_Node;
-	String outname_Conf = make_stdname("CD_Configuration", paras);
+	String outname_Conf = paras["-path"];
+	outname_Conf += "CDtemp.conf";
 	char *conf_file = (char*)outname_Conf;
 	int is_weighted = 1;
 	int is_directed = 1;
@@ -264,7 +268,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		GreedyLouvain::iterate_randomly = stochastic;
 		GreedyLouvain::detect_communities(community);
 
-		if (paras["-dm"] == "URF")//Affinity matrix from Unweighted RF distance is read.
+		if (paras["-dm"] == String("URF"))//Affinity matrix from Unweighted RF distance is read.
 		{
 			bool allsametopo = true;
 			double samevalue = mat(0, 0);
@@ -586,7 +590,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	}
 
 	//plateaus
-	String outname_Pla = make_stdname("CD_Plateaus", paras);
+	String outname_Pla = make_stdname2("CD_Plateaus", paras);
 	info.insert("output_type", "Plateaus of Community detection result");
 	
 	if (label_flag)
@@ -648,7 +652,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	}
 
 	// output communities information
-	String outname_CD = make_stdname("Community", paras);
+	String outname_CD = make_stdname2("Community", paras);
 	info.insert("output_type", "Community detection result");
 	File file_CD(outname_CD);
 	file_CD.clean();

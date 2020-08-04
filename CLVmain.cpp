@@ -57,6 +57,20 @@ void aff_driver(map<String, String> &paras);
 void comm_driver(map<String, String> &paras);
 String get_path(String fname);
 
+String make_stdname(String s, std::map<String, String> &paras) {
+	String Ans = paras["-path"];
+	Ans += s;
+	if (paras["-post"] != String("none")) {
+		Ans += "_";
+		if (paras["-post"] != String("time"))
+			Ans += paras["-post"];
+		else
+			Ans += time_stamp();
+	}
+	Ans += ".out";
+	return Ans;
+}
+
 int main(int argc, char* argv[])
 {
     if(argc > 1 && (String) argv[1] == (String) "-dimest")
@@ -110,10 +124,10 @@ int main(int argc, char* argv[])
     if(argc > 1 && (String) argv[1] == (String) "-trees")
     {
         String default_paras[25] = {"nuctrees.txt", "0", "0", "Community", "list", 
-                                    "", "Majority", "Newick", "URF", "Exp", "time"
+                                    "", "Majority", "Newick", "URF", "Exp", "time",
                                     "Covariance", "CNM", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "auto", "Trees"};
         String options[25] =       {"-f", "-w", "-r", "-o", "-bfm", 
-                                    "-if", "-ct", "-cfm", "-dm", "-am", "-post"
+                                    "-if", "-ct", "-cfm", "-dm", "-am", "-post",
                                     "-t", "-cm", "-lp", "-lps", "-lpe", "-lpiv", "-ln", "-lns", "-lne", "-lniv", "-hf", "-lf", "-lm", "-ft"};
         
         for(int i = 1; i < argc; i++)
@@ -507,6 +521,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 			file_Bipart.close();
 			outBipartMatrix.open((char*)outname_bipartmat, std::ios::app);
 			TreesData->OutputBipartitionMatrix(outBipartMatrix, RCVLIST);
+			outBipartMatrix.close();
 		}
 		else if (paras["-bfm"] == (String) "matrix")
 		{
@@ -524,6 +539,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 			file_Bipart.close();
 			outBipartMatrix.open((char*)outname_bipartmat, std::ios::app);
 			TreesData->OutputBipartitionMatrix(outBipartMatrix, FULLMATRIX);
+			outBipartMatrix.close();
 		}
 		else
 		{
@@ -1074,7 +1090,7 @@ void comm_driver(map<String, String> &paras) {
 		}
 	}
 
-	if (paras["-lm"] == "auto") {
+	if (paras["-lm"] == String("auto")) {
 		community_detection_automatically(mat, paras);
 	}
 
