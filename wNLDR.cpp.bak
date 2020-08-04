@@ -3104,7 +3104,7 @@ bool NLDR::search_first_condition(const Matrix<double> &DX, double fxc, const Ma
 			{
 				a = ((fxnew - fxc - step_size * initslope) / step_size / step_size - (fxnew_pre - fxc - pre_step_size * initslope) / pre_step_size / pre_step_size) / (step_size - pre_step_size);
 				b = (- pre_step_size * (fxnew - fxc - step_size * initslope) / step_size / step_size + step_size * (fxnew_pre - fxc - pre_step_size * initslope) / pre_step_size / pre_step_size) / (step_size - pre_step_size);
-				
+
 				disc = b * b - 3 * a * initslope;
 				if(fabs(a) < 0.0000001)
 					sizetemp = - initslope / (2 * b);
@@ -3123,7 +3123,7 @@ bool NLDR::search_first_condition(const Matrix<double> &DX, double fxc, const Ma
 				step_size = sizetemp;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -3162,7 +3162,7 @@ bool NLDR::search_first_condition(const Matrix<double> &DX, double fxc, double d
 			{
 				a = ((fxnew - fxc - step_size * initslope) / step_size / step_size - (fxnew_pre - fxc - pre_step_size * initslope) / pre_step_size / pre_step_size) / (step_size - pre_step_size);
 				b = (- pre_step_size * (fxnew - fxc - step_size * initslope) / step_size / step_size + step_size * (fxnew_pre - fxc - pre_step_size * initslope) / pre_step_size / pre_step_size) / (step_size - pre_step_size);
-				
+
 				disc = b * b - 3 * a * initslope;
 				if(fabs(a) < 0.0000001)
 					sizetemp = - initslope / (2 * b);
@@ -3669,7 +3669,7 @@ void NLDR::oneNN_analysis()
 		index = salshu_index;
 	else
 		return;
-	
+
 	i_index = 0;
 	correct_num = 0;
 	for(int i = 0; i < size; i++)
@@ -3699,7 +3699,7 @@ void NLDR::oneNN_analysis()
 			correct_num++;
 	}
 	oneNN.matrix[1][0] = (double) correct_num / size;
-	
+
 	i_index = 0;
 	correct_num = 0;
 	for(int i = 0; i < size; i++)

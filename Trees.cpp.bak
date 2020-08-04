@@ -3786,7 +3786,7 @@ void Trees::WriteSelectedTrees(string &outfile, Treefileformat tf) // newick nex
     } else
     if(tf == NEXUS)
     {
-        int n_subtrees = 0;
+        int n_subtrees;
         for(int i = 0; i < selected_trees.get_length(); i++)
         {
             if(selected_trees[i] == -1)

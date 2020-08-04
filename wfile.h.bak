@@ -116,28 +116,15 @@ public:
 
 	Header_info(File &input);
 
-	Header_info(String* item, String* content, int length);
+	Header_info(String* option, String* content, int length);
 
 	~Header_info() {};
 
-	const Header_info &operator=(const Header_info &rhs) {
-		(*this).list = rhs.list;
-		return (*this);
-	}
-
 	int size() { return list.size(); };
 
-	void insert(String item, String content) {
-		list[item] = content;
+	void insert(String &option, String &content) {
+		list[option] = content;
 	};
-
-	bool count(String rhs) {
-		return list.count(rhs);
-	}
-
-	String operator[](String key) {
-		return list[key];
-	}
 
 	friend std::istream &operator>>(std::istream &input, Header_info &info);
 

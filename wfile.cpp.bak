@@ -240,7 +240,7 @@ Header_info::Header_info(File &input) {
 		input.seek(0);
 		char temp[1000];
 		std::string stemp;
-		String item;
+		String option;
 		String content;
 		int colon_pos;
 		while (temp[0] != '>' && !input.is_end()) {
@@ -248,17 +248,18 @@ Header_info::Header_info(File &input) {
 			stemp = std::string(temp);
 			colon_pos = stemp.find(':');
 			if (colon_pos != std::string::npos) {
-				item = (stemp.substr(0, colon_pos)).c_str();
+				option = (stemp.substr(0, colon_pos)).c_str();
 				content = (stemp.substr(colon_pos + 1, stemp.length())).c_str();
-				list[item] = content;
+				list[option] = content;
 			}
 		}
 	}
 }
 
-Header_info::Header_info(String* item, String* content, int length) {
+Header_info::Header_info(String* option, String* content, int length) {
+	std::map<String, String> list;
 	for (int i = 0; i < length; i++) {
-		(*this).list[item[i]] = content[i];
+		list[option[i]] = content[i];
 	}
 }
 
@@ -270,7 +271,7 @@ std::istream &operator>>(std::istream &input, Header_info &info) {
 		std::cout << "No header was found in the input file.\n";
 	else {
 		std::string stemp;
-		String item;
+		String option;
 		String content;
 		int colon_pos;
 		while (temp[0] != '>' && !input.eof()) {
@@ -278,9 +279,9 @@ std::istream &operator>>(std::istream &input, Header_info &info) {
 			stemp = std::string(temp);
 			colon_pos = stemp.find(':');
 			if (colon_pos != std::string::npos) {
-				item = (stemp.substr(0, colon_pos)).c_str();
+				option = (stemp.substr(0, colon_pos - 1)).c_str();
 				content = (stemp.substr(colon_pos + 1, stemp.length())).c_str();
-				info.insert(item, content);
+				info.insert(option, content);
 			}
 		}
 	}
@@ -306,7 +307,7 @@ File &operator>>(File &input, Header_info &info) {
 		std::cout << "No header was found in "<< input.get_filename()<< ".\n";
 	else {
 		std::string stemp;
-		String item;
+		String option;
 		String content;
 		int colon_pos;
 		while (temp[0] != '>' && !input.is_end()) {
@@ -314,9 +315,9 @@ File &operator>>(File &input, Header_info &info) {
 			stemp = std::string(temp);
 			colon_pos = stemp.find(':');
 			if (colon_pos != std::string::npos) {
-				item = (stemp.substr(0, colon_pos)).c_str();
+				option = (stemp.substr(0, colon_pos - 1)).c_str();
 				content = (stemp.substr(colon_pos + 1, stemp.length())).c_str();
-				info.insert(item, content);
+				info.insert(option, content);
 			}
 		}
 	}
