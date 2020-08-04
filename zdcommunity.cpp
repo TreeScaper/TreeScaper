@@ -15,13 +15,10 @@ String make_stdname2(String s, std::map<String, String> &paras) {
 }
 
 template<class T>
-void print_comm_array(Matrix<T> &arr, int n, File &output, bool arr_is_covariance, double highfreq, double lowfreq,
-					int &covariance_freeid_size, int &covariance_nonfree_id_size, int *covariance_freeid, int *covariance_nonfree_id)
+void print_comm_array(Matrix<T> &arr, int n, File &output, bool arr_is_covariance, double highfreq, double lowfreq, int &covariance_freeid_size, int &covariance_nonfree_id_size, int *covariance_freeid, int *covariance_nonfree_id)
 {
-	int *covariance_freeid = new int[n];
-	int covariance_freeid_size = 0;
-	int *covariance_nonfree_id = new int[n];
-	int covariance_nonfree_id_size = 0;
+	covariance_freeid_size = 0;
+	covariance_nonfree_id_size = 0;
 
 	if (arr.get_row() != 0 && arr.get_col() != 0)
 	{
@@ -161,9 +158,9 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 
 	srand(time(NULL));
 	int covariance_freeid_size = 0;
-	int *covariance_freeid = NULL;
+	int *covariance_freeid = new int[size];
 	int covariance_nonfree_id_size = 0;
-	int *covariance_nonfree_id = NULL;
+	int *covariance_nonfree_id = new int[size];
 
 	String temp = paras["-post"];
 	paras["-post"] = "";
@@ -185,8 +182,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		cout << "Warning: The high and low frequencies must be between 0 and 1!\n\n";
 		return false;
 	}
-	print_comm_array(mat, size, file_Comm_temp, label_flag, highfrequence, lowfrequence
-		covariance_freeid_size, covariance_nonfree_id_size, covariance_freeid, covariance_nonfree_id);
+	print_comm_array(mat, size, file_Comm_temp, label_flag, highfrequence, lowfrequence, covariance_freeid_size, covariance_nonfree_id_size, covariance_freeid, covariance_nonfree_id);
 
 	char *infile = strdup((char*)temp_file);
 
@@ -689,17 +685,25 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 
 	//delete temporary file
 	free(infile);
-	free(outfile);
-	free(node_map_file);
-	free(conf_file);
 
 	free(conf);
 	free(sign);
+	free(covariance_freeid);
+	free(covariance_nonfree_id);
 	if (lambda != NULL)
 		delete[] lambda;
 
 	for (it = LamCommunities.begin(); it != LamCommunities.end(); it++)
 		delete it->second;
+
+	const char *tempfile0 = (char*)temp_file;
+	remove(tempfile0);
+	const char *tempfile1 = outfile;
+	remove(tempfile1);
+	const char *tempfile2 = node_map_file;
+	remove(tempfile2);
+	const char *tempfile3 = conf_file;
+	remove(tempfile3);
 
 	cout << "Output community results to file: " << outname_CD << endl;
 	cout << "and " << outname_Pla << "\n\n";

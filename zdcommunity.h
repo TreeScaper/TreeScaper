@@ -53,8 +53,7 @@
 String make_stdname(String s, std::map<String, String> &paras);
 
 template<class T>
-void print_comm_array(Matrix<T> &arr, int n, File &output, bool arr_is_covariance, double highfreq, double lowfreq
-	int &covariance_freeid_size, int &covariance_nonfree_id_size, int *covariance_freeid, int *covariance_nonfree_id);
+void print_comm_array(Matrix<T> &arr, int n, File &output, bool arr_is_covariance, double highfreq, double lowfreq, int &covariance_freeid_size, int &covariance_nonfree_id_size, int *covariance_freeid, int *covariance_nonfree_id);
 
 int read_conf(char* filename, int* &conf, int* &sign);
 
