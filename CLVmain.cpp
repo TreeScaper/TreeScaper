@@ -570,6 +570,7 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
 	{
 		TreesData->Compute_Bipart_Covariance();
 		cout << "Successfully computed covariance matrix of bipartition." << endl;
+		info.insert("size", to_string(TreesData->Get_treecov_size()));
 
 		string outCovaName = TreesData->make_DISToutput_name("Covariance Matrix");
 		TreesData->print_matrix("Covariance Matrix", outCovaName);
