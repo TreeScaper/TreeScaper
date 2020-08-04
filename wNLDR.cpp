@@ -531,13 +531,18 @@ void NLDR::output_to_files()
 {
 	String filename_COR, filename_DIS, filename_STR, filename_TIM, filename_TRU, filename_CON, filename_1NN;
 	//this->make_output_file_names(filename_COR, filename_DIS, filename_STR, filename_TIM, filename_TRU, filename_CON, filename_1NN);
+	String root_path = paras["-path"];
+	String sub_path = paras["-path"];
 	filename_COR = make_stdname3("Coordinates", paras);
 	filename_DIS = make_stdname3("Distance", paras);
+	sub_path += "NLDR_analysis/";
+	paras["-path"] = sub_path;
 	filename_STR = make_stdname3("Stress", paras);
 	filename_TIM = make_stdname3("Time", paras);
 	filename_TRU = make_stdname3("Trustworthiness", paras);
 	filename_CON = make_stdname3("Connectivity", paras);
 	filename_1NN = make_stdname3("1NN", paras);
+	paras["-path"] = root_path;
 
 	File file_COR(filename_COR);
 	File file_DIS(filename_DIS);
