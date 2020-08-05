@@ -242,7 +242,7 @@
 	
 	\texttt{-aff} and \texttt{-comm} which stand for affinity and community detection are separated from \texttt{-tree}, which now only takes care of computing bipartition matrix, distance matrix and covariance matrix from tree file. Users are now able to perform any modification on output files from \texttt{-tree}, for example, send them to \texttt{-nldr}. Then \texttt{-comm} will take these (modified) files and other necessary information to perform CD methods.
 	
-	The specific argument list of these keys are given in following sections. Note that the current beta version of TreeScaper still accepts old commands, yet those keys are not suggested to use anymore and will also be \st{crossed} in the argument table. The default option, if there is any, will be colored in \textcolor{red}{red}.
+	The specific argument list of these keys are given in following sections. Note that the current new version of TreeScaper still accepts old commands, yet those keys are not suggested to use anymore and will also be \st{crossed} in the argument table. The default option, if there is any, will be colored in \textcolor{red}{red}.
 	
 	\clearpage
 	\subsection{\texttt{-dimest} arguments}
@@ -454,7 +454,7 @@
 	
 	Note that the old command requires the tree file be in the same directory of the binary file. This command will sequentially generates bipartition file, distance file, affinity file and the final community detection result.
 	
-	For the beta version, you are suggested to use the following set of commands to call CLVTreeScaper multiple times. Notice that the new command allows input and output in directory other than the current one.
+	For the new version, you are suggested to use the following set of commands to call CLVTreeScaper multiple times. Notice that the new command allows input and output in directory other than the current one.
 	
 	\begin{enumerate}
 		\item \texttt{./CLVTreeScaper -trees -f sub\_dir/boottrees.nhx -w 1 -r 0 -o Dist -dm RF -post test}
@@ -486,7 +486,7 @@
 	
 	This command will sequentially generates bipartition file, covariance file and the final community detection result.
 	
-	For the beta version, you are suggested to use the following set of commands to call CLVTreeScaper multiple times.
+	For the new version, you are suggested to use the following set of commands to call CLVTreeScaper multiple times.
 
 	\begin{enumerate}
 		\item \texttt{./CLVTreeScaper -trees -f sub\_dir/boottrees.nhx -w 1 -r 0 -o Cova -post test}
@@ -501,7 +501,7 @@
 	
 	\subsection{Header information}
 	
-	The beta version of TreeScaper are now centered at the output files of each subroutine. Different subroutines communicate through the formatted header information in the file they read and the file they output. (\textbf{WARNING}: Header in tree file and \texttt{-dimest} is NOT supported.)
+	The new version of TreeScaper are now centered at the output files of each subroutine. Different subroutines communicate through the formatted header information in the file they read and the file they output. (\textbf{WARNING}: Header in tree file and \texttt{-dimest} is NOT supported.)
 	
 	Here is a typical header information from a distance matrix created by \texttt{-nldr}:
 	\\
