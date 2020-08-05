@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/W32TeX) (preloaded format=pdflatex 2018.3.4)  30 JUL 2020 13:44
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/W32TeX) (preloaded format=pdflatex 2018.3.4)  4 AUG 2020 23:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -616,11 +616,23 @@ File: pdftex.cnt 2004/11/18 v2.14 Print contoured text (HH, MH)
 Package: ulem 2012/05/18
 \ULdepth=\dimen173
 )
+(c:/texlive/2017/texmf-dist/tex/latex/soul/soul.sty
+Package: soul 2003/11/17 v2.4 letterspacing/underlining (mf)
+\SOUL@word=\toks37
+\SOUL@lasttoken=\toks38
+\SOUL@cmds=\toks39
+\SOUL@buffer=\toks40
+\SOUL@token=\toks41
+\SOUL@spaceskip=\skip51
+\SOUL@ttwidth=\dimen174
+\SOUL@uldp=\dimen175
+\SOUL@ulht=\dimen176
+)
 (c:/texlive/2017/texmf-dist/tex/latex/enumitem/enumitem.sty
 Package: enumitem 2011/09/28 v3.5.2 Customized lists
-\labelindent=\skip51
-\enit@outerparindent=\dimen174
-\enit@toks=\toks37
+\labelindent=\skip52
+\enit@outerparindent=\dimen177
+\enit@toks=\toks42
 \enit@inbox=\box42
 \enitdp@description=\count130
 )
@@ -639,14 +651,14 @@ Package: mathtools 2018/01/08 v1.21 mathematical typesetting tools
 Package: calc 2014/10/28 v4.3 Infix arithmetic (KKT,FJ)
 \calc@Acount=\count131
 \calc@Bcount=\count132
-\calc@Adimen=\dimen175
-\calc@Bdimen=\dimen176
-\calc@Askip=\skip52
-\calc@Bskip=\skip53
+\calc@Adimen=\dimen178
+\calc@Bdimen=\dimen179
+\calc@Askip=\skip53
+\calc@Bskip=\skip54
 LaTeX Info: Redefining \setlength on input line 80.
 LaTeX Info: Redefining \addtolength on input line 81.
 \calc@Ccount=\count133
-\calc@Cskip=\skip54
+\calc@Cskip=\skip55
 )
 (c:/texlive/2017/texmf-dist/tex/latex/mathtools/mhsetup.sty
 Package: mhsetup 2017/03/31 v1.3 programming setup (MH)
@@ -656,26 +668,26 @@ LaTeX Info: Thecontrolsequence`\)'isalreadyrobust on input line 129.
 LaTeX Info: Thecontrolsequence`\['isalreadyrobust on input line 129.
 LaTeX Info: Thecontrolsequence`\]'isalreadyrobust on input line 129.
 \g_MT_multlinerow_int=\count134
-\l_MT_multwidth_dim=\dimen177
-\origjot=\skip55
-\l_MT_shortvdotswithinadjustabove_dim=\dimen178
-\l_MT_shortvdotswithinadjustbelow_dim=\dimen179
-\l_MT_above_intertext_sep=\dimen180
-\l_MT_below_intertext_sep=\dimen181
-\l_MT_above_shortintertext_sep=\dimen182
-\l_MT_below_shortintertext_sep=\dimen183
+\l_MT_multwidth_dim=\dimen180
+\origjot=\skip56
+\l_MT_shortvdotswithinadjustabove_dim=\dimen181
+\l_MT_shortvdotswithinadjustbelow_dim=\dimen182
+\l_MT_above_intertext_sep=\dimen183
+\l_MT_below_intertext_sep=\dimen184
+\l_MT_above_shortintertext_sep=\dimen185
+\l_MT_below_shortintertext_sep=\dimen186
 )
 (c:/texlive/2017/texmf-dist/tex/latex/amscls/amsthm.sty
 Package: amsthm 2017/10/31 v2.20.4
-\thm@style=\toks38
-\thm@bodyfont=\toks39
-\thm@headfont=\toks40
-\thm@notefont=\toks41
-\thm@headpunct=\toks42
-\thm@preskip=\skip56
-\thm@postskip=\skip57
-\thm@headsep=\skip58
-\dth@everypar=\toks43
+\thm@style=\toks43
+\thm@bodyfont=\toks44
+\thm@headfont=\toks45
+\thm@notefont=\toks46
+\thm@headpunct=\toks47
+\thm@preskip=\skip57
+\thm@postskip=\skip58
+\thm@headsep=\skip59
+\dth@everypar=\toks48
 )
 (c:/texlive/2017/texmf-dist/tex/latex/algorithm2e/algorithm2e.sty
 Package: algorithm2e 2017/07/18 v5.2 algorithms environments
@@ -684,7 +696,7 @@ Package: algorithm2e 2017/07/18 v5.2 algorithms environments
 (c:/texlive/2017/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
 )
-\algocf@hangindent=\skip59
+\algocf@hangindent=\skip60
 
 (c:/texlive/2017/texmf-dist/tex/latex/ifoddpage/ifoddpage.sty
 Package: ifoddpage 2016/04/23 v1.1 Conditionals for odd/even page detection
@@ -696,36 +708,36 @@ Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
 (c:/texlive/2017/texmf-dist/tex/latex/relsize/relsize.sty
 Package: relsize 2013/03/29 ver 4.1
 )
-\skiptotal=\skip60
-\skiplinenumber=\skip61
-\skiprule=\skip62
-\skiphlne=\skip63
-\skiptext=\skip64
-\skiplength=\skip65
-\algomargin=\skip66
-\skipalgocfslide=\skip67
-\algowidth=\dimen184
-\inoutsize=\dimen185
-\inoutindent=\dimen186
-\interspacetitleruled=\dimen187
-\interspacealgoruled=\dimen188
-\interspacetitleboxruled=\dimen189
-\algocf@ruledwidth=\skip68
+\skiptotal=\skip61
+\skiplinenumber=\skip62
+\skiprule=\skip63
+\skiphlne=\skip64
+\skiptext=\skip65
+\skiplength=\skip66
+\algomargin=\skip67
+\skipalgocfslide=\skip68
+\algowidth=\dimen187
+\inoutsize=\dimen188
+\inoutindent=\dimen189
+\interspacetitleruled=\dimen190
+\interspacealgoruled=\dimen191
+\interspacetitleboxruled=\dimen192
+\algocf@ruledwidth=\skip69
 \algocf@inoutbox=\box43
 \algocf@inputbox=\box44
-\AlCapSkip=\skip69
-\AlCapHSkip=\skip70
-\algoskipindent=\skip71
+\AlCapSkip=\skip70
+\AlCapHSkip=\skip71
+\algoskipindent=\skip72
 \algocf@nlbox=\box45
 \algocf@hangingbox=\box46
 \algocf@untilbox=\box47
-\algocf@skipuntil=\skip72
+\algocf@skipuntil=\skip73
 \algocf@capbox=\box48
-\algocf@lcaptionbox=\skip73
-\algoheightruledefault=\skip74
-\algoheightrule=\skip75
-\algotitleheightruledefault=\skip76
-\algotitleheightrule=\skip77
+\algocf@lcaptionbox=\skip74
+\algoheightruledefault=\skip75
+\algoheightrule=\skip76
+\algotitleheightruledefault=\skip77
+\algotitleheightrule=\skip78
 \c@algocfline=\count137
 \c@algocfproc=\count138
 \c@algocf=\count139
@@ -741,37 +753,37 @@ LaTeX Warning: Label `addchild' multiply defined.
 )
 \openout1 = `DeveloperManual.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Try loading font information for T1+lmr on input line 73.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Try loading font information for T1+lmr on input line 74.
  (c:/texlive/2017/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 (c:/texlive/2017/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count141
-\scratchdimen=\dimen190
+\scratchdimen=\dimen193
 \scratchbox=\box51
 \nofMPsegments=\count142
 \nofMParguments=\count143
-\everyMPshowfont=\toks44
+\everyMPshowfont=\toks49
 \MPscratchCnt=\count144
-\MPscratchDim=\dimen191
+\MPscratchDim=\dimen194
 \MPnumerator=\count145
 \makeMPintoPDFobject=\count146
-\everyMPtoPDFconversion=\toks45
+\everyMPtoPDFconversion=\toks50
 ) (c:/texlive/2017/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
 
@@ -790,7 +802,7 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 \AtBeginShipoutBox=\box52
-Package hyperref Info: Link coloring OFF on input line 73.
+Package hyperref Info: Link coloring OFF on input line 74.
 
 (c:/texlive/2017/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
@@ -800,9 +812,9 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count147
 )
-LaTeX Info: Redefining \ref on input line 73.
-LaTeX Info: Redefining \pageref on input line 73.
-LaTeX Info: Redefining \nameref on input line 73.
+LaTeX Info: Redefining \ref on input line 74.
+LaTeX Info: Redefining \pageref on input line 74.
+LaTeX Info: Redefining \nameref on input line 74.
 
 (./DeveloperManual.out) (./DeveloperManual.out)
 \@outlinefile=\write4
@@ -810,82 +822,82 @@ LaTeX Info: Redefining \nameref on input line 73.
 
 
 ABD: EveryShipout initializing macros
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 75.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 76.
 
 (c:/texlive/2017/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OML+lmm on input line 75.
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 76.
 
 (c:/texlive/2017/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 75.
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 76.
 
 
 (c:/texlive/2017/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMX+lmex on input line 75.
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 76.
 
 
 (c:/texlive/2017/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 75.
+(Font)              <12> on input line 76.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 75.
+(Font)              <8> on input line 76.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 75.
-LaTeX Font Info:    Try loading font information for U+rsfs on input line 75.
+(Font)              <6> on input line 76.
+LaTeX Font Info:    Try loading font information for U+rsfs on input line 76.
 
 (c:/texlive/2017/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
-LaTeX Font Info:    Try loading font information for U+msa on input line 75.
+LaTeX Font Info:    Try loading font information for U+msa on input line 76.
 
 (c:/texlive/2017/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 75.
+LaTeX Font Info:    Try loading font information for U+msb on input line 76.
 
 (c:/texlive/2017/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Overfull \hbox (17.0205pt too wide) in paragraph at lines 82--84
+Overfull \hbox (17.0205pt too wide) in paragraph at lines 83--85
 \T1/lmr/m/n/10.95 CLVTreeScaper re-quires a CLA-PACK prop-erly in-stalled and l
 inked on your ma-chine. CLAPACK-
  []
 
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 94.
-LaTeX Font Info:    Try loading font information for T1+lmtt on input line 110.
+(Font)              <10.95> on input line 95.
+LaTeX Font Info:    Try loading font information for T1+lmtt on input line 111.
 
 (c:/texlive/2017/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-Overfull \hbox (3.46645pt too wide) in paragraph at lines 110--112
+Overfull \hbox (3.46645pt too wide) in paragraph at lines 111--113
 []\T1/lmtt/m/n/10.95 git clone -b zdver https://github.com/TreeScaper/TreeScape
 r.git \T1/lmr/m/n/10.95 to build the
  []
 
 
-Overfull \hbox (63.70778pt too wide) in paragraph at lines 125--130
+Overfull \hbox (63.70778pt too wide) in paragraph at lines 126--131
 \T1/lmr/m/n/10.95 de-fault in-stal-la-tion, you need to only mod-ify the OS pos
 t-fix name \T1/lmtt/m/n/10.95 PLAT \T1/lmr/m/n/10.95 in \T1/lmtt/m/n/10.95 /CLA
 PACK-3.2.1/make.inc\T1/lmr/m/n/10.95 .
  []
 
 
-Overfull \hbox (33.84575pt too wide) in paragraph at lines 131--136
+Overfull \hbox (33.84575pt too wide) in paragraph at lines 132--137
 \T1/lmr/m/n/10.95 the OS post-fix name is con-sis-tent with \T1/lmtt/m/n/10.95 
 CLAPACK \T1/lmr/m/n/10.95 set-ting, i.e. \T1/lmtt/m/n/10.95 PLAT \T1/lmr/m/n/10
 .95 in \T1/lmtt/m/n/10.95 /CLAPACK-3.2.1/make.inc
  []
 
 
-Overfull \hbox (240.52196pt too wide) in paragraph at lines 137--138
+Overfull \hbox (240.52196pt too wide) in paragraph at lines 138--139
 []\T1/lmr/m/n/10.95 ===========================================================
 ================== 
  []
@@ -894,7 +906,7 @@ Overfull \hbox (240.52196pt too wide) in paragraph at lines 137--138
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 
-Overfull \hbox (24.51288pt too wide) in paragraph at lines 157--161
+Overfull \hbox (24.51288pt too wide) in paragraph at lines 158--162
 \T1/lmr/m/n/10.95 post-fix name of \T1/lmtt/m/n/10.95 lapack_XXX.a \T1/lmr/m/n/
 10.95 and \T1/lmtt/m/n/10.95 blas_XXX.a \T1/lmr/m/n/10.95 and mod-ify \T1/lmtt/
 m/n/10.95 PLAT \T1/lmr/m/n/10.95 in \T1/lmtt/m/n/10.95 makeCLVTreeScaper.inc 
@@ -903,78 +915,158 @@ m/n/10.95 PLAT \T1/lmr/m/n/10.95 in \T1/lmtt/m/n/10.95 makeCLVTreeScaper.inc
 [1
 
 {c:/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Overfull \hbox (240.52196pt too wide) in paragraph at lines 168--169
+Overfull \hbox (240.52196pt too wide) in paragraph at lines 169--170
 []\T1/lmr/m/n/10.95 ===========================================================
 ================== 
  []
 
 
-Overfull \hbox (35.67827pt too wide) in paragraph at lines 175--178
+Overfull \hbox (35.67827pt too wide) in paragraph at lines 176--179
 \T1/lmr/m/n/10.95 sure you also move the de-fault pa-ram-e-ters files nldr_para
 meters.csv and dimest_parameters.csv
  []
 
 
-Overfull \hbox (15.80211pt too wide) in paragraph at lines 200--202
+Overfull \hbox (15.80211pt too wide) in paragraph at lines 201--203
 []\T1/lmr/m/n/10.95 If there is no change on CLA-PACK side, which is usu-ally t
 he case, run \T1/lmtt/m/n/10.95 make CLVTreeScaper
  []
 
-<ArgumentList1.jpg, id=78, 636.87938pt x 525.46312pt>
-File: ArgumentList1.jpg Graphic file (type jpg)
-<use ArgumentList1.jpg>
-Package pdftex.def Info: ArgumentList1.jpg  used on input line 214.
+<imagesForManual/ArgumentList1.jpg, id=86, 636.87938pt x 525.46312pt>
+File: imagesForManual/ArgumentList1.jpg Graphic file (type jpg)
+<use imagesForManual/ArgumentList1.jpg>
+Package pdftex.def Info: imagesForManual/ArgumentList1.jpg  used on input line 
+215.
 (pdftex.def)             Requested size: 442.65375pt x 365.21585pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 [2]
-Overfull \hbox (11.4962pt too wide) in paragraph at lines 227--230
+Overfull \hbox (11.4962pt too wide) in paragraph at lines 228--231
 \T1/lmtt/m/n/10.95 ./CLVTreeScaper -trees -f test.tre -ft trees -r 1 -w 1 -o Co
 mmunity -t Affinity
  []
 
-[3 <./ArgumentList1.jpg>]
-<ArgumentList2.jpg, id=97, 748.29562pt x 469.755pt>
-File: ArgumentList2.jpg Graphic file (type jpg)
-<use ArgumentList2.jpg>
-Package pdftex.def Info: ArgumentList2.jpg  used on input line 235.
+[3 <./imagesForManual/ArgumentList1.jpg>]
+<imagesForManual/ArgumentList2.jpg, id=105, 748.29562pt x 469.755pt>
+File: imagesForManual/ArgumentList2.jpg Graphic file (type jpg)
+<use imagesForManual/ArgumentList2.jpg>
+Package pdftex.def Info: imagesForManual/ArgumentList2.jpg  used on input line 
+236.
 (pdftex.def)             Requested size: 442.65375pt x 277.88417pt.
+ [4 <./imagesForManual/ArgumentList2.jpg>]
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 244.
- [4 <./ArgumentList2.jpg>] [5
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 248.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <9> on input line 288.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 288.
+ [5
 
 ] [6
 
-] [7
+]
+Overfull \hbox (40.50551pt too wide) in paragraph at lines 439--440
+[]\T1/lmr/m/n/10.95 Note that the ar-gu-ments for man-u-ally tun-ing CD will la
+ter be com-bine into a \T1/lmtt/m/n/10.95 parameter_comm.csv\T1/lmr/m/n/10.95 .
+ 
+ []
+
+[7
 
 ]
-Overfull \hbox (19.26749pt too wide) in paragraph at lines 416--417
+Overfull \hbox (11.25pt too wide) in paragraph at lines 453--454
+[]\T1/lmtt/m/n/10.95 ./CLVTreeScaper -trees -f boottrees.nhx -ft Trees -w 1 -r 
+0 -o Community -dm
+ []
+
+
+Overfull \hbox (33.12253pt too wide) in paragraph at lines 460--461
+[]\T1/lmtt/m/n/10.95 ./CLVTreeScaper -trees -f sub_dir/boottrees.nhx -w 1 -r 0 
+-o Dist -dm RF -post
+ []
+
+
+Overfull \hbox (4.37886pt too wide) in paragraph at lines 466--467
+[]\T1/lmtt/m/n/10.95 ./CLVTreeScaper -nldr -f sub_dir/Distance_test.out -t DIS 
+-d 20 -c CCA -a
+ []
+
+
+Overfull \hbox (33.12253pt too wide) in paragraph at lines 470--471
+[]\T1/lmtt/m/n/10.95 ./CLVTreeScaper -aff -f sub_dir/Distance_NLDR_test.out -am
+ Rec -post NLDR_test 
+ []
+
+
+Overfull \hbox (21.62506pt too wide) in paragraph at lines 474--475
+[]\T1/lmtt/m/n/10.95 ./CLVTreeScaper -comm -f example/Affinity_NLDR_test.out -l
+m auto -hf 0.9 -lf
+ []
+
+
+Overfull \hbox (5.50127pt too wide) in paragraph at lines 485--486
+[]\T1/lmtt/m/n/10.95 ./CLVTreeScaper -trees -f boottrees.nhx -ft Trees -w 1 -r 
+0 -o Community -t
+ []
+
+
+Overfull \hbox (21.62506pt too wide) in paragraph at lines 492--493
+[]\T1/lmtt/m/n/10.95 ./CLVTreeScaper -trees -f sub_dir/boottrees.nhx -w 1 -r 0 
+-o Cova -post test 
+ []
+
+
+Overfull \hbox (4.37886pt too wide) in paragraph at lines 496--497
+[]\T1/lmtt/m/n/10.95 ./CLVTreeScaper -comm -f example/Covariance_test.out -lm a
+uto -hf 0.9 -lf
+ []
+
+[8]
+Underfull \hbox (badness 10000) in paragraph at lines 506--525
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 506--525
+
+ []
+
+
+Overfull \hbox (5.46075pt too wide) in paragraph at lines 526--527
+[]\T1/lmr/m/n/10.95 It is mul-ti-ple lines of string in-side a an-gle bracket. 
+The in-for-ma-tion is stored as \T1/lmtt/m/n/10.95 map<String,
+ []
+
+[9]
+Overfull \hbox (19.26749pt too wide) in paragraph at lines 586--587
 []\T1/lmr/m/n/10.95 Warning: this im-ple-men-ta-tion is dif-fer-ent than the im
 -ple-men-ta-tion of \T1/lmtt/m/n/10.95 String::operator()\T1/lmr/m/n/10.95 ,
  []
 
+[10]
 
-LaTeX Warning: Hyper reference `MatrixResize' on page 8 undefined on input line
- 443.
+LaTeX Warning: Hyper reference `MatrixResize' on page 11 undefined on input lin
+e 613.
 
-contour: Using 16 copies for `\texttt {resize}' on input line 443.
-[8]
-Overfull \hbox (10.55466pt too wide) in paragraph at lines 463--464
+contour: Using 16 copies for `\texttt {resize}' on input line 613.
+
+Overfull \hbox (10.55466pt too wide) in paragraph at lines 633--634
 []\T1/lmtt/m/n/10.95 friend Matrix operator*([]S[] value, Matrix<[]T[]> mat) \T
 1/lmr/m/n/10.95 or \T1/lmtt/m/n/10.95 (Matrix<[]T[]> mat, []S[] value)\T1/lmr/m
 /n/10.95 . 
  []
 
-[9] [10]
-contour: Using 16 copies for `\texttt {Matrix}' on input line 528.
-contour: Using 16 copies for `\texttt {Matrix}' on input line 529.
+[11] [12]
+contour: Using 16 copies for `\texttt {Matrix}' on input line 698.
+contour: Using 16 copies for `\texttt {Matrix}' on input line 699.
+[13]
 
-LaTeX Warning: Hyper reference `NLDR' on page 11 undefined on input line 550.
+LaTeX Warning: Hyper reference `NLDR' on page 14 undefined on input line 720.
 
-contour: Using 16 copies for `\texttt {NLDR}' on input line 550.
+contour: Using 16 copies for `\texttt {NLDR}' on input line 720.
 
-Overfull \hbox (136.50182pt too wide) in paragraph at lines 550--551
+Overfull \hbox (136.50182pt too wide) in paragraph at lines 720--721
 []\T1/lmr/m/n/10.95 Compute the stress that es-ti-mate how good $\OML/lmm/m/it/
 10.95 BB[]$ \T1/lmr/m/n/10.95 ap-prox-i-mate $\OML/lmm/m/it/10.95 D[]$ \T1/lmr/
 m/n/10.95 by call-ing []|   [][][]::\T1/lmtt/m/n/10.95 CLASSIC_MDS_stress_funct
@@ -982,460 +1074,460 @@ ion[]\T1/lmr/m/n/10.95 .
  []
 
 
-LaTeX Warning: Hyper reference `MatrixResize' on page 11 undefined on input lin
-e 573.
+LaTeX Warning: Hyper reference `MatrixResize' on page 14 undefined on input lin
+e 743.
 
-contour: Using 16 copies for `\texttt {resize}' on input line 573.
+contour: Using 16 copies for `\texttt {resize}' on input line 743.
 
-Overfull \hbox (70.3392pt too wide) in paragraph at lines 568--575
+Overfull \hbox (70.3392pt too wide) in paragraph at lines 738--745
 [][] 
  []
 
-[11]
-Overfull \hbox (70.3392pt too wide) in paragraph at lines 578--587
+
+Overfull \hbox (70.3392pt too wide) in paragraph at lines 748--757
 [][] 
  []
 
-contour: Using 16 copies for `\texttt {NEWICKNODE}' on input line 607.
-contour: Using 16 copies for `\texttt {NEWICKNODE}' on input line 608.
-contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 616.
-contour: Using 16 copies for `\texttt {loadnewicktree}' on input line 619.
-contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 619.
-contour: Using 16 copies for `\texttt {loadnewicktree2}' on input line 620.
-contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 620.
-contour: Using 16 copies for `\texttt {floadnewicktree}' on input line 621.
-contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 621.
-contour: Using 16 copies for `\texttt {loadnode}' on input line 622.
-contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 622.
-contour: Using 16 copies for `\texttt {loadleaf}' on input line 623.
-contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 623.
-contour: Using 16 copies for `\texttt {parsetree}' on input line 624.
-contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 624.
-contour: Using 16 copies for `\texttt {parsenode}' on input line 625.
-contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 625.
-contour: Using 16 copies for `\texttt {parseleaf}' on input line 626.
-contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 626.
-contour: Using 16 copies for `\texttt {addchild}' on input line 627.
-contour: Using 16 copies for `\texttt {dfs\_compute\_hash}' on input line 628.
+[14]
+contour: Using 16 copies for `\texttt {NEWICKNODE}' on input line 777.
+contour: Using 16 copies for `\texttt {NEWICKNODE}' on input line 778.
+contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 786.
+contour: Using 16 copies for `\texttt {loadnewicktree}' on input line 789.
+contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 789.
+contour: Using 16 copies for `\texttt {loadnewicktree2}' on input line 790.
+contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 790.
+contour: Using 16 copies for `\texttt {floadnewicktree}' on input line 791.
+contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 791.
+contour: Using 16 copies for `\texttt {loadnode}' on input line 792.
+contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 792.
+contour: Using 16 copies for `\texttt {loadleaf}' on input line 793.
+contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 793.
+contour: Using 16 copies for `\texttt {parsetree}' on input line 794.
+contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 794.
+contour: Using 16 copies for `\texttt {parsenode}' on input line 795.
+contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 795.
+contour: Using 16 copies for `\texttt {parseleaf}' on input line 796.
+contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 796.
+contour: Using 16 copies for `\texttt {addchild}' on input line 797.
+contour: Using 16 copies for `\texttt {dfs\_compute\_hash}' on input line 798.
 
-Overfull \hbox (3.45035pt too wide) in paragraph at lines 628--628
+Overfull \hbox (3.45035pt too wide) in paragraph at lines 798--798
 []|[][]|   [][][][]| 
  []
 
 
-Underfull \hbox (badness 1019) in paragraph at lines 628--629
+Underfull \hbox (badness 1019) in paragraph at lines 798--799
 []|\T1/lmr/m/n/10.95 Assigned hash val-ues to all (sub-
  []
 
-contour: Using 16 copies for `\texttt {bipart}' on input line 629.
-contour: Using 16 copies for `\texttt {findleaf}' on input line 630.
-contour: Using 16 copies for `NEWICKNODE::\texttt {label}' on input line 630.
+contour: Using 16 copies for `\texttt {bipart}' on input line 799.
+contour: Using 16 copies for `\texttt {findleaf}' on input line 800.
+contour: Using 16 copies for `NEWICKNODE::\texttt {label}' on input line 800.
 
-Underfull \hbox (badness 10000) in paragraph at lines 630--631
+Underfull \hbox (badness 10000) in paragraph at lines 800--801
 []|\T1/lmr/m/n/10.95 Find a leaf by the
  []
 
-contour: Using 16 copies for `\texttt {normalizedTree}' on input line 631.
-contour: Using 16 copies for `\texttt {newick2lcbb}' on input line 632.
-contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 632.
-contour: Using 16 copies for `\texttt {Ptree}' on input line 632.
-contour: Using 16 copies for `\texttt {newick2ptree}' on input line 633.
-contour: Using 16 copies for `\texttt {newick2lcbb}' on input line 633.
-contour: Using 16 copies for `\texttt {sumofdegree}' on input line 634.
-contour: Using 16 copies for `\texttt {bipartcount}' on input line 635.
-contour: Using 16 copies for `\texttt {Addbipart}' on input line 636.
-[12]
-contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 643.
-contour: Using 16 copies for `\texttt {initialTrees}' on input line 645.
-contour: Using 16 copies for `\texttt {ReadTrees}' on input line 646.
-contour: Using 16 copies for `\texttt {compute\_numofbipart}' on input line 647
+contour: Using 16 copies for `\texttt {normalizedTree}' on input line 801.
+contour: Using 16 copies for `\texttt {newick2lcbb}' on input line 802.
+contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 802.
+contour: Using 16 copies for `\texttt {Ptree}' on input line 802.
+contour: Using 16 copies for `\texttt {newick2ptree}' on input line 803.
+contour: Using 16 copies for `\texttt {newick2lcbb}' on input line 803.
+contour: Using 16 copies for `\texttt {sumofdegree}' on input line 804.
+contour: Using 16 copies for `\texttt {bipartcount}' on input line 805.
+contour: Using 16 copies for `\texttt {Addbipart}' on input line 806.
+contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 813.
+contour: Using 16 copies for `\texttt {initialTrees}' on input line 815.
+contour: Using 16 copies for `\texttt {ReadTrees}' on input line 816.
+contour: Using 16 copies for `\texttt {compute\_numofbipart}' on input line 817
 .
-contour: Using 16 copies for `\texttt {Compute\_Hash}' on input line 648.
+contour: Using 16 copies for `\texttt {Compute\_Hash}' on input line 818.
 
-Underfull \hbox (badness 4686) in paragraph at lines 648--649
+Underfull \hbox (badness 4686) in paragraph at lines 818--819
 []|\T1/lmr/m/n/10.95 Generate hash ta-ble for
  []
 
 contour: Using 16 copies for `\texttt {Compute\_Bipart\_Matrix}' on input line 
-649.
+819.
 contour: Using 16 copies for `\texttt {Compute\_Bipart\_Covariance}' on input l
-ine 650.
+ine 820.
 
-Overfull \hbox (10.92087pt too wide) in paragraph at lines 650--650
+Overfull \hbox (10.92087pt too wide) in paragraph at lines 820--820
 []|[][]|   [][][][]| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 650--651
+Underfull \hbox (badness 10000) in paragraph at lines 820--821
 []|\T1/lmr/m/n/10.95 Generate the co-vari-ance
  []
 
 
-Underfull \hbox (badness 4366) in paragraph at lines 650--651
+Underfull \hbox (badness 4366) in paragraph at lines 820--821
 \T1/lmr/m/n/10.95 ma-trix ac-cord-ing to the
  []
 
 contour: Using 16 copies for `\texttt {Compute\_RF\_dist\_by\_hash}' on input l
-ine 651.
+ine 821.
 
-Underfull \hbox (badness 1565) in paragraph at lines 651--652
+Underfull \hbox (badness 1565) in paragraph at lines 821--822
 []|\T1/lmr/m/n/10.95 Generate the RF-distance
  []
 
-contour: Using 16 copies for `\texttt {pttree}' on input line 652.
-contour: Using 16 copies for `\texttt {Ptree}' on input line 652.
+contour: Using 16 copies for `\texttt {pttree}' on input line 822.
+contour: Using 16 copies for `\texttt {Ptree}' on input line 822.
 
-Underfull \hbox (badness 10000) in paragraph at lines 652--653
+Underfull \hbox (badness 10000) in paragraph at lines 822--823
 []|\T1/lmr/m/n/10.95 Construct the ad-ja-cency
  []
 
-contour: Using 16 copies for `\texttt {compute\_matrix}' on input line 653.
-contour: Using 16 copies for `\texttt {Ptree}' on input line 653.
+contour: Using 16 copies for `\texttt {compute\_matrix}' on input line 823.
+contour: Using 16 copies for `\texttt {Ptree}' on input line 823.
 
-Underfull \hbox (badness 3019) in paragraph at lines 653--654
+Underfull \hbox (badness 3019) in paragraph at lines 823--824
 \T1/lmr/m/n/10.95 put-ing match-ing dis-tance
  []
 
 
-Underfull \hbox (badness 2189) in paragraph at lines 653--654
+Underfull \hbox (badness 2189) in paragraph at lines 823--824
 \T1/lmr/m/n/10.95 by ac-cu-mu-lat-ing com-mon
  []
 
 contour: Using 16 copies for `\texttt {Compute\_Matching\_dist}' on input line 
-654.
+824.
 contour: Using 16 copies for `\texttt {Compute\_Affinity\_dist}' on input line 
-655.
+825.
 
-Underfull \hbox (badness 1127) in paragraph at lines 655--656
+Underfull \hbox (badness 1127) in paragraph at lines 825--826
 []|\T1/lmr/m/n/10.95 Compute the affin-ity dis-
  []
 
-[13]
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 665.
-contour: Using 16 copies for `\texttt {floadnewicktree}' on input line 672.
-contour: Using 16 copies for `\texttt {floadnewicktree}' on input line 677.
-contour: Using 16 copies for `\texttt {loadnewicktree2}' on input line 679.
-[14]
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 686.
-contour: Using 16 copies for `\texttt {loadnewicktree}' on input line 692.
-contour: Using 16 copies for `\texttt {floadnewicktree}' on input line 692.
-contour: Using 16 copies for `\texttt {floadnewicktree}' on input line 697.
+[15]
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 835.
+contour: Using 16 copies for `\texttt {floadnewicktree}' on input line 842.
+contour: Using 16 copies for `\texttt {floadnewicktree}' on input line 847.
+contour: Using 16 copies for `\texttt {loadnewicktree2}' on input line 849.
+[16]
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 856.
+contour: Using 16 copies for `\texttt {loadnewicktree}' on input line 862.
+contour: Using 16 copies for `\texttt {floadnewicktree}' on input line 862.
+contour: Using 16 copies for `\texttt {floadnewicktree}' on input line 867.
 
-Underfull \hbox (badness 2351) in paragraph at lines 697--698
+Underfull \hbox (badness 2351) in paragraph at lines 867--868
 []|\T1/lmr/m/n/10.95 Implementation by re-cur-
  []
 
-contour: Using 16 copies for `\texttt {parsetree}' on input line 699.
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 707.
-contour: Using 16 copies for `\texttt {loadnode}' on input line 713.
-contour: Using 16 copies for `\texttt {loadnode}' on input line 718.
-contour: Using 16 copies for `\texttt {parsetree}' on input line 720.
-[15]
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 727.
-contour: Using 16 copies for `\texttt {loadnode}' on input line 733.
-contour: Using 16 copies for `\texttt {loadleaf}' on input line 733.
+contour: Using 16 copies for `\texttt {parsetree}' on input line 869.
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 877.
+contour: Using 16 copies for `\texttt {loadnode}' on input line 883.
+contour: Using 16 copies for `\texttt {loadnode}' on input line 888.
+contour: Using 16 copies for `\texttt {parsetree}' on input line 890.
+[17]
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 897.
+contour: Using 16 copies for `\texttt {loadnode}' on input line 903.
+contour: Using 16 copies for `\texttt {loadleaf}' on input line 903.
 
-Underfull \hbox (badness 10000) in paragraph at lines 740--741
+Underfull \hbox (badness 10000) in paragraph at lines 910--911
 []|\T1/lmr/m/n/10.95 Read ad-di-tional in-for-ma-tion
  []
 
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 749.
-contour: Using 16 copies for `\texttt {floadnewicktree}' on input line 755.
-contour: Using 16 copies for `\texttt {parsenode}' on input line 760.
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 769.
-[16]
-contour: Using 16 copies for `\texttt {loadnode}' on input line 775.
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 919.
+contour: Using 16 copies for `\texttt {floadnewicktree}' on input line 925.
+contour: Using 16 copies for `\texttt {parsenode}' on input line 930.
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 939.
+[18]
+contour: Using 16 copies for `\texttt {loadnode}' on input line 945.
 
-Underfull \hbox (badness 10000) in paragraph at lines 782--783
+Underfull \hbox (badness 10000) in paragraph at lines 952--953
 []|\T1/lmr/m/n/10.95 Read ad-di-tional in-for-ma-tion
  []
 
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 789.
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 959.
 
-Underfull \hbox (badness 10000) in paragraph at lines 804--804
+Underfull \hbox (badness 10000) in paragraph at lines 974--974
 []|\T1/lmtt/m/n/10.95 ( NEWICKNODE* startNode, LabelMap &lm,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 804--804
+Underfull \hbox (badness 10000) in paragraph at lines 974--974
 \T1/lmtt/m/n/10.95 HashRFMap &vec_hashrf, unsigned treeIdx,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 804--804
+Underfull \hbox (badness 10000) in paragraph at lines 974--974
 \T1/lmtt/m/n/10.95 unsigned &numBitstr, unsigned long long
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 804--804
+Underfull \hbox (badness 10000) in paragraph at lines 974--974
 \T1/lmtt/m/n/10.95 m1, unsigned long long m2, bool WEIGHTED,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 804--804
+Underfull \hbox (badness 10000) in paragraph at lines 974--974
 \T1/lmtt/m/n/10.95 unsigned int NUM_Taxa, map<unsigned long
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 804--804
+Underfull \hbox (badness 10000) in paragraph at lines 974--974
 \T1/lmtt/m/n/10.95 long, Array<char> *> &hash2bitstr, int
  []
 
 
-LaTeX Warning: Hyper reference `Array' on page 17 undefined on input line 813.
+LaTeX Warning: Hyper reference `Array' on page 19 undefined on input line 983.
 
-contour: Using 16 copies for `\texttt {Array}' on input line 813.
+contour: Using 16 copies for `\texttt {Array}' on input line 983.
 
-Overfull \hbox (9.53363pt too wide) in paragraph at lines 813--813
+Overfull \hbox (9.53363pt too wide) in paragraph at lines 983--983
 []|[]|   [][][]\T1/lmr/m/n/10.95 ::\T1/lmtt/m/n/10.95 SetBitArray[]| 
  []
 
 
-LaTeX Warning: Hyper reference `Array' on page 17 undefined on input line 814.
+LaTeX Warning: Hyper reference `Array' on page 19 undefined on input line 984.
 
-contour: Using 16 copies for `\texttt {Array}' on input line 814.
-[17]
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 823.
+contour: Using 16 copies for `\texttt {Array}' on input line 984.
+[19]
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 993.
 
-Underfull \hbox (badness 10000) in paragraph at lines 830--830
+Underfull \hbox (badness 10000) in paragraph at lines 1000--1000
 []|\T1/lmtt/m/n/10.95 (NEWICKNODE *const startnode, unsigned int
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 830--830
+Underfull \hbox (badness 10000) in paragraph at lines 1000--1000
 \T1/lmtt/m/n/10.95 &treeIdx, unsigned long long *matrix_hv,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 830--830
+Underfull \hbox (badness 10000) in paragraph at lines 1000--1000
 \T1/lmtt/m/n/10.95 unsigned int *matrix_treeIdx, double
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 830--830
+Underfull \hbox (badness 10000) in paragraph at lines 1000--1000
 \T1/lmtt/m/n/10.95 *matrix_weight, int &idx, int depth, bool
  []
 
-[18]
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 846.
+[20]
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 1016.
 
-Underfull \hbox (badness 10000) in paragraph at lines 850--850
+Underfull \hbox (badness 10000) in paragraph at lines 1020--1020
 []|\T1/lmtt/m/n/10.95 (std::string leafname, NEWICKNODE
  []
 
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 861.
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 1031.
 
-Underfull \hbox (badness 10000) in paragraph at lines 865--865
+Underfull \hbox (badness 10000) in paragraph at lines 1035--1035
 []|\T1/lmtt/m/n/10.95 (NEWICKNODE *lrpt, NEWICKTREE *newickTree, int
  []
 
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 876.
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 1046.
 
-Underfull \hbox (badness 10000) in paragraph at lines 880--880
+Underfull \hbox (badness 10000) in paragraph at lines 1050--1050
 []|\T1/lmtt/m/n/10.95 (const NEWICKTREE *nwtree, int num_leaves,
  []
 
-contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 882.
-contour: Using 16 copies for `\texttt {Ptree}' on input line 882.
-contour: Using 16 copies for `\texttt {newick2lcbb}' on input line 887.
-contour: Using 16 copies for `\texttt {Ptree}' on input line 889.
-contour: Using 16 copies for `\texttt {Ptree}' on input line 889.
-[19]
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 893.
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 913.
+contour: Using 16 copies for `\texttt {NEWICKTREE}' on input line 1052.
+contour: Using 16 copies for `\texttt {Ptree}' on input line 1052.
+contour: Using 16 copies for `\texttt {newick2lcbb}' on input line 1057.
+contour: Using 16 copies for `\texttt {Ptree}' on input line 1059.
+contour: Using 16 copies for `\texttt {Ptree}' on input line 1059.
+[21]
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 1063.
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 1083.
 
-Underfull \hbox (badness 10000) in paragraph at lines 917--917
+Underfull \hbox (badness 10000) in paragraph at lines 1087--1087
 []|\T1/lmtt/m/n/10.95 (NEWICKNODE *node, bool isrooted, map<unsigned
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 917--917
+Underfull \hbox (badness 10000) in paragraph at lines 1087--1087
 \T1/lmtt/m/n/10.95 long long, unsigned long long> &bipcount, int
  []
 
-contour: Using 16 copies for `\texttt {TreeOPE}' on input line 930.
+contour: Using 16 copies for `\texttt {TreeOPE}' on input line 1100.
 
-Underfull \hbox (badness 10000) in paragraph at lines 934--934
+Underfull \hbox (badness 10000) in paragraph at lines 1104--1104
 []|\T1/lmtt/m/n/10.95 (NEWICKNODE* startNode, double freq, unsigned
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 934--934
+Underfull \hbox (badness 10000) in paragraph at lines 1104--1104
 \T1/lmtt/m/n/10.95 long long hash, Array<char> &bitstr, int
  []
 
-contour: Using 16 copies for `\texttt {Trees}' on input line 950.
-contour: Using 16 copies for `\texttt {Trees}' on input line 955.
-[20]
+contour: Using 16 copies for `\texttt {Trees}' on input line 1120.
+contour: Using 16 copies for `\texttt {Trees}' on input line 1125.
+[22]
 
-LaTeX Warning: Hyper reference `NEWICKEDTREE' on page 21 undefined on input lin
-e 961.
+LaTeX Warning: Hyper reference `NEWICKEDTREE' on page 23 undefined on input lin
+e 1131.
 
-contour: Using 16 copies for `\texttt {NEWICKEDTREE}' on input line 961.
+contour: Using 16 copies for `\texttt {NEWICKEDTREE}' on input line 1131.
 
-LaTeX Warning: Hyper reference `loadnewickedtree2' on page 21 undefined on inpu
-t line 961.
+LaTeX Warning: Hyper reference `loadnewickedtree2' on page 23 undefined on inpu
+t line 1131.
 
-contour: Using 16 copies for `\texttt {loadnewickedtree2}' on input line 961.
+contour: Using 16 copies for `\texttt {loadnewickedtree2}' on input line 1131.
 
-Underfull \hbox (badness 10000) in paragraph at lines 961--961
+Underfull \hbox (badness 10000) in paragraph at lines 1131--1131
 []|\T1/lmr/m/n/10.95 Initialize a set of []|   [][][]s by call-ing
  []
 
-contour: Using 16 copies for `\texttt {loadnewicktree2}' on input line 966.
-contour: Using 16 copies for `\texttt {Trees}' on input line 976.
-contour: Using 16 copies for `\texttt {initialTrees}' on input line 982.
-contour: Using 16 copies for `\texttt {parsetree}' on input line 982.
-contour: Using 16 copies for `\texttt {parsetree}' on input line 987.
-contour: Using 16 copies for `\texttt {normalizedTree}' on input line 988.
-contour: Using 16 copies for `\texttt {Trees}' on input line 999.
+contour: Using 16 copies for `\texttt {loadnewicktree2}' on input line 1136.
+contour: Using 16 copies for `\texttt {Trees}' on input line 1146.
+contour: Using 16 copies for `\texttt {initialTrees}' on input line 1152.
+contour: Using 16 copies for `\texttt {parsetree}' on input line 1152.
+contour: Using 16 copies for `\texttt {parsetree}' on input line 1157.
+contour: Using 16 copies for `\texttt {normalizedTree}' on input line 1158.
+contour: Using 16 copies for `\texttt {Trees}' on input line 1169.
 
-LaTeX Warning: Hyper reference `numberofbipartition' on page 21 undefined on in
-put line 1005.
+LaTeX Warning: Hyper reference `numberofbipartition' on page 23 undefined on in
+put line 1175.
 
-contour: Using 16 copies for `\texttt {numberofbipartition}' on input line 1005
+contour: Using 16 copies for `\texttt {numberofbipartition}' on input line 1175
 .
-contour: Using 16 copies for `\texttt {sumofdegree}' on input line 1010.
-contour: Using 16 copies for `\texttt {Trees}' on input line 1014.
-contour: Using 16 copies for `\texttt {dfs\_compute\_hash}' on input line 1025.
+contour: Using 16 copies for `\texttt {sumofdegree}' on input line 1180.
+contour: Using 16 copies for `\texttt {Trees}' on input line 1184.
+contour: Using 16 copies for `\texttt {dfs\_compute\_hash}' on input line 1195.
 
 
-Overfull \hbox (3.45035pt too wide) in paragraph at lines 1025--1025
+Overfull \hbox (3.45035pt too wide) in paragraph at lines 1195--1195
 []|[][]|   [][][][]| 
  []
 
-[21]
-contour: Using 16 copies for `\texttt {Trees}' on input line 1029.
-contour: Using 16 copies for `\texttt {bipart}' on input line 1035.
-contour: Using 16 copies for `\texttt {bipart}' on input line 1040.
-contour: Using 16 copies for `\texttt {Sort}' on input line 1044.
-contour: Using 16 copies for `\texttt {Trees}' on input line 1050.
+[23]
+contour: Using 16 copies for `\texttt {Trees}' on input line 1199.
+contour: Using 16 copies for `\texttt {bipart}' on input line 1205.
+contour: Using 16 copies for `\texttt {bipart}' on input line 1210.
+contour: Using 16 copies for `\texttt {Sort}' on input line 1214.
+contour: Using 16 copies for `\texttt {Trees}' on input line 1220.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1054--1054
+Underfull \hbox (badness 10000) in paragraph at lines 1224--1224
 []|\T1/lmtt/m/n/10.95 (const double* Vec1, const double* Vec2, int
  []
 
 
-LaTeX Warning: Hyper reference `SparseMatrix' on page 22 undefined on input lin
-e 1063.
+LaTeX Warning: Hyper reference `SparseMatrix' on page 24 undefined on input lin
+e 1233.
 
-contour: Using 16 copies for `\texttt {SparseMatrix}' on input line 1063.
+contour: Using 16 copies for `\texttt {SparseMatrix}' on input line 1233.
 
-LaTeX Warning: Hyper reference `Multiplyvec' on page 22 undefined on input line
- 1063.
+LaTeX Warning: Hyper reference `Multiplyvec' on page 24 undefined on input line
+ 1233.
 
-contour: Using 16 copies for `\texttt {Multiply\_vec}' on input line 1063.
+contour: Using 16 copies for `\texttt {Multiply\_vec}' on input line 1233.
 
-LaTeX Warning: Hyper reference `Vector' on page 22 undefined on input line 1063
+LaTeX Warning: Hyper reference `Vector' on page 24 undefined on input line 1233
 .
 
-contour: Using 16 copies for `\texttt {Vector}' on input line 1063.
-contour: Using 16 copies for `\texttt {Trees}' on input line 1067.
+contour: Using 16 copies for `\texttt {Vector}' on input line 1233.
+contour: Using 16 copies for `\texttt {Trees}' on input line 1237.
 contour: Using 16 copies for `\texttt {Compute\_Bipart\_Matrix}' on input line 
-1073.
+1243.
 
-LaTeX Warning: Hyper reference `SparseMatrix' on page 22 undefined on input lin
-e 1078.
+LaTeX Warning: Hyper reference `SparseMatrix' on page 24 undefined on input lin
+e 1248.
 
-contour: Using 16 copies for `\texttt {SparseMatrix}' on input line 1078.
+contour: Using 16 copies for `\texttt {SparseMatrix}' on input line 1248.
 
-LaTeX Warning: Hyper reference `transpose' on page 22 undefined on input line 1
-078.
+LaTeX Warning: Hyper reference `transpose' on page 24 undefined on input line 1
+248.
 
-contour: Using 16 copies for `\texttt {transpose}' on input line 1078.
+contour: Using 16 copies for `\texttt {transpose}' on input line 1248.
 
-LaTeX Warning: Hyper reference `SparseMatrix' on page 22 undefined on input lin
-e 1079.
+LaTeX Warning: Hyper reference `SparseMatrix' on page 24 undefined on input lin
+e 1249.
 
-contour: Using 16 copies for `\texttt {SparseMatrix}' on input line 1079.
+contour: Using 16 copies for `\texttt {SparseMatrix}' on input line 1249.
 
-LaTeX Warning: Hyper reference `Multiply' on page 22 undefined on input line 10
-79.
+LaTeX Warning: Hyper reference `Multiply' on page 24 undefined on input line 12
+49.
 
-contour: Using 16 copies for `\texttt {Multiply}' on input line 1079.
+contour: Using 16 copies for `\texttt {Multiply}' on input line 1249.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1079--1080
+Underfull \hbox (badness 10000) in paragraph at lines 1249--1250
 []|\T1/lmr/m/n/10.95 Matrix-Matrix mul-ti-pli-ca-
  []
 
 
-LaTeX Warning: Hyper reference `SparseMatrix' on page 22 undefined on input lin
-e 1080.
+LaTeX Warning: Hyper reference `SparseMatrix' on page 24 undefined on input lin
+e 1250.
 
-contour: Using 16 copies for `\texttt {SparseMatrix}' on input line 1080.
+contour: Using 16 copies for `\texttt {SparseMatrix}' on input line 1250.
 
-LaTeX Warning: Hyper reference `Mean' on page 22 undefined on input line 1080.
+LaTeX Warning: Hyper reference `Mean' on page 24 undefined on input line 1250.
 
-contour: Using 16 copies for `\texttt {Mean}' on input line 1080.
+contour: Using 16 copies for `\texttt {Mean}' on input line 1250.
 
-LaTeX Warning: Hyper reference `SparseMatrix' on page 22 undefined on input lin
-e 1081.
+LaTeX Warning: Hyper reference `SparseMatrix' on page 24 undefined on input lin
+e 1251.
 
-contour: Using 16 copies for `\texttt {SparseMatrix}' on input line 1081.
+contour: Using 16 copies for `\texttt {SparseMatrix}' on input line 1251.
 
-LaTeX Warning: Hyper reference `Multiplyvec' on page 22 undefined on input line
- 1081.
+LaTeX Warning: Hyper reference `Multiplyvec' on page 24 undefined on input line
+ 1251.
 
-contour: Using 16 copies for `\texttt {Multiply\_vec}' on input line 1081.
+contour: Using 16 copies for `\texttt {Multiply\_vec}' on input line 1251.
 
-Overfull \hbox (11.25542pt too wide) in paragraph at lines 1081--1081
+Overfull \hbox (11.25542pt too wide) in paragraph at lines 1251--1251
 []|[]|   [][][]\T1/lmr/m/n/10.95 ::[]|   [][][]| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1081--1082
+Underfull \hbox (badness 10000) in paragraph at lines 1251--1252
 []|\T1/lmr/m/n/10.95 Matrix-vector mul-ti-pli-ca-
  []
 
-contour: Using 16 copies for `\texttt {Trees}' on input line 1082.
-contour: Using 16 copies for `\texttt {Vec\_Multiply}' on input line 1082.
-[22]
-contour: Using 16 copies for `\texttt {Trees}' on input line 1090.
-contour: Using 16 copies for `\texttt {Trees}' on input line 1108.
-contour: Using 16 copies for `\texttt {Ptree}' on input line 1114.
-contour: Using 16 copies for `\texttt {Trees}' on input line 1124.
+contour: Using 16 copies for `\texttt {Trees}' on input line 1252.
+contour: Using 16 copies for `\texttt {Vec\_Multiply}' on input line 1252.
+[24]
+contour: Using 16 copies for `\texttt {Trees}' on input line 1260.
+contour: Using 16 copies for `\texttt {Trees}' on input line 1278.
+contour: Using 16 copies for `\texttt {Ptree}' on input line 1284.
+contour: Using 16 copies for `\texttt {Trees}' on input line 1294.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1128--1128
+Underfull \hbox (badness 10000) in paragraph at lines 1298--1298
 []|\T1/lmtt/m/n/10.95 (int *r, int range, struct Ptree *tree1,
  []
 
-[23]
-contour: Using 16 copies for `\texttt {Trees}' on input line 1141.
-contour: Using 16 copies for `\texttt {compute\_matrix}' on input line 1147.
-contour: Using 16 copies for `\texttt {Trees}' on input line 1162.
+[25]
+contour: Using 16 copies for `\texttt {Trees}' on input line 1311.
+contour: Using 16 copies for `\texttt {compute\_matrix}' on input line 1317.
+contour: Using 16 copies for `\texttt {Trees}' on input line 1332.
 
-LaTeX Warning: Hyper reference `Getbipartitionofonetree' on page 24 undefined o
-n input line 1173.
+LaTeX Warning: Hyper reference `Getbipartitionofonetree' on page 26 undefined o
+n input line 1343.
 
 contour: Using 16 copies for `\texttt {Get\_bipartitionofonetree}' on input lin
-e 1173.
+e 1343.
 
-Overfull \hbox (49.44022pt too wide) in paragraph at lines 1173--1173
+Overfull \hbox (49.44022pt too wide) in paragraph at lines 1343--1343
 []|[]|   [][][]| 
  []
 
-contour: Using 16 copies for `\texttt {Trees}' on input line 1181.
+contour: Using 16 copies for `\texttt {Trees}' on input line 1351.
 
-Underfull \hbox (badness 5147) in paragraph at lines 1187--1187
+Underfull \hbox (badness 5147) in paragraph at lines 1357--1357
 \T1/lmr/m/n/10.95 depending on the flag \T1/lmtt/m/n/10.95 type\T1/lmr/m/n/10.9
 5 . It ac-cepts un-
  []
 
 
-Underfull \hbox (badness 7433) in paragraph at lines 1187--1187
+Underfull \hbox (badness 7433) in paragraph at lines 1357--1357
 \T1/lmr/m/n/10.95 weighted/weighted RF-distance, Matching-distance,
  []
 
-contour: Using 16 copies for `\texttt {Trees}' on input line 1197.
-[24] [25]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1220.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1220.
+contour: Using 16 copies for `\texttt {Trees}' on input line 1367.
+[26] [27]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1390.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1390.
  (./DeveloperManual.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1220.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1220.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1390.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1390.
 
 Package rerunfilecheck Info: File `DeveloperManual.out' has not changed.
-(rerunfilecheck)             Checksum: 0AD1360FF4D863AEB9621AE8C6E1AD22;900.
+(rerunfilecheck)             Checksum: D0A6162125C9BF321168EE7A3E63F90E;1023.
 
 
 LaTeX Warning: There were undefined references.
@@ -1443,37 +1535,55 @@ LaTeX Warning: There were undefined references.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1220.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1390.
  ) 
 Here is how much of TeX's memory you used:
- 19067 strings out of 492982
- 349587 string characters out of 6136241
- 475947 words of memory out of 5000000
- 22125 multiletter control sequences out of 15000+600000
- 57785 words of font info for 63 fonts, out of 8000000 for 9000
+ 19306 strings out of 492982
+ 352516 string characters out of 6136241
+ 482661 words of memory out of 5000000
+ 22321 multiletter control sequences out of 15000+600000
+ 82925 words of font info for 86 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 55i,11n,65p,665b,479s stack positions out of 5000i,500n,10000p,200000b,80000s
-{c:/texlive/2017/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/texlive/2017/tex
-mf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/texlive/2017/texmf-dist/fonts/enc/
-dvips/lm/lm-mathex.enc}{c:/texlive/2017/texmf-dist/fonts/enc/dvips/lm/lm-mathit
-.enc}{c:/texlive/2017/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}<c:/texlive/2017/
-texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/texlive/2017/texmf-dist/fonts/t
-ype1/public/lm/lmbx12.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/lm/lme
-x10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/texliv
-e/2017/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/texlive/2017/texmf-dist/f
-onts/type1/public/lm/lmmi8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/l
-m/lmr10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/tex
-live/2017/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/texlive/2017/texmf-dis
-t/fonts/type1/public/lm/lmr6.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public
-/lm/lmr8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/t
-exlive/2017/texmf-dist/fonts/type1/public/lm/lmsy6.pfb><c:/texlive/2017/texmf-d
-ist/fonts/type1/public/lm/lmsy8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/pub
-lic/lm/lmtk10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-<c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on DeveloperManual.pdf (25 pages, 503070 bytes).
+ 55i,16n,65p,665b,479s stack positions out of 5000i,500n,10000p,200000b,80000s
+pdfTeX warning (dest): name{Hfootnote.6} has been referenced but does not exi
+st, replaced by a fixed one
+
+pdfTeX warning (dest): name{Hfootnote.5} has been referenced but does not exist
+, replaced by a fixed one
+
+pdfTeX warning (dest): name{Hfootnote.4} has been referenced but does not exist
+, replaced by a fixed one
+
+pdfTeX warning (dest): name{Hfootnote.3} has been referenced but does not exist
+, replaced by a fixed one
+
+pdfTeX warning (dest): name{Hfootnote.2} has been referenced but does not exist
+, replaced by a fixed one
+
+pdfTeX warning (dest): name{Hfootnote.1} has been referenced but does not exist
+, replaced by a fixed one
+
+{c:/texlive/2017/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/texlive/2017/texmf
+-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/texlive/2017/texmf-dist/fonts/enc/dv
+ips/lm/lm-mathex.enc}{c:/texlive/2017/texmf-dist/fonts/enc/dvips/lm/lm-mathit.e
+nc}{c:/texlive/2017/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}<c:/texlive/2017/te
+xmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/texlive/2017/texmf-dist/fonts/typ
+e1/public/lm/lmbx12.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/lm/lmex1
+0.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/texlive/
+2017/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/texlive/2017/texmf-dist/fon
+ts/type1/public/lm/lmmi8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/lm/
+lmr10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/texli
+ve/2017/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/texlive/2017/texmf-dist/
+fonts/type1/public/lm/lmr6.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/l
+m/lmr8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/tex
+live/2017/texmf-dist/fonts/type1/public/lm/lmsy6.pfb><c:/texlive/2017/texmf-dis
+t/fonts/type1/public/lm/lmsy8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/publi
+c/lm/lmtk10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c
+:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on DeveloperManual.pdf (27 pages, 515868 bytes).
 PDF statistics:
- 484 PDF objects out of 1000 (max. 8388607)
- 433 compressed objects within 5 object streams
- 120 named destinations out of 1000 (max. 500000)
- 135 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 530 PDF objects out of 1000 (max. 8388607)
+ 477 compressed objects within 5 object streams
+ 141 named destinations out of 1000 (max. 500000)
+ 151 words of extra memory for PDF output out of 10000 (max. 10000000)
 

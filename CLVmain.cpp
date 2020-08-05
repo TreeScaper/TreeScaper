@@ -180,9 +180,9 @@ int main(int argc, char* argv[])
 	}
 	else if (argc > 1 && (String)argv[1] == (String) "-comm") {
 		String default_paras[16] = { "", "Covariance", "CNM", "1", "0", "1",
-			"0", "1", "0", "1", "0", "1", "0", "auto", "Trees", "time" };
+			"0", "1", "0", "1", "0", "1", "0", "auto", "", "time" };
 		String options[16] = { "-f", "-t", "-cm", "-lp", "-lps", "-lpe",
-			"-lpiv", "-ln", "-lns", "-lne", "-lniv", "-hf", "-lf", "-lm", "-ft", "-post"};
+			"-lpiv", "-ln", "-lns", "-lne", "-lniv", "-hf", "-lf", "-lm", "-node", "-post"};
 		for (int i = 1; i < argc; i++)
 		{
 			for (int j = 0; j < 16; j++)
@@ -1118,15 +1118,9 @@ void comm_driver(map<String, String> &paras) {
 			paras["-dm"] = "";
 	}
 
-	if (!paras.count("-node")) {
+	if (paras["-node"] == (String) "") {
 		if (info.count("node_type")) {
-			std::string ft = (char*) info["node_type"];
-			if (ft.find("Tree") != std::string::npos)
-				paras["-node"] = "Tree";
-			else if (ft.find("Bipartition") != std::string::npos)
-				paras["-node"] = "Bipartition";
-			else
-				paras["-node"] = "Unknown_node";
+			paras["-node"] = info["node_type"];
 		}
 		else {
 			paras["-node"] = "Unknown_node";
