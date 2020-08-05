@@ -22,4 +22,57 @@
 -- 7/16/20
 
 	- New keyword and command structure proposed on developer manual. The actual changed has not been merged yet.
+
+-- 8/4/20
 	
+	- New command structures are fully online. They are
+	* -dimest
+		** -f
+		** -e: CORR_DIM, NN_DIM, EIG_DIM
+		** -i: DIS, COR
+		** -p
+	* -nldr
+		** -f
+		** -t: DIS, COR
+		** -d
+		** -c: CCA, SAMMON, CLASSIC_MDS, KRUSKAL1, NORMALIZED
+		** -a: STOCHASTIC, METROPOLIS, GAUSS_SEIDEL, LINEAR_ITERATION, MAJORIZATION
+		** -i: RAND, CLASSIC_MDS
+		** -post: none, time, AnyString
+		** -p
+	* -trees
+		** -f
+		** -w
+		** -r
+		** -o: Dist, Cova, Consensus
+		** -bfm: list, matrix
+		** -if
+		** -ct: Majority, Strict
+		** -ctm: Nexus, Newick
+		** -dm: RF, URF, Mat, SPR
+		** -post: none, time, AnyString
+	* -aff
+		** -am: Rec, Exp
+		** -post: none, time, AnyString
+	* -comm
+		** -f
+		** -cm: CNN, CPM, ERNM, NNM
+		** -lm: auto, manu
+		** -node
+		** -post: none, time, AnyString
+		** -hf
+		** -lf
+		** other tuning parameters
+	Note that TreeScaper beta still accept the old command.
+
+	- Header information supported. Now header information in the beginning of file in format of:
+<
+
+created:8_3_0_33
+output_type:Distance matrix
+distance_type:Robinson-Foulds
+node_type:Tree node_feature:weighted, unrooted, NLDR(20)
+source:example/ATP8.tre
+
+>
+can be import and export. User may manually add lines in format of XXX:YYYY.
