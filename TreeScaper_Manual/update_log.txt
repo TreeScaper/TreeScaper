@@ -71,7 +71,8 @@
 created:8_3_0_33
 output_type:Distance matrix
 distance_type:Robinson-Foulds
-node_type:Tree node_feature:weighted, unrooted, NLDR(20)
+node_type:Tree 
+node_feature:weighted, unrooted, NLDR(20)
 source:example/ATP8.tre
 
 >
