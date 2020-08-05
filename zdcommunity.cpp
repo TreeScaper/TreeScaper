@@ -232,8 +232,11 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	int times = 0;
 	int numNodes = 0;
 
+	cout << "Searching minimum of lambda_pos";
+
 	while (times <= 20)
 	{
+		cout << ".";
 		create_resolution(lambda_pos_min, lambda_neg, layers, sign, lambda);
 		community = new Community(outfile, conf, sign, lambda);
 		int stochastic = 0;
@@ -259,6 +262,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		cout << "Error: Cannot find lambda pos min!\n\n";
 		return false;
 	}
+	cout << " Done!\n";
 
 	Matrix<double> mat_adj;
 	if (paras["-dm"] == (String) "URF") {
@@ -282,8 +286,11 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		}
 	}
 	times = 0;
+
+	cout << "Searching maximum of lambda_pos";
 	while (times <= 20)
 	{
+		cout << ".";
 		create_resolution(lambda_pos_max, lambda_neg, layers, sign, lambda);
 		community = new Community(outfile, conf, sign, lambda);
 		int stochastic = 0;
@@ -342,6 +349,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		cout << "Error: Cannot find lambda pos max!\n\n";
 		return false;
 	}
+	cout << " Done!\n";
 
 	cout << "lambda neg: " << lambda_neg << endl;
 	cout << "lambda pos min: " << lambda_pos_min << ", lambda pos max: " << lambda_pos_max << endl;
