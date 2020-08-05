@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
 			}
 		}
 		map<String, String> paras;
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 15; i++)
 		{
 			paras[options[i]] = default_paras[i];
 		}
