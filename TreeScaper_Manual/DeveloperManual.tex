@@ -242,7 +242,7 @@
 	
 	\texttt{-aff} and \texttt{-comm} which stand for affinity and community detection are separated from \texttt{-tree}, which now only takes care of computing bipartition matrix, distance matrix and covariance matrix from tree file. Users are now able to perform any modification on output files from \texttt{-tree}, for example, send them to \texttt{-nldr}. Then \texttt{-comm} will take these (modified) files and other necessary information to perform CD methods.
 	
-	The specific argument list of these keys are given in following sections. Note that the current beta version of TreeScaper still accepts old commands, yet those keys are not suggested to use anymore and will also be \st{crossed} in the argument table.
+	The specific argument list of these keys are given in following sections. Note that the current beta version of TreeScaper still accepts old commands, yet those keys are not suggested to use anymore and will also be \st{crossed} in the argument table. The default option, if there is any, will be colored in \textcolor{red}{red}.
 	
 	\clearpage
 	\subsection{\texttt{-dimest} arguments}
@@ -257,9 +257,9 @@
 			\hline
 			\texttt{-f}& Source file &  \\
 			\hline
-			\texttt{-e}& Algorithm & \texttt{CORR\_DIM}, \texttt{NN\_DIM}, \texttt{EIG\_DIM}, \texttt{MLE\_DIM}\\
+			\texttt{-e}& Algorithm & \textcolor{red}{\texttt{CORR\_DIM}}, \texttt{NN\_DIM}, \texttt{EIG\_DIM}, \texttt{MLE\_DIM}\\
 			\hline
-			\texttt{-i}& Data type& \texttt{DIS}, \texttt{COR}\\
+			\texttt{-i}& Data type& \texttt{DIS}, \textcolor{red}{\texttt{COR}}\\
 			\hline
 			\texttt{-p}& Parameter file&\\
 			\hline
@@ -281,21 +281,21 @@
 			\hline
 			\texttt{-f}& Source file &  \\
 			\hline
-			\texttt{-t}& Data type & \texttt{COR}, \texttt{DIS}\\
+			\texttt{-t}& Data type & \textcolor{red}{\texttt{COR}}, \texttt{DIS}\\
 			\hline
-			\texttt{-d}& Target dimension, $k$&\\
+			\texttt{-d}& Target dimension, $k$& \textcolor{red}{2}\\
 			\hline
-			\texttt{-c}& Cost function& \texttt{CCA}, \texttt{SAMMON}, \texttt{CLASSIC\_MDS}\footnote{This method, classical scaling, only works when distance matrix are generated on classic Euclidean space $\mathbb{R}^n$.}\\
+			\texttt{-c}& Cost function& \textcolor{red}{\texttt{CCA}}, \texttt{SAMMON}, \texttt{CLASSIC\_MDS}\footnote{This method, classical scaling, only works when distance matrix are generated on classic Euclidean space $\mathbb{R}^n$.}\\
 			&&\texttt{KRUSKAL1}, \texttt{NORMALIZED}\\
 			\hline
-			\texttt{-a}& Algorithm & \texttt{STOCHASTIC}, \texttt{METROPOLIS}, \texttt{GAUSS\_SEIDEL}\\
+			\texttt{-a}& Algorithm & \textcolor{red}{\texttt{STOCHASTIC}}, \texttt{METROPOLIS}, \texttt{GAUSS\_SEIDEL}\\
 			&&\texttt{LINEAR\_ITERATION}, \texttt{MAJORIZATION}\\
 			\hline
-			\texttt{-i}& Initial guess & \texttt{RAND}, \texttt{CLASSIC\_MDS}\footnote{Use the result of classical scaling as initial guess.}\\
+			\texttt{-i}& Initial guess & \textcolor{red}{\texttt{RAND}}, \texttt{CLASSIC\_MDS}\footnote{Use the result of classical scaling as initial guess.}\\
 			\hline
 			\texttt{\st{-o}}& \st{Output postfix}&\\
 			\hline
-			\texttt{-post} & Output postfix&\texttt{none}, \texttt{time}, \texttt{AnyString}\\
+			\texttt{-post} & Output postfix&\texttt{none}, \texttt{time}, \textcolor{red}{\texttt{NLDR}}, \texttt{AnyString}\\
 			\hline
 			\texttt{-p}& Parameter file&\\
 			\hline
@@ -337,18 +337,18 @@
 			\hline
 			\texttt{-r}& Rooted tree flag& \\
 			\hline
-			\texttt{-o}& Output type & \texttt{Dist}, \texttt{Cova}, \texttt{Consensus}\\
+			\texttt{-o}& Output type & \textcolor{red}{\texttt{Dist}}, \texttt{Cova}, \texttt{Consensus}\\
 			&&\st{\texttt{Affinity}, \texttt{Community}}\\
 			\hline
 			\texttt{-bfm}& Bipartition output format & \texttt{list}, \texttt{matrix}\\
 			\hline
 			\texttt{-if}& Tree id file&\\
 			\hline
-			\texttt{-ct}& Consensus Tree type& \texttt{Majority}, \texttt{Strict}\\
+			\texttt{-ct}& Consensus Tree type& \textcolor{red}{\texttt{Majority}}, \texttt{Strict}\\
 			\hline
-			\texttt{-ctm}& Consensus Tree format& \texttt{Nexus}, \texttt{Newick}\\
+			\texttt{-ctm}& Consensus Tree format& \texttt{Nexus}, \textcolor{red}{\texttt{Newick}}\\
 			\hline
-			\texttt{-dm}& Distance type& \texttt{RF}, \texttt{URF}, \texttt{Mat}, \texttt{SPR}\\
+			\texttt{-dm}& Distance type& \texttt{RF}, \textcolor{red}{\texttt{URF}}, \texttt{Mat}, \texttt{SPR}\\
 			\hline
 			\st{\texttt{-am}}& \st{Affinity type}& \st{\texttt{Rec}, \texttt{Exp}}\\
 			\hline
@@ -360,7 +360,7 @@
 			\st{\texttt{-t}}& \st{Type of label used in} & \st{\texttt{Affinity}, \texttt{Covariance}}\\
 			& \st{community detection}&\\
 			\hline
-			\texttt{-post} & Output postfix&\texttt{none}, \texttt{time}, \texttt{AnyString}\\
+			\texttt{-post} & Output postfix&\texttt{none}, \textcolor{red}{\texttt{time}}, \texttt{AnyString}\\
 			\hline
 		\end{tabular}
 		\caption{Argument list of \texttt{-trees}}
@@ -382,9 +382,9 @@
 			\hline
 			\texttt{-f}& Source file &  \\
 			\hline
-			\texttt{-am}& Affinity type & \texttt{Rec}, \texttt{Exp}\\
+			\texttt{-am}& Affinity type & \texttt{Rec}, \textcolor{red}{\texttt{Exp}}\\
 			\hline
-			\texttt{-post} & Output postfix&\texttt{none}, \texttt{time}, \texttt{AnyString}\\
+			\texttt{-post} & Output postfix&\texttt{none}, \textcolor{red}{\texttt{time}}, \texttt{AnyString}\\
 			\hline
 		\end{tabular}
 		\caption{Argument list of \texttt{-aff}}
@@ -403,17 +403,17 @@
 			\hline
 			\texttt{-f}& Source file &  \\
 			\hline
-			\texttt{-cm}& Community Detection method & \texttt{CNN}, \texttt{CPM}, \texttt{ERNM}, \texttt{NNM}\\
+			\texttt{-cm}& Community Detection method & \textcolor{red}{\texttt{CNN}}, \texttt{CPM}, \texttt{ERNM}, \texttt{NNM}\\
 			\hline
-			\texttt{-lm}& Parameter tuning\footnote{Set $\lambda^+_{\min}$ and $\lambda^+_{\max}$ manually or automatically.}& \texttt{auto}, \texttt{manu}\\
+			\texttt{-lm}& Parameter tuning\footnote{Set $\lambda^+_{\min}$ and $\lambda^+_{\max}$ manually or automatically.}& \textcolor{red}{\texttt{auto}}, \texttt{manu}\\
 			\hline
 			\texttt{-node}& Node type& \\
 			\hline
-			\texttt{-post}& Output postfix & \texttt{none}, \texttt{time}, \texttt{AnyString}\\
+			\texttt{-post}& Output postfix & \texttt{none}, \textcolor{red}{\texttt{time}}, \texttt{AnyString}\\
 			\hline
-			\texttt{-hf}\footnote{Upper bound for removing highly connected nodes}& Tunning parameter&\\
+			\texttt{-hf}\footnote{Upper bound for removing highly connected nodes}& Tunning parameter&\textcolor{red}{1}\\
 			\hline
-			\texttt{-lf}\footnote{lower bound for removing merely connected nodes}& Tunning parameter&\\
+			\texttt{-lf}\footnote{lower bound for removing merely connected nodes}& Tunning parameter&\textcolor{red}{0}\\
 			\hline
 			\texttt{-lp}& Manual Tunning parameter&\\
 			\hline

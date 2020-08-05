@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
     } else
     if(argc > 1 && (String) argv[1] == (String) "-trees")
     {
-        String default_paras[25] = {"nuctrees.txt", "0", "0", "Community", "list", 
+        String default_paras[25] = {"nuctrees.txt", "0", "0", "Dist", "list", 
                                     "", "Majority", "Newick", "URF", "Exp", "time",
                                     "Covariance", "CNM", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "auto", "Trees"};
         String options[25] =       {"-f", "-w", "-r", "-o", "-bfm", 
@@ -179,13 +179,13 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 	else if (argc > 1 && (String)argv[1] == (String) "-comm") {
-		String default_paras[16] = { "", "Covariance", "CNM", "1", "0", "1",
+		String default_paras[15] = { "", "CNM", "1", "0", "1",
 			"0", "1", "0", "1", "0", "1", "0", "auto", "", "time" };
-		String options[16] = { "-f", "-t", "-cm", "-lp", "-lps", "-lpe",
+		String options[15] = { "-f", "-cm", "-lp", "-lps", "-lpe",
 			"-lpiv", "-ln", "-lns", "-lne", "-lniv", "-hf", "-lf", "-lm", "-node", "-post"};
 		for (int i = 1; i < argc; i++)
 		{
-			for (int j = 0; j < 16; j++)
+			for (int j = 0; j < 15; j++)
 			{
 				if ((String)argv[i] == options[j] && i + 1 < argc && argv[i + 1][0] != '-')
 				{
