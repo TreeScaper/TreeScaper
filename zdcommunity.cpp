@@ -144,6 +144,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	Header_info info_nldr;
 	File file_Cor(paras["-fnldr"]);
 	Matrix<double> nldr_Cor;
+	int nldr_k, nldr_size;
 	if (paras["-fnldr"] != (String) "")
 	{
 		
@@ -737,7 +738,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	file_ComCor.clean();
 	file_ComCor << info_nldr;
 
-	for (int i = 0; i < covariance_nonfree_id + 4; i++){
+	for (int i = 0; i < covariance_nonfree_id_size + 4; i++){
 		if (i < 4){
 			for(int j = 0; j < nldr_k; j++)
 				file_ComCor << "x" << j << "\t";
