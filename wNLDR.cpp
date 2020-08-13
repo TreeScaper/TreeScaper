@@ -561,6 +561,8 @@ void NLDR::output_to_files()
 	info.insert("source", paras["-f"]);
 	info.insert("nldr_algorithm", paras["-a"]);
 	info.insert("nldr_cost_function", paras["-c"]);
+	info.insert("dimension", to_string(COR.get_col()));
+	info.insert("size", to_string(COR.get_row()));
 	if (info.count("node_feature")) {
 		String feature_str = (char*) info["node_feature"];
 		feature_str += ", ";
