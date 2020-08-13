@@ -140,6 +140,30 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	int size = atoi((char*)paras["-size"]);
 	bool label_flag = (paras["-ft"] == String("Cova")); 
 	// label_flag is true when labels are bipartition and false when labels are trees.
+
+	Header_info info_nldr;
+	File file_Cor(paras["-fnldr"]);
+	Matrix<double> nldr_Cor;
+	if (paras["-fnldr"] != (String) "")
+	{
+		
+		if (!file_Cor.is_open())
+			cout << "Error! Unable to open coordinates file :/" << paras["-fnldr"] << "/ \n";
+		else 
+			file_Cor >> info_nldr;
+		int nldr_k = atoi(info_nldr["dimension"]);
+		int nldr_size = atoi(info_nldr["size"]);
+		nldr_Cor.resize(nldr_size, nldr_k);
+		file_Cor.end_header();
+		for(int i = 0; i < nldr_size; i++)
+			for(int j = 0; j < nldr_k; j++)
+				file_Cor >> nldr_Cor.matrix[i][j];
+	}
+
+	info_nldr.insert("source", paras["-f"]);
+	info_nldr.insert("created", time_stamp());
+	String outname_ComCor("Community_COR");
+	outname_ComCor.make_stdname(paras);
 	
 
 
@@ -567,6 +591,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 
 	
 	
+	
 
 	int com_info_col = LamCommunities.size() + 1;
 	double **com_info = new double *[covariance_nonfree_id_size + 4];
@@ -677,6 +702,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	file_CD.clean();
 	file_CD << info;
 
+
 	for (int i = 0; i < covariance_nonfree_id_size + 4; i++)
 	{
 		if (i == 0)
@@ -693,6 +719,41 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 			file_CD << com_info[i][j] << "\t";
 		file_CD << "\n";
 	}
+
+	info_nldr.insert("output_type", "Community detection with nldr Coordinates");
+	info_nldr.insert("node_type", paras["-node"]);
+
+	if (modelType == 3)
+		info_nldr.insert("CD_model","Configuration Null Model");
+	else if (modelType == 4)
+		info_nldr.insert("CD_model", "Constant Potts Model");
+	else if (modelType == 2)
+		info_nldr.insert("CD_model", "Erdos-Renyi Null Model");
+	else if (modelType == 1)
+		info_nldr.insert("CD_model", "No Null Model");
+	info_nldr.insert("tuning", "automatically");
+
+	File file_ComCor(outname_ComCor);
+	file_ComCor.clean();
+	file_ComCor << info_nldr;
+
+	for (int i = 0; i < covariance_nonfree_id + 4; i++){
+		if (i < 4){
+			for(int j = 0; j < nldr_k; j++)
+				file_ComCor << "x" << j << "\t";
+			for (int j = 1; j < com_info_col; j++)
+				file_ComCor << com_info[i][j] << "\t";
+			file_ComCor << "\n";
+		}
+		else{
+			for(int j = 0; j < nldr_k; j++)
+				file_ComCor << nldr_Cor(i, j) << "\t";
+			for (int j = 1; j < com_info_col; j++)
+				file_ComCor << com_info[i][j] << "\t";
+			file_ComCor << "\n";
+		}
+	}
+	file_ComCor.close();
 
 	//delete temporary file
 	free(infile);
