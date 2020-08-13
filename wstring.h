@@ -80,14 +80,14 @@ public:
 	void make_stdname(std::map<String, String>& paras) {
 		String temp = paras["-path"];
 		temp += (*this);
-		if (paras["-post"] != "") {
+		if (paras["-post"] != (String) "") {
 			temp += "_";
-			if (paras["-post"] != "time")
+			if (paras["-post"] != (String) "time")
 				temp += paras["-post"];
 			else
 				temp += get_time_stamp();
 		}
-		temp += ".out";
+		temp += (String) ".out";
 		(*this) = temp;
 	}
 
