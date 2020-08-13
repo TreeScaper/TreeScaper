@@ -50,7 +50,6 @@
 #include "queue"
 #include "wmatrix.h"
 
-String make_stdname(String s, std::map<String, String> &paras);
 
 template<class T>
 void print_comm_array(Matrix<T> &arr, int n, File &output, bool arr_is_covariance, double highfreq, double lowfreq, int &covariance_freeid_size, int &covariance_nonfree_id_size, int *covariance_freeid, int *covariance_nonfree_id);
@@ -61,4 +60,5 @@ void create_resolution(double lp, double ln, int nb_layers, int* sign, double* &
 
 bool community_detection_automatically(Matrix<double> &mat, map<String, String> &paras);
 
-bool community_detection_manually(Matrix<double> &mat, map<String, String> &paras);
+bool community_detection_manually(Matrix<double>& mat, map<String, String>& paras);
+

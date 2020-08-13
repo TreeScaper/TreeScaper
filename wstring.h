@@ -26,6 +26,8 @@
 #include <iomanip>
 #include <cstring>
 #include <iostream>
+#include <map>
+
 
 class String {
     friend std::istream &operator>>(std::istream &input, String &s)
@@ -74,6 +76,20 @@ public:
 	operator char *() const{return str_ptr;};   // translate to array.
 	int get_length() const;						// return String length
 	void add(char);
+	String get_time_stamp(char filler = '_');
+	void make_stdname(std::map<String, String>& paras) {
+		String temp = paras["-path"];
+		temp += (*this);
+		if (paras["-post"] != "") {
+			temp += "_";
+			if (paras["-post"] != "time")
+				temp += paras["-post"];
+			else
+				temp += get_time_stamp();
+		}
+		temp += ".out";
+		(*this) = temp;
+	}
 
 private:
 	int length;                             // String length

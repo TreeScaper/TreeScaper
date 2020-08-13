@@ -396,18 +396,6 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-int check_info(String** info, String content, int &lines) {
-	int ind = lines;
-	for (int i = 0; i < lines; i++) {
-		if (info[i][0] == content) {
-			ind = i;
-			break;
-		}
-	}
-	if (ind == lines)
-		lines++;
-	return ind;
-}
 
 String get_path(String fname) {
 	String path = fname;
@@ -479,29 +467,18 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 	if (paras["-ft"] == (String) "Trees")
 	{
 		TreesData->Compute_Hash();
-		TreesData->Compute_Bipart_Matrix();
+		TreesData->Compute_Bipart_Matrix(paras);
 
-		cout << "Successfully computed bipartitation matrix." << endl;
+		cout << "Successfully computed bipartitation matrix. Found " << TreesData->Get_treecov_size() << " unique bipartitions." << endl;
 
 		String fname = paras["-f"];
 		string stdfname = (char *)fname;
 		string namebipartmatrix;
 		ofstream outBipartMatrix;
 
-		String info_item[4] = { "created", "output_type", "bipartition_size", "source" };
-		String info_content[4] = { time_stamp(),"Bipartition count", to_string(TreesData->Get_treecov_size()), fname };
+		String info_item[4] = { "created", "output_type", "size", "source" };
+		String info_content[4] = { time_stamp(),"Bipartition matrix", to_string(TreesData->Get_treecov_size()), fname };
 		Header_info info(info_item, info_content, 4);
-
-		String outname_bipartcnt = make_stdname("Bipartition_Count", paras);
-		File file_Bipartcnt(outname_bipartcnt);
-		file_Bipartcnt.clean();
-		file_Bipartcnt << info;
-		unsigned int* bipartcnt = TreesData->get_bipartcount();
-		for (int i = 0; i < TreesData->Get_treecov_size(); i++)
-			file_Bipartcnt << bipartcnt[i] << '\n';
-		file_Bipartcnt.close();
-
-		info.insert("output_type", "Bipartition matrix");
 		
 		if (paras["-bfm"] == (String) "list")
 		{
@@ -512,7 +489,8 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 			outBipartMatrix.close();
 
 
-			String outname_bipartmat = make_stdname("Bipartition", paras);
+			String outname_bipartmat("Bipartition");
+			outname_bipartmat.make_stdname(paras);
 			
 			File file_Bipart(outname_bipartmat);
 			file_Bipart.clean();
@@ -531,7 +509,8 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 			TreesData->OutputBipartitionMatrix(outBipartMatrix, FULLMATRIX);
 			outBipartMatrix.close();
 
-			String outname_bipartmat = make_stdname("Bipartition", paras);
+			String outname_bipartmat("Bipartition");
+			outname_bipartmat.make_stdname(paras);
 			File file_Bipart(outname_bipartmat);
 			file_Bipart.clean();
 			info.insert("output_format", "Matrix form");
@@ -576,7 +555,8 @@ void Compute_Covariance(Trees *TreesData, map<String, String> &paras)
 		TreesData->print_matrix("Covariance Matrix", outCovaName);
 		cout << "Successfully printed Covariance Matrix matrix!" << endl;
 
-		String outname_cova = make_stdname("Covariance", paras);
+		String outname_cova("Covariance");
+		outname_cova.make_stdname(paras);
 		File file_Cova(outname_cova);
 		file_Cova.clean();
 		file_Cova << info;
@@ -686,6 +666,7 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
 	info.insert("output_type", "Distance matrix");
 	info.insert("node_type", "Tree");
 	info.insert("source", paras["-f"]);
+	info.insert("size", to_string(TreesData->Get_n_trees()));
 	String dis_str;
 	if (paras["-dm"] == (String) "URF")
 		dis_str = "Unweighted Robinson-Foulds";
@@ -757,7 +738,8 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
 		TreesData->print_matrix(memorydata, outDistName);
 		cout << "Successfully printed " << memorydata << " matrix!" << endl;
 
-		String outname_dist = make_stdname("Distance", paras);
+		String outname_dist("Distance");
+		outname_dist.make_stdname(paras);
 		File file_Dist(outname_dist);
 		file_Dist.clean();
 		file_Dist << info;
@@ -938,7 +920,8 @@ void Compute_Consensus_Tree(Trees *TreesData, map<String, String> &paras)
 	string outName = (char *)confname;
 	//string outName2 = (char *)paras["-f"];
 
-	String outname_cons = make_stdname("Consensus", paras);
+	String outname_cons("Consensus");
+	outname_cons.make_stdname(paras);
 
 	std::string outName3((char *)outname_cons);
 
@@ -1018,7 +1001,7 @@ void aff_driver(map<String, String> & paras) {
 	if (info.count("size"))
 		size = atoi(info["size"]);
 	else
-		size = file_Dis.lines() + 1;
+		size = file_Dis.lines();
 	file_Dis.seek(pos);
 
 	//D.resize(size, size);
@@ -1073,8 +1056,9 @@ void aff_driver(map<String, String> & paras) {
 		}
 	}
 
-	String Aff_Filename = make_stdname("Affinity", paras);
-	File file_Aff(Aff_Filename);
+	String outname_aff("Affinity");
+	outname_aff.make_stdname(paras);
+	File file_Aff(outname_aff);
 	file_Aff.clean();
 	file_Aff << info;
 	for (int i = 0; i < size; i++)

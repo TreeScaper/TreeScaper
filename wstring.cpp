@@ -185,6 +185,25 @@ void String::set_String( const char *String2)
 	strcpy( str_ptr, String2);         // copy literal to object
 }
 
+String String::get_time_stamp(char filler) {
+	time_t t = time(0);
+	struct tm* timeStruct = localtime(&t);
+	String temp;
+	String result;
+	temp = String(std::to_string(timeStruct->tm_mon));
+	result += temp;
+	result.add(filler);
+	temp = String(std::to_string(timeStruct->tm_mday));
+	result += temp;
+	result.add(filler);
+	temp = String(std::to_string(timeStruct->tm_hour));
+	result += temp;
+	result.add(filler);
+	temp = String(std::to_string(timeStruct->tm_min));
+	result += temp;
+	return result;
+}
+
 String time_stamp(char filler) {
 	time_t t = time(0);
 	struct tm * timeStruct = localtime(&t);

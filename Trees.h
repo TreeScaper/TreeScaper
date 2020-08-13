@@ -95,6 +95,7 @@ public:
     void Compute_Hash();
 
     void Compute_Bipart_Matrix();
+    void Compute_Bipart_Matrix(std::map<String, String>& paras);
 
     string make_Bipart_Matrix_name(string fname, String format);
 	string make_Bipart_Matrix_name(string fname);

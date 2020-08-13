@@ -1,18 +1,5 @@
 #include "zdcommunity.h"
 
-String make_stdname2(String s, std::map<String, String> &paras) {
-	String Ans = paras["-path"];
-	Ans += s;
-	if (paras["-post"] != String("none")) {
-		Ans += "_";
-		if (paras["-post"] != String("time"))
-			Ans += paras["-post"];
-		else
-			Ans += time_stamp();
-	}
-	Ans += ".out";
-	return Ans;
-}
 
 template<class T>
 void print_comm_array(Matrix<T> &arr, int n, File &output, bool arr_is_covariance, double highfreq, double lowfreq, int &covariance_freeid_size, int &covariance_nonfree_id_size, int *covariance_freeid, int *covariance_nonfree_id)
@@ -623,7 +610,8 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	}
 
 	//plateaus
-	String outname_Pla = make_stdname2("CD_Plateaus", paras);
+	String outname_pla("CD_Plateaus");
+	outname_pla.make_stdname(paras);
 	info.insert("output_type", "Plateaus of Community detection result");
 	
 	info.insert("node_type", paras["-node"]);
@@ -638,7 +626,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		info.insert("CD_model", "No Null Model");
 	info.insert("tuning", "automatically");
 
-	File file_Pla(outname_Pla);
+	File file_Pla(outname_pla);
 	file_Pla.clean();
 	file_Pla << info;
 
@@ -681,7 +669,9 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	}
 
 	// output communities information
-	String outname_CD = make_stdname2("Community", paras);
+	String outname_CD("Community");
+	outname_CD.make_stdname(paras);
+
 	info.insert("output_type", "Community detection result");
 	File file_CD(outname_CD);
 	file_CD.clean();
@@ -727,7 +717,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	remove(tempfile3);
 
 	cout << "Output community results to file: " << outname_CD << endl;
-	cout << "and " << outname_Pla << "\n\n";
+	cout << "and " << outname_pla << "\n\n";
 	return true;
 }
 
@@ -876,7 +866,8 @@ bool community_detection_manually(Matrix<double> &mat, map<String, String> &para
 	}
 	info.insert("lambda_pos", lplist);
 
-	String outname_CD = make_stdname2("Community", paras);
+	String outname_CD("Community");
+	outname_CD.make_stdname(paras);
 	info.insert("output_type", "Community detection result");
 	File file_CD(outname_CD);
 	file_CD.clean();
