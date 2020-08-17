@@ -140,6 +140,68 @@ void NLDR::init_NLDR(String fname, String ftype, String dim, String cost, String
 	}
 }
 
+void NLDR::init_NLDR()
+{
+	// load initial info.
+	// NLDR_init_parameters(para_fname);  this is for command line version only.
+	time_cost = -1;
+	dim_str = paras["-d"];
+	cost_function = paras["-c"];
+	algorithm = paras["-a"];
+	file_flag = paras["-o"];
+	String fname = paras["-f"];
+	int seed = atoi(paras["-s"]);
+	String init_md = paras["-i"];
+	String para_fname = paras["-p"];
+	String ftype = paras["-t"];
+	STRESS = -1;
+
+	NLDR_init_parameters(para_fname);
+	File D_file(fname);
+
+	if (!D_file.is_open())
+	{
+		std::cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
+		exit(0);
+	}
+
+	D_prefname = D_file.prefix_name_lastof();
+	D_postfname = D_file.postfix_name_lastof();
+	int pos = D_file.end_header();
+	D_file.seek(pos);
+
+	size = D_file.lines();
+
+	D_file.seek(pos);
+	int dim_int = atoi(dim_str);
+
+	if (dim_int < 1)
+	{
+		std::cout << "Error: The dimension must be equal to or greater than 1! Please use command -h to see help." << std::endl;
+		exit(0);
+	}
+
+	if (ftype == (String) "DIS")
+	{
+		this->NLDR_load_D(paras["-f"]);
+		this->NLDR_init_X();
+	}
+	else
+		if (ftype == (String) "COR")
+		{
+			this->NLDR_load_MX();
+			this->NLDR_init_X();
+		}
+		else
+			std::cout << "Warning: Undefined matrix type" << std::endl;
+
+	if (seed < -1)
+	{
+		std::cout << "Error: The seed of random generator must be equal to or greater than -1 and also be a integer! Please use command -h to see help." << std::endl;
+		exit(0);
+	}
+}
+
 void NLDR::NLDR_init_parameters(String para_filename)
 {
 	parameters.distance_file_type = 1;
@@ -373,6 +435,47 @@ void NLDR::NLDR_load_MX()
 	}
 	out_D.close();///------------
 };
+
+void NLDR::NLDR_load_MX(String fname)
+{
+	File D_file(fname);
+	if (!D_file.is_open())
+	{
+		std::cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
+		exit(0);
+	}
+	int dim = D_file.cols();
+	D_file.seek(0);
+
+	std::cout << "size : " << size << ", dim:" << dim << std::endl;//-------
+	MX.resize(size, dim);
+	for (int i = 0; i < size; i++)
+		for (int j = 0; j < dim; j++)
+			D_file >> MX.matrix[i][j];
+
+	D.resize(size, size);
+	for (int i = 0; i < size; i++)
+		for (int j = 0; j < i; j++)
+		{
+			for (int k = 0; k < dim; k++)
+				D.matrix[i][j] += (MX.matrix[i][k] - MX.matrix[j][k]) * (MX.matrix[i][k] - MX.matrix[j][k]);
+			D.matrix[i][j] = sqrt(D.matrix[i][j]);
+			D.matrix[j][i] = D.matrix[i][j];
+		}
+
+	//File out_D("test_D.out");///-----
+	//out_D.clean();
+	//out_D.seek(0);
+	//for (int i = 0; i < size; i++)
+	//{
+	//	for (int j = 0; j <= i; j++)
+	//	{
+	//		out_D << D.matrix[i][j] << "\t";
+	//	}
+	//	out_D << "\n";//---
+	//}
+	//out_D.close();///------------
+};
 #endif
 
 void NLDR::Compute_NLDR()
@@ -427,7 +530,20 @@ void NLDR::result_analysis()
 void NLDR::output_to_files()
 {
 	String filename_COR, filename_DIS, filename_STR, filename_TIM, filename_TRU, filename_CON, filename_1NN;
-	this->make_output_file_names(filename_COR, filename_DIS, filename_STR, filename_TIM, filename_TRU, filename_CON, filename_1NN);
+	//this->make_output_file_names(filename_COR, filename_DIS, filename_STR, filename_TIM, filename_TRU, filename_CON, filename_1NN);
+	String root_path = paras["-path"];
+	String sub_path = paras["-path"];
+	filename_COR = make_stdname3("Coordinates", paras);
+	filename_DIS = make_stdname3("Distance", paras);
+	sub_path += "NLDR_analysis/";
+	paras["-path"] = sub_path;
+	filename_STR = make_stdname3("Stress", paras);
+	filename_TIM = make_stdname3("Time", paras);
+	filename_TRU = make_stdname3("Trustworthiness", paras);
+	filename_CON = make_stdname3("Connectivity", paras);
+	filename_1NN = make_stdname3("1NN", paras);
+	paras["-path"] = root_path;
+
 	File file_COR(filename_COR);
 	File file_DIS(filename_DIS);
 	File file_STR(filename_STR);
@@ -435,75 +551,132 @@ void NLDR::output_to_files()
 	File file_TRU(filename_TRU);
 	File file_CON(filename_CON);
 	File file_1NN(filename_1NN);
-	if(COR.get_row() > 0 && COR.get_col() > 0)
+
+	Header_info info;
+	File finput(paras["-f"]);
+	finput >> info;
+	finput.close();
+	
+	info.insert("created", time_stamp());
+	info.insert("source", paras["-f"]);
+	info.insert("nldr_algorithm", paras["-a"]);
+	info.insert("nldr_cost_function", paras["-c"]);
+	info.insert("dimension", to_string(COR.get_col()));
+	info.insert("size", to_string(COR.get_row()));
+	if (info.count("node_feature")) {
+		String feature_str = (char*) info["node_feature"];
+		feature_str += ", ";
+		feature_str += "NLDR";
+		feature_str += "(";
+		feature_str += paras["-d"];
+		feature_str += ")";
+		info["node_feature"] = feature_str;
+	}
+	else {
+		String feature_str = "NLDR";
+		feature_str += "(";
+		feature_str += paras["-d"];
+		feature_str += ")";
+		info["node_feature"] = feature_str;
+	}
+	
+
+	if (COR.get_row() > 0 && COR.get_col() > 0)
 	{
 		file_COR.clean();
-		for(int i = 0; i < size; i++)
+		info.insert("output_type", "Coordinates of points in reduced space");
+		file_COR << info;
+		for (int i = 0; i < size; i++)
 		{
-			for(int j = 0; j < atoi(dim_str); j++)
+			for (int j = 0; j < atoi(dim_str); j++)
 				file_COR << COR(i, j) << "\t";
-            file_COR << "" << std::endl;
+			file_COR << "" << std::endl;
 		}
-	} else
-        std::cout << "Warning: Have not computed COR yet" << std::endl;
 
-	if(DIS.get_row() > 0 && DIS.get_col() > 0)
+
+	}
+	else
+		std::cout << "Warning: Have not computed COR yet" << std::endl;
+
+	if (DIS.get_row() > 0 && DIS.get_col() > 0)
 	{
 		file_DIS.clean();
-		for(int i = 0; i < size; i++)
+		info.insert("output_type", "Distance matrix in reduced space");
+		file_DIS << info;
+		for (int i = 0; i < size; i++)
 		{
-			for(int j = 0; j <= i; j++)
+			for (int j = 0; j <= i; j++)
 				file_DIS << DIS(i, j) << "\t";
-            file_DIS << "" << std::endl;
+			file_DIS << "" << std::endl;
 		}
-	} else
-        std::cout << "Warning: Have not computed DIS yet" << std::endl;
 
-	if(STRESS != -1)
+	}
+	else
+		std::cout << "Warning: Have not computed DIS yet" << std::endl;
+
+	if (STRESS != -1)
 	{
 		file_STR.clean();
-        file_STR << STRESS << std::endl;
-	} else
-        std::cout << "Warning: Have not computed STRESS yet" << std::endl;
+		info.insert("output_type", "Stress value of the result");
+		file_STR << info;
+		file_STR << STRESS << std::endl;
 
-	if(time_cost != -1)
+	}
+	else
+		std::cout << "Warning: Have not computed STRESS yet" << std::endl;
+
+	if (time_cost != -1)
 	{
 		file_TIM.clean();
-        file_TIM << time_cost << std::endl;
-	} else
-        std::cout << "Warning: Have not recorded time cost yet" << std::endl;
+		info.insert("output_type", "Time used");
+		file_TIM << info;
+		file_TIM << time_cost << std::endl;
 
-	if(Trustworthiness.get_row() > 0 && Trustworthiness.get_col() > 0)
+	}
+	else
+		std::cout << "Warning: Have not recorded time cost yet" << std::endl;
+
+	if (Trustworthiness.get_row() > 0 && Trustworthiness.get_col() > 0)
 	{
 		file_TRU.clean();
-		for(int i = 0; i < Trustworthiness.get_row(); i++)
+		info.insert("output_type", "Trustworthiness analysis result");
+		file_TRU << info;
+		for (int i = 0; i < Trustworthiness.get_row(); i++)
 		{
-			for(int j = 0; j < Trustworthiness.get_col(); j++)
+			for (int j = 0; j < Trustworthiness.get_col(); j++)
 				file_TRU << Trustworthiness(i, j) << "\t";
-            file_TRU << "" << std::endl;
+			file_TRU << "" << std::endl;
 		}
+
 	}
 
-	if(Continuity.get_row() > 0 && Continuity.get_col() > 0)
+	if (Continuity.get_row() > 0 && Continuity.get_col() > 0)
 	{
 		file_CON.clean();
-		for(int i = 0; i < Continuity.get_row(); i++)
+		info.insert("output_type", "Connectivity analysis reuslt");
+		file_CON << info;
+		for (int i = 0; i < Continuity.get_row(); i++)
 		{
-			for(int j = 0; j < Continuity.get_col(); j++)
+			for (int j = 0; j < Continuity.get_col(); j++)
 				file_CON << Continuity(i, j) << "\t";
-            file_CON << "" << std::endl;
+			file_CON << "" << std::endl;
 		}
+
 	}
 
-	if(oneNN.get_row() > 0 && oneNN.get_col() > 0)
+	if (oneNN.get_row() > 0 && oneNN.get_col() > 0)
 	{
 		file_1NN.clean();
-        file_1NN << oneNN.matrix[0][0] << std::endl;
-        file_1NN << oneNN.matrix[1][0] << std::endl;
-	} else
-        std::cout << "Warning: Have not computed 1NN yet" << std::endl;
+		info.insert("output_type", "1NN result");
+		file_1NN << info;
+		file_1NN << oneNN.matrix[0][0] << std::endl;
+		file_1NN << oneNN.matrix[1][0] << std::endl;
 
-    std::cout << "Please see the help for details of the introduction of output files." << std::endl;
+	}
+	else
+		std::cout << "Warning: Have not computed 1NN yet" << std::endl;
+
+	std::cout << "Please see the help for details of the introduction of output files." << std::endl;
 }
 
 void NLDR::make_output_file_names(String &filename_COR, String &filename_DIS, String &filename_STR, String &filename_TIM, String &filename_TRU, String &filename_CON, String &filename_1NN)
@@ -576,6 +749,43 @@ void NLDR::NLDR_load_D()
     }
 };
 
+void NLDR::NLDR_load_D(String fname)
+{
+	File D_file(fname);
+	if (!D_file.is_open())
+	{
+		std::cout << "Error: File \"" << fname << "\" cannot be opened! Please check if this file exists or is readable." << std::endl;
+		exit(0);
+	}
+	int pos = D_file.end_header();
+
+	//D_file.seek(pos);
+	//D.resize(size, size);
+	//for (int i = 0; i < size; i++)
+	//	for (int j = 0; j <= i; j++)
+	//	{
+	//		D_file >> D.matrix[i][j];
+	//		D.matrix[j][i] = D.matrix[i][j];
+	//	}
+	String tree;
+	double index;
+	size--;
+	D.resize(size, size);
+	D_file >> tree;
+	for (int i = 0; i < size; i++)
+		D_file >> index;
+	for (int i = 0; i < size; i++)
+	{
+		D_file >> index;
+		for (int j = 0; j <= i; j++)
+		{
+			D_file >> D.matrix[i][j];
+			D.matrix[j][i] = D.matrix[i][j];
+		}
+	}
+	// Dense symmetric matrix is stored.
+};
+
 void NLDR::NLDR_init_X(String init_md, long seed)
 {
 	File mds_result;
@@ -609,6 +819,54 @@ void NLDR::NLDR_init_X(String init_md, long seed)
 			X = COR;
 		}
 	}
+};
+
+void NLDR::NLDR_init_X()
+{
+	String init_md = paras["-i"];
+	int seed = atoi(paras["-s"]);
+
+	File mds_result;
+	String init_fname;
+	int dim_int = atoi(dim_str);
+	X.resize(size, dim_int);
+
+
+	if (init_md == (String) "RAND")
+	{
+		if (seed == -1)
+			init_genrand((unsigned)time(NULL));
+		else
+			init_genrand(seed);
+		for (int i = 0; i < size; i++)
+			for (int j = 0; j < dim_int; j++)
+				X.matrix[i][j] = genrand_real2() * (parameters.random_end - parameters.random_start) + parameters.random_start;
+	}
+	else
+		if (init_md == (String) "CLASSIC_MDS")
+		{
+			init_fname = paras["-path"];
+			init_fname += "NLDR_COR";
+			init_fname += ".out";
+			mds_result.open(init_fname);
+			bool flag = false;
+
+			if (mds_result.is_open() && cost_function != (String) "CLASSIC_MDS")
+			{
+				if (mds_result.check_header("CLASSIC_MDS")) {
+					int pos = mds_result.end_header();
+					mds_result.seek(pos);
+					for (int i = 0; i < size; i++)
+						for (int j = 0; j < dim_int; j++)
+							mds_result >> X.matrix[i][j];
+				}
+			}
+			else
+			{
+				this->CLASSIC_MDS();
+				X = COR;
+			}
+		}
 };
 
 String NLDR::make_filename(String name_D, String dimension, String cost_f, String output, String algorithm, String flag)
@@ -824,9 +1082,6 @@ void NLDR::NLDR_init_parameters(String para_filename)
 // It has been fixed now. zd --2/21/20
 void NLDR::CLASSIC_MDS()
 {
-	cout << "Warning: Optimizing classical scaling cost function. The solution is only"
-		<< " legit for Eucludean space data or for the use of initial guess. For general"
-		<< " metric space, please infer to other cost function like CCA.\n";
 	String filename_U = make_filename(D_prefname, "ALL",cost_function, "U", "SVD", "");
 	String filename_S = make_filename(D_prefname, "ALL", cost_function, "S", "SVD", "");
 	String filename_Vt = make_filename(D_prefname, "ALL", cost_function, "Vt", "SVD", "");
@@ -838,40 +1093,46 @@ void NLDR::CLASSIC_MDS()
 	Scalar_Product = D.compute_scalar_product_matrix();
 	U.resize(size, size), S.resize(size, size), Vt.resize(size, size);
 
-	if(!file_U.is_open() || !file_S.is_open() || !file_Vt.is_open())
-        {
-                if(!Scalar_Product.SVD_LIB(U, S, Vt))
-                {
-                        std::cout << "Error: Singular Value Decomposition failed." << std::endl;
-                        exit(0);
-                }
+	//if(!file_U.is_open() || !file_S.is_open() || !file_Vt.is_open())
+ //       {
+ //               if(!Scalar_Product.SVD_LIB(U, S, Vt))
+ //               {
+ //                       std::cout << "Error: Singular Value Decomposition failed." << std::endl;
+ //                       exit(0);
+ //               }
 
-                file_U.clean();
-                file_S.clean();
-                file_Vt.clean();
+ //               file_U.clean();
+ //               file_S.clean();
+ //               file_Vt.clean();
 
-		for(int i = 0; i < size; i++)
-		{
-			for(int j = 0; j < size; j++)
-			{
-				file_U << U(i, j) << "\t";
-				file_Vt << Vt(i, j) << "\t";
-			}
-            file_S << S(i, i) << std::endl;
-            file_U << "" << std::endl;
-            file_Vt << "" << std::endl;
-		}
-	}
-	else
+	//	for(int i = 0; i < size; i++)
+	//	{
+	//		for(int j = 0; j < size; j++)
+	//		{
+	//			file_U << U(i, j) << "\t";
+	//			file_Vt << Vt(i, j) << "\t";
+	//		}
+ //           file_S << S(i, i) << std::endl;
+ //           file_U << "" << std::endl;
+ //           file_Vt << "" << std::endl;
+	//	}
+	//}
+	//else
+	//{
+	//	for(int i = 0; i < size; i++)
+	//		file_S >> S(i, i);
+	//	for(int i = 0; i < size; i++)
+	//		for(int j = 0; j < size; j++)
+	//		{
+	//			file_Vt >> Vt(i, j);
+	//			file_U >> U(i, j);
+	//		}
+	//}
+
+	if (!Scalar_Product.SVD_LIB(U, S, Vt))
 	{
-		for(int i = 0; i < size; i++)
-			file_S >> S(i, i);
-		for(int i = 0; i < size; i++)
-			for(int j = 0; j < size; j++)
-			{
-				file_Vt >> Vt(i, j);
-				file_U >> U(i, j);
-			}
+		std::cout << "Error: Singular Value Decomposition failed." << std::endl;
+		exit(0);
 	}
 
 	COR.resize(size, atoi(dim_str));
@@ -2868,7 +3129,7 @@ bool NLDR::search_first_condition(const Matrix<double> &DX, double fxc, const Ma
 			{
 				a = ((fxnew - fxc - step_size * initslope) / step_size / step_size - (fxnew_pre - fxc - pre_step_size * initslope) / pre_step_size / pre_step_size) / (step_size - pre_step_size);
 				b = (- pre_step_size * (fxnew - fxc - step_size * initslope) / step_size / step_size + step_size * (fxnew_pre - fxc - pre_step_size * initslope) / pre_step_size / pre_step_size) / (step_size - pre_step_size);
-
+				
 				disc = b * b - 3 * a * initslope;
 				if(fabs(a) < 0.0000001)
 					sizetemp = - initslope / (2 * b);
@@ -2887,7 +3148,7 @@ bool NLDR::search_first_condition(const Matrix<double> &DX, double fxc, const Ma
 				step_size = sizetemp;
 		}
 	}
-
+	
 	return true;
 }
 
@@ -2926,7 +3187,7 @@ bool NLDR::search_first_condition(const Matrix<double> &DX, double fxc, double d
 			{
 				a = ((fxnew - fxc - step_size * initslope) / step_size / step_size - (fxnew_pre - fxc - pre_step_size * initslope) / pre_step_size / pre_step_size) / (step_size - pre_step_size);
 				b = (- pre_step_size * (fxnew - fxc - step_size * initslope) / step_size / step_size + step_size * (fxnew_pre - fxc - pre_step_size * initslope) / pre_step_size / pre_step_size) / (step_size - pre_step_size);
-
+				
 				disc = b * b - 3 * a * initslope;
 				if(fabs(a) < 0.0000001)
 					sizetemp = - initslope / (2 * b);
@@ -3433,7 +3694,7 @@ void NLDR::oneNN_analysis()
 		index = salshu_index;
 	else
 		return;
-
+	
 	i_index = 0;
 	correct_num = 0;
 	for(int i = 0; i < size; i++)
@@ -3463,7 +3724,7 @@ void NLDR::oneNN_analysis()
 			correct_num++;
 	}
 	oneNN.matrix[1][0] = (double) correct_num / size;
-
+	
 	i_index = 0;
 	correct_num = 0;
 	for(int i = 0; i < size; i++)
@@ -3495,5 +3756,19 @@ void NLDR::oneNN_analysis()
 
 	oneNN.matrix[0][0] = (double) correct_num / size;
 };
+
+String make_stdname3(String s, std::map<String, String> &paras) {
+	String Ans = paras["-path"];
+	Ans += s;
+	if (paras["-post"] != String("none")) {
+		Ans += "_";
+		if (paras["-post"] != String("time"))
+			Ans += paras["-post"];
+		else
+			Ans += time_stamp();
+	}
+	Ans += ".out";
+	return Ans;
+}
 
 #endif

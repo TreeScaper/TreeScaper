@@ -95,6 +95,7 @@ public:
     void Compute_Hash();
 
     void Compute_Bipart_Matrix();
+    void Compute_Bipart_Matrix(std::map<String, String>& paras);
 
     string make_Bipart_Matrix_name(string fname, String format);
 	string make_Bipart_Matrix_name(string fname);
@@ -214,6 +215,7 @@ public:
     bool Get_isweighted(){return isweighted;}
     const LabelMap *Get_labelmap(){return &leaveslabelsmaps;}
     Array<int> *getidxlist(){return &idxlist;}
+	unsigned int *get_bipartcount() { return bipart_count; };
 
     map<unsigned long long, Array<char> *> hash2bitstr;
     Array<int> selected_trees;
@@ -320,6 +322,7 @@ private:
     int covariance_nonfree_id_size;
     double **com_info;
     int com_info_col;
+
 
 //    double** bipartFreq;
 //    int* bipartFreqIdx;
