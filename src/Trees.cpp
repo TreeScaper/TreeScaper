@@ -1141,14 +1141,14 @@ void Trees::Compute_Hash()
 //# "Sort" is confusing here. Is it the default sort in c++?
 //########################ZD comment########################################
 
-void Trees::Compute_Bipart_Matrix()
+void Trees::Compute_Bipart_Matrix(std::map<String, String> &paras)
 {
     int n_taxa = leaveslabelsmaps.size();
 
     int idex = 0;
-    unsigned long long *matrix_hv = new unsigned long long[(n_taxa - 1) * n_trees];
-    unsigned int *matrix_treeIdx = new unsigned int[(n_taxa - 1) * n_trees];
-    double *matrix_weight = new double[(n_taxa - 1) * n_trees];
+    unsigned long long *matrix_hv = new unsigned long long[(n_taxa - 1) * (int) n_trees];
+    unsigned int *matrix_treeIdx = new unsigned int[(n_taxa - 1) * (int) n_trees];
+    double *matrix_weight = new double[(n_taxa - 1) * (int) n_trees];
 
     for (unsigned int treeIdx = 0; treeIdx < n_trees; ++treeIdx)
     {
@@ -1184,10 +1184,35 @@ void Trees::Compute_Bipart_Matrix()
     cout << "Unique bipartition number: " << Unique_idx << endl;
     treecov_size = Unique_idx;
 
+
+    String info_item[4] = { "created", "output_type", "size", "source" };
+    String info_content[4] = { time_stamp(),"Taxon ID", to_string(n_taxa), paras["-f"] };
+    Header_info info(info_item, info_content, 4);
+    info.insert("format", "taxon id, taxon name");
+
+    String outname_taxonid("TaxonID");
+    outname_taxonid.make_stdname(paras);
+    File file_Taxonid(outname_taxonid);
+    file_Taxonid.clean();
+    file_Taxonid << info;
+
+
     //**************bipartition type****************************//
-    cout << "Translation of taxa:" << endl;
     for (int i = 0; i < n_taxa; i++)
-        cout << leaveslabelsmaps.name(i) << " , " << i+1 << endl;
+        file_Taxonid << i << " , " << leaveslabelsmaps.name(i)  << endl;
+    file_Taxonid.close();
+
+    String outname_bipartcnt("Bipartition_Count");
+    outname_bipartcnt.make_stdname(paras);
+    File file_Bipartcnt(outname_bipartcnt);
+    file_Bipartcnt.clean();
+
+    info.insert("output_type", "Bipartition count");
+    info.insert("size", to_string(treecov_size));
+    info.insert("format", "bipartition id, binary-of-bipartition, appear times");
+    
+    file_Bipartcnt << info;
+
     map<unsigned long long, Array<char> *>::iterator it = hash2bitstr.begin();
     Array<char> *pt = NULL;
     for(;it != hash2bitstr.end(); it++)
@@ -1196,20 +1221,22 @@ void Trees::Compute_Bipart_Matrix()
         {
             if (it->first == Unique_bipart[j])
             {
-                cout << "bipartition " << j + 1 << " : ";//---
+                file_Bipartcnt << j << ", ";//---
                 pt = it->second;
-                pt->printbits(n_taxa);
-                cout << ", appear times: " << bipart_count[j] << endl;
+                pt->printbits(n_taxa,file_Bipartcnt);
+                file_Bipartcnt << ", " << bipart_count[j] << endl;
             }
             else
                 continue;
         }
     }
+    file_Bipartcnt.close();
+
 
     //==============Create Sparse Bipartition Matrix==================//
-    double *Vals = new double [Unique_idx * n_trees];
-    int *RowInds = new int [Unique_idx * n_trees];
-    int *ColPtr = new int [n_trees+1];
+    double* Vals = new double[Unique_idx * (int)n_trees];
+    int* RowInds = new int[Unique_idx * (int)n_trees];
+    int* ColPtr = new int[(int)n_trees + 1];
     int idx = 0;
     int Col_ind = 0;
     ColPtr[Col_ind] = 0;
@@ -1308,17 +1335,17 @@ string Trees::make_Bipart_Matrix_name(string fname)
 		result = "";
 
 	result += "Bipartition";
-	time_t t = time(0);
-	struct tm * timeStruct = localtime(&t);
-	result += "_";
-	result += to_string(timeStruct->tm_mon);
-	result += "_";
-	result += to_string(timeStruct->tm_mday);
-	result += "_";
-	result += to_string(timeStruct->tm_hour);
-	result += "_";
-	result += to_string(timeStruct->tm_min);
-	result += ".txt";
+	//time_t t = time(0);
+	//struct tm * timeStruct = localtime(&t);
+	//result += "_";
+	//result += to_string(timeStruct->tm_mon);
+	//result += "_";
+	//result += to_string(timeStruct->tm_mday);
+	//result += "_";
+	//result += to_string(timeStruct->tm_hour);
+	//result += "_";
+	//result += to_string(timeStruct->tm_min);
+	result += ".out";
 	return result;
 }
 //########################ZD comment########################################
@@ -2021,6 +2048,9 @@ void Trees::load_affinityfile(string fname)
 
 void Trees::load_covariancefile(string fname)
 {
+	File file_Cova(fname);
+	int pos_header = file_Cova.end_header();
+	file_Cova.close();
     ifstream covfile(fname.c_str(), ios::binary);
 
     if (!covfile)
@@ -2028,6 +2058,8 @@ void Trees::load_covariancefile(string fname)
         cout << "Unable to open the file!\n\n";
         exit(0);
     }
+
+	covfile.seekg(pos_header);
 
     filecov_size = 0;
     string line;
@@ -2045,7 +2077,7 @@ void Trees::load_covariancefile(string fname)
     filecov = new double *[filecov_size];
     double index;
     covfile.clear();
-    covfile.seekg(0, ios::beg);
+    covfile.seekg(pos_header, ios::beg);
     covfile >> line;
     for (int i = 0; i < filecov_size; i++)
         covfile >> index;
@@ -3781,7 +3813,7 @@ void Trees::WriteSelectedTrees(string &outfile, Treefileformat tf) // newick nex
     } else
     if(tf == NEXUS)
     {
-        int n_subtrees;
+        int n_subtrees = 0;
         for(int i = 0; i < selected_trees.get_length(); i++)
         {
             if(selected_trees[i] == -1)

@@ -27,6 +27,7 @@
 #include <iostream>
 #include <fstream>
 #include "wstring.h"
+#include <map>
 
 class File{
 	template<class T>
@@ -54,6 +55,7 @@ public:
 
 	~File()
 	{
+		//fname.~String();
 		if(fhandle.is_open())
 			fhandle.close();
 	};
@@ -76,6 +78,12 @@ public:
 
 	bool clean();
 
+	String get_filename() { return fname; };
+
+	void getline(char* s, int n) {
+		fhandle.getline(s, n);
+	};
+
 	String prefix_name();
 
 	String postfix_name();
@@ -84,9 +92,62 @@ public:
 
     String postfix_name_lastof();
 
+	int end_header();
+	// Return the end position of header information (return 0 if no header information existed).
+
+	void insert_header(String ** info, int lines);
+	// Insert header information stored in info.
+
+	bool check_header(String content);
+	// Return true if "content" presents in header informaion of the file.
+
+	int load_header(String** info);
+	// Return lines of header information and store them in info.
+	
 private:
     std::fstream fhandle;
 	String fname;
 };
 
+
+class Header_info {
+public:
+	Header_info() {};
+
+	Header_info(File &input);
+
+	Header_info(String* item, String* content, int length);
+
+	~Header_info() {};
+
+	const Header_info &operator=(const Header_info &rhs) {
+		(*this).list = rhs.list;
+		return (*this);
+	}
+
+	int size() { return list.size(); };
+
+	void insert(String item, String content) {
+		list[item] = content;
+	};
+
+	bool count(String rhs) {
+		return list.count(rhs);
+	}
+
+	String operator[](String key) {
+		return list[key];
+	}
+
+	friend std::istream &operator>>(std::istream &input, Header_info &info);
+
+	friend std::ostream &operator<<(std::ostream &output, Header_info &info);
+
+	friend File &operator>>(File &input, Header_info &info);
+
+	friend File &operator<<(File &output, Header_info &info);
+private:
+	std::map<String, String> list;
+
+};
 #endif

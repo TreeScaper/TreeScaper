@@ -1,9 +1,9 @@
 
 //##########################################################################
 //# This software is part of the Treescaper i
-//# -- Version 0.1
+//# -- Version 0.1   
 //# Copyright (C) 2010 Wen Huang
-//#
+//# 
 //# This program is free software; you can redistribute it and/or
 //# modify it under the terms of the GNU General Public License
 //# as published by the Free Software Foundation; either version 2
@@ -12,8 +12,8 @@
 //# This program is distributed in the hope that it will be useful,
 //# but WITHOUT ANY WARRANTY; without even the implied warranty of
 //# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//# GNU General Public License for more details.
-//# http://www.gnu.org/copyleft/gpl.html
+//# GNU General Public License for more details. 
+//# http://www.gnu.org/copyleft/gpl.html 
 //##########################################################################
 
 // wfile.h
@@ -83,6 +83,8 @@ int File::cols()
 	int n = 0;
 	char str[100000] = "";
 	bool pre_is_table = true;
+	int pos = (*this).end_header();
+	(*this).seek(pos);
 	fhandle.getline(str, 100000);
 	for(int i = 0; i < strlen(str); i++)
 	{
@@ -132,7 +134,7 @@ String File::postfix_name()
 	if(i == fname.get_length())
 		return "";
 
-	return fname(i + 1, fname.get_length() - i - 1);
+	return fname(i + 1, fname.get_length());// zd_comment: This seems wrong.
 };
 
 String File::prefix_name_lastof()
@@ -155,5 +157,182 @@ String File::postfix_name_lastof()
 
     return fname(i + 1, fname.get_length() - i - 1);
 };
+
+int File::end_header() {
+	(*this).seek(0);
+	int pos = 0;
+	char c;
+	(*this) >> c;
+	if (c != '<')
+		return 0;
+	else {
+		while (c != '>' && !(*this).is_end()) 
+			fhandle.get(c);
+		if ((*this).is_end()) {
+			std::cout << "Error! Wrong header information format.\n";
+			throw(1);
+		}
+		else
+			pos = fhandle.tellp();
+	}
+
+	return pos;
+
+}
+
+void File::insert_header(String** info, int lines) {
+	if ((*this).end_header() != 0) {
+		std::cout << "Error! Attempt to insert header information to a file that already have one.\n";
+		throw(1);
+	}
+	(*this).seek(0);
+	fhandle << "<\n\n";
+	for (int i = 0; i < lines; i++) 
+		fhandle << info[i][0] << ":" << info[i][1] << '\n';
+	fhandle << "\n>\n";
+
+}
+
+bool File::check_header(String content) {
+	fhandle.seekg(0, std::ios::beg);
+	char temp[1000];
+	std::string stemp;
+	std::string scontent((char*)content);
+	while (temp[0] != '>' && !(*this).is_end()) {
+		fhandle.getline(temp, 1000);
+		stemp = std::string(temp);
+		if (stemp.find(scontent) != std::string::npos) {
+			(*this).seek(0);
+			return true;
+		}
+	}
+	(*this).seek(0);
+	return false;
+}
+
+int File::load_header(String** info) {
+	if ((*this).end_header() == 0)
+		return 0;
+	(*this).seek(0);
+	int lines = 0;
+	int pos = 0;
+	char temp[1000];
+	std::string stemp;
+	while (temp[0] != '>' && (*this).is_end()) {
+		fhandle.getline(temp, 1000);
+		stemp = temp;
+		if (stemp.length() > 2) {
+			pos = stemp.find(':');
+			info[lines][0] = (stemp.substr(0, pos - 1)).c_str();
+			info[lines][1] = (stemp.substr(pos + 1, stemp.length() - 1)).c_str();
+			lines++;
+		}
+	}
+	return lines;
+}
+
+Header_info::Header_info(File &input) {
+	std::map<String, String> list;
+	int header_pos = input.end_header();
+	if (header_pos == 0) 
+		std::cout << "No header was found in " << input.get_filename() << ".\n";
+	else {
+		input.seek(0);
+		char temp[1000];
+		std::string stemp;
+		String item;
+		String content;
+		int colon_pos;
+		while (temp[0] != '>' && !input.is_end()) {
+			input.getline(temp, 1000);
+			stemp = std::string(temp);
+			colon_pos = stemp.find(':');
+			if (colon_pos != std::string::npos) {
+				item = (stemp.substr(0, colon_pos)).c_str();
+				content = (stemp.substr(colon_pos + 1, stemp.length())).c_str();
+				list[item] = content;
+			}
+		}
+	}
+}
+
+Header_info::Header_info(String* item, String* content, int length) {
+	for (int i = 0; i < length; i++) {
+		(*this).list[item[i]] = content[i];
+	}
+}
+
+std::istream &operator>>(std::istream &input, Header_info &info) {
+	input.seekg(0, std::ios::beg);
+	char temp[1000];
+	input.getline(temp, 1000);
+	if(temp[0]!='<')
+		std::cout << "No header was found in the input file.\n";
+	else {
+		std::string stemp;
+		String item;
+		String content;
+		int colon_pos;
+		while (temp[0] != '>' && !input.eof()) {
+			input.getline(temp, 1000);
+			stemp = std::string(temp);
+			colon_pos = stemp.find(':');
+			if (colon_pos != std::string::npos) {
+				item = (stemp.substr(0, colon_pos)).c_str();
+				content = (stemp.substr(colon_pos + 1, stemp.length())).c_str();
+				info.insert(item, content);
+			}
+		}
+	}
+	return input;
+
+}
+
+std::ostream &operator<<(std::ostream &output, Header_info &info){
+	output << "<\n\n";
+	if (info.size() != 0) {
+		for (auto it = info.list.begin(); it != info.list.end(); it++)
+			output << it->first << ':' << it->second << '\n';
+	}
+	output << "\n>\n";
+	return output;
+}
+
+File &operator>>(File &input, Header_info &info) {
+	input.seek(0);
+	char temp[1000];
+	input.getline(temp, 1000);
+	if (temp[0] != '<')
+		std::cout << "No header was found in "<< input.get_filename()<< ".\n";
+	else {
+		std::string stemp;
+		String item;
+		String content;
+		int colon_pos;
+		while (temp[0] != '>' && !input.is_end()) {
+			input.getline(temp, 1000);
+			stemp = std::string(temp);
+			colon_pos = stemp.find(':');
+			if (colon_pos != std::string::npos) {
+				item = (stemp.substr(0, colon_pos)).c_str();
+				content = (stemp.substr(colon_pos + 1, stemp.length())).c_str();
+				info.insert(item, content);
+			}
+		}
+	}
+	return input;
+}
+
+File &operator<<(File &output, Header_info &info) {
+	output.seek(0);
+	output << "<\n\n";
+	if (info.size() != 0) {
+		for (auto it = info.list.begin(); it != info.list.end(); it++)
+			output << it->first << ':' << it->second << '\n';
+	}
+	output << "\n>\n";
+	return output;
+}
+
 
 #endif

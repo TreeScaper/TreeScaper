@@ -26,6 +26,8 @@
 #include <iomanip>
 #include <cstring>
 #include <iostream>
+#include <map>
+
 
 class String {
     friend std::istream &operator>>(std::istream &input, String &s)
@@ -44,8 +46,9 @@ class String {
 	};
 
 public:
-    String( const char * s = "");                 // constuct and default empty String
-	String( const String &);                    // copy constructor
+    String( const char * s = "");               // constuct and default empty String
+	String( const String &);					// copy constructor
+	String(const std::string &src);
     ~String();                                  // destructor
 	const String &operator=(const String &);    // assignment
 	const String &operator+=(const String &);   // concatenation
@@ -73,6 +76,20 @@ public:
 	operator char *() const{return str_ptr;};   // translate to array.
 	int get_length() const;						// return String length
 	void add(char);
+	String get_time_stamp(char filler = '_');
+	void make_stdname(std::map<String, String>& paras) {
+		String temp = paras["-path"];
+		temp += (*this);
+		if (paras["-post"] != (String) "") {
+			temp += "_";
+			if (paras["-post"] != (String) "time")
+				temp += paras["-post"];
+			else
+				temp += get_time_stamp();
+		}
+		temp += (String) ".out";
+		(*this) = temp;
+	}
 
 private:
 	int length;                             // String length
@@ -80,6 +97,8 @@ private:
 
 	void set_String(const char *);          // utility function
 };
+
+String time_stamp(char filler = '_');
 
 extern String EMPTY_STRING;
 
