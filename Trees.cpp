@@ -4162,6 +4162,7 @@ bool Trees::Compute_Matching_dist()
     {
         dist_match[i][i] = 0;
         Array<Array<char> > bitstrofatree(numberofbipartition[i], Array<char> ());
+        Array<char> OneBitstr(n_taxa, '1');
         idx = 0;
         Get_bipartitionofonetree(treeset[i]->root, isrooted, 0, bitstrofatree, idx);
 
@@ -4192,12 +4193,14 @@ bool Trees::Compute_Matching_dist()
                     }
                     else if (k >= numberofbipartition[i] && l < numberofbipartition[j])
                     {
-                        if(Array<char>::onebitstrXOR(bitstrofatreej[l], result))
+                        //if(Array<char>::onebitstrXOR(bitstrofatreej[l], result))
+                        if (Array<char>::bitstrXOR(OneBitstr, bitstrofatreej[l], result))
                             strdist[k][l] = result;
                     }
                     else
                     {
-                        if(Array<char>::onebitstrXOR(bitstrofatree[k], result))
+                        //if(Array<char>::onebitstrXOR(bitstrofatree[k], result))
+                        if (Array<char>::bitstrXOR(bitstrofatree[k], OneBitstr, result))
                             strdist[k][l] = result;
                     }
 
