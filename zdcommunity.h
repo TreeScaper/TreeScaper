@@ -51,6 +51,8 @@
 #include "wmatrix.h"
 
 
+double bisec_plateaus(double left, double right);
+
 template<class T>
 void print_comm_array(Matrix<T> &arr, int n, File &output, bool arr_is_covariance, double highfreq, double lowfreq, int &covariance_freeid_size, int &covariance_nonfree_id_size, int *covariance_freeid, int *covariance_nonfree_id);
 

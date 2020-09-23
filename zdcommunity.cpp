@@ -1,5 +1,13 @@
 #include "zdcommunity.h"
 
+double bisec_plateaus(double left, double right) {
+	double prod = left * right;
+	if (prod < 0.01)
+		return (left + right) / 2.0;
+	else
+		return sqrt(prod);
+}
+
 
 template<class T>
 void print_comm_array(Matrix<T> &arr, int n, File &output, bool arr_is_covariance, double highfreq, double lowfreq, int &covariance_freeid_size, int &covariance_nonfree_id_size, int *covariance_freeid, int *covariance_nonfree_id)
@@ -238,7 +246,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	double lambda_neg = 0;
 	double lambda_pos_min = -1, lambda_pos_max = 1;
 	Community * community;
-	map<double, Community *> LamCommunities;
+	map<double, Community *> LamCommunities; // This map stores all CD results and labeled them with the tunning parameter
 	map<double, Community *>::iterator it, it2;
 	map<double, double> mods;
 	int times = 0;
@@ -368,8 +376,8 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 
 	queue<pair<double, double> > qq;
 	pair<double, double> p, pp;
-	vector<pair<double, double> > plateausLb(0);
-	vector<pair<double, double> > plateausUb(0);
+	vector<pair<double, double> > plateausLb(0); // plateausLb records two number pair denoted as lb.left and lb.right
+	vector<pair<double, double> > plateausUb(0); // plateausUb records two number pair denoted as ub.left and ub.right
 	bool SameAsFirst, SameAsSecond;
 	double lambda_pos, plateaubound = 0;
 	int atleastsearchnum = 0;
@@ -383,7 +391,8 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	{
 		pp = qq.front();
 		qq.pop();
-		lambda_pos = (pp.first + pp.second) / 2;
+		//lambda_pos = (pp.first + pp.second) / 2; //Bisection search on pos_min and pos_max
+		lambda_pos = bisec_plateaus(pp.first, pp.second);
 		cout << lambda_pos << ", ";
 		std::cout.flush();
 		create_resolution(lambda_pos, lambda_neg, layers, sign, lambda);
@@ -393,12 +402,12 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		GreedyLouvain::detect_communities(community);
 
 		SameAsFirst = false;
-		if (lambda_pos_min == pp.first)
+		if (lambda_pos_min == pp.first) // If lambda_pos_min is not updated during the process
 		{
-			if (community->nb_comm == 1)
+			if (community->nb_comm == 1) // And only 1 community is detected
 			{
 				SameAsFirst = true;
-				lambda_pos_min = lambda_pos;
+				lambda_pos_min = lambda_pos; // update the lambda_pos_min with the bisection search obtained.
 			}
 		}
 		else
@@ -411,12 +420,12 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 			}
 		}
 		SameAsSecond = false;
-		if (lambda_pos_max == pp.second)
+		if (lambda_pos_max == pp.second) // If lambda_pos_max is not updated during the process
 		{
-			if (community->nb_comm == covariance_nonfree_id_size)
+			if (community->nb_comm == covariance_nonfree_id_size) // And all points are a single community itself
 			{
 				SameAsSecond = true;
-				lambda_pos_max = lambda_pos;
+				lambda_pos_max = lambda_pos; // update the lambda_pos_max with the bisection search obtained
 			}
 		}
 		else
@@ -432,11 +441,11 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		LamCommunities[lambda_pos] = community;
 
 		// added new interval for testing
-		if (!SameAsFirst && ((lambda_pos - pp.first) > plateaubound || plateaubound == 0 || LamCommunities.size() + qq.size() < atleastsearchnum))
+		if (!SameAsFirst && (/*(lambda_pos - pp.first) > plateaubound ||*/ plateaubound == 0 || LamCommunities.size() + qq.size() < atleastsearchnum))
 		{
 			qq.push(make_pair(pp.first, lambda_pos));
 		}
-		if (!SameAsSecond && ((pp.second - lambda_pos) > plateaubound || plateaubound == 0 || LamCommunities.size() + qq.size() < atleastsearchnum))
+		if (!SameAsSecond && (/*(pp.second - lambda_pos) > plateaubound ||*/ plateaubound == 0 || LamCommunities.size() + qq.size() < atleastsearchnum))
 		{
 			qq.push(make_pair(lambda_pos, pp.second));
 		}
@@ -447,15 +456,15 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 			if (plateaubound == 0)
 				plateaubound = (lambda_pos - pp.first) / 2;
 			int i;
-			for (i = 0; i < plateausLb.size(); i++)
+			for (i = 0; i < plateausLb.size(); i++) // For current testing interval pp
 			{
-				if (plateausLb[i].second == pp.first)
+				if (plateausLb[i].second == pp.first) // Search if pp.left appeared before as some right endpoint of the interval
 				{
-					plateausLb[i].second = lambda_pos;
+					plateausLb[i].second = lambda_pos; // If yes, then make that interval's right endpoint extend to the bisection obtained in pp.
 					break;
 				}
 			}
-			if (i == plateausLb.size())
+			if (i == plateausLb.size()) // If no, push the new interval into plateausLb
 			{
 				plateausLb.resize(plateausLb.size() + 1);
 				plateausLb[plateausLb.size() - 1] = make_pair(pp.first, lambda_pos);
@@ -494,6 +503,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	plateausUb.resize(plateausLb.size());
 	for (int i = 0; i < plateausLb.size(); i++)
 		plateausUb[i] = make_pair(plateausLb[i].first, plateausLb[i].second);
+	// Initial plateausUb with plateusLb.
 
 	double extstart, extend, max_length = 0;
 	vector<int> totestidix(0);
@@ -503,14 +513,14 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 
 		for (int i = 0; i < plateausUb.size(); i++)
 		{
-			extstart = plateausLb[i].first - (plateausLb[i].second - plateausLb[i].first);
-			extend = plateausLb[i].second + (plateausLb[i].second - plateausLb[i].first);
+			extstart = plateausLb[i].first - (plateausLb[i].second - plateausLb[i].first); // extended ub.left (with the length of the original interval)
+			extend = plateausLb[i].second + (plateausLb[i].second - plateausLb[i].first); // extended ub.right (with the length of the original interval)
 			for (it = LamCommunities.begin(); it != LamCommunities.end(); it++)
 			{
-				if (it->first > extstart && it->first < plateausLb[i].first)
-					extstart = it->first;
-				if (it->first < extend && it->first > plateausLb[i].second)
-					extend = it->first;
+				if (it->first > extstart && it->first < plateausLb[i].first) // if there are lambda in [ub.left, lb.left] already tested
+					extstart = it->first; // Shrink the ub.left to lambda
+				if (it->first < extend && it->first > plateausLb[i].second) // if there are lambda in [lb.right, ub.right] already tested
+					extend = it->first; // Shrink the ub.right to lambda
 			}
 			plateausUb[i].first = extstart;
 			plateausUb[i].second = extend;
@@ -518,14 +528,14 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 			if (plateausLb[i].second - plateausLb[i].first > max_length)
 			{
 				max_length = plateausLb[i].second - plateausLb[i].first;
-			}
+			} // max_length record the maximum length of intervals recorded in plateausLb
 		}
 
-		for (int i = 0; i < plateausLb.size(); i++)
+		for (int i = 0; i < plateausLb.size(); i++) // Scan through plateausUb
 		{
-			if (((plateausUb[i].second - plateausUb[i].first) - max_length) >= 0.000001)
+			if (((plateausUb[i].second - plateausUb[i].first) - max_length) >= 0.000001) // If there is an Ub interval with length greater than max_length
 			{
-				totestidix.resize(totestidix.size() + 1);
+				totestidix.resize(totestidix.size() + 1); // record the index i of such interval in totestidix
 				totestidix[totestidix.size() - 1] = i;
 			}
 		}
@@ -533,12 +543,13 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 			break;
 		else
 		{
-			for (int i = 0; i < totestidix.size(); i++)
+			for (int i = 0; i < totestidix.size(); i++) // Test the interval recorded in totestidix in order to find the boundary of plateaus
 			{
 				int idx = totestidix[i];
 
-				lambda_pos = (plateausUb[idx].first + plateausLb[idx].first) / 2;
-				if (LamCommunities.find(lambda_pos) == LamCommunities.end())
+				//lambda_pos = (plateausUb[idx].first + plateausLb[idx].first) / 2; // Perform CD with lambda_pos obtained in [ub.left, lb.left]
+				lambda_pos = bisec_plateaus(plateausUb[idx].first, plateausLb[idx].first);
+				if (LamCommunities.find(lambda_pos) == LamCommunities.end()) // If the lambda_pos is not tested yet, test it.
 				{
 					cout << lambda_pos << ", ";
 					std::cout.flush();
@@ -550,13 +561,14 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 					mods[lambda_pos] = community->modularity();
 					LamCommunities[lambda_pos] = community;
 				}
-				it = LamCommunities.find(lambda_pos);
-				it2 = LamCommunities.find(plateausLb[idx].first);
+				it = LamCommunities.find(lambda_pos); // it points to the CD result from lambda_pos
+				it2 = LamCommunities.find(plateausLb[idx].first); // it2 points to the CD result from plateusLb[idx].left
 				if (Community::IsSameCommunity(it2->second, it->second))
-					plateausLb[idx].first = lambda_pos;
+					plateausLb[idx].first = lambda_pos; // if they are the same, extend lb.left with lambda_pos.
 				else
-					plateausUb[idx].first = lambda_pos;
-				lambda_pos = (plateausLb[idx].second + plateausUb[idx].second) / 2;
+					plateausUb[idx].first = lambda_pos; // Otherwise, shrink ub.left to lambda_pos
+				//lambda_pos = (plateausLb[idx].second + plateausUb[idx].second) / 2; // Perform CD with lambda_pos obtained in [lb.right, ub.right]
+				lambda_pos = bisec_plateaus(plateausLb[idx].second, plateausUb[idx].second);
 				if (LamCommunities.find(lambda_pos) == LamCommunities.end())
 				{
 					cout << lambda_pos << ", ";
@@ -583,11 +595,15 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	cout << "\nThe found plateaus are:" << endl;
 	for (int i = 0; i < plateausLb.size(); i++)
 	{
-		cout << "Transition lower bound: [" << plateausUb[i].first << ", " << plateausLb[i].first << "]" << endl;
+		cout << "Transition lower bound: [" << plateausUb[i].first << ", " << plateausLb[i].first << "]" << endl; 
+		// Transition lower bound [ub.left,  lb.left]
 		cout << "Transition upper bound: [" << plateausLb[i].second << ", " << plateausUb[i].second << "]" << endl;
+		// Transition upper boubd [lb.right, ub.right]
+		// i.e., [lb.left, lb.right] is a subset of [ub.left, ub.right] 
 		cout << "Updated plateau: [" << plateausLb[i].first << ", " << plateausLb[i].second << "], length: " <<
 			plateausLb[i].second - plateausLb[i].first << ", number of communities: " <<
 			LamCommunities[plateausLb[i].first]->nb_comm << endl << endl;
+		// Use the interval recorded in lb to represent the plateaus.
 	}
 
 	
