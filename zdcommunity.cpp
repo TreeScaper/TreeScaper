@@ -1150,28 +1150,15 @@ bool community_detection_file(Matrix<double> &mat, map<String, String> &paras)
 	
 	Array<double> lambda_pos_list;
 	file_lambda >> temp_size;
-	lambda_pos_lost.resize(temp_size);
+	lambda_pos_list.resize(temp_size);
 	for (int i = 0; i < temp_size; i++)
-		temp_size >> lambda_pos_list[i];
+		file_lambda >> lambda_pos_list[i];
 	Array<double> lambda_neg_list;
 	file_lambda >> temp_size;
-	lambda_neg_lost.resize(temp_size);
+	lambda_neg_list.resize(temp_size);
 	for (int i = 0; i < temp_size; i++)
-		temp_size >> lambda_neg_list[i];
+		file_lambda >> lambda_neg_list[i];
 	
-
-	if (0 == lpiv)
-	{
-		lambda_pos_list.resize(1);
-		lambda_pos_list[0] = lp;
-	}
-	else
-	{
-		int size = (int)((lpe - lps) / lpiv + 1);
-		lambda_pos_list.resize(size);
-		for (int i = 0; i < size; i++)
-			lambda_pos_list[i] = lps + i * lpiv;
-	}
 
 	srand(time(NULL));
 	int covariance_freeid_size = 0;
