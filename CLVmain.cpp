@@ -179,13 +179,13 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 	else if (argc > 1 && (String)argv[1] == (String) "-comm") {
-		String default_paras[16] = { "", "CNM", "1", "0", "1",
-			"0", "1", "0", "1", "0", "1", "0", "auto", "", "time", "" };
-		String options[16] = { "-f", "-cm", "-lp", "-lps", "-lpe",
-			"-lpiv", "-ln", "-lns", "-lne", "-lniv", "-hf", "-lf", "-lm", "-node", "-post", "-fnldr"};
+		String default_paras[17] = { "", "CNM", "1", "0", "1",
+			"0", "1", "0", "1", "0", "1", "0", "auto", "", "time", "", "" };
+		String options[17] = { "-f", "-cm", "-lp", "-lps", "-lpe",
+			"-lpiv", "-ln", "-lns", "-lne", "-lniv", "-hf", "-lf", "-lm", "-node", "-post", "-fnldr", "-flambda"};
 		for (int i = 1; i < argc; i++)
 		{
-			for (int j = 0; j < 16; j++)
+			for (int j = 0; j < 17; j++)
 			{
 				if ((String)argv[i] == options[j] && i + 1 < argc && argv[i + 1][0] != '-')
 				{
@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
 			}
 		}
 		map<String, String> paras;
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 17; i++)
 		{
 			paras[options[i]] = default_paras[i];
 		}
