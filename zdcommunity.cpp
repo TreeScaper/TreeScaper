@@ -350,7 +350,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 				break;
 			}
 		}
-		if (community->nb_comm == covariance_nonfree_id_size)
+		if (community->nb_comm == covariance_nonfree_id_size || community->nb_comm > 30)
 		{
 			mods[lambda_pos_max] = community->modularity();
 			LamCommunities[lambda_pos_max] = community;
