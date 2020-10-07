@@ -64,3 +64,4 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 
 bool community_detection_manually(Matrix<double>& mat, map<String, String>& paras);
 
+bool community_detection_file(Matrix<double>& mat, map<String, String>& paras);
