@@ -4189,8 +4189,7 @@ bool Trees::Compute_Matching_dist()
     char* tempbitstr = new char[btlength];
     memset(tempbitstr, 1, sizeof(char) * btlength);
     memset(tempbitstr, 0, sizeof(char) * btlength - n_taxa);
-    Array<char> OneBitstr(btlength);
-    memcpy(*OneBitstr, tempbitstr, sizeof(char) * btlength);
+    Array<char> OneBitstr(btlength, tempbitstr);
     int max_numberofbipartition = 0;
     int idx = 0;
 

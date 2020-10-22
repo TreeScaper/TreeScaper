@@ -117,6 +117,19 @@ public:
 		}
 	};
 
+    template<class S>
+    Array(int size, S* arr)
+    {
+        length = size;
+
+        if (length > 0)
+            vec = new S[length];
+        else
+            vec = NULL;
+
+        memcpy(vec, arr, sizeof(S) * size);
+    };
+
 	Array(int size)
 	{
 		length = size;
