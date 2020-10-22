@@ -4189,7 +4189,8 @@ bool Trees::Compute_Matching_dist()
     char* tempbitstr = new char[btlength];
     memset(tempbitstr, 1, sizeof(char) * btlength);
     memset(tempbitstr, 0, sizeof(char) * btlength - n_taxa);
-    Array<char> OneBitstr(btlength, tempbitstr);
+    Array<char> OneBitstr(btlength);
+    memcpy(*OneBitstr, tempbitstr, sizeof(char) * btlength);
     int max_numberofbipartition = 0;
     int idx = 0;
 
@@ -4288,7 +4289,7 @@ bool Trees::Compute_SPR_dist()
     for (int i = 0; i < n_trees; i++) {
         if (Get_num_leaves(treeset[i]->root) != leaveslabelsmaps.size()) {
             cout << "Warning! Tree with missing taxa detected! Tree ID: " << i + 1 << ". SPR distance failed!\n";
-            return false();
+            return false;
         }
     }
 
