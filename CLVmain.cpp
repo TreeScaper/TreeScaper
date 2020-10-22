@@ -457,7 +457,12 @@ void trees_driver(map<String, String> &paras)
         TreesData->compute_numofbipart();
         cout << "Successfully read " << TreesData->Get_n_trees() << " trees from file: " << fname << "." << endl;
     }
-    Compute_BipartMatrix(TreesData, paras);
+	for (int i = 0; i < TreesData->Get_n_trees(); i++) {
+		if(TreesData->Get_num_leaves(TreesData->get_tree(i)->root) != TreesData->Get_labelmap()->size())
+			cout << "Warning! Tree with missing taxa detected! Tree ID: " << i + 1 << ".\n";	
+	}
+
+     Compute_BipartMatrix(TreesData, paras);
     
     delete TreesData;
 }

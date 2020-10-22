@@ -211,6 +211,7 @@ public:
     int Get_fileAffinitysize(){return affinityfile_size;}
     int Get_filedcoordinatesize(){return file_coordinatesize;}
     int Get_filedcoordinatedim(){return file_coordinatedim;}
+    int Get_num_leaves(NEWICKNODE* root);
     bool Get_isrooted(){return isrooted;}
     bool Get_isweighted(){return isweighted;}
     const LabelMap *Get_labelmap(){return &leaveslabelsmaps;}
