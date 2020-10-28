@@ -1,5 +1,13 @@
 #include "zdcommunity.h"
 
+double bisec_plateaus(double left, double right) {
+	double prod = left * right;
+	if (prod < 0.01)
+		return (left + right) / 2.0;
+	else
+		return sqrt(prod);
+}
+
 
 template<class T>
 void print_comm_array(Matrix<T> &arr, int n, File &output, bool arr_is_covariance, double highfreq, double lowfreq, int &covariance_freeid_size, int &covariance_nonfree_id_size, int *covariance_freeid, int *covariance_nonfree_id)
@@ -238,7 +246,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	double lambda_neg = 0;
 	double lambda_pos_min = -1, lambda_pos_max = 1;
 	Community * community;
-	map<double, Community *> LamCommunities;
+	map<double, Community *> LamCommunities; // This map stores all CD results and labeled them with the tunning parameter
 	map<double, Community *>::iterator it, it2;
 	map<double, double> mods;
 	int times = 0;
@@ -342,7 +350,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 				break;
 			}
 		}
-		if (community->nb_comm == covariance_nonfree_id_size)
+		if (community->nb_comm == covariance_nonfree_id_size || community->nb_comm > 30)
 		{
 			mods[lambda_pos_max] = community->modularity();
 			LamCommunities[lambda_pos_max] = community;
@@ -368,8 +376,8 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 
 	queue<pair<double, double> > qq;
 	pair<double, double> p, pp;
-	vector<pair<double, double> > plateausLb(0);
-	vector<pair<double, double> > plateausUb(0);
+	vector<pair<double, double> > plateausLb(0); // plateausLb records two number pair denoted as lb.left and lb.right
+	vector<pair<double, double> > plateausUb(0); // plateausUb records two number pair denoted as ub.left and ub.right
 	bool SameAsFirst, SameAsSecond;
 	double lambda_pos, plateaubound = 0;
 	int atleastsearchnum = 0;
@@ -383,7 +391,8 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	{
 		pp = qq.front();
 		qq.pop();
-		lambda_pos = (pp.first + pp.second) / 2;
+		//lambda_pos = (pp.first + pp.second) / 2; //Bisection search on pos_min and pos_max
+		lambda_pos = bisec_plateaus(pp.first, pp.second);
 		cout << lambda_pos << ", ";
 		std::cout.flush();
 		create_resolution(lambda_pos, lambda_neg, layers, sign, lambda);
@@ -393,12 +402,12 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		GreedyLouvain::detect_communities(community);
 
 		SameAsFirst = false;
-		if (lambda_pos_min == pp.first)
+		if (lambda_pos_min == pp.first) // If lambda_pos_min is not updated during the process
 		{
-			if (community->nb_comm == 1)
+			if (community->nb_comm == 1) // And only 1 community is detected
 			{
 				SameAsFirst = true;
-				lambda_pos_min = lambda_pos;
+				lambda_pos_min = lambda_pos; // update the lambda_pos_min with the bisection search obtained.
 			}
 		}
 		else
@@ -411,12 +420,12 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 			}
 		}
 		SameAsSecond = false;
-		if (lambda_pos_max == pp.second)
+		if (lambda_pos_max == pp.second) // If lambda_pos_max is not updated during the process
 		{
-			if (community->nb_comm == covariance_nonfree_id_size)
+			if (community->nb_comm == covariance_nonfree_id_size) // And all points are a single community itself
 			{
 				SameAsSecond = true;
-				lambda_pos_max = lambda_pos;
+				lambda_pos_max = lambda_pos; // update the lambda_pos_max with the bisection search obtained
 			}
 		}
 		else
@@ -432,11 +441,11 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 		LamCommunities[lambda_pos] = community;
 
 		// added new interval for testing
-		if (!SameAsFirst && ((lambda_pos - pp.first) > plateaubound || plateaubound == 0 || LamCommunities.size() + qq.size() < atleastsearchnum))
+		if (!SameAsFirst && (/*(lambda_pos - pp.first) > plateaubound ||*/ plateaubound == 0 || LamCommunities.size() + qq.size() < atleastsearchnum))
 		{
 			qq.push(make_pair(pp.first, lambda_pos));
 		}
-		if (!SameAsSecond && ((pp.second - lambda_pos) > plateaubound || plateaubound == 0 || LamCommunities.size() + qq.size() < atleastsearchnum))
+		if (!SameAsSecond && (/*(pp.second - lambda_pos) > plateaubound ||*/ plateaubound == 0 || LamCommunities.size() + qq.size() < atleastsearchnum))
 		{
 			qq.push(make_pair(lambda_pos, pp.second));
 		}
@@ -447,15 +456,15 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 			if (plateaubound == 0)
 				plateaubound = (lambda_pos - pp.first) / 2;
 			int i;
-			for (i = 0; i < plateausLb.size(); i++)
+			for (i = 0; i < plateausLb.size(); i++) // For current testing interval pp
 			{
-				if (plateausLb[i].second == pp.first)
+				if (plateausLb[i].second == pp.first) // Search if pp.left appeared before as some right endpoint of the interval
 				{
-					plateausLb[i].second = lambda_pos;
+					plateausLb[i].second = lambda_pos; // If yes, then make that interval's right endpoint extend to the bisection obtained in pp.
 					break;
 				}
 			}
-			if (i == plateausLb.size())
+			if (i == plateausLb.size()) // If no, push the new interval into plateausLb
 			{
 				plateausLb.resize(plateausLb.size() + 1);
 				plateausLb[plateausLb.size() - 1] = make_pair(pp.first, lambda_pos);
@@ -494,6 +503,7 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	plateausUb.resize(plateausLb.size());
 	for (int i = 0; i < plateausLb.size(); i++)
 		plateausUb[i] = make_pair(plateausLb[i].first, plateausLb[i].second);
+	// Initial plateausUb with plateusLb.
 
 	double extstart, extend, max_length = 0;
 	vector<int> totestidix(0);
@@ -503,14 +513,14 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 
 		for (int i = 0; i < plateausUb.size(); i++)
 		{
-			extstart = plateausLb[i].first - (plateausLb[i].second - plateausLb[i].first);
-			extend = plateausLb[i].second + (plateausLb[i].second - plateausLb[i].first);
+			extstart = plateausLb[i].first - (plateausLb[i].second - plateausLb[i].first); // extended ub.left (with the length of the original interval)
+			extend = plateausLb[i].second + (plateausLb[i].second - plateausLb[i].first); // extended ub.right (with the length of the original interval)
 			for (it = LamCommunities.begin(); it != LamCommunities.end(); it++)
 			{
-				if (it->first > extstart && it->first < plateausLb[i].first)
-					extstart = it->first;
-				if (it->first < extend && it->first > plateausLb[i].second)
-					extend = it->first;
+				if (it->first > extstart && it->first < plateausLb[i].first) // if there are lambda in [ub.left, lb.left] already tested
+					extstart = it->first; // Shrink the ub.left to lambda
+				if (it->first < extend && it->first > plateausLb[i].second) // if there are lambda in [lb.right, ub.right] already tested
+					extend = it->first; // Shrink the ub.right to lambda
 			}
 			plateausUb[i].first = extstart;
 			plateausUb[i].second = extend;
@@ -518,14 +528,14 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 			if (plateausLb[i].second - plateausLb[i].first > max_length)
 			{
 				max_length = plateausLb[i].second - plateausLb[i].first;
-			}
+			} // max_length record the maximum length of intervals recorded in plateausLb
 		}
 
-		for (int i = 0; i < plateausLb.size(); i++)
+		for (int i = 0; i < plateausLb.size(); i++) // Scan through plateausUb
 		{
-			if (((plateausUb[i].second - plateausUb[i].first) - max_length) >= 0.000001)
+			if (((plateausUb[i].second - plateausUb[i].first) - max_length) >= 0.000001) // If there is an Ub interval with length greater than max_length
 			{
-				totestidix.resize(totestidix.size() + 1);
+				totestidix.resize(totestidix.size() + 1); // record the index i of such interval in totestidix
 				totestidix[totestidix.size() - 1] = i;
 			}
 		}
@@ -533,12 +543,13 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 			break;
 		else
 		{
-			for (int i = 0; i < totestidix.size(); i++)
+			for (int i = 0; i < totestidix.size(); i++) // Test the interval recorded in totestidix in order to find the boundary of plateaus
 			{
 				int idx = totestidix[i];
 
-				lambda_pos = (plateausUb[idx].first + plateausLb[idx].first) / 2;
-				if (LamCommunities.find(lambda_pos) == LamCommunities.end())
+				//lambda_pos = (plateausUb[idx].first + plateausLb[idx].first) / 2; // Perform CD with lambda_pos obtained in [ub.left, lb.left]
+				lambda_pos = bisec_plateaus(plateausUb[idx].first, plateausLb[idx].first);
+				if (LamCommunities.find(lambda_pos) == LamCommunities.end()) // If the lambda_pos is not tested yet, test it.
 				{
 					cout << lambda_pos << ", ";
 					std::cout.flush();
@@ -550,13 +561,14 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 					mods[lambda_pos] = community->modularity();
 					LamCommunities[lambda_pos] = community;
 				}
-				it = LamCommunities.find(lambda_pos);
-				it2 = LamCommunities.find(plateausLb[idx].first);
+				it = LamCommunities.find(lambda_pos); // it points to the CD result from lambda_pos
+				it2 = LamCommunities.find(plateausLb[idx].first); // it2 points to the CD result from plateusLb[idx].left
 				if (Community::IsSameCommunity(it2->second, it->second))
-					plateausLb[idx].first = lambda_pos;
+					plateausLb[idx].first = lambda_pos; // if they are the same, extend lb.left with lambda_pos.
 				else
-					plateausUb[idx].first = lambda_pos;
-				lambda_pos = (plateausLb[idx].second + plateausUb[idx].second) / 2;
+					plateausUb[idx].first = lambda_pos; // Otherwise, shrink ub.left to lambda_pos
+				//lambda_pos = (plateausLb[idx].second + plateausUb[idx].second) / 2; // Perform CD with lambda_pos obtained in [lb.right, ub.right]
+				lambda_pos = bisec_plateaus(plateausLb[idx].second, plateausUb[idx].second);
 				if (LamCommunities.find(lambda_pos) == LamCommunities.end())
 				{
 					cout << lambda_pos << ", ";
@@ -583,11 +595,15 @@ bool community_detection_automatically(Matrix<double> &mat, map<String, String> 
 	cout << "\nThe found plateaus are:" << endl;
 	for (int i = 0; i < plateausLb.size(); i++)
 	{
-		cout << "Transition lower bound: [" << plateausUb[i].first << ", " << plateausLb[i].first << "]" << endl;
+		cout << "Transition lower bound: [" << plateausUb[i].first << ", " << plateausLb[i].first << "]" << endl; 
+		// Transition lower bound [ub.left,  lb.left]
 		cout << "Transition upper bound: [" << plateausLb[i].second << ", " << plateausUb[i].second << "]" << endl;
+		// Transition upper boubd [lb.right, ub.right]
+		// i.e., [lb.left, lb.right] is a subset of [ub.left, ub.right] 
 		cout << "Updated plateau: [" << plateausLb[i].first << ", " << plateausLb[i].second << "], length: " <<
 			plateausLb[i].second - plateausLb[i].first << ", number of communities: " <<
 			LamCommunities[plateausLb[i].first]->nb_comm << endl << endl;
+		// Use the interval recorded in lb to represent the plateaus.
 	}
 
 	
@@ -838,6 +854,311 @@ bool community_detection_manually(Matrix<double> &mat, map<String, String> &para
 		for (int i = 0; i < size; i++)
 			lambda_neg_list[i] = lns + i * lniv;
 	}
+
+	srand(time(NULL));
+	int covariance_freeid_size = 0;
+	int *covariance_freeid = new int[size];
+	int covariance_nonfree_id_size = 0;
+	int *covariance_nonfree_id = new int[size];
+
+
+	Header_info info;
+	File file_src(paras["-f"]);
+	file_src >> info;
+	info.insert("created", time_stamp());
+	info.insert("size", paras["-size"]);
+	info.insert("source", paras["-f"]);
+
+	String temp_file = paras["-path"];
+	temp_file += "CDtemp_temp.txt";
+	File file_Comm_temp(temp_file);
+	file_Comm_temp.clean();
+
+	double highfrequence = atof(highfreq.c_str());
+	double lowfrequence = atof(lowfreq.c_str());
+	if (label_flag && (highfrequence > 1.0 || highfrequence < 0.0
+		|| lowfrequence > 1.0 || lowfrequence < 0.0 || (highfrequence - lowfrequence) <= 0.0))
+	{
+		cout << "Warning: The high and low frequencies must be between 0 and 1!\n\n";
+		return false;
+	}
+
+	print_comm_array(mat, size, file_Comm_temp, label_flag, highfrequence, lowfrequence, covariance_freeid_size, covariance_nonfree_id_size, covariance_freeid, covariance_nonfree_id);
+	info.insert("active_node_size", to_string(covariance_nonfree_id_size));
+
+	char *infile = strdup((char*)temp_file);
+
+	String outname_Graph = paras["-path"];
+	outname_Graph += "CDtemp.bin";
+	char *outfile = (char*)outname_Graph;
+
+	String outname_Node = paras["-path"];
+	outname_Node += "CDtemp_node_map.txt";
+	char *node_map_file = (char*)outname_Node;
+	String outname_Conf = paras["-path"];
+	outname_Conf += "CDtemp.conf";
+	char *conf_file = (char*)outname_Conf;
+
+	int is_weighted = 1;
+	int is_directed = 1;
+	int is_single_slice = 0;
+	double interslice_weight = 1.0;
+
+	int* conf = NULL;
+	int* sign = NULL;
+	double* lambda = NULL;
+
+	Slicer s(infile, (double)interslice_weight, is_directed, is_weighted, is_single_slice);
+	Graph* g = s.get_graph();
+	g->display_binary(outfile);
+	delete g;
+	s.display_node_mapping(node_map_file);
+	s.display_conf(conf_file, modelType);
+
+	int layers = read_conf(conf_file, conf, sign);
+	lambda = new double[layers];
+	double lambda_pos;// = atof(lambda_pos_list.c_str());
+	double lambda_neg;// = atof(lambda_neg_list.c_str());
+
+	info.insert("node_type", paras["-node"]);
+
+	if (modelType == 3)
+		info.insert("CD_model", "Configuration Null Model");
+	else if (modelType == 4)
+		info.insert("CD_model", "Constant Potts Model");
+	else if (modelType == 2)
+		info.insert("CD_model", "Erdos-Renyi Null Model");
+	else if (modelType == 1)
+		info.insert("CD_model", "No Null Model");
+	info.insert("tuning", "manually");
+	String lnlist = to_string(lambda_neg_list[0]);
+	for (int i=1;i<lambda_neg_list.get_length();i++){
+		lnlist += ",";
+		lnlist += to_string(lambda_neg_list[i]);
+	}
+	info.insert("lambda_neg", lnlist);
+	String lplist = to_string(lambda_pos_list[0]);
+	for (int i = 1; i<lambda_pos_list.get_length(); i++) {
+		lplist += ",";
+		lplist += to_string(lambda_pos_list[i]);
+	}
+	info.insert("lambda_pos", lplist);
+
+	String outname_CD("Community");
+	outname_CD.make_stdname(paras);
+	info.insert("output_type", "Community detection result");
+	File file_CD(outname_CD);
+	file_CD.clean();
+	file_CD << info;
+	if (!file_CD.is_open())
+	{
+		cout << "Unable to open the file: /" << outname_CD << "/\n\n";
+		return false;
+	}
+	int lambdasize = 0;
+
+	if (lambda_pos_list.get_length() == 1)
+		lambdasize = lambda_neg_list.get_length();
+	else if (lambda_neg_list.get_length() == 1)
+		lambdasize = lambda_pos_list.get_length();
+	else
+	{
+		cout << "Error: The length of the array of lambda negative or the length of the array lambda positive should be one!\n\n";
+		return false;
+	};
+	int com_info_col = lambdasize + 1;
+
+	double **com_info = new double *[covariance_nonfree_id_size + 4];
+	for (int i = 0; i < covariance_nonfree_id_size + 4; i++)
+		com_info[i] = new double[com_info_col];
+
+	Community** communities = new Community *[lambdasize];
+
+	for (int k = 0; k < lambdasize; k++)
+	{
+		if (lambda_pos_list.get_length() == 1)
+		{
+			lambda_pos = lambda_pos_list[0];
+			lambda_neg = lambda_neg_list[k];
+		}
+		else
+		{
+			lambda_pos = lambda_pos_list[k];
+			lambda_neg = lambda_neg_list[0];
+		}
+		if (modelType != 1)
+		{
+			cout << "Using lambda+ " << lambda_pos << ", lambda- " << lambda_neg << endl;
+		}
+		create_resolution(lambda_pos, lambda_neg, layers, sign, lambda);
+		communities[k] = new Community(outfile, conf, sign, lambda);
+		int stochastic = 0;
+		GreedyLouvain::iterate_randomly = stochastic;
+		if (stochastic)
+			cout << "Using random node order" << endl;
+		cout << "Network has "
+			<< communities[k]->g->nb_nodes << " nodes, "
+			<< communities[k]->g->nb_links << " links, " << endl;
+
+		GreedyLouvain::detect_communities(communities[k]);
+		double mod = communities[k]->modularity();
+
+		cout << "Value of modularity:" << mod << endl;
+		cout << "Number of communities: " << communities[k]->nb_comm << endl;
+		//co->display_comm2node();
+
+		if (covariance_freeid != NULL && covariance_freeid_size != 0)
+		{
+			for (int i = 0; i < communities[k]->nb_comm; i++)
+			{
+				std::cout << "Community " << i + 1 << " includes nodes: ";
+				for (int j = 0; j < communities[k]->size; j++)
+				{
+					if (communities[k]->n2c[j] == i)
+						std::cout << covariance_nonfree_id[j] << ",";
+				}
+				std::cout << "\n";
+			}
+			std::cout << "Free node index:" << endl;
+			for (int i = 0; i < covariance_freeid_size; i++)
+				std::cout << covariance_freeid[i] << ", ";
+			std::cout << "\n";
+		}
+		else
+		{
+			for (int i = 0; i < communities[k]->nb_comm; i++)
+			{
+				std::cout << "Community " << i + 1 << " includes nodes: ";
+				for (int j = 0; j < communities[k]->size; j++)
+				{
+					if (communities[k]->n2c[j] == i)
+						std::cout << j << ",";
+				}
+				std::cout << "\n";
+			}
+		}
+
+		if (k == 0)
+		{
+			com_info[0][0] = communities[k]->g->nb_nodes;
+
+			if (lambda_pos_list.get_length() == 1)
+				com_info[1][0] = lambda_pos_list[0];
+			else
+				com_info[1][0] = lambda_neg_list[0];
+			com_info[2][0] = 0;
+			com_info[3][0] = 0;
+			for (int i = 0; i < covariance_nonfree_id_size; i++)
+				com_info[i + 4][0] = covariance_nonfree_id[i];
+		}
+
+		if (k == 0)
+			com_info[0][1] = 0;
+		else
+		{
+			if (Community::IsSameCommunity(communities[k - 1], communities[k]))
+				com_info[0][k + 1] = com_info[0][k];
+			else
+				com_info[0][k + 1] = com_info[0][k] + 1;
+		}
+		if (lambda_pos_list.get_length() == 1)
+			com_info[1][k + 1] = lambda_neg_list[k];
+		else
+			com_info[1][k + 1] = lambda_pos_list[k];
+
+		com_info[2][k + 1] = communities[k]->nb_comm;
+		com_info[3][k + 1] = mod;
+
+		for (int i = 4; i < covariance_nonfree_id_size + 4; i++)
+			com_info[i][k + 1] = communities[k]->n2c[i - 4];
+	}
+
+	for (int i = 0; i < covariance_nonfree_id_size + 4; i++)
+	{
+		if (i == 0)
+		{
+			file_CD << "Same community as previous or not (first number is number of "<< paras["-node"] <<")\n";
+		}
+		else if (i == 1)
+			file_CD << "Value of lambda: " << "\n";
+		else if (i == 2)
+			file_CD << "Number of communities: " << "\n";
+		else if (i == 3)
+			file_CD << "Value of modularity: " << "\n";
+		else if (i == 4)
+		{
+			file_CD << "Community index (first column is " << paras["-node"] << " index): \n";
+		}
+		for (int j = 0; j < lambdasize + 1; j++)
+			file_CD << com_info[i][j] << "\t";
+		file_CD << "\n";
+	}
+
+	//delete temporary file
+	free(infile);
+
+	free(conf);
+	free(sign);
+	free(covariance_freeid);
+	free(covariance_nonfree_id);
+	if (lambda != NULL)
+		delete[] lambda;
+
+
+	const char *tempfile0 = (char*)temp_file;
+	remove(tempfile0);
+	const char *tempfile1 = outfile;
+	remove(tempfile1);
+	const char *tempfile2 = node_map_file;
+	remove(tempfile2);
+	const char *tempfile3 = conf_file;
+	remove(tempfile3);
+
+	cout << "Output community results to file: " << outname_CD << endl;
+	return true;
+}
+
+bool community_detection_file(Matrix<double> &mat, map<String, String> &paras)
+{
+	string highfreq = (char*)paras["-hf"];
+	string lowfreq = (char*)paras["-lf"];
+
+
+
+	int modelType = 0;
+	if (paras["-cm"] == (String) "CNM")
+		modelType = 3;
+	else
+		if (paras["-cm"] == (String) "CPM")
+			modelType = 4;
+		else
+			if (paras["-cm"] == (String) "ERNM")
+				modelType = 2;
+			else
+				if (paras["-cm"] == (String) "NNM")
+					modelType = 1;
+	int size = atoi((char*)paras["-size"]);
+	bool label_flag = (paras["-node"] == String("Bipartition"));
+
+	File file_lambda(paras["-flambda"]);
+	if(!file_lambda.is_open())
+	{
+        cout << "Error: can not open the lambda file!" << endl;
+        return false;
+    }
+	int temp_size = 0;
+	
+	Array<double> lambda_pos_list;
+	file_lambda >> temp_size;
+	lambda_pos_list.resize(temp_size);
+	for (int i = 0; i < temp_size; i++)
+		file_lambda >> lambda_pos_list[i];
+	Array<double> lambda_neg_list;
+	file_lambda >> temp_size;
+	lambda_neg_list.resize(temp_size);
+	for (int i = 0; i < temp_size; i++)
+		file_lambda >> lambda_neg_list[i];
+	
 
 	srand(time(NULL));
 	int covariance_freeid_size = 0;

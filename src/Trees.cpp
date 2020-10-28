@@ -1449,6 +1449,17 @@ void Trees::Get_bipartitionofonetree(NEWICKNODE*currentnode, bool isrooted, int 
     }
 }
 
+int Trees::Get_num_leaves(NEWICKNODE* root) {
+    int result = 0;
+    if (root->Nchildren == 0)
+        result += 1;
+    else {
+        for (int i = 0; i < root->Nchildren; i++)
+            result += Get_num_leaves(root->child[i]);
+    }
+    return result;
+}
+
 //########################ZD comment########################################
 //# This routine compute the affinity distance, a,
 //# from the given distance ,d. The formula is either
@@ -4131,6 +4142,25 @@ bool Trees::Compute_RF_dist_by_hash(bool ISWEIGHTED)
         }
     }
 
+    // Temperate sanity check for trees with missing taxa.
+
+    for (int i = 0; i < n_trees; i++) {
+        if (Get_num_leaves(treeset[i]->root) != leaveslabelsmaps.size()) {
+            cout << "Warning! Tree with missing taxa detected! Tree ID: " << i + 1 << ". The associated distances are replaced by -1.\n";
+            if (!ISWEIGHTED) {
+                for (int j = 0; j < n_trees; j++) {
+                    dist_URF[i][j] = -1;
+                    dist_URF[j][i] = -1;
+                }
+            }
+            else {
+                for (int j = 0; j < n_trees; j++) {
+                    dist_RF[i][j] = -1;
+                    dist_RF[j][i] = -1;
+                }
+            }
+        }
+    }
     return true;
 }
 
@@ -4155,19 +4185,44 @@ bool Trees::Compute_Matching_dist()
         return false;
     }
     int n_taxa = leaveslabelsmaps.size();
+    int btlength = (int)((n_taxa + 7) / 8);
+    char* tempbitstr = new char[btlength];
+    memset(tempbitstr, 1, sizeof(char) * btlength);
+    memset(tempbitstr, 0, sizeof(char) * btlength - n_taxa);
+    Array<char> OneBitstr(btlength, tempbitstr);
     int max_numberofbipartition = 0;
     int idx = 0;
 
-    for (int i = 0; i < n_trees; i++)
+    for (int i = 0; i < n_trees; i++) // For tree i
     {
         dist_match[i][i] = 0;
         Array<Array<char> > bitstrofatree(numberofbipartition[i], Array<char> ());
-        Array<char> OneBitstr(n_taxa, '1');
+
+        //Temperate fix to tree with missing taxa.
+        if (Get_num_leaves(treeset[i]->root) != n_taxa) {
+            cout << "Warning! Tree with missing taxa detected! Tree ID: " << i + 1 << ". The associated distances are replaced by -1.\n";
+            for (int j = 0; j < n_trees; j++) {
+                dist_match[i][j] = -1;
+                dist_match[j][i] = -1;
+            }
+            continue;
+        }
+        
         idx = 0;
         Get_bipartitionofonetree(treeset[i]->root, isrooted, 0, bitstrofatree, idx);
 
-        for (int j = 0; j < i; j++)
+        for (int j = 0; j < i; j++)// For tree j
         {
+            //Temperate fix to tree with missing taxa.
+            if (Get_num_leaves(treeset[j]->root) != n_taxa) {
+                cout << "Warning! Tree with missing taxa detected! Tree ID: " << j + 1 << ". The associated distances are replaced by -1.\n";
+                for (int j = 0; j < n_trees; j++) {
+                    dist_match[i][j] = -1;
+                    dist_match[j][i] = -1;
+                }
+                continue;
+            }
+
             Array<Array<char> > bitstrofatreej(numberofbipartition[j], Array<char> ());
             idx = 0;
             Get_bipartitionofonetree(treeset[j]->root, isrooted, 0, bitstrofatreej, idx);
@@ -4186,12 +4241,12 @@ bool Trees::Compute_Matching_dist()
                 for (int l = 0; l < max_numberofbipartition; l++)
                 {
                     int result = 0;
-                    if (k < numberofbipartition[i] && l < numberofbipartition[j])
+                    if (k < numberofbipartition[i] && l < numberofbipartition[j]) // For bipartition k in tree i and bipartition l in tree j
                     {
-                        if(Array<char>::bitstrXOR(bitstrofatree[k], bitstrofatreej[l], result))
+                        if(Array<char>::bitstrXOR(bitstrofatree[k], bitstrofatreej[l], result)) // Count the number of different characters in bitstring
                             strdist[k][l] = result;
                     }
-                    else if (k >= numberofbipartition[i] && l < numberofbipartition[j])
+                    else if (k >= numberofbipartition[i] && l < numberofbipartition[j]) // For bipartition k in tree i and bipartition l not in tree j
                     {
                         //if(Array<char>::onebitstrXOR(bitstrofatreej[l], result))
                         if (Array<char>::bitstrXOR(OneBitstr, bitstrofatreej[l], result))
@@ -4229,6 +4284,14 @@ bool Trees::Compute_Matching_dist()
 
 bool Trees::Compute_SPR_dist()
 {
+    //Temperate fix to tree with missing taxa.
+    for (int i = 0; i < n_trees; i++) {
+        if (Get_num_leaves(treeset[i]->root) != leaveslabelsmaps.size()) {
+            cout << "Warning! Tree with missing taxa detected! Tree ID: " << i + 1 << ". SPR distance failed!\n";
+            return false;
+        }
+    }
+
     delete_double_array(dist_SPR, n_trees);
     dist_SPR = new int *[n_trees];
     for (int i = 0; i < n_trees; i++)
