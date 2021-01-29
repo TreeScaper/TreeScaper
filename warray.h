@@ -156,7 +156,7 @@ public:
 	
 	bool include(const T) const;                                               // check if this Array include the element
 
-	bool operator==(const Array<T> &) const;                                         // compare
+	//bool operator==(const Array<T> &) const;                                         // compare
 
     bool friend operator==(const Array<T> &lhs, const Array<T> &rhs){
         if(lhs.get_length() != rhs.get_length())                                     // if they don't have the same size, they are not same things.
