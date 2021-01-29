@@ -376,6 +376,30 @@ public:
                     break;
             }
         }
+        void printbits(int outputlength, std::ostream &fout)
+        {
+            int bitnum = 8 * sizeof(T);
+            T BITS = 0;
+            int idx = 0;
+            for (int i = 0; i < length; i++)
+            {
+                BITS = 1;
+                //std::cout << std::endl; std::cout << "i:" << i << ":" << (int) vec[i] << std::endl;//---
+                for (int j = 0; j < bitnum; j++)
+                {
+                    if (BITS & vec[i])
+                        fout << 1;
+                    else
+                        fout << 0;
+                    BITS *= 2;
+                    idx++;
+                    if (idx == outputlength)
+                        break;
+                }
+                if (idx == outputlength)
+                    break;
+            }
+        }
 
 	template<class S>
 	void resize(int size, S arr)
