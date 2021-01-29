@@ -158,7 +158,7 @@ public:
 
 	bool operator==(const Array<T> &) const;                                         // compare
 
-    friend operator==(const Array<T> &lhs, const Array<T> &rhs){
+    bool friend operator==(const Array<T> &lhs, const Array<T> &rhs){
         if(lhs.get_length() != rhs.get_length())                                     // if they don't have the same size, they are not same things.
 		    return false;
 
