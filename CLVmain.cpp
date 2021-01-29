@@ -474,7 +474,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 {
 	if (paras["-ft"] == (String) "Trees")
 	{
-		String outname_collusion("Colusion");
+		String outname_collusion("Collision");
         outname_collusion.make_stdname(paras);
 
         std::ofstream file_collusion;

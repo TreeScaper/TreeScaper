@@ -1130,7 +1130,7 @@ void Trees::Compute_Hash(std::ostream& file_collusion)
     }
 
     if (collusion_cnt > 0)
-        std::cout << "Warning!" << collusion_cnt << "collusions in hv2 detected!\n See instruction in README.txt. See Collusion_post.out file for bitstrings that get tossed out.\n";
+        std::cout << "Warning!" << collusion_cnt << "collisions in hv2 detected!\n See instruction in README.txt. See Collusion_post.out file for bitstrings that get tossed out.\n";
 
     /*map<unsigned long long, Array<char> *>::iterator it = hash2bitstr.begin();
     Array<char> *pt = NULL;
