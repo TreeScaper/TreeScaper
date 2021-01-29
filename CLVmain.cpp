@@ -123,16 +123,16 @@ int main(int argc, char* argv[])
     } else
     if(argc > 1 && (String) argv[1] == (String) "-trees")
     {
-        String default_paras[25] = {"nuctrees.txt", "0", "0", "Dist", "list", 
+        String default_paras[26] = {"nuctrees.txt", "0", "0", "Dist", "list", 
                                     "", "Majority", "Newick", "URF", "Exp", "time",
-                                    "Covariance", "CNM", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "auto", "Trees"};
-        String options[25] =       {"-f", "-w", "-r", "-o", "-bfm", 
+                                    "Covariance", "CNM", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "auto", "Trees", "matrix"};
+        String options[26] =       {"-f", "-w", "-r", "-o", "-bfm", 
                                     "-if", "-ct", "-cfm", "-dm", "-am", "-post",
-                                    "-t", "-cm", "-lp", "-lps", "-lpe", "-lpiv", "-ln", "-lns", "-lne", "-lniv", "-hf", "-lf", "-lm", "-ft"};
+                                    "-t", "-cm", "-lp", "-lps", "-lpe", "-lpiv", "-ln", "-lns", "-lne", "-lniv", "-hf", "-lf", "-lm", "-ft", "-dfm"};
         
         for(int i = 1; i < argc; i++)
         {
-            for(int j = 0; j < 25; j++)
+            for(int j = 0; j < 26; j++)
             {
                 if((String) argv[i] == options[j] && i + 1 < argc && argv[i + 1][0] != '-')
                 {
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
             }
         }
         map<String, String> paras;
-        for(int i = 0; i < 25; i++)
+        for(int i = 0; i < 26; i++)
         {
             paras[options[i]] = default_paras[i];
         }
@@ -438,6 +438,7 @@ void trees_driver(map<String, String> &paras)
         {
             TreesData->Settreeweighttype(true);
             std::cout << "weighted ";
+
         } else
         {
             TreesData->Settreeweighttype(false);
@@ -755,6 +756,7 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
 
 		string outDistName = TreesData->make_DISToutput_name(memorydata);
 		TreesData->print_matrix(memorydata, outDistName);
+			
 		cout << "Successfully printed " << memorydata << " matrix!" << endl;
 
 		String outname_dist("Distance");
