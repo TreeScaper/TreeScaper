@@ -162,7 +162,7 @@ public:
         if(lhs.get_length() != rhs.get_length())                                     // if they don't have the same size, they are not same things.
 		    return false;
 
-        length = lhs.get_length();
+        int length = lhs.get_length();
 
 	    for(int i = 0; i < length; i++)                                // compare every element
 		    if(lhs.vec[i] != rhs.vec[i])
