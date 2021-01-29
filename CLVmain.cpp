@@ -455,7 +455,7 @@ void trees_driver(map<String, String> &paras)
         }
         std::cout << "trees" << std::endl;
 		if (paras["-r"] == (String) "1")
-			std::cout << "Warning: TreeScaper does not perform bitstring normalization on rooted tree. The leading bits can be `1' or `0' which may cause complementary bitstrings of a same bipartition are treated as different bipartition. To avoid this issue, flag `-r' as `0' and TreeScaper will convert the rooted format into unrooted, then all bitstring must have leading `0'. \n"
+			std::cout << "Warning: TreeScaper does not perform bitstring normalization on rooted tree. The leading bits can be `1' or `0' which may cause complementary bitstrings of a same bipartition are treated as different bipartition. To avoid this issue, flag `-r' as `0' and TreeScaper will convert the rooted format into unrooted, then all bitstring must have leading `0'. \n";
         TreesData->ReadTrees();
         TreesData->compute_numofbipart();
         cout << "Successfully read " << TreesData->Get_n_trees() << " trees from file: " << fname << "." << endl;
@@ -479,9 +479,8 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 
         std::ofstream file_collusion;
         file_collusion.open((char *) outname_collusion);
+		TreesData->Compute_Hash(file_collusion);
 		file_collusion.close();
-
-		TreesData->Compute_Hash();
 		TreesData->Compute_Bipart_Matrix(paras);
 
 		cout << "Successfully computed bipartitation matrix. Found " << TreesData->Get_treecov_size() << " unique bipartitions." << endl;

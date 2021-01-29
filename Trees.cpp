@@ -482,7 +482,7 @@ void Trees::print_matrix(String str_matrix, string outfile)
     }
 }
 
-void Trees::print_matrix2(String str_matrix, string outfile, bool flag_mat_format = true)
+void Trees::print_matrix2(String str_matrix, string outfile, bool flag_mat_format)
 {
 	if (str_matrix == (String)"Covariance Matrix")
 		print_double_array2((double ***)StrToDist[str_matrix], treecov_size, outfile, flag_mat_format);
@@ -1087,7 +1087,7 @@ void Trees::Printf(int *idx, int length)
 //# hash value in tree.
 //########################ZD comment########################################
 
-void Trees::Compute_Hash()
+void Trees::Compute_Hash(std::ostream& file_collusion)
 {
     // Set a random number for m1 (= Initial size of hash table)
     // m1 is the closest value to (t*n)+(t*n*HASHTABLE_FACTOR)
@@ -1124,7 +1124,7 @@ void Trees::Compute_Hash()
     {
         unsigned int numBitstr = 0;
         TreeOPE::dfs_compute_hash(treeset[treeIdx]->root, leaveslabelsmaps, vec_hashrf, treeIdx,
-                                  numBitstr, M1, M2, isweighted, leaveslabelsmaps.size(), hash2bitstr, numberofbipartition[treeIdx]);
+                                  numBitstr, M1, M2, isweighted, leaveslabelsmaps.size(), hash2bitstr, numberofbipartition[treeIdx], file_collusion);
     }
 
     /*map<unsigned long long, Array<char> *>::iterator it = hash2bitstr.begin();

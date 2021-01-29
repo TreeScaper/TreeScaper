@@ -92,7 +92,7 @@ public:
 
 //    const NEWICKTREE * &operator[](const int idx) const{return treeset[idx];};   // pick the (index + 1)-th element
 
-    void Compute_Hash();
+    void Compute_Hash(std::ostream& file_collusion);
 
     void Compute_Bipart_Matrix();
     void Compute_Bipart_Matrix(std::map<String, String>& paras);
@@ -162,7 +162,7 @@ public:
 
     void print_matrix(String str_matrix, string outfile);
 
-	void print_matrix2(String str_matrix, string outfile);
+	void print_matrix2(String str_matrix, string outfile, bool flag_mat_format = true);
 
     bool bipartmatrixIsexisting();
 
@@ -234,7 +234,7 @@ private:
     template<class T>
     void print_double_array(T *** arr, int n, string outfile);
 	template<class T>
-	void print_double_array2(T *** arr, int n, string outfile);
+	void print_double_array2(T *** arr, int n, string outfile, bool flag_mat_format);
     template<class T>
     void print_coordinate_matrix(T *** arr, int n, int m, string outfile);
 
