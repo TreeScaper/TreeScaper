@@ -169,13 +169,15 @@ public:
 			    return false;
 
 	    return true;
-    }
+    };
 
 	bool operator<(const Array<T> &) const;
 
 	Array operator()(const int, const int);
 
 	bool operator!=(const Array<T> &right) const{return ! ((*this) == right);};
+
+    bool friend operator!=(const Array<T> &lhs, const Array<T> &rhs) {return !(lhs == rhs);};
 
 	bool operator>(const Array<T> &right) const{return right < (*this);};
 
