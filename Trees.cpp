@@ -409,7 +409,7 @@ void Trees::print_double_array(T *** arr, int n, string outfile)
 }
 
 template<class T>
-void Trees::print_double_array2(T *** arr, int n, string outfile)
+void Trees::print_double_array2(T *** arr, int n, string outfile, bool flag_mat_format)
 {
 	ofstream fout;
 	if (outfile != "")
@@ -417,15 +417,24 @@ void Trees::print_double_array2(T *** arr, int n, string outfile)
 
 	if ((*arr) != NULL)
 	{
-
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j <= i; j++)
-			{
-				fout << setw(5) << (*arr)[i][j] << "\t" << ' ';
-			}
-			fout << endl;
-		}
+        if (flag_mat_format)
+        {
+		    for (int i = 0; i < n; i++)
+		    {
+			    for (int j = 0; j <= i; j++)
+			    {
+				    fout << setw(5) << (*arr)[i][j] << '\t';
+			    }
+			    fout << endl;
+		    }
+        }
+        else{
+            for (int i = 0; i < n; i++)
+		    {
+			    for (int j = 0; j <= n; j++)
+				    fout << i << ' ' << j << ' ' << setw(5) << (*arr)[i][j] << '\n';
+		    }
+        }
 	}
 	if (outfile != "")
 		fout.close();
@@ -473,23 +482,23 @@ void Trees::print_matrix(String str_matrix, string outfile)
     }
 }
 
-void Trees::print_matrix2(String str_matrix, string outfile)
+void Trees::print_matrix2(String str_matrix, string outfile, bool flag_mat_format = true)
 {
 	if (str_matrix == (String)"Covariance Matrix")
-		print_double_array2((double ***)StrToDist[str_matrix], treecov_size, outfile);
+		print_double_array2((double ***)StrToDist[str_matrix], treecov_size, outfile, flag_mat_format);
 	else if (str_matrix == (String)"File-covariance")
-		print_double_array2((double ***)StrToDist[str_matrix], filecov_size, outfile);
+		print_double_array2((double ***)StrToDist[str_matrix], filecov_size, outfile, flag_mat_format);
 	else if (str_matrix == (String)"Matching-distance" || str_matrix == (String)"SPR-distance")
-		print_double_array2((int ***)StrToDist[str_matrix], n_trees, outfile);
+		print_double_array2((int ***)StrToDist[str_matrix], n_trees, outfile, flag_mat_format);
 	else if (str_matrix == (String)"File-distance" || str_matrix == (String)"Affinity-filedist")
-		print_double_array2((double ***)StrToDist[str_matrix], file_distsize, outfile);
+		print_double_array2((double ***)StrToDist[str_matrix], file_distsize, outfile, flag_mat_format);
 	else if (str_matrix == (String)"File-coordinate")
 		print_coordinate_matrix((double ***)StrToDist[str_matrix], file_coordinatesize, file_coordinatedim, outfile);
 	else if (str_matrix == (String)"File-affinity")
-		print_double_array2((double ***)StrToDist[str_matrix], affinityfile_size, outfile);
+		print_double_array2((double ***)StrToDist[str_matrix], affinityfile_size, outfile, flag_mat_format);
 	else
 	{
-		print_double_array2((double ***)StrToDist[str_matrix], n_trees, outfile);
+		print_double_array2((double ***)StrToDist[str_matrix], n_trees, outfile, flag_mat_format);
 	}
 }
 
@@ -1211,7 +1220,7 @@ void Trees::Compute_Bipart_Matrix(std::map<String, String> &paras)
     info.insert("size", to_string(treecov_size));
     info.insert("format", "bipartition id, binary-of-bipartition, appear times");
     
-    file_Bipartcnt << info;
+    //file_Bipartcnt << info;
 
     map<unsigned long long, Array<char> *>::iterator it = hash2bitstr.begin();
     Array<char> *pt = NULL;
@@ -1221,10 +1230,10 @@ void Trees::Compute_Bipart_Matrix(std::map<String, String> &paras)
         {
             if (it->first == Unique_bipart[j])
             {
-                file_Bipartcnt << j << ", ";//---
+                file_Bipartcnt << j << " ";//---
                 pt = it->second;
                 pt->printbits(n_taxa,file_Bipartcnt);
-                file_Bipartcnt << ", " << bipart_count[j] << endl;
+                file_Bipartcnt << " " << bipart_count[j] << endl;
             }
             else
                 continue;
