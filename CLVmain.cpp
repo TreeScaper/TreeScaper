@@ -758,7 +758,8 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
 		file_Dist.clean();
 		file_Dist << info;
 		file_Dist.close();
-		TreesData->print_matrix2(memorydata, (char *)outname_dist);
+		TreesData->print_matrix2(memorydata, (char *)outname_dist, (paras["-dfm"] == (String) "matrix"));
+		
 	}
 
 	if (paras["-ft"] == (String) "Dist")
