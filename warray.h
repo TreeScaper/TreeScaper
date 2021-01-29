@@ -159,11 +159,13 @@ public:
 	bool operator==(const Array<T> &) const;                                         // compare
 
     friend operator==(const Array<T> &lhs, const Array<T> &rhs){
-        if(lhs.get_length() != right.get_length())                                     // if they don't have the same size, they are not same things.
-		return false;
+        if(lhs.get_length() != rhs.get_length())                                     // if they don't have the same size, they are not same things.
+		    return false;
+
+        length = lhs.get_length();
 
 	    for(int i = 0; i < length; i++)                                // compare every element
-		    if(lhs.vec[i] != right.vec[i])
+		    if(lhs.vec[i] != rhs.vec[i])
 			    return false;
 
 	    return true;
