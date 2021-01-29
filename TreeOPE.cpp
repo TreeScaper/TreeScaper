@@ -915,8 +915,19 @@ void TreeOPE::dfs_compute_hash(
 
         Array<char> *btpt = NULL;
         btpt = new Array<char> (*startNode->bitstr);
+
+        String outname_collusion("Colusion");
+        outname_collusion.make_stdname(paras);
+
+        std::ofstream file_collusion;
+        file_collusion.open((char *) outname_collusion, std::ios::app);
         if(hash2bitstr[startNode->hv2] != NULL)
         {
+            std::cout << "Warning! Collusion in hv2 detected! See instruction in README.txt. See Collusion_XX.out file for bitstring that get tossed out.\n";
+            file_collusion << startNode->hv2 << ' ' << treeIdx << ' ';
+            btpt->printbits(NUM_Taxa, file_collusion);
+            file_collusion << ' ';
+            hash2bitstr[startNode->hv2]->printbits(NUM_Taxa, file_collusion);
             delete hash2bitstr[startNode->hv2];
             hash2bitstr[startNode->hv2] = btpt;
         }
@@ -925,6 +936,8 @@ void TreeOPE::dfs_compute_hash(
             hash2bitstr[startNode->hv2] = btpt;
         }
         // Store bitstring in hash table
+        file_collusion.close();
+
         if (numBitstr <= numofbipartions)
         {
             vec_hashrf.hashing_bs_without_type2_nbits(treeIdx, NUM_Taxa, startNode->hv1, startNode->hv2, dist, WEIGHTED);
