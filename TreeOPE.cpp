@@ -928,6 +928,7 @@ void TreeOPE::dfs_compute_hash(
                file_collusion << ' ';
                hash2bitstr[startNode->hv2]->printbits(NUM_Taxa, file_collusion);
                file_collusion << '\n';
+               collusion_cnt++;
             }
             delete hash2bitstr[startNode->hv2];
             hash2bitstr[startNode->hv2] = btpt;
