@@ -812,7 +812,8 @@ void TreeOPE::dfs_compute_hash(
                             unsigned int NUM_Taxa,
                             map<unsigned long long, Array<char> *> &hash2bitstr,
                             int numofbipartions,
-                            std::ostream& file_collusion)
+                            std::ostream& file_collusion,
+                            int &collusion_cnt)
 {
     // If the node is leaf node, just set the place of the taxon name in the bit string to '1'
     // push the bit string into stack
@@ -859,7 +860,7 @@ void TreeOPE::dfs_compute_hash(
         for (int i = 0; i < startNode->Nchildren; ++i)
         {
             dfs_compute_hash(startNode->child[i], lm, vec_hashrf,
-                             treeIdx, numBitstr, m1, m2,WEIGHTED,NUM_Taxa, hash2bitstr, numofbipartions, file_collusion);
+                             treeIdx, numBitstr, m1, m2,WEIGHTED,NUM_Taxa, hash2bitstr, numofbipartions, file_collusion, collusion_cnt);
         }
         // For weighted RF
         float dist = 0.0;
@@ -919,11 +920,11 @@ void TreeOPE::dfs_compute_hash(
 
         if(hash2bitstr[startNode->hv2] != NULL)
         {
-            std::cout << "Warning! Collusion in hv2 detected! See instruction in README.txt. See Collusion_XX.out file for bitstring that get tossed out.\n";
             file_collusion << startNode->hv2 << ' ' << treeIdx << ' ';
             btpt->printbits(NUM_Taxa, file_collusion);
             file_collusion << ' ';
             hash2bitstr[startNode->hv2]->printbits(NUM_Taxa, file_collusion);
+            file_collusion << '\n';
             delete hash2bitstr[startNode->hv2];
             hash2bitstr[startNode->hv2] = btpt;
         }
