@@ -429,7 +429,9 @@ void trees_driver(map<String, String> &paras)
 //         cout << "Error: can not open the data file!" << endl;
 //         return;
 //     }
-    
+    clock_t start, end;
+	start = clock();
+
     Trees *TreesData = new Trees;
     if(paras["-ft"] == (String) "Trees")
     {
@@ -464,8 +466,11 @@ void trees_driver(map<String, String> &paras)
 		if(TreesData->Get_num_leaves(TreesData->get_tree(i)->root) != TreesData->Get_labelmap()->size())
 			cout << "Warning! Tree with missing taxa detected! Tree ID: " << i + 1 << ".\n";	
 	}
+	end = clock();
+	std::cout << "Read tree time(s):\t" << end - start << '\n';
 
-     Compute_BipartMatrix(TreesData, paras);
+
+    Compute_BipartMatrix(TreesData, paras);
     
     delete TreesData;
 }
