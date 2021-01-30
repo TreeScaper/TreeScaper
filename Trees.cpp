@@ -1087,7 +1087,7 @@ void Trees::Printf(int *idx, int length)
 //# hash value in tree.
 //########################ZD comment########################################
 
-void Trees::Compute_Hash()
+void Trees::Compute_Hash(std::ostream& file_collusion)
 {
     // Set a random number for m1 (= Initial size of hash table)
     // m1 is the closest value to (t*n)+(t*n*HASHTABLE_FACTOR)
@@ -1120,12 +1120,17 @@ void Trees::Compute_Hash()
         hash2bitstr.clear();
     }
 
+    int collusion_cnt = 0;
+
     for (unsigned int treeIdx = 0; treeIdx < n_trees; ++treeIdx)
     {
         unsigned int numBitstr = 0;
         TreeOPE::dfs_compute_hash(treeset[treeIdx]->root, leaveslabelsmaps, vec_hashrf, treeIdx,
-                                  numBitstr, M1, M2, isweighted, leaveslabelsmaps.size(), hash2bitstr, numberofbipartition[treeIdx]);
+                                  numBitstr, M1, M2, isweighted, leaveslabelsmaps.size(), hash2bitstr, numberofbipartition[treeIdx], file_collusion, collusion_cnt);
     }
+
+    if (collusion_cnt > 0)
+        std::cout << "Warning!" << collusion_cnt << "collisions in hv2 detected!\n See instruction in README.txt. See Collusion_post.out file for bitstrings that get tossed out.\n";
 
     /*map<unsigned long long, Array<char> *>::iterator it = hash2bitstr.begin();
     Array<char> *pt = NULL;
