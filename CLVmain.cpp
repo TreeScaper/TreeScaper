@@ -469,7 +469,8 @@ void trees_driver(map<String, String> &paras)
 	end = clock();
 	std::cout << "Read tree time(s):\t" << (end - start) / (double) CLOCKS_PER_SEC << '\n';
 
-     Compute_BipartMatrix(TreesData, paras);
+
+    Compute_BipartMatrix(TreesData, paras);
     
     delete TreesData;
 }
