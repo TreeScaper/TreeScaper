@@ -922,7 +922,7 @@ void TreeOPE::dfs_compute_hash(
         {
             //Array<char> new_bitstr = Array<char>(btpt->get_length(), btpt->operator char *() );
             //Array<char> old_bitstr = Array<char>(hash2bitstr[startNode->hv2]->get_length(), hash2bitstr[startNode->hv2]->operator char *() );
-            if (*btpt != *(hash2bitstr[startNode->hv2])){
+            if (!(*btpt == *(hash2bitstr[startNode->hv2]))){
                file_collusion << startNode->hv2 << ' ' << treeIdx << ' ';
                btpt->printbits(NUM_Taxa, file_collusion);
                file_collusion << ' ';
