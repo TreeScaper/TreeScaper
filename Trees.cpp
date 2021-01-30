@@ -409,7 +409,7 @@ void Trees::print_double_array(T *** arr, int n, string outfile)
 }
 
 template<class T>
-void Trees::print_double_array2(T *** arr, int n, string outfile)
+void Trees::print_double_array2(T *** arr, int n, string outfile, bool flag_mat_format)
 {
 	ofstream fout;
 	if (outfile != "")
@@ -417,15 +417,24 @@ void Trees::print_double_array2(T *** arr, int n, string outfile)
 
 	if ((*arr) != NULL)
 	{
-
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j <= i; j++)
-			{
-				fout << setw(5) << (*arr)[i][j] << "\t" << ' ';
-			}
-			fout << endl;
-		}
+        if (flag_mat_format)
+        {
+		    for (int i = 0; i < n; i++)
+		    {
+			    for (int j = 0; j <= i; j++)
+			    {
+				    fout << setw(5) << (*arr)[i][j] << '\t';
+			    }
+			    fout << endl;
+		    }
+        }
+        else{
+            for (int i = 0; i < n; i++)
+		    {
+			    for (int j = 0; j <= n; j++)
+				    fout << i << ' ' << j << ' ' << setw(5) << (*arr)[i][j] << '\n';
+		    }
+        }
 	}
 	if (outfile != "")
 		fout.close();
@@ -473,23 +482,23 @@ void Trees::print_matrix(String str_matrix, string outfile)
     }
 }
 
-void Trees::print_matrix2(String str_matrix, string outfile)
+void Trees::print_matrix2(String str_matrix, string outfile, bool flag_mat_format)
 {
 	if (str_matrix == (String)"Covariance Matrix")
-		print_double_array2((double ***)StrToDist[str_matrix], treecov_size, outfile);
+		print_double_array2((double ***)StrToDist[str_matrix], treecov_size, outfile, flag_mat_format);
 	else if (str_matrix == (String)"File-covariance")
-		print_double_array2((double ***)StrToDist[str_matrix], filecov_size, outfile);
+		print_double_array2((double ***)StrToDist[str_matrix], filecov_size, outfile, flag_mat_format);
 	else if (str_matrix == (String)"Matching-distance" || str_matrix == (String)"SPR-distance")
-		print_double_array2((int ***)StrToDist[str_matrix], n_trees, outfile);
+		print_double_array2((int ***)StrToDist[str_matrix], n_trees, outfile, flag_mat_format);
 	else if (str_matrix == (String)"File-distance" || str_matrix == (String)"Affinity-filedist")
-		print_double_array2((double ***)StrToDist[str_matrix], file_distsize, outfile);
+		print_double_array2((double ***)StrToDist[str_matrix], file_distsize, outfile, flag_mat_format);
 	else if (str_matrix == (String)"File-coordinate")
 		print_coordinate_matrix((double ***)StrToDist[str_matrix], file_coordinatesize, file_coordinatedim, outfile);
 	else if (str_matrix == (String)"File-affinity")
-		print_double_array2((double ***)StrToDist[str_matrix], affinityfile_size, outfile);
+		print_double_array2((double ***)StrToDist[str_matrix], affinityfile_size, outfile, flag_mat_format);
 	else
 	{
-		print_double_array2((double ***)StrToDist[str_matrix], n_trees, outfile);
+		print_double_array2((double ***)StrToDist[str_matrix], n_trees, outfile, flag_mat_format);
 	}
 }
 
