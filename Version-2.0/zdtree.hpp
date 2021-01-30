@@ -411,8 +411,10 @@ public:
 		for (int i = 0; i < n; i++){
 			fout << i << " ";
 			Id2BitString[i].print_BitString(fout);
-			if (Id2Tree[0][0] == -1)
+			if (Id2Tree[0][0] == -1){
+				std::cout << Id2Tree[i] << '\n';
 				fout << ' ' <<  n_tree << '\n';
+			}
 			else
 				fout << ' ' << Id2Tree[i].get_size() << '\n';
 		}
