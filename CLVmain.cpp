@@ -551,6 +551,11 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 			return;
 		}
     }
+	
+
+	if(paras["-o"] == (String) "Bipartition"){
+		return;
+	}
       
     if(paras["-o"] == (String) "Consensus")
         Compute_Consensus_Tree(TreesData, paras);
