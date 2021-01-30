@@ -12,7 +12,7 @@ main.o : zdarray.hpp zdtree.hpp wstring.hpp
 wstring.o : 
 Sparse_matrix.o :
 zdarray.o : 
-zdtree.o :
+zdtree.o : zdarray.hpp Sparse_matrix.hpp
 
 .PHONY : clean
 clean :
