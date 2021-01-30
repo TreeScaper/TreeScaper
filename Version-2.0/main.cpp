@@ -1,10 +1,10 @@
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <cstring>
 #include <random>
 #include <ctime>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #include "zdarray.hpp"
 #include "zdtree.hpp"
