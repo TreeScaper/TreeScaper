@@ -466,6 +466,8 @@ void trees_driver(map<String, String> &paras)
 		if(TreesData->Get_num_leaves(TreesData->get_tree(i)->root) != TreesData->Get_labelmap()->size())
 			cout << "Warning! Tree with missing taxa detected! Tree ID: " << i + 1 << ".\n";	
 	}
+	end = clock();
+	std::cout << "Read tree time(s):\t" << (end - start) / (double) CLOCKS_PER_SEC << '\n';
 
      Compute_BipartMatrix(TreesData, paras);
     
