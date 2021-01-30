@@ -1322,7 +1322,7 @@ void Trees::Compute_Bipart_Matrix(std::map<String, String> &paras)
     delete [] matrix_weight;
     end = clock();
     duration += end - start;
-    std::cout << "Form Bipart-matrix time(ms):\t" << duration << '\n';
+    std::cout << "Form Bipart-matrix time(s):\t" << duration / (double) CLOCKS_PER_SEC << '\n';
 }
 
 

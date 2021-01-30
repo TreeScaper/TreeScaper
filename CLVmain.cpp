@@ -467,7 +467,7 @@ void trees_driver(map<String, String> &paras)
 			cout << "Warning! Tree with missing taxa detected! Tree ID: " << i + 1 << ".\n";	
 	}
 	end = clock();
-	std::cout << "Read tree time(s):\t" << end - start << '\n';
+	std::cout << "Read tree time(s):\t" << (end - start) / (double) CLOCKS_PER_SEC << '\n';
 
 
     Compute_BipartMatrix(TreesData, paras);
@@ -488,7 +488,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 		start = clock();
 		TreesData->Compute_Hash(file_collusion);
 		end = clock();
-		std::cout << "Compute Bipartition time(ms):\t" << end - start << '\n';
+		std::cout << "Compute Bipartition time(s):\t" << (end - start) / (double) CLOCKS_PER_SEC << '\n';
 
 		file_collusion.close();
 		TreesData->Compute_Bipart_Matrix(paras);
