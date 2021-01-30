@@ -456,6 +456,8 @@ void trees_driver(map<String, String> &paras)
             std::cout << "unrooted ";
         }
         std::cout << "trees" << std::endl;
+		if (paras["-r"] == (String) "1")
+			std::cout << "Warning: TreeScaper does not perform bitstring normalization on rooted tree. The leading bits can be `1' or `0' which may cause complementary bitstrings of a same bipartition are treated as different bipartition. To avoid this issue, flag `-r' as `0' and TreeScaper will convert the rooted format into unrooted, then all bitstring must have leading `0'. \n";
         TreesData->ReadTrees();
         TreesData->compute_numofbipart();
         cout << "Successfully read " << TreesData->Get_n_trees() << " trees from file: " << fname << "." << endl;
