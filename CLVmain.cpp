@@ -492,6 +492,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 
 		file_collusion.close();
 		TreesData->Compute_Bipart_Matrix(paras);
+		
 
 		cout << "Successfully computed bipartitation matrix. Found " << TreesData->Get_treecov_size() << " unique bipartitions." << endl;
 
