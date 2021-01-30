@@ -156,13 +156,28 @@ public:
 	
 	bool include(const T) const;                                               // check if this Array include the element
 
-	bool operator==(const Array<T> &) const;                                         // compare
+	//bool operator==(const Array<T> &) const;                                         // compare
+
+    bool friend operator==(const Array<T> &lhs, const Array<T> &rhs){
+        if(lhs.get_length() != rhs.get_length())                                     // if they don't have the same size, they are not same things.
+		    return false;
+
+        int length = lhs.get_length();
+
+	    for(int i = 0; i < length; i++)                                // compare every element
+		    if(lhs.vec[i] != rhs.vec[i])
+			    return false;
+
+	    return true;
+    };
 
 	bool operator<(const Array<T> &) const;
 
 	Array operator()(const int, const int);
 
 	bool operator!=(const Array<T> &right) const{return ! ((*this) == right);};
+
+    bool friend operator!=(const Array<T> &lhs, const Array<T> &rhs) {return !(lhs == rhs);};
 
 	bool operator>(const Array<T> &right) const{return right < (*this);};
 
@@ -353,6 +368,30 @@ public:
             }
         }
         void printbits(int outputlength, File &fout)
+        {
+            int bitnum = 8 * sizeof(T);
+            T BITS = 0;
+            int idx = 0;
+            for (int i = 0; i < length; i++)
+            {
+                BITS = 1;
+                //std::cout << std::endl; std::cout << "i:" << i << ":" << (int) vec[i] << std::endl;//---
+                for (int j = 0; j < bitnum; j++)
+                {
+                    if (BITS & vec[i])
+                        fout << 1;
+                    else
+                        fout << 0;
+                    BITS *= 2;
+                    idx++;
+                    if (idx == outputlength)
+                        break;
+                }
+                if (idx == outputlength)
+                    break;
+            }
+        }
+        void printbits(int outputlength, std::ostream &fout)
         {
             int bitnum = 8 * sizeof(T);
             T BITS = 0;

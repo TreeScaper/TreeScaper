@@ -116,18 +116,18 @@ bool Array<T>::include(const T value) const
 	return false;
 }
 
-template<class T>
-bool Array<T>::operator==(const Array<T> &right) const
-{
-	if(length != right.length)                                     // if they don't have the same size, they are not same things.
-		return false;
+// template<class T>
+// bool Array<T>::operator==(const Array<T> &right) const
+// {
+// 	if(length != right.length)                                     // if they don't have the same size, they are not same things.
+// 		return false;
 
-	for(int i = 0; i < length; i++)                                // compare every element
-		if(vec[i] != right.vec[i])
-			return false;
+// 	for(int i = 0; i < length; i++)                                // compare every element
+// 		if(vec[i] != right.vec[i])
+// 			return false;
 
-	return true;
-}
+// 	return true;
+// }
 
 template<class T>
 bool Array<T>::operator<(const Array<T> &right) const
