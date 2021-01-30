@@ -479,14 +479,20 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
 {
 	if (paras["-ft"] == (String) "Trees")
 	{
+		clock_t start, end;
 		String outname_collusion("Collision");
         outname_collusion.make_stdname(paras);
 
         std::ofstream file_collusion;
         file_collusion.open((char *) outname_collusion);
+		start = clock();
 		TreesData->Compute_Hash(file_collusion);
+		end = clock();
+		std::cout << "Compute Bipartition time(ms):\t" << end - start << '\n';
+
 		file_collusion.close();
 		TreesData->Compute_Bipart_Matrix(paras);
+		
 
 		cout << "Successfully computed bipartitation matrix. Found " << TreesData->Get_treecov_size() << " unique bipartitions." << endl;
 
