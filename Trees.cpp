@@ -1234,7 +1234,7 @@ void Trees::Compute_Bipart_Matrix(std::map<String, String> &paras)
     info.insert("size", to_string(treecov_size));
     info.insert("format", "bipartition id, binary-of-bipartition, appear times");
     
-    file_Bipartcnt << info;
+    //file_Bipartcnt << info;
 
     map<unsigned long long, Array<char> *>::iterator it = hash2bitstr.begin();
     Array<char> *pt = NULL;
@@ -1244,10 +1244,10 @@ void Trees::Compute_Bipart_Matrix(std::map<String, String> &paras)
         {
             if (it->first == Unique_bipart[j])
             {
-                file_Bipartcnt << j << ", ";//---
+                file_Bipartcnt << j << " ";//---
                 pt = it->second;
                 pt->printbits(n_taxa,file_Bipartcnt);
-                file_Bipartcnt << ", " << bipart_count[j] << endl;
+                file_Bipartcnt << " " << bipart_count[j] << endl;
             }
             else
                 continue;
