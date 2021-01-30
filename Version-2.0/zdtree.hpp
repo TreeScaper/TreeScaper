@@ -6,7 +6,6 @@
 #include <fstream>
 #include <iostream>
 #include "zdarray.hpp"
-#include "zdarray.cpp"
 #include "Sparse_matrix.hpp"
 
 using std::string;
@@ -909,6 +908,9 @@ public:
 		return true;
 	}
 
+	void print_Bipart_Matrix(std::ostream &fout){
+		sbipart_mat->OutputSparseMatrix(fout, RCVLIST);
+	}
 
 private:
 	TreeSet<T>* Trees;

@@ -139,9 +139,14 @@ bool trees_driver(map<String, String> paras){
 		cout << "Form Bipartition Matrix time(s):\t" << (end - start)/ (double) CLOCKS_PER_SEC << "\n";
 		String outname_Bipartcnt("Bipartition_Count");
 		outname_Bipartcnt.make_stdname(paras);
+		String outname_Bipart("Bipartition");
+		outname_Bipart.make_stdname(paras);
 		ofstream fout;
 		fout.open((char *) outname_Bipartcnt);
 		Bipart_8.print_Bipart(fout);
+		fout.close();
+		fout.open((char *) outname_Bipartcnt);
+		treesobj_8.print_Bipart_Matrix(fout);
 		fout.close();
 		trees_8.release_tree();
 	}
@@ -166,9 +171,14 @@ bool trees_driver(map<String, String> paras){
 		cout << "Form Bipartition Matrix time(s):\t" << (end - start)/ (double) CLOCKS_PER_SEC << "\n";
 		String outname_Bipartcnt("Bipartition_Count");
 		outname_Bipartcnt.make_stdname(paras);
+		String outname_Bipart("Bipartition");
+		outname_Bipart.make_stdname(paras);
 		ofstream fout;
 		fout.open((char *) outname_Bipartcnt);
 		Bipart_32.print_Bipart(fout);
+		fout.close();
+		fout.open((char *) outname_Bipartcnt);
+		treesobj_32.print_Bipart_Matrix(fout);
 		fout.close();
 		trees_32.release_tree();
 	}
@@ -194,9 +204,14 @@ bool trees_driver(map<String, String> paras){
 		cout << "Form Bipartition Matrix time(s):\t" << (end - start)/ (double) CLOCKS_PER_SEC << "\n";
 		String outname_Bipartcnt("Bipartition_Count");
 		outname_Bipartcnt.make_stdname(paras);
+		String outname_Bipart("Bipartition");
+		outname_Bipart.make_stdname(paras);
 		ofstream fout;
 		fout.open((char *) outname_Bipartcnt);
 		Bipart_64.print_Bipart(fout);
+		fout.close();
+		fout.open((char *) outname_Bipartcnt);
+		treesobj_64.print_Bipart_Matrix(fout);
 		fout.close();
 		trees_64.release_tree();
 	}
