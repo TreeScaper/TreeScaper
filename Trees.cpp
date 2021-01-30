@@ -1257,6 +1257,7 @@ void Trees::Compute_Bipart_Matrix(std::map<String, String> &paras)
 
 
     //==============Create Sparse Bipartition Matrix==================//
+    start = clock();
     double* Vals = new double[Unique_idx * (int)n_trees];
     int* RowInds = new int[Unique_idx * (int)n_trees];
     int* ColPtr = new int[(int)n_trees + 1];
@@ -1319,6 +1320,9 @@ void Trees::Compute_Bipart_Matrix(std::map<String, String> &paras)
     delete [] matrix_hv;
     delete [] matrix_treeIdx;
     delete [] matrix_weight;
+    end = clock();
+    duration += end - start;
+    std::cout << "Form Bipart-matrix time(s):\t" << duration / (double) CLOCKS_PER_SEC << '\n';
 }
 
 
