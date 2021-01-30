@@ -811,7 +811,9 @@ void TreeOPE::dfs_compute_hash(
                             bool WEIGHTED,
                             unsigned int NUM_Taxa,
                             map<unsigned long long, Array<char> *> &hash2bitstr,
-                            int numofbipartions)
+                            int numofbipartions,
+                            std::ostream& file_collusion,
+                            int &collusion_cnt)
 {
     // If the node is leaf node, just set the place of the taxon name in the bit string to '1'
     // push the bit string into stack
@@ -858,7 +860,7 @@ void TreeOPE::dfs_compute_hash(
         for (int i = 0; i < startNode->Nchildren; ++i)
         {
             dfs_compute_hash(startNode->child[i], lm, vec_hashrf,
-                             treeIdx, numBitstr, m1, m2,WEIGHTED,NUM_Taxa, hash2bitstr, numofbipartions);
+                             treeIdx, numBitstr, m1, m2,WEIGHTED,NUM_Taxa, hash2bitstr, numofbipartions, file_collusion, collusion_cnt);
         }
         // For weighted RF
         float dist = 0.0;
@@ -915,8 +917,17 @@ void TreeOPE::dfs_compute_hash(
 
         Array<char> *btpt = NULL;
         btpt = new Array<char> (*startNode->bitstr);
+
         if(hash2bitstr[startNode->hv2] != NULL)
         {
+            if (!(*btpt == *(hash2bitstr[startNode->hv2]))){
+               file_collusion << startNode->hv2 << ' ' << treeIdx << ' ';
+               btpt->printbits(NUM_Taxa, file_collusion);
+               file_collusion << ' ';
+               hash2bitstr[startNode->hv2]->printbits(NUM_Taxa, file_collusion);
+               file_collusion << '\n';
+               collusion_cnt++;
+            }
             delete hash2bitstr[startNode->hv2];
             hash2bitstr[startNode->hv2] = btpt;
         }
@@ -925,6 +936,7 @@ void TreeOPE::dfs_compute_hash(
             hash2bitstr[startNode->hv2] = btpt;
         }
         // Store bitstring in hash table
+
         if (numBitstr <= numofbipartions)
         {
             vec_hashrf.hashing_bs_without_type2_nbits(treeIdx, NUM_Taxa, startNode->hv1, startNode->hv2, dist, WEIGHTED);
