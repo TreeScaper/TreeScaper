@@ -1,12 +1,14 @@
-
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <random>
+#include <ctime>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "zdarray.hpp"
 #include "zdtree.hpp"
 #include "wstring.hpp"
-#include <random>
-#include <ctime>
 
 using namespace std;
 
