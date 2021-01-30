@@ -262,7 +262,7 @@ public:
 		Hash2Id(new Array<int>*[hash_bound]), Id2Tree(0, 500) {
 		this->set_invariant();
 		for (int i = 0; i < Taxa->size; i++)
-			this->push(BitString<T>(Taxa->bitstr_size, Taxa->size, i), 0);
+			this->push(BitString<T>(Taxa->bitstr_size, Taxa->size, i).normalized(), -1);
 	};
 
 	Bipartition(TaxonList* taxa, int n_tree) : Taxa(taxa), Id2BitString(Array<BitString<T> >(0, 1000)),
@@ -271,7 +271,7 @@ public:
 		this->set_invariant();
 		
 		for (int i = 0; i < Taxa->size; i++)
-			this->push(BitString<T>(Taxa->bitstr_size, Taxa->size, i).normalized(), 0);
+			this->push(BitString<T>(Taxa->bitstr_size, Taxa->size, i).normalized(), -1);
 	};
 
 	bool is_empty() { return Id2BitString.is_empty(); };
@@ -405,13 +405,16 @@ public:
 		std::cout << "-------------Bipartition info summary------------------\n";
 	}
 
-	void print_Bipart(ostream& fout) {
+	void print_Bipart(ostream& fout, int n_tree) {
 		size_t n = Id2BitString.get_size();
 		fout << Taxa->size << '\t' << n << '\n';
 		for (int i = 0; i < n; i++){
 			fout << i << " ";
 			Id2BitString[i].print_BitString(fout);
-			fout << ' ' << Id2Tree[i].get_size() << '\n';
+			if (Id2Tree[0][0] == -1)
+				fout << ' ' <<  n_tree << '\n';
+			else
+				fout << ' ' << Id2Tree[i].get_size() << '\n';
 		}
 	}
 
@@ -615,7 +618,7 @@ public:
 		if (Bipart->is_empty()) {
 			for (int i = 0; i < Taxa->size; i++) {
 				BitString<T> temp = BitString<T>(Taxa->bitstr_size, Taxa->size, i);
-				Bipart->push(temp, 0);
+				Bipart->push(temp, -1);
 			}
 		}
 		for (int i = 0; i < this->size; i++) {

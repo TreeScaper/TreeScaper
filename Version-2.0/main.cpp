@@ -143,7 +143,7 @@ bool trees_driver(map<String, String> paras){
 		outname_Bipart.make_stdname(paras);
 		ofstream fout;
 		fout.open((char *) outname_Bipartcnt);
-		Bipart_8.print_Bipart(fout);
+		Bipart_8.print_Bipart(fout, trees_8.get_size());
 		fout.close();
 		fout.open((char *) outname_Bipart);
 		treesobj_8.print_Bipart_Matrix(fout);
@@ -175,7 +175,7 @@ bool trees_driver(map<String, String> paras){
 		outname_Bipart.make_stdname(paras);
 		ofstream fout;
 		fout.open((char *) outname_Bipartcnt);
-		Bipart_32.print_Bipart(fout);
+		Bipart_32.print_Bipart(fout, trees_32.get_size());
 		fout.close();
 		fout.open((char *) outname_Bipart);
 		treesobj_32.print_Bipart_Matrix(fout);
@@ -208,7 +208,7 @@ bool trees_driver(map<String, String> paras){
 		outname_Bipart.make_stdname(paras);
 		ofstream fout;
 		fout.open((char *) outname_Bipartcnt);
-		Bipart_64.print_Bipart(fout);
+		Bipart_64.print_Bipart(fout, trees_64.get_size());
 		fout.close();
 		fout.open((char *) outname_Bipart);
 		treesobj_64.print_Bipart_Matrix(fout);
