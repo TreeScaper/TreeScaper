@@ -1,0 +1,19 @@
+CC = g++
+CFLAG = -c -std=c++17 -Wall
+LFLAG = -std=c++17 -Wall
+
+OBJ = main.o wstring.o Sparse_matrix.o zdarray.o zdtree.o
+
+
+CLVTreeScaper2 : $(OBJ)
+	$(CC) $(LFLAG) $^ -o $@
+
+main.o : zdarray.hpp zdtree.hpp wstring.hpp
+wstring.o : 
+Sparse_matrix.o :
+zdarray.o : 
+zdtree.o :
+
+.PHONY : clean
+clean :
+	rm CLVTreeScaper2 $(OBJ)
