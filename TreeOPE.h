@@ -116,7 +116,9 @@ public:
                                 bool WEIGHTED,
                                 unsigned int NUM_Taxa,
                                 map<unsigned long long, Array<char> *> &hash2bitstr,
-                                int numofbipartition);
+                                int numofbipartition,
+                                std::ostream& file_collusion,
+                                int &collusion_cnt);
 
     static void GetTaxaLabels(NEWICKNODE *node, LabelMap &lm);
 
