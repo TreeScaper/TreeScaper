@@ -766,6 +766,7 @@ void Compute_Distance(Trees *TreesData, map<String, String> &paras)
 
 		string outDistName = TreesData->make_DISToutput_name(memorydata);
 		TreesData->print_matrix(memorydata, outDistName);
+			
 		cout << "Successfully printed " << memorydata << " matrix!" << endl;
 
 		String outname_dist("Distance");
