@@ -429,7 +429,9 @@ void trees_driver(map<String, String> &paras)
 //         cout << "Error: can not open the data file!" << endl;
 //         return;
 //     }
-    
+    clock_t start, end;
+	start = clock();
+
     Trees *TreesData = new Trees;
     if(paras["-ft"] == (String) "Trees")
     {
@@ -438,6 +440,7 @@ void trees_driver(map<String, String> &paras)
         {
             TreesData->Settreeweighttype(true);
             std::cout << "weighted ";
+
         } else
         {
             TreesData->Settreeweighttype(false);
