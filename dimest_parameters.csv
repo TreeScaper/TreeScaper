@@ -1,4 +1,0 @@
-"""id""","""name""","""value""",
-1,"""cor_n""",20,// the number of points used in the interval
-2,"""mle_n""",20,// the number of neighbors used
-3,"""nn_n""",20,// the number of neighbors used

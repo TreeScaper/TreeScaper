@@ -1,5 +1,5 @@
 
-#include "Sparse_matrix.h"
+#include "Sparse_matrix.hpp"
 
 SparseMatrix::SparseMatrix(int rows, int columns, double* Vals, int* RowInds, int*ColPtr)
 {

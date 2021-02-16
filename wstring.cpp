@@ -26,7 +26,7 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
-#include "wstring.h"
+#include "wstring.hpp"
 #include <cassert>
 
 String EMPTY_STRING;
