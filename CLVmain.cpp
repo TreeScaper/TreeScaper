@@ -486,7 +486,7 @@ void Compute_BipartMatrix(Trees *TreesData, map<String, String> &paras)
         std::ofstream file_collusion;
         file_collusion.open((char *) outname_collusion);
 		start = clock();
-		TreesData->Compute_Hash(file_collusion);
+		TreesData->Compute_Hash(paras);
 		end = clock();
 		std::cout << "Compute Bipartition time(s):\t" << (end - start) / (double) CLOCKS_PER_SEC << '\n';
 
