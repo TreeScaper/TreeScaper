@@ -1115,13 +1115,12 @@ void Trees::Compute_Hash(std::map<String, String>& paras)
         hash2bitstr.clear();
     }
 
-    int collusion_cnt = 0;
 
     for (unsigned int treeIdx = 0; treeIdx < n_trees; ++treeIdx)
     {
         unsigned int numBitstr = 0;
         TreeOPE::dfs_compute_hash(treeset[treeIdx]->root, leaveslabelsmaps, vec_hashrf, treeIdx,
-                                  numBitstr, M1, M2, isweighted, leaveslabelsmaps.size(), hash2bitstr, numberofbipartition[treeIdx], file_collusion, collusion_cnt);
+                                  numBitstr, M1, M2, isweighted, leaveslabelsmaps.size(), hash2bitstr, numberofbipartition[treeIdx]);
     }
 
     if (collusion_cnt > 0)
