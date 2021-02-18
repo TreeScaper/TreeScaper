@@ -919,12 +919,11 @@ void TreeOPE::dfs_compute_hash(
         if(hash2bitstr[startNode->hv2] != NULL)
         {
             if (!(*btpt == *(hash2bitstr[startNode->hv2]))){
-               file_collusion << startNode->hv2 << ' ' << treeIdx << ' ';
-               btpt->printbits(NUM_Taxa, file_collusion);
-               file_collusion << ' ';
-               hash2bitstr[startNode->hv2]->printbits(NUM_Taxa, file_collusion);
-               file_collusion << '\n';
-               collusion_cnt++;
+                std::cout << "Error! Collison in bitstring detected! Below bitstring is dumpped."
+                hash2bitstr[startNode->hv2]->printbits(NUM_Taxa, file_collusion);
+                std::cout << '\n';
+                std::cout << "TreeScaper is terminated. Please try reset random seed with \"-r\" other than 1 or constant scalar \"-c\" larger than 10 to use different hash function.\n";
+                exit(1);
             }
             delete hash2bitstr[startNode->hv2];
             hash2bitstr[startNode->hv2] = btpt;
