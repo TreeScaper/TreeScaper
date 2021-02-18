@@ -1104,12 +1104,7 @@ void Trees::Compute_Hash(std::map<String, String>& paras)
 
     unsigned long long M1 = 0;
     unsigned long long M2 = 0;
-    if (NEWSEED != 1000)
-    {
-        vec_hashrf.uhashfunc_init(n_trees, leaveslabelsmaps.size(), C, NEWSEED);
-    }
-    else
-        vec_hashrf.uhashfunc_init(n_trees, leaveslabelsmaps.size(), C);
+    vec_hashrf.uhashfunc_init(n_trees, leaveslabelsmaps.size(), C, NEWSEED);
 
     M1 = vec_hashrf._HF.getM1();
     M2 = vec_hashrf._HF.getM2();
