@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
     } else
     if(argc > 1 && (String) argv[1] == (String) "-trees")
     {
-        String default_paras[28] = {"nuctrees.txt", "0", "0", "Dist", "list", "1", "10",
+        String default_paras[28] = {"nuctrees.txt", "0", "0", "Dist", "list", "1", "1000",
                                     "", "Majority", "Newick", "URF", "Exp", "time",
                                     "Covariance", "CNM", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "auto", "Trees", "matrix"};
         String options[28] =       {"-f", "-w", "-r", "-o", "-bfm", "-s", "-c",
