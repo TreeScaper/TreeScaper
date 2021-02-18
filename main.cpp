@@ -9,6 +9,7 @@
 #include "zdarray.hpp"
 #include "zdtree.hpp"
 #include "wstring.hpp"
+#include "version.hpp"
 
 using namespace std;
 
@@ -65,18 +66,21 @@ map<String, String> read_paras(int argc, char* argv[], int key_size, String* def
 
 int main(int argc, char* argv[]) {
 
+	if (argc == 1) {
+		cerr << "No arguments supplied." << endl;
+		return 1;
+	}
 
-	if(argc > 1 && (String) argv[1] == (String) "-trees")
-    {
-        String default_paras[4] = {"", "postfix", "taxon", "64"};
-        String options[4] =       {"-f", "-post", "-tm", "-bit"};
-        
-        map<String, String> paras = read_paras(argc, argv, 4, default_paras, options);
-        
-        trees_driver(paras);
-    } 
+	if ((String) argv[1] == (String) "-trees") {
+		String default_paras[4] = {"", "postfix", "taxon", "64"};
+		String options[4] =	   {"-f", "-post", "-tm", "-bit"};
 
+		map<String, String> paras = read_paras(argc, argv, 4, default_paras, options);
 
+		trees_driver(paras);
+	} else if ((String) argv[1] == (String) "-version" || (String) argv[1] == (String) "-v") {
+		cout << program_version << endl;
+	}
 	
 	return 0;
 }
