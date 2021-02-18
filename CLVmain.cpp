@@ -123,16 +123,16 @@ int main(int argc, char* argv[])
     } else
     if(argc > 1 && (String) argv[1] == (String) "-trees")
     {
-        String default_paras[26] = {"nuctrees.txt", "0", "0", "Dist", "list", 
+        String default_paras[28] = {"nuctrees.txt", "0", "0", "Dist", "list", "1", "10",
                                     "", "Majority", "Newick", "URF", "Exp", "time",
                                     "Covariance", "CNM", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "auto", "Trees", "matrix"};
-        String options[26] =       {"-f", "-w", "-r", "-o", "-bfm", 
+        String options[28] =       {"-f", "-w", "-r", "-o", "-bfm", "-s", "-c",
                                     "-if", "-ct", "-cfm", "-dm", "-am", "-post",
                                     "-t", "-cm", "-lp", "-lps", "-lpe", "-lpiv", "-ln", "-lns", "-lne", "-lniv", "-hf", "-lf", "-lm", "-ft", "-dfm"};
         
         for(int i = 1; i < argc; i++)
         {
-            for(int j = 0; j < 26; j++)
+            for(int j = 0; j < 28; j++)
             {
                 if((String) argv[i] == options[j] && i + 1 < argc && argv[i + 1][0] != '-')
                 {
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
             }
         }
         map<String, String> paras;
-        for(int i = 0; i < 26; i++)
+        for(int i = 0; i < 28; i++)
         {
             paras[options[i]] = default_paras[i];
         }
