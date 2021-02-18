@@ -92,7 +92,7 @@ public:
 
 //    const NEWICKTREE * &operator[](const int idx) const{return treeset[idx];};   // pick the (index + 1)-th element
 
-    void Compute_Hash(std::ostream& file_collusion);
+    void Compute_Hash(std::map<String, String>& paras);
 
     void Compute_Bipart_Matrix();
     void Compute_Bipart_Matrix(std::map<String, String>& paras);
