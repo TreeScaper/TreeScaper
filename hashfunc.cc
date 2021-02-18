@@ -150,7 +150,7 @@ CHashFunc::UHashfunc_init(
 	//RandomLib::Random rnd(newseed);		// r created with random seed
 	//std::cout << "    Random seed set to " << rnd.SeedString() << std::endl;
 	
-    srand(1);
+    srand(newseed);
 	for (unsigned int i=0; i<_n; ++i) {
 		//_a1[i] = rnd.Integer<unsigned long long>(_m1-1);
 		_a1[i] = rand() % (_m1-1);
