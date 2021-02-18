@@ -811,9 +811,7 @@ void TreeOPE::dfs_compute_hash(
                             bool WEIGHTED,
                             unsigned int NUM_Taxa,
                             map<unsigned long long, Array<char> *> &hash2bitstr,
-                            int numofbipartions,
-                            std::ostream& file_collusion,
-                            int &collusion_cnt)
+                            int numofbipartions)
 {
     // If the node is leaf node, just set the place of the taxon name in the bit string to '1'
     // push the bit string into stack
@@ -860,7 +858,7 @@ void TreeOPE::dfs_compute_hash(
         for (int i = 0; i < startNode->Nchildren; ++i)
         {
             dfs_compute_hash(startNode->child[i], lm, vec_hashrf,
-                             treeIdx, numBitstr, m1, m2,WEIGHTED,NUM_Taxa, hash2bitstr, numofbipartions, file_collusion, collusion_cnt);
+                             treeIdx, numBitstr, m1, m2,WEIGHTED,NUM_Taxa, hash2bitstr, numofbipartions);
         }
         // For weighted RF
         float dist = 0.0;
