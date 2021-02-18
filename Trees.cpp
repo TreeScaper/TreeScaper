@@ -1087,15 +1087,15 @@ void Trees::Printf(int *idx, int length)
 //# hash value in tree.
 //########################ZD comment########################################
 
-void Trees::Compute_Hash(std::ostream& file_collusion)
+void Trees::Compute_Hash(std::map<String, String>& paras)
 {
     // Set a random number for m1 (= Initial size of hash table)
     // m1 is the closest value to (t*n)+(t*n*HASHTABLE_FACTOR)
     #define HASHTABLE_FACTOR                       0.2
 
     // the c value of m2 > c*t*n
-    unsigned int C                          =1000;
-    int32 NEWSEED                           = 0  ;
+    unsigned int C                          = 100 * atoi((String) paras["-c"]);
+    int32 NEWSEED                           = atoi((String) paras["-s"]);
 
     if(!vec_hashrf._hashtab2.empty())
     {
