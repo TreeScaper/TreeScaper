@@ -1094,8 +1094,8 @@ void Trees::Compute_Hash(std::map<String, String>& paras)
     #define HASHTABLE_FACTOR                       0.2
 
     // the c value of m2 > c*t*n
-    unsigned int C                          = 100 * atoi((String) paras["-c"]);
-    int32 NEWSEED                           = atoi((String) paras["-s"]);
+    unsigned int C                          = 100 * atoi(paras["-c"]);
+    int32 NEWSEED                           = atoi(paras["-s"]);
 
     if(!vec_hashrf._hashtab2.empty())
     {
