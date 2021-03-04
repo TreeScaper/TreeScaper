@@ -39,6 +39,7 @@
 #include "Trees.h"
 #include "TreeOPE.h"
 #include "zdcommunity.h"
+#include "version.hpp"
 #include <map>
 
 using namespace std;
@@ -206,6 +207,10 @@ int main(int argc, char* argv[])
 		comm_driver(paras);
 		return 0;
 	}
+
+    else if(((String) argv[1] == (String) "-v" || (String) argv[1] == (String) "-version")) {
+        cout << program_version << endl;
+    }
 	else if(argc == 2 && ((String) argv[1] == (String) "-h" || (String) argv[1] == (String) "-help"))
     {
         std::cout << "\n";
