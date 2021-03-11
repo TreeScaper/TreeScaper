@@ -10,6 +10,7 @@
 #include "zdtree.hpp"
 #include "wstring.hpp"
 #include "version.hpp"
+#include "cra.hpp"
 
 using namespace std;
 
@@ -65,17 +66,41 @@ map<String, String> read_paras(int argc, char* argv[], int key_size, String* def
 
 
 int main(int argc, char* argv[]) {
-
 	if (argc == 1) {
 		cerr << "No arguments supplied." << endl;
 		return 1;
 	}
+	if ((String) argv[1] == (String) "-inference") {
+		String default_paras[] = {"", "", "", ""};
+		String options[] = {"-f", "-cra-key", "-cra-user", "-cra-pass"};
 
-	if ((String) argv[1] == (String) "-trees") {
-		String default_paras[4] = {"", "postfix", "taxon", "64"};
-		String options[4] =	   {"-f", "-post", "-tm", "-bit"};
+		map<String, String> paras = read_paras(argc, argv, sizeof(options)/sizeof(String), default_paras, options);
 
-		map<String, String> paras = read_paras(argc, argv, 4, default_paras, options);
+		string cra_key = string((char*)paras["-cra-key"]);
+		string cra_user = string((char*)paras["-cra-user"]);
+		string cra_pass = string((char*)paras["-cra-pass"]);
+		string filename = string((char*)paras["-f"]);
+
+		CRAHandle crahandle(cra_key, cra_user, cra_pass);
+		crahandle.submit_raxml(filename);
+		return 0;
+
+	} else if ((String) argv[1] == (String) "-trees") {
+		String default_paras[] = {"", "postfix", "taxon", "64", "", "", "", ""};
+		String options[] = {"-f", "-post", "-tm", "-bit", "-cra-key", "-cra-user", "-cra-pass", "-jobname"};
+
+		map<String, String> paras = read_paras(argc, argv, sizeof(options)/sizeof(String), default_paras, options);
+
+		string cra_key = string((char*)paras["-cra-key"]);
+		string cra_user = string((char*)paras["-cra-user"]);
+		string cra_pass = string((char*)paras["-cra-pass"]);
+		string jobname = string((char*)paras["-jobname"]);
+
+		if (jobname != "") {
+			CRAHandle crahandle(cra_key, cra_user, cra_pass);
+			crahandle.retrieve_raxml(jobname);
+			paras["-f"] = (String) bootstrap_results_filename.c_str();
+		}
 
 		trees_driver(paras);
 	} else if ((String) argv[1] == (String) "-version" || (String) argv[1] == (String) "-v") {
@@ -111,7 +136,7 @@ bool trees_driver(map<String, String> paras){
 	int n_tree = 100;
 	std::string fname((char *) paras["-f"]);
 
-	std::cout << "Reading taxa...\n"; 
+	std::cout << "Reading taxa...\n" << endl;
 	start = std::clock();
 
 	TaxonList Taxa;	
