@@ -14,7 +14,7 @@
 # version = v2.0.0-alpha.1-3-12345678       # Commit 12345678 and two others have been added since the last release.
 # version = v2.0.0-alpha.1-3-12345678_dirty # The same as above, but some uncommitted changes are present in tracked files.
 
-version_string="$(git describe)$(git status --porcelain | grep -v '^?' >/dev/null && echo _dirty)"
+version_string="$(git describe --tag)$(git status --porcelain | grep -v '^?' >/dev/null && echo _dirty)"
 version_file=version.hpp
 version_variable=program_version
 
