@@ -68,7 +68,7 @@ CURL *CRAHandle::create_cra_curl_handle() {
 	return curl;
 }
 
-void CRAHandle::retrieve_raxml(string jobname) {
+bool CRAHandle::retrieve_raxml(string jobname) {
 	string results_url = cra_url + username + "/" + jobname + "/output";
 
 	CURL *curl = create_cra_curl_handle();
@@ -80,12 +80,19 @@ void CRAHandle::retrieve_raxml(string jobname) {
 	CURLcode res = curl_easy_perform(curl);
 	curl_easy_cleanup(curl);
 
+	// Check for errors
+	if(res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_perform() failed: %s\n",
+			curl_easy_strerror(res));
+		return false;
+	}
+
 	// Parse response into a pugi xml result
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_buffer(userdata.c_str(), userdata.size());
 	if (!result) {
 		cerr << "Error parsing XML" << endl;
-		return;
+		return false;
 	}
 
 	for (pugi::xml_node node: doc.child("results").child("jobfiles").children("jobfile")) {
@@ -100,6 +107,13 @@ void CRAHandle::retrieve_raxml(string jobname) {
 		res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
 
+		// Check for errors
+		if(res != CURLE_OK) {
+			fprintf(stderr, "curl_easy_perform() failed: %s\n",
+					curl_easy_strerror(res));
+			return false;
+		}
+
 		// Write response data to file
 		ofstream outfile(bootstrap_results_filename);
 		if (outfile) {
@@ -107,14 +121,15 @@ void CRAHandle::retrieve_raxml(string jobname) {
 			outfile << userdata;
 		}
 	}
+	return true;
 }
 
-void CRAHandle::submit_raxml(string filename) {
+bool CRAHandle::submit_raxml(string filename) {
 
 	// Initialize CURL object
 	CURL *curl = create_cra_curl_handle();
 	if(!curl) {
-		return;
+		return false;
 	}
 
 	// Set up URL for initial request
@@ -160,17 +175,17 @@ void CRAHandle::submit_raxml(string filename) {
 
 	cout << "Submitting job to RAxML on XSEDE..." << endl;
 
-	// Perform the POST request to submit job
+	// Submit job
 	CURLcode res = curl_easy_perform(curl);
+
+	curl_easy_cleanup(curl);
 
 	// Check for errors
 	if(res != CURLE_OK) {
 		fprintf(stderr, "curl_easy_perform() failed: %s\n",
 			curl_easy_strerror(res));
+		return false;
 	}
-
-	/* always cleanup */
-	curl_easy_cleanup(curl);
 
 	//
 	// The code below handles the response XML data
@@ -179,14 +194,12 @@ void CRAHandle::submit_raxml(string filename) {
 	// Parse response into a pugi xml result
 	pugi::xml_document doc;
 
-	// Do we need to make sure callback finished?
 	pugi::xml_parse_result result = doc.load_buffer(userdata.c_str(), userdata.size());
 	if (!result) {
-		return;
+		return false;
 	}
 
-	// Set up HTTP request to query job status
-
+	// Get URL to query job status
 	string results_url = string(doc.child("jobstatus").child("selfUri").child("url").child_value());
 
 	std::regex r("[^/]*$");
@@ -195,5 +208,5 @@ void CRAHandle::submit_raxml(string filename) {
 	string match = m[0];
 	cout << job_submitted_message << match << " <further options>" << endl << endl;
 
-	bool results_ready = false;
+	return true;
 }

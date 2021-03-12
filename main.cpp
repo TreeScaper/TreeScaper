@@ -82,7 +82,9 @@ int main(int argc, char* argv[]) {
 		string filename = string((char*)paras["-f"]);
 
 		CRAHandle crahandle(cra_key, cra_user, cra_pass);
-		crahandle.submit_raxml(filename);
+		if (crahandle.submit_raxml(filename) == false) {
+			return 1;
+		}
 		return 0;
 
 	} else if ((String) argv[1] == (String) "-trees") {
@@ -98,7 +100,9 @@ int main(int argc, char* argv[]) {
 
 		if (jobname != "") {
 			CRAHandle crahandle(cra_key, cra_user, cra_pass);
-			crahandle.retrieve_raxml(jobname);
+			if (crahandle.retrieve_raxml(jobname) == false) {
+				return 1;
+			}
 			paras["-f"] = (String) bootstrap_results_filename.c_str();
 		}
 
