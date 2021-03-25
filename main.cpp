@@ -82,29 +82,16 @@ int main(int argc, char* argv[]) {
 		string filename = string((char*)paras["-f"]);
 
 		CRAHandle crahandle(cra_key, cra_user, cra_pass);
-		if (crahandle.submit_raxml(filename) == false) {
+		if (crahandle.submit_jobs(filename) == false) {
 			return 1;
 		}
 		return 0;
 
 	} else if ((String) argv[1] == (String) "-trees") {
-		String default_paras[] = {"", "postfix", "taxon", "64", "", "", "", ""};
-		String options[] = {"-f", "-post", "-tm", "-bit", "-cra-key", "-cra-user", "-cra-pass", "-jobname"};
+		String default_paras[] = {"", "postfix", "taxon", "64"};
+		String options[] = {"-f", "-post", "-tm", "-bit"};
 
 		map<String, String> paras = read_paras(argc, argv, sizeof(options)/sizeof(String), default_paras, options);
-
-		string cra_key = string((char*)paras["-cra-key"]);
-		string cra_user = string((char*)paras["-cra-user"]);
-		string cra_pass = string((char*)paras["-cra-pass"]);
-		string jobname = string((char*)paras["-jobname"]);
-
-		if (jobname != "") {
-			CRAHandle crahandle(cra_key, cra_user, cra_pass);
-			if (crahandle.retrieve_raxml(jobname) == false) {
-				return 1;
-			}
-			paras["-f"] = (String) bootstrap_results_filename.c_str();
-		}
 
 		trees_driver(paras);
 	} else if ((String) argv[1] == (String) "-version" || (String) argv[1] == (String) "-v") {
