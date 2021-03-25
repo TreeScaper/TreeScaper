@@ -2,7 +2,7 @@ CC = g++
 CFLAG = -c -std=c++17 -Wall
 LFLAG = -std=c++17 -Wall
 
-OBJ = main.o wstring.o Sparse_matrix.o zdarray.o zdtree.o
+OBJ = main.o array.o wstring.o sparse.o zdtree.o 
 
 all: CLVTreeScaper2
 
@@ -18,11 +18,12 @@ version.hpp: generate_version
 CLVTreeScaper2 : $(OBJ)
 	$(CC) $(LFLAG) $^ -o $@
 
-main.o : zdarray.hpp zdtree.hpp wstring.hpp version.hpp
+main.o : array.hpp zdtree.hpp wstring.hpp zdtreeobj.hpp version.hpp
 wstring.o : 
-Sparse_matrix.o :
-zdarray.o : 
-zdtree.o : zdarray.hpp Sparse_matrix.hpp
+array.o : 
+sparse.o : array.hpp
+zdtree.o : array.hpp sparse.hpp
+zdtreeobj.o : array.hpp sparse.hpp zdtree.hpp
 
 .PHONY : clean
 clean :
