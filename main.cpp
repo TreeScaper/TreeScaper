@@ -10,6 +10,7 @@
 #include "zdtree.hpp"
 #include "zdtreeobj.hpp"
 #include "wstring.hpp"
+#include "version.hpp"
 
 using namespace std;
 
