@@ -20,6 +20,8 @@
 // Member function definitions for class String
 //              by whuang Nov/03/2008
 
+#pragma warning(disable : 4996)
+
 #ifndef WSTRING_CPP
 #define WSTRING_CPP
 
