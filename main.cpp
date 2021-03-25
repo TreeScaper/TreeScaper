@@ -6,8 +6,9 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "zdarray.hpp"
+#include "array.hpp"
 #include "zdtree.hpp"
+#include "zdtreeobj.hpp"
 #include "wstring.hpp"
 
 using namespace std;
@@ -62,16 +63,15 @@ map<String, String> read_paras(int argc, char* argv[], int key_size, String* def
 	return paras;
 }
 
-
 int main(int argc, char* argv[]) {
 
 
 	if(argc > 1 && (String) argv[1] == (String) "-trees")
     {
-        String default_paras[4] = {"", "postfix", "taxon", "64"};
-        String options[4] =       {"-f", "-post", "-tm", "-bit"};
+        String default_paras[7] = {"", 		"postfix", 	"taxon", 	"64", 	"0",	"1",	"Cov"};
+        String options[7] =       {"-f", "	-post", 	"-tm", 		"-bit", "-r",	"-w", 	"-o"};
         
-        map<String, String> paras = read_paras(argc, argv, 4, default_paras, options);
+        map<String, String> paras = read_paras(argc, argv, 7, default_paras, options);
         
         trees_driver(paras);
     } 
@@ -85,6 +85,10 @@ bool trees_driver(map<String, String> paras){
 	std::clock_t start, end;
 	int flag_type;
 	int flag_label;
+	bool rooted = (paras["-r"] == (String) "1");
+	bool weighted = (paras["-w"] == (String) "1");
+
+	std::cout << (rooted ? "rooted" : "unrooted") << "\t" << (weighted ? "weighted" : "unweighted") << '\n';
 
 	if (paras["-tm"] == (String) "taxon")
 		flag_label = 2;
@@ -121,98 +125,226 @@ bool trees_driver(map<String, String> paras){
 	if (flag_type == 0) {
 		Taxa.set_bitstr_size((u_8)1);
 		Bipartition<u_8> Bipart_8(&Taxa, n_tree);
-		TreeSet<u_8> trees_8(&Bipart_8, &Taxa);
-		trees_8.ReadTree(fname, tree_pos, flag_label);
+		std::cout << "Bipartition initialized...\n"; 
+		TreeSet<u_8> trees_8(&Bipart_8, &Taxa);	
+		trees_8.ReadTree(fname, tree_pos, flag_label, rooted, weighted);
 		end = std::clock();
 		cout << "Read tree time(s):\t\t" << (end - start)/ (double) CLOCKS_PER_SEC << "\n";
+		TreeSetObjects<u_8> treesobj_8(&(trees_8), rooted, weighted);
 		std::cout << "Computing bipartition...\n"; 
 		start = std::clock();
-		trees_8.compute_Bipart();
+		treesobj_8.Compute_Bipart();
 		end = std::clock();
 		cout << "Compute Bipartition time(s):\t" << (end - start)/ (double) CLOCKS_PER_SEC << "\n";
-		Bipart_8.print_summary(trees_8.get_size());
-		std::cout << "Computing bipartition matrix...\n"; 
+		cout << "Distinct bipartition number:\t" << treesobj_8.get_unique_bipart_num() << "\n\n";
+
+		ofstream fout;
+		// // Print Bipartition List
+		// String outname_Bipartcnt("Bipartition_Count");
+		// outname_Bipartcnt.make_stdname(paras);
+		// fout.open((char *) outname_Bipartcnt);
+		// treesobj_8.print_Bipart_List(fout);
+		// fout.close();
+		// cout << "Sucessfully printed bipartition list info in Bipartition_count_" << paras["-post"] << ".out file.\n\n";
+
+
+		std::cout << "Computing Bipart2Tree sparse matrix...\n";
 		start = std::clock();
-		TreeObjects<u_8> treesobj_8(&(trees_8));
 		treesobj_8.Compute_Bipart_Matrix();
 		end = std::clock();
-		cout << "Form Bipartition Matrix time(s):\t" << (end - start)/ (double) CLOCKS_PER_SEC << "\n";
-		String outname_Bipartcnt("Bipartition_Count");
-		outname_Bipartcnt.make_stdname(paras);
+		cout << "Compute Bipart2Tree sparse matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
+
+		// Print Bipartition2Tree Sparse Matrix
 		String outname_Bipart("Bipartition");
 		outname_Bipart.make_stdname(paras);
-		ofstream fout;
-		fout.open((char *) outname_Bipartcnt);
-		Bipart_8.print_Bipart(fout, trees_8.get_size());
-		fout.close();
 		fout.open((char *) outname_Bipart);
-		treesobj_8.print_Bipart_Matrix(fout);
+		treesobj_8.print_Bipart2Tree_Matrix(fout, RCVLIST);
 		fout.close();
+		cout << "Sucessfully printed bipartition-to-tree sparse matrix in Bipartition_" << (char*)paras["-post"] << ".out file.\n\n";
+
+
+
+		if (paras["-o"] == (String) "Cov" || paras["-o"] == (String) "cov" || paras["-o"] == (String) "covariance"){
+			std::cout << "Computing covariance matrix...\n";
+			start = std::clock();
+			treesobj_8.Compute_Covariance_Matrix();
+			end = std::clock();
+			cout << "Compute covariance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
+
+			// Print Covariance Matrix
+			String outname_Cova("Covariance");
+			outname_Cova.make_stdname(paras);
+			fout.open((char *) outname_Cova);
+			treesobj_8.print_Covariance_Matrix(fout);
+			fout.close();
+			cout << "Sucessfully printed covariance matrix in Covariance_" << (char*)paras["-post"] << ".out file.\n\n";
+		}
+		else if (paras["-o"] == (String) "Dis" || paras["-o"] == (String) "dis" || paras["-o"] == (String) "distance"){
+			std::cout << "Computing RF-distance matrix...\n";
+			start = std::clock();
+			treesobj_8.Compute_RF_Distance_Matrix();
+			end = std::clock();
+			cout << "Compute RF-distance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
+
+			// Print Covariance Matrix
+			String outname_Dist("Distance");
+			outname_Dist.make_stdname(paras);
+			fout.open((char *) outname_Dist);
+			treesobj_8.print_Distance_Matrix(fout);
+			fout.close();
+			cout << "Sucessfully printed distance matrix in Distance_" << (char*)paras["-post"] << ".out file.\n\n";
+		}
+		treesobj_8.print_summary();
 		trees_8.release_tree();
 	}
 	else if (flag_type == 1) {
 		Taxa.set_bitstr_size((u_32)1);
 		Bipartition<u_32> Bipart_32(&Taxa, n_tree);
-		TreeSet<u_32> trees_32(&Bipart_32, &Taxa);
-		trees_32.ReadTree(fname, tree_pos, flag_label);
+		std::cout << "Bipartition initialized...\n"; 
+		TreeSet<u_32> trees_32(&Bipart_32, &Taxa);	
+		trees_32.ReadTree(fname, tree_pos, flag_label, rooted, weighted);
 		end = std::clock();
 		cout << "Read tree time(s):\t\t" << (end - start)/ (double) CLOCKS_PER_SEC << "\n";
+		TreeSetObjects<u_32> treesobj_32(&(trees_32), rooted, weighted);
 		std::cout << "Computing bipartition...\n"; 
 		start = std::clock();
-		trees_32.compute_Bipart();
+		treesobj_32.Compute_Bipart();
 		end = std::clock();
 		cout << "Compute Bipartition time(s):\t" << (end - start)/ (double) CLOCKS_PER_SEC << "\n";
-		Bipart_32.print_summary(trees_32.get_size());
-		std::cout << "Computing bipartition matrix...\n"; 
+		cout << "Distinct bipartition number:\t" << treesobj_32.get_unique_bipart_num() << "\n\n";
+
+		ofstream fout;
+		// // Print Bipartition List
+		// String outname_Bipartcnt("Bipartition_Count");
+		// outname_Bipartcnt.make_stdname(paras);
+		// fout.open((char *) outname_Bipartcnt);
+		// treesobj_32.print_Bipart_List(fout);
+		// fout.close();
+		// cout << "Sucessfully printed bipartition list info in Bipartition_count_" << paras["-post"] << ".out file.\n\n";
+
+
+		std::cout << "Computing Bipart2Tree sparse matrix...\n";
 		start = std::clock();
-		TreeObjects<u_32> treesobj_32(&(trees_32));
 		treesobj_32.Compute_Bipart_Matrix();
 		end = std::clock();
-		cout << "Form Bipartition Matrix time(s):\t" << (end - start)/ (double) CLOCKS_PER_SEC << "\n";
-		String outname_Bipartcnt("Bipartition_Count");
-		outname_Bipartcnt.make_stdname(paras);
+		cout << "Compute Bipart2Tree sparse matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
+
+		// Print Bipartition2Tree Sparse Matrix
 		String outname_Bipart("Bipartition");
 		outname_Bipart.make_stdname(paras);
-		ofstream fout;
-		fout.open((char *) outname_Bipartcnt);
-		Bipart_32.print_Bipart(fout, trees_32.get_size());
-		fout.close();
 		fout.open((char *) outname_Bipart);
-		treesobj_32.print_Bipart_Matrix(fout);
+		treesobj_32.print_Bipart2Tree_Matrix(fout, RCVLIST);
 		fout.close();
+		cout << "Sucessfully printed bipartition-to-tree sparse matrix in Bipartition_" << (char*)paras["-post"] << ".out file.\n\n";
+
+
+
+		if (paras["-o"] == (String) "Cov" || paras["-o"] == (String) "cov" || paras["-o"] == (String) "covariance"){
+			std::cout << "Computing covariance matrix...\n";
+			start = std::clock();
+			treesobj_32.Compute_Covariance_Matrix();
+			end = std::clock();
+			cout << "Compute covariance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
+
+			// Print Covariance Matrix
+			String outname_Cova("Covariance");
+			outname_Cova.make_stdname(paras);
+			fout.open((char *) outname_Cova);
+			treesobj_32.print_Covariance_Matrix(fout);
+			fout.close();
+			cout << "Sucessfully printed covariance matrix in Covariance_" << (char*)paras["-post"] << ".out file.\n\n";
+		}
+		else if (paras["-o"] == (String) "Dis" || paras["-o"] == (String) "dis" || paras["-o"] == (String) "distance"){
+			std::cout << "Computing RF-distance matrix...\n";
+			start = std::clock();
+			treesobj_32.Compute_RF_Distance_Matrix();
+			end = std::clock();
+			cout << "Compute RF-distance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
+
+			// Print Covariance Matrix
+			String outname_Dist("Distance");
+			outname_Dist.make_stdname(paras);
+			fout.open((char *) outname_Dist);
+			treesobj_32.print_Distance_Matrix(fout);
+			fout.close();
+			cout << "Sucessfully printed distance matrix in Distance_" << (char*)paras["-post"] << ".out file.\n\n";
+		}
+		treesobj_32.print_summary();
 		trees_32.release_tree();
 	}
 	else {
 		Taxa.set_bitstr_size((u_64)1);
 		Bipartition<u_64> Bipart_64(&Taxa, n_tree);
 		std::cout << "Bipartition initialized...\n"; 
-		TreeSet<u_64> trees_64(&Bipart_64, &Taxa);
-		trees_64.ReadTree(fname, tree_pos, flag_label);
+		TreeSet<u_64> trees_64(&Bipart_64, &Taxa);	
+		trees_64.ReadTree(fname, tree_pos, flag_label, rooted, weighted);
 		end = std::clock();
 		cout << "Read tree time(s):\t\t" << (end - start)/ (double) CLOCKS_PER_SEC << "\n";
+		TreeSetObjects<u_64> treesobj_64(&(trees_64), rooted, weighted);
 		std::cout << "Computing bipartition...\n"; 
 		start = std::clock();
-		trees_64.compute_Bipart();
+		treesobj_64.Compute_Bipart();
 		end = std::clock();
 		cout << "Compute Bipartition time(s):\t" << (end - start)/ (double) CLOCKS_PER_SEC << "\n";
-		Bipart_64.print_summary(trees_64.get_size());
-		std::cout << "Computing bipartition matrix...\n"; 
+		cout << "Distinct bipartition number:\t" << treesobj_64.get_unique_bipart_num() << "\n\n";
+
+		ofstream fout;
+		// Print Bipartition List
+		// String outname_Bipartcnt("Bipartition_Count");
+		// outname_Bipartcnt.make_stdname(paras);
+		// fout.open((char *) outname_Bipartcnt);
+		// treesobj_64.print_Bipart_List(fout);
+		// fout.close();
+		// cout << "Sucessfully printed bipartition list info in Bipartition_count_" << paras["-post"] << ".out file.\n\n";
+
+
+		std::cout << "Computing Bipart2Tree sparse matrix...\n";
 		start = std::clock();
-		TreeObjects<u_64> treesobj_64(&(trees_64));
 		treesobj_64.Compute_Bipart_Matrix();
 		end = std::clock();
-		cout << "Form Bipartition Matrix time(s):\t" << (end - start)/ (double) CLOCKS_PER_SEC << "\n";
-		String outname_Bipartcnt("Bipartition_Count");
-		outname_Bipartcnt.make_stdname(paras);
+		cout << "Compute Bipart2Tree sparse matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
+
+		// Print Bipartition2Tree Sparse Matrix
 		String outname_Bipart("Bipartition");
 		outname_Bipart.make_stdname(paras);
-		ofstream fout;
-		fout.open((char *) outname_Bipartcnt);
-		Bipart_64.print_Bipart(fout, trees_64.get_size());
-		fout.close();
 		fout.open((char *) outname_Bipart);
-		treesobj_64.print_Bipart_Matrix(fout);
+		treesobj_64.print_Bipart2Tree_Matrix(fout, RCVLIST);
 		fout.close();
+		cout << "Sucessfully printed bipartition-to-tree sparse matrix in Bipartition_" << (char*)paras["-post"] << ".out file.\n\n";
+
+
+
+		if (paras["-o"] == (String) "Cov" || paras["-o"] == (String) "cov" || paras["-o"] == (String) "covariance"){
+			std::cout << "Computing covariance matrix...\n";
+			start = std::clock();
+			treesobj_64.Compute_Covariance_Matrix();
+			end = std::clock();
+			cout << "Compute covariance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
+
+			// Print Covariance Matrix
+			String outname_Cova("Covariance");
+			outname_Cova.make_stdname(paras);
+			fout.open((char *) outname_Cova);
+			treesobj_64.print_Covariance_Matrix(fout);
+			fout.close();
+			cout << "Sucessfully printed covariance matrix in Covariance_" << (char*)paras["-post"] << ".out file.\n\n";
+		}
+		else if (paras["-o"] == (String) "Dis" || paras["-o"] == (String) "dis" || paras["-o"] == (String) "distance"){
+			std::cout << "Computing RF-distance matrix...\n";
+			start = std::clock();
+			treesobj_64.Compute_RF_Distance_Matrix();
+			end = std::clock();
+			cout << "Compute RF-distance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
+
+			// Print Covariance Matrix
+			String outname_Dist("Distance");
+			outname_Dist.make_stdname(paras);
+			fout.open((char *) outname_Dist);
+			treesobj_64.print_Distance_Matrix(fout);
+			fout.close();
+			cout << "Sucessfully printed distance matrix in Distance_" << (char*)paras["-post"] << ".out file.\n\n";
+		}
+		treesobj_64.print_summary();
 		trees_64.release_tree();
 	}
 	return true;
