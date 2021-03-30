@@ -71,14 +71,11 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	if ((String) argv[1] == (String) "-inference") {
-		String default_paras[] = {"", "", "", ""};
-		String options[] = {"-f", "-cra-key", "-cra-user", "-cra-pass"};
+		String default_paras[] = {""};
+		String options[] = {"-f"};
 
 		map<String, String> paras = read_paras(argc, argv, sizeof(options)/sizeof(String), default_paras, options);
 
-		string cra_key = string((char*)paras["-cra-key"]);
-		string cra_user = string((char*)paras["-cra-user"]);
-		string cra_pass = string((char*)paras["-cra-pass"]);
 		string filename = string((char*)paras["-f"]);
 
 		CRAHandle crahandle;
