@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
 		string cra_pass = string((char*)paras["-cra-pass"]);
 		string filename = string((char*)paras["-f"]);
 
-		CRAHandle crahandle(cra_key, cra_user, cra_pass);
+		CRAHandle crahandle;
 		if (crahandle.submit_jobs(filename) == false) {
 			return 1;
 		}

@@ -38,6 +38,9 @@ const int rate_limit = 500;
 // Minimum time in milliseconds between requests checking status of job.
 const int status_rate_limit = 10 * 1000;
 
+// Application ID for CRA
+const string cra_application_id = "treescaper_inference_dev-D4DFA6E180C643779DC203C1D5114ED4";
+
 // Characters output indicating status of each job in the status file
 const map<enum JobStatus, string> status_characters = {
 	{UNSUBMITTED, "U"},
@@ -73,7 +76,7 @@ CURL *CRAHandle::create_cra_curl_handle() {
 	headerlist = curl_slist_append(headerlist, "");
 
 	// Add application key to header list
-	string key_header = "cipres-appkey:" + appkey;
+	string key_header = "cipres-appkey:" + cra_application_id;
 	headerlist = curl_slist_append(headerlist, key_header.c_str());
 
 	// Add Expect: 100-continue to header list

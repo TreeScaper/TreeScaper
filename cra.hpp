@@ -43,10 +43,9 @@ class CRAJob {
 class CRAHandle {
 public:
 	// Initializes authentication and CRA application ID.
-	CRAHandle(string appkey, string username, string password) :
-		appkey(appkey),
-		username(username),
-		password(password),
+	CRAHandle() :
+		username(getenv("TS_CRA_USERNAME")),
+		password(getenv("TS_CRA_PASSWORD")),
 		active_jobs(0)
 		{};
 	bool submit_jobs(string filename);
@@ -57,9 +56,6 @@ private:
 	bool change_job_status(CRAJob& job, enum JobStatus status);
 	bool write_job_status();
 	CURL *create_cra_curl_handle();
-
-	// ID for a CRA application.
-	string appkey;
 
 	// Username provided by user.
 	string username;
