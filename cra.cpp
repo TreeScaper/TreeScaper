@@ -474,8 +474,7 @@ bool CRAHandle::submit_job(CRAJob& job) {
 	}
 
 	// Get URL to query job status
-	string joburl = string(doc.child("jobstatus").child("selfUri").child("url").child_value());
-	job.joburl = joburl;
+	job.joburl = string(doc.child("jobstatus").child("selfUri").child("url").child_value());
 
 	// Get minimum poll interval.
 	min_poll_interval_seconds = doc.child("jobstatus").child("minPollIntervalSeconds").text().as_int();
