@@ -46,7 +46,8 @@ public:
 	CRAHandle() :
 		username(getenv("TS_CRA_USERNAME")),
 		password(getenv("TS_CRA_PASSWORD")),
-		active_jobs(0)
+		active_jobs(0),
+		min_poll_interval_seconds(60)
 		{};
 	bool submit_jobs(string filelist, string paramfile);
 	bool submit_job(CRAJob& job);
@@ -75,4 +76,7 @@ private:
 
 	// Parameters for tool
 	map<string, string> cra_params;
+
+	// Minimum number of seconds between polls to check status of one job
+	int min_poll_interval_seconds;
 };

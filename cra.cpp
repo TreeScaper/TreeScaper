@@ -35,9 +35,6 @@ const int active_job_limit = 50;
 // Minimum time in milliseconds between REST requests
 const int rate_limit = 500;
 
-// Minimum time in milliseconds between requests checking status of job.
-const int status_rate_limit = 10 * 1000;
-
 // Application ID for CRA
 const string cra_application_id = "treescaper_inference_dev-D4DFA6E180C643779DC203C1D5114ED4";
 
@@ -370,7 +367,7 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 		for (CRAJob& job : jobs) {
 			const time_point<system_clock> now = system_clock::now();
 			if (job.status == SUBMITTED &&
-				duration_cast<milliseconds>(now - job.last_poll).count() > status_rate_limit) {
+				duration_cast<seconds>(now - job.last_poll).count() > min_poll_interval_seconds) {
 
 				// Get status
 				retrieve_url(job.joburl);
@@ -479,6 +476,9 @@ bool CRAHandle::submit_job(CRAJob& job) {
 	// Get URL to query job status
 	string joburl = string(doc.child("jobstatus").child("selfUri").child("url").child_value());
 	job.joburl = joburl;
+
+	// Get minimum poll interval.
+	min_poll_interval_seconds = doc.child("jobstatus").child("minPollIntervalSeconds").text().as_int();
 
 	// Wait until we've updated the joburl to change status, s.t. that status file contains the url.
 	change_job_status(job, SUBMITTED);
