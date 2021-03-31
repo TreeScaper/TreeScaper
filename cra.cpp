@@ -19,8 +19,8 @@ using namespace std;
 // Base URL for CRA API
 const string cra_url = "https://cipresrest.sdsc.edu/cipresrest/v1/job/";
 
-// RAxML boostrap results name
-const string bootstrap_results_filename = "RAxML_bootstrap.result";
+// Parameter for name of the output file to download.
+const string output_file_param = "treescaper.output";
 
 // Directory where results are downloaded
 const string cra_output_directory = "cra_output";
@@ -215,7 +215,8 @@ bool CRAHandle::parse_status(CRAJob& job) {
 
 		// Check if name matches expected name for bootstrap results.
 		string filename = node.child("filename").child_value();
-		if (filename != bootstrap_results_filename) {
+		string output_filename = cra_params.at(output_file_param);
+		if (filename != output_filename) {
 			continue;
 		}
 
@@ -236,7 +237,7 @@ bool CRAHandle::parse_status(CRAJob& job) {
 		// Write response data to file
 		// The output files are named based on the input filenames.
 		string inputfile_name = job.inputfile.substr(job.inputfile.find_last_of("/\\") + 1);
-		string output_filepath = cra_output_directory + "/" + inputfile_name + "_" + bootstrap_results_filename;
+		string output_filepath = cra_output_directory + "/" + inputfile_name + "_" + output_filename;
 		ofstream outfile(output_filepath);
 		if (outfile) {
 			outfile << userdata;
@@ -286,17 +287,40 @@ bool CRAHandle::change_job_status(CRAJob& job, enum JobStatus status) {
 // This main loop consists of two inner loops:
 //
 // The first runs only until the active job limit has not been reached. It goes through all
-// jobs submitting unsubmitted jobs.
+// jobs submitting unsubmitted jobs. The second goes through all jobs checking and updating the status for submitted jobs.
 //
-// The second goes through all jobs checking and updating the status for submitted jobs.
+// @param filelist  File containing a list of input files.
+// @param paramfile File containing common parameters for all jobs.
 //
-bool CRAHandle::submit_jobs(string filename) {
+bool CRAHandle::submit_jobs(string filelist, string paramfile) {
+
+	// Parse parameters.
+	ifstream param_f(paramfile);
+	string param_line;
+	while (getline(param_f, param_line)) {
+
+		// Ignore commented and blank lines.
+		std::regex comment_regex("^#");
+		if (regex_search(param_line, comment_regex) || param_line.length() == 0) {
+			continue;
+		}
+
+		// Find position of "=".
+		size_t delim_pos = param_line.find("=");
+
+		// Parse name and value of configuration parameter
+		string param_name = param_line.substr(0, delim_pos);
+		string param_value = param_line.substr(delim_pos + 1);
+
+		// Add parameter to param map
+		cra_params.insert(std::pair<string,string>(param_name, param_value));
+	}
 
 	// Create CRAJob objects from input files
-	ifstream f(filename);
-	string line;
-	while (getline(f, line)) {
-		jobs.push_back(CRAJob(line));
+	ifstream list_f(filelist);
+	string list_line;
+	while (getline(list_f, list_line)) {
+		jobs.push_back(CRAJob(list_line));
 	}
 
 	// Create output directory if needed
@@ -332,7 +356,9 @@ bool CRAHandle::submit_jobs(string filename) {
 
 			// If we have an unsubmitted job, submit it.
 			if (job.status == UNSUBMITTED) {
-				submit_raxml(job);
+				if (!submit_job(job)) {
+					return false;
+				}
 			}
 		}
 
@@ -362,9 +388,7 @@ bool CRAHandle::submit_jobs(string filename) {
 	return true;
 }
 
-// Submits a RAxML job
-bool CRAHandle::submit_raxml(CRAJob& job) {
-
+bool CRAHandle::submit_job(CRAJob& job) {
 	// Initialize CURL object
 	CURL *curl = create_cra_curl_handle();
 	if (!curl) {
@@ -380,33 +404,52 @@ bool CRAHandle::submit_raxml(CRAJob& job) {
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 
-	// Create a mime form
+	// Create a mime form.
 	form = curl_mime_init(curl);
 
-	// Fill in the file upload field
+	// Add the input.infile_ parameter separately because it is the only
+	// parameter that differs for each job in a batch.
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "input.infile_");
 	curl_mime_filedata(field, job.inputfile.c_str());
 
-	// Specify the CRA tool
-	field = curl_mime_addpart(form);
-	curl_mime_name(field, "tool");
-	curl_mime_data(field, "RAXMLHPC8_REST_XSEDE", CURL_ZERO_TERMINATED);
+	// Add each parameter to the request.
+	for (pair <string,string> param : cra_params) {
+		string param_name = param.first;
+		string param_value = param.second;
 
-	// Specify a status email should be sent
-	field = curl_mime_addpart(form);
-	curl_mime_name(field, "metadata.statusEmail");
-	curl_mime_data(field, "true", CURL_ZERO_TERMINATED);
+		// Create new field and populate name.
+		// The function used to populate the data depends on the type of field.
 
-	// Set -x flag for RAxML to perform bootstrap analysis
-	field = curl_mime_addpart(form);
-	curl_mime_name(field, "vparam.choose_bootstrap_");
-	curl_mime_data(field, "b", CURL_ZERO_TERMINATED);
+		std::regex input_regex("^input");
+		std::regex treescaper_regex("^treescaper");
+		std::regex other_param_regex("^(vparam|tool|metadata)");
 
-	// Print branch lengths on bootstrap trees
-	field = curl_mime_addpart(form);
-	curl_mime_name(field, "vparam.printbrlength_");
-	curl_mime_data(field, "1", CURL_ZERO_TERMINATED);
+		// Parameters prefixed with input expect a file to be uploaded.
+		if (regex_search(param_name, input_regex)) {
+
+			// Add filedata field
+			field = curl_mime_addpart(form);
+			curl_mime_name(field, param_name.c_str());
+			curl_mime_filedata(field, param_value.c_str());
+
+		// Parameters prefixed with tool, vparam, or metadata are simply passed as the parameter value.
+		} else if (regex_search(param_name, other_param_regex)) {
+
+			// Add data field
+			field = curl_mime_addpart(form);
+			curl_mime_name(field, param_name.c_str());
+			curl_mime_data(field, param_value.c_str(), CURL_ZERO_TERMINATED);
+
+		// TreeScaper-specific configuration is not passed to CRA
+		} else if (regex_search(param_name, treescaper_regex)) {
+			continue;
+
+		// One of the above prefixes is expected for CRA parameters.
+		} else {
+			cerr << "Warning: Unknown parameter type for " << param.first << ". Ignoring." << endl;
+		}
+	}
 
 	// Provide form to curl object
 	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);

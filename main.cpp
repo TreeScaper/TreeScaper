@@ -71,15 +71,16 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	if ((String) argv[1] == (String) "-inference") {
-		String default_paras[] = {""};
-		String options[] = {"-f"};
+		String default_paras[] = {"", ""};
+		String options[] = {"-f", "-p"};
 
 		map<String, String> paras = read_paras(argc, argv, sizeof(options)/sizeof(String), default_paras, options);
 
-		string filename = string((char*)paras["-f"]);
+		string inputfile = string((char*)paras["-f"]);
+		string paramfile = string((char*)paras["-p"]);
 
 		CRAHandle crahandle;
-		if (crahandle.submit_jobs(filename) == false) {
+		if (crahandle.submit_jobs(inputfile, paramfile) == false) {
 			return 1;
 		}
 		return 0;

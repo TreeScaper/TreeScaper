@@ -48,8 +48,8 @@ public:
 		password(getenv("TS_CRA_PASSWORD")),
 		active_jobs(0)
 		{};
-	bool submit_jobs(string filename);
-	bool submit_raxml(CRAJob& job);
+	bool submit_jobs(string filelist, string paramfile);
+	bool submit_job(CRAJob& job);
 	bool parse_status(CRAJob& job);
 private:
 	bool retrieve_url(string url);
@@ -72,4 +72,7 @@ private:
 
 	// List of jobs to run.
 	vector<CRAJob> jobs;
+
+	// Parameters for tool
+	map<string, string> cra_params;
 };

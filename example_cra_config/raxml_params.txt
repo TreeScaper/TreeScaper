@@ -1,0 +1,8 @@
+# Parameters used by CRA
+tool=RAXMLHPC8_REST_XSEDE
+metadata.statusEmail=true
+vparam.choose_bootstrap_=b
+vparam.printbrlength_=1
+
+# Parameters used by TreeScaper
+treescaper.output=RAxML_bootstrap.result
