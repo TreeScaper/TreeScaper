@@ -6,9 +6,6 @@
 
 using namespace std;
 
-// Filename we expect to find RAxML bootstrap results in.
-extern const string bootstrap_results_filename;
-
 // TreeScaper's classification of job status.
 enum JobStatus {
 	UNSUBMITTED,
