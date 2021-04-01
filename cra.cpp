@@ -28,6 +28,9 @@ const string cra_output_directory = "cra_output";
 // File that tracks status of jobs for each input file
 const string job_status_filepath = cra_output_directory + "/job_status";
 
+// Delimiter between fields in status file.
+const char status_file_delim = '\t';
+
 // Number of jobs that can be active via the CRA at once. This is a limit build
 // into the CRA, but we reproduce it here.
 const int active_job_limit = 50;
@@ -191,9 +194,6 @@ bool CRAHandle::parse_status(CRAJob& job) {
 		return true;
 	}
 
-	// If completed and not failed, the job is considered SUCCESSFUL.
-	change_job_status(job, SUCCESSFUL);
-
 	// Retrieve list of output files
 	string results_url = string(doc.child("jobstatus").child("resultsUri").child("url").child_value());
 	retrieve_url(results_url);
@@ -240,6 +240,10 @@ bool CRAHandle::parse_status(CRAJob& job) {
 			outfile << userdata;
 		}
 	}
+
+	// If completed and not failed, the job is considered SUCCESSFUL.
+	change_job_status(job, SUCCESSFUL);
+
 	return true;
 }
 
@@ -260,7 +264,7 @@ bool CRAHandle::write_job_status() {
 	// For each job, write its status, file, and url if it exists
 	for (CRAJob& job : jobs) {
 		string status_character = status_characters.at(job.status);
-		of << status_character << " " << job.inputfile << " " << job.joburl << endl;
+		of << job.inputfile << status_file_delim << status_character << status_file_delim << job.joburl << endl;
 	}
 	return true;
 }
@@ -316,8 +320,46 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 	// Create CRAJob objects from input files
 	ifstream list_f(filelist);
 	string list_line;
+
 	while (getline(list_f, list_line)) {
-		jobs.push_back(CRAJob(list_line));
+		istringstream line_stream(list_line);
+
+		// Read filename.
+		string inputfile("");
+		if (!getline(line_stream, inputfile, status_file_delim) && line_stream.bad()) {
+			return false;
+		}
+
+		// Read status character.
+		string status_character("");
+		if (!getline(line_stream, status_character, status_file_delim) && line_stream.bad()) {
+			return false;
+		}
+
+		// Read URL for job if submitted.
+		string joburl("");
+		if (!getline(line_stream, joburl, status_file_delim) && line_stream.bad()) {
+			return false;
+		}
+
+		// Convert status character to status enum.
+		enum JobStatus status;
+		if (status_character == "") {
+			status = UNSUBMITTED;
+		} else {
+			for (pair <enum JobStatus,string> status_pair : status_characters) {
+				if (status_pair.second == status_character) {
+					status = status_pair.first;
+					if (status == SUBMITTED) {
+						active_jobs++;
+					}
+					break;
+				}
+			}
+		}
+
+		CRAJob job(inputfile, status, joburl);
+		jobs.push_back(job);
 	}
 
 	// Create output directory if needed

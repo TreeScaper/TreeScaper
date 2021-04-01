@@ -20,9 +20,10 @@ enum JobStatus {
 // Stores information about a CRA job.
 class CRAJob {
 	public:
-		CRAJob(string inputfile) : inputfile(inputfile) {
-			status = UNSUBMITTED;
-		};
+		CRAJob(string inputfile, enum JobStatus status = UNSUBMITTED, string joburl = "") :
+			inputfile(inputfile),
+			status(status),
+			joburl(joburl) {};
 
 		// Input file for CRA job.
 		// Most jobs have a single input file.
@@ -44,11 +45,23 @@ class CRAHandle {
 public:
 	// Initializes authentication and CRA application ID.
 	CRAHandle() :
-		username(getenv("TS_CRA_USERNAME")),
-		password(getenv("TS_CRA_PASSWORD")),
 		active_jobs(0),
 		min_poll_interval_seconds(60)
-		{};
+		{
+			// Get CRA username supplied as environment variable.
+			const char *username_env = getenv("TS_CRA_USERNAME");
+			if (username_env == NULL) {
+				throw invalid_argument("Must supply TS_CRA_USERNAME environment variable.");
+			}
+			username = string(username_env);
+
+			// Get CRA password supplied as environment variable.
+			const char *password_env = getenv("TS_CRA_PASSWORD");
+			if (password_env == NULL) {
+				throw invalid_argument("Must supply TS_CRA_PASSWORD environment variable.");
+			}
+			password = string(password_env);
+		};
 	bool submit_jobs(string filelist, string paramfile);
 	bool submit_job(CRAJob& job);
 	bool parse_status(CRAJob& job);
