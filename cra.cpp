@@ -248,9 +248,9 @@ bool CRAHandle::parse_status(CRAJob& job) {
 }
 
 //
-// Writes a list with the status of each job. Each row is space-delimited with the format:
+// Writes a list with the status of each job. Each row is tab-delimited with the format:
 //
-//	 <job status> <input file> <job url>
+//	 <input file> <job status> <job url>
 //
 // The statuses are recorded as single characters, as provided by a map<enum JobStatus, string>
 //
