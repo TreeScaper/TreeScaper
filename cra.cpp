@@ -382,6 +382,8 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 		}
 	}
 
+	write_job_status();
+
 	bool all_jobs_completed = false;
 
 	// Main submission loop
