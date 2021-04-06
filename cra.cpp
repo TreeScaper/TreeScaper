@@ -40,7 +40,7 @@ const char status_file_delim = '\t';
 const int active_job_limit = 50;
 
 // Minimum time in milliseconds between REST requests
-const int rate_limit = 1000;
+const int rate_limit = 5000;
 
 // Application ID for CRA
 const string cra_application_id = "treescaper_inference_dev-D4DFA6E180C643779DC203C1D5114ED4";
@@ -76,6 +76,19 @@ void log_message(string message) {
 //
 bool submit_curl_request(CURL *curl) {
 
+	using namespace std::chrono;
+
+	// Rate limiting
+	static time_point<system_clock> last_request_time;
+
+	// Calculate the difference in milliseconds since the last request was made.
+	long diff = duration_cast<milliseconds>(system_clock::now() - last_request_time).count();
+
+	// If this difference is less than the limit, sleep for the remainder.
+	if (diff < rate_limit) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(diff));
+	}
+
 	log_message("Sending request..");
 
 	// Perform the request.
@@ -99,6 +112,10 @@ bool submit_curl_request(CURL *curl) {
 		return false;
 	}
 	log_message("OK");
+
+	// Reset the last request time.
+	last_request_time = system_clock::now();
+
 	return true;
 }
 
@@ -157,26 +174,10 @@ bool CRAHandle::retrieve_url(string url) {
 
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
-	using namespace std::chrono;
-
-	// Rate limiting
-	static time_point<system_clock> last_request_time;
-
-	// Calculate the difference in milliseconds since the last request was made.
-	long diff = duration_cast<milliseconds>(system_clock::now() - last_request_time).count();
-
-	// If this difference is less than the limit, sleep for the remainder.
-	if (diff < rate_limit) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(diff));
-	}
-
 	// Submit request.
 	if (!submit_curl_request(curl)) {
 		return false;
 	}
-
-	// Reset the last request time.
-	last_request_time = system_clock::now();
 
 	return true;
 }
