@@ -71,13 +71,14 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	if ((String) argv[1] == (String) "-inference") {
-		String default_paras[] = {"", ""};
-		String options[] = {"-f", "-p"};
+		String default_paras[] = {"", "", ""};
+		String options[] = {"-f", "-p", "-cl"};
 
 		map<String, String> paras = read_paras(argc, argv, sizeof(options)/sizeof(String), default_paras, options);
 
 		string inputfile = string((char*)paras["-f"]);
 		string paramfile = string((char*)paras["-p"]);
+		cra_log_level = string((char*)paras["-cl"]) == "debug" ? DEBUG : NONE;
 
 		CRAHandle crahandle;
 		if (crahandle.submit_jobs(inputfile, paramfile) == false) {

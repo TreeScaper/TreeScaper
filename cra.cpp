@@ -8,6 +8,7 @@
 #include <thread>
 #include <regex>
 #include <fstream>
+#include <iomanip>
 #include <curl/curl.h>
 #include <pugixml.hpp>
 #include <sys/types.h>
@@ -15,6 +16,9 @@
 #include "cra.hpp"
 
 using namespace std;
+
+// Level for logging to stdout
+enum CRALogLevel cra_log_level;
 
 // Base URL for CRA API
 const string cra_url = "https://cipresrest.sdsc.edu/cipresrest/v1/job/";
@@ -60,10 +64,20 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
 	return nmemb;
 }
 
+void log_message(string message) {
+	if (cra_log_level == DEBUG) {
+		time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		cout << std::put_time(gmtime(&time), "CRA %Y-%m-%d %H:%M:%S") << ": " << message << endl;
+	}
+}
+
 //
 // Submits request and checks for errors and bad response codes.
 //
 bool submit_curl_request(CURL *curl) {
+
+	log_message("Sending request..");
+
 	// Perform the request.
 	CURLcode res = curl_easy_perform(curl);
 
@@ -80,9 +94,11 @@ bool submit_curl_request(CURL *curl) {
 
 	// Check for HTTP OK response code.
 	if (response_code != 200) {
+		log_message("FAIL");
 		cerr << "Error: non-200 HTTP response. Response code was " << response_code << "." << endl;
 		return false;
 	}
+	log_message("OK");
 	return true;
 }
 
@@ -136,6 +152,8 @@ CURL *CRAHandle::create_cra_curl_handle() {
 bool CRAHandle::retrieve_url(string url) {
 
 	CURL *curl = create_cra_curl_handle();
+
+	log_message("Setting request URL: " + url);
 
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
@@ -236,6 +254,9 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 		// If filename matches, create a new curl request and download it
 		string file_url = node.child("downloadUri").child("url").child_value();
 		CURL *curl = create_cra_curl_handle();
+
+		log_message("Setting request URL: " + file_url);
+
 		curl_easy_setopt(curl, CURLOPT_URL, file_url.c_str());
 
 		// Submit request.
@@ -490,6 +511,8 @@ bool CRAHandle::submit_job(CRAJob& job) {
 		return false;
 	}
 
+	log_message("Setting request URL: " + cra_url + username);
+
 	// Set up URL for initial request
 	curl_easy_setopt(curl, CURLOPT_URL, (cra_url + username).c_str());
 
@@ -549,6 +572,8 @@ bool CRAHandle::submit_job(CRAJob& job) {
 	// Provide form to curl object
 	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
 
+	log_message("Submitting job for " + job.inputfile + ".");
+
 	// Submit request.
 	if (!submit_curl_request(curl)) {
 		return false;
@@ -566,6 +591,8 @@ bool CRAHandle::submit_job(CRAJob& job) {
 
 	// Get URL to query job status
 	job.handle = string(doc.child("jobstatus").child("jobHandle").child_value());
+
+	log_message("Job handle is: " + job.handle);
 
 	// Get minimum poll interval.
 	min_poll_interval_seconds =

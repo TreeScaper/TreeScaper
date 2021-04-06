@@ -15,6 +15,13 @@ enum JobStatus {
 	FAILED
 };
 
+enum CRALogLevel {
+	NONE,
+	DEBUG
+};
+
+extern enum CRALogLevel cra_log_level;
+
 // Stores information about a CRA job.
 class CRAJob {
 	public:
