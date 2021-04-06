@@ -86,7 +86,7 @@ bool submit_curl_request(CURL *curl) {
 
 	// If this difference is less than the limit, sleep for the remainder.
 	if (diff < rate_limit) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(diff));
+		std::this_thread::sleep_for(std::chrono::milliseconds(rate_limit - diff));
 	}
 
 	log_message("Sending request..");
