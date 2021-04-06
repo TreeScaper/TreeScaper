@@ -3,6 +3,7 @@
 #include <string>
 #include <chrono>
 #include <curl/curl.h>
+#include <pugixml.hpp>
 
 using namespace std;
 
@@ -17,10 +18,10 @@ enum JobStatus {
 // Stores information about a CRA job.
 class CRAJob {
 	public:
-		CRAJob(string inputfile, enum JobStatus status = UNSUBMITTED, string joburl = "") :
+		CRAJob(string inputfile, enum JobStatus status = UNSUBMITTED, string handle = "") :
 			inputfile(inputfile),
 			status(status),
-			joburl(joburl) {};
+			handle(handle) {};
 
 		// Input file for CRA job.
 		// Most jobs have a single input file.
@@ -29,12 +30,8 @@ class CRAJob {
 		// Status of job as tracked in TreeScaper.
 		enum JobStatus status;
 
-		// URL where job status is found.
-		string joburl;
-
-		// Last time the jobs status was checked.
-		// We rate limit this check.
-		chrono::time_point<std::chrono::system_clock> last_poll;
+		// Handle for constructing url to find status.
+		string handle;
 };
 
 // Manages interaction with the CRA.
@@ -60,9 +57,10 @@ public:
 			password = string(password_env);
 		};
 	bool submit_jobs(string filelist, string paramfile);
-	bool submit_job(CRAJob& job);
-	bool parse_status(CRAJob& job);
 private:
+	bool submit_job(CRAJob& job);
+	bool parse_single_status(pugi::xml_node status_node);
+	bool parse_status_list();
 	bool retrieve_url(string url);
 	bool change_job_status(CRAJob& job, enum JobStatus status);
 	bool write_job_status();
@@ -89,4 +87,8 @@ private:
 
 	// Minimum number of seconds between polls to check status of one job
 	int min_poll_interval_seconds;
+
+	// Last time status of all active jobs in the jobs list was checked.
+	// We rate limit this check.
+	chrono::time_point<std::chrono::system_clock> last_poll;
 };

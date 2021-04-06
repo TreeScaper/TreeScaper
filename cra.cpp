@@ -36,10 +36,13 @@ const char status_file_delim = '\t';
 const int active_job_limit = 50;
 
 // Minimum time in milliseconds between REST requests
-const int rate_limit = 500;
+const int rate_limit = 1000;
 
 // Application ID for CRA
 const string cra_application_id = "treescaper_inference_dev-D4DFA6E180C643779DC203C1D5114ED4";
+
+// Increase the poll interval from the minimum allowable as a matter of courtesy.
+const int poll_interval_multiplier = 5;
 
 // Characters output indicating status of each job in the status file
 const map<enum JobStatus, string> status_characters = {
@@ -80,6 +83,7 @@ bool submit_curl_request(CURL *curl) {
 		cerr << "Error: non-200 HTTP response. Response code was " << response_code << "." << endl;
 		return false;
 	}
+	return true;
 }
 
 //
@@ -159,68 +163,61 @@ bool CRAHandle::retrieve_url(string url) {
 	return true;
 }
 
-//
-// Parses results from the last request to the job url.  These results should already
-// be present in the member userdata variable.
-//
-// If there has been a change in the job's status, change job.status.
-// If the job completed successfully, download its output bootstrap trees.
-//
-// This function expects a specific XML scheme from the CRA.
-//
-bool CRAHandle::parse_status(CRAJob& job) {
+bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
+
+	// Check if job finished.
+	bool finished = (string(status_node.child("terminalStage").child_value()) == string("true"));
+	if (!finished) {
+		return true;
+	}
+
+	// Find matching job from list.
+	string job_handle = string(status_node.child("jobHandle").child_value());
+	CRAJob *job;
+	for (CRAJob& job_p : jobs) {
+		if (job_p.status == SUBMITTED) {
+			if (job_p.handle == job_handle) {
+				job = &job_p;
+				break;
+			}
+		}
+	}
+
+	// Decrement the number of jobs if the job has finished.
+	active_jobs--;
+
+	// Check if there was a failure by CRA to submit the job or retrieve results.
+	bool failed = (string(status_node.child("failed").child_value()) == string("true"));
+	if (failed) {
+		change_job_status(*job, FAILED);
+		return false;
+	}
+
+	// Check if we have a message that the job completed successfully.
+	bool completed_message = false;
+	for (pugi::xml_node node: status_node.child("messages").children("message")) {
+		string stage = node.child("stage").child_value();
+		if (stage == "COMPLETED") {
+			completed_message = true;
+			break;
+		}
+	}
+
+	// If we are at the terminal stage but don't have that message, consider it failed.
+	if (!completed_message) {
+		change_job_status(*job, FAILED);
+		return true;
+	}
+
+	// Retrieve list of output files
+	string results_url = string(status_node.child("resultsUri").child("url").child_value());
+	retrieve_url(results_url);
 
 	// Parse response into a pugi xml doc
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_buffer(userdata.c_str(), userdata.size());
 	if (!result) {
-		cerr << "Error parsing XML" << endl;
-		return false;
-	}
-
-	// Check if completed
-
-	bool completed = false;
-	bool failed = false;
-
-	// Go through each message and check the "stage". If we find COMPLETED then the
-	// job is finished. We then check the <failed> tag for success.
-	for (pugi::xml_node node: doc.child("jobstatus").child("messages").children("message")) {
-		string stage = node.child("stage").child_value();
-		if (stage == "COMPLETED") {
-			completed = true;
-			string failed_tag =
-				string(doc.child("jobstatus").child("failed").child_value());
-			if (failed_tag == "true") {
-				failed = true;
-			}
-			break;
-		}
-	}
-
-	// If completed, first set the job status to either FAILED or SUCCESSFUL.
-	// If successful, then download the output file.
-	if (!completed) {
-		return true;
-	}
-
-	// The job has completed, so decrement the active_job counter.
-	active_jobs--;
-
-	// If failed, exit before attempting to retrieve results.
-	if (failed) {
-		change_job_status(job, FAILED);
-		return true;
-	}
-
-	// Retrieve list of output files
-	string results_url = string(doc.child("jobstatus").child("resultsUri").child("url").child_value());
-	retrieve_url(results_url);
-
-	// Parse response into a pugi xml doc
-	result = doc.load_buffer(userdata.c_str(), userdata.size());
-	if (!result) {
-		cerr << "Error parsing XML" << endl;
+		cerr << "Error parsing XML: " << userdata << endl;
 		return false;
 	}
 
@@ -248,16 +245,45 @@ bool CRAHandle::parse_status(CRAJob& job) {
 
 		// Write response data to file
 		// The output files are named based on the input filenames.
-		string inputfile_name = job.inputfile.substr(job.inputfile.find_last_of("/\\") + 1);
+		string inputfile_name = job->inputfile.substr(job->inputfile.find_last_of("/\\") + 1);
 		string output_filepath = cra_output_directory + "/" + inputfile_name + "_" + output_filename;
 		ofstream outfile(output_filepath);
 		if (outfile) {
 			outfile << userdata;
 		}
+		outfile.close();
 	}
 
 	// If completed and not failed, the job is considered SUCCESSFUL.
-	change_job_status(job, SUCCESSFUL);
+	change_job_status(*job, SUCCESSFUL);
+	return true;
+}
+
+//
+// Parses results from the last request to the job url.  These results should already
+// be present in the member userdata variable.
+//
+// If there has been a change in the job's status, change job.status.
+// If the job completed successfully, download its output bootstrap trees.
+//
+// This function expects a specific XML scheme from the CRA.
+//
+bool CRAHandle::parse_status_list() {
+
+	// Parse response into a pugi xml doc
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_buffer(userdata.c_str(), userdata.size());
+	if (!result) {
+		cerr << "Error parsing XML: " << userdata << endl;
+		return false;
+	}
+
+	// Parse the status of each job
+	for (pugi::xml_node node: doc.child("joblist").child("jobs").children("jobstatus")) {
+		if (!parse_single_status(node)) {
+			return false;
+		}
+	}
 
 	return true;
 }
@@ -279,8 +305,9 @@ bool CRAHandle::write_job_status() {
 	// For each job, write its status, file, and url if it exists
 	for (CRAJob& job : jobs) {
 		string status_character = status_characters.at(job.status);
-		of << job.inputfile << status_file_delim << status_character << status_file_delim << job.joburl << endl;
+		of << job.inputfile << status_file_delim << status_character << status_file_delim << job.handle << endl;
 	}
+	of.close();
 	return true;
 }
 
@@ -331,6 +358,7 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 		// Add parameter to param map
 		cra_params.insert(std::pair<string,string>(param_name, param_value));
 	}
+	param_f.close();
 
 	// Create CRAJob objects from input files
 	ifstream list_f(filelist);
@@ -352,8 +380,8 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 		}
 
 		// Read URL for job if submitted.
-		string joburl("");
-		if (!getline(line_stream, joburl, status_file_delim) && line_stream.bad()) {
+		string job_handle("");
+		if (!getline(line_stream, job_handle, status_file_delim) && line_stream.bad()) {
 			return false;
 		}
 
@@ -373,7 +401,7 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 			}
 		}
 
-		CRAJob job(inputfile, status, joburl);
+		CRAJob job(inputfile, status, job_handle);
 		jobs.push_back(job);
 	}
 
@@ -422,21 +450,32 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 
 		using namespace std::chrono;
 
-		// Loop through jobs and check status of submitted jobs.
+		// Build url to request status of all active jobs
+		string url_query = "?";
+
 		for (CRAJob& job : jobs) {
-			const time_point<system_clock> now = system_clock::now();
-			if (job.status == SUBMITTED &&
-				duration_cast<seconds>(now - job.last_poll).count() > min_poll_interval_seconds) {
-
-				// Get status
-				retrieve_url(job.joburl);
-				job.last_poll = system_clock::now();
-				parse_status(job);
+			if (job.status == SUBMITTED) {
+				url_query.append("jh=" + job.handle + "&");
 			}
+		}
 
-			// Mark that we still have some unfinished jobs.
+		// If enough time has passed, check the status of all submitted jobs.
+		const time_point<system_clock> now = system_clock::now();
+		if (duration_cast<seconds>(now - last_poll).count() > min_poll_interval_seconds) {
+
+			// Get status of all active jobs
+			retrieve_url(cra_url + "/" + url_query);
+			last_poll = system_clock::now();
+
+			// Parse status.
+			parse_status_list();
+		}
+
+		// Check if there are any unfinished jobs.
+		for (CRAJob& job : jobs) {
 			if (job.status != SUCCESSFUL && job.status != FAILED) {
 				all_jobs_completed = false;
+				break;
 			}
 		}
 	}
@@ -526,12 +565,13 @@ bool CRAHandle::submit_job(CRAJob& job) {
 	}
 
 	// Get URL to query job status
-	job.joburl = string(doc.child("jobstatus").child("selfUri").child("url").child_value());
+	job.handle = string(doc.child("jobstatus").child("jobHandle").child_value());
 
 	// Get minimum poll interval.
-	min_poll_interval_seconds = doc.child("jobstatus").child("minPollIntervalSeconds").text().as_int();
+	min_poll_interval_seconds =
+		poll_interval_multiplier * doc.child("jobstatus").child("minPollIntervalSeconds").text().as_int();
 
-	// Wait until we've updated the joburl to change status, s.t. that status file contains the url.
+	// Wait until we've updated the handle to change status, s.t. that status file contains the url.
 	change_job_status(job, SUBMITTED);
 
 	return true;
