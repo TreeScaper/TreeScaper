@@ -58,6 +58,31 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
 }
 
 //
+// Submits request and checks for errors and bad response codes.
+//
+bool submit_curl_request(CURL *curl) {
+	// Perform the request.
+	CURLcode res = curl_easy_perform(curl);
+
+	curl_easy_cleanup(curl);
+
+	// Check for errors
+	if(res != CURLE_OK) {
+		cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << endl;
+		return false;
+	}
+
+	long response_code = 0;
+	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+
+	// Check for HTTP OK response code.
+	if (response_code != 200) {
+		cerr << "Error: non-200 HTTP response. Response code was " << response_code << "." << endl;
+		return false;
+	}
+}
+
+//
 // Create a simple CURL handle with the basic configuration needed
 // for all CRA requests.
 //
@@ -123,20 +148,14 @@ bool CRAHandle::retrieve_url(string url) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(diff));
 	}
 
-	// Perform the request.
-	CURLcode res = curl_easy_perform(curl);
+	// Submit request.
+	if (!submit_curl_request(curl)) {
+		return false;
+	}
 
 	// Reset the last request time.
 	last_request_time = system_clock::now();
 
-	curl_easy_cleanup(curl);
-
-	// Check for errors
-	if(res != CURLE_OK) {
-		fprintf(stderr, "curl_easy_perform() failed: %s\n",
-			curl_easy_strerror(res));
-		return false;
-	}
 	return true;
 }
 
@@ -221,13 +240,9 @@ bool CRAHandle::parse_status(CRAJob& job) {
 		string file_url = node.child("downloadUri").child("url").child_value();
 		CURL *curl = create_cra_curl_handle();
 		curl_easy_setopt(curl, CURLOPT_URL, file_url.c_str());
-		CURLcode res = curl_easy_perform(curl);
-		curl_easy_cleanup(curl);
 
-		// Check for errors
-		if(res != CURLE_OK) {
-			fprintf(stderr, "curl_easy_perform() failed: %s\n",
-					curl_easy_strerror(res));
+		// Submit request.
+		if (!submit_curl_request(curl)) {
 			return false;
 		}
 
@@ -495,15 +510,8 @@ bool CRAHandle::submit_job(CRAJob& job) {
 	// Provide form to curl object
 	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
 
-	// Submit job
-	CURLcode res = curl_easy_perform(curl);
-
-	curl_easy_cleanup(curl);
-
-	// Check for errors
-	if(res != CURLE_OK) {
-		fprintf(stderr, "curl_easy_perform() failed: %s\n",
-			curl_easy_strerror(res));
+	// Submit request.
+	if (!submit_curl_request(curl)) {
 		return false;
 	}
 
