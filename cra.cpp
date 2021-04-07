@@ -64,6 +64,14 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
 	return nmemb;
 }
 
+//
+// Populate buffer with header data
+//
+size_t header_callback(char *ptr, size_t size, size_t nmemb, void *headerdata) {
+	*(string*)headerdata += string(ptr);
+	return nmemb;
+}
+
 void log_message(string message) {
 	if (cra_log_level == DEBUG) {
 		time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -120,6 +128,18 @@ bool submit_curl_request(CURL *curl) {
 }
 
 //
+// Logs data and headers from most recent HTTP response.
+//
+void CRAHandle::log_last_response() {
+	if (cra_log_level = DEBUG) {
+		cout << "Response data:" << endl;
+		cout << userdata << endl;
+		cout << "Headers:" << endl;
+		cout << headerdata << endl;
+	}
+}
+
+//
 // Create a simple CURL handle with the basic configuration needed
 // for all CRA requests.
 //
@@ -150,12 +170,17 @@ CURL *CRAHandle::create_cra_curl_handle() {
 	// Verbose output for debugging. Not desired for production.
 	//curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
-	// Clear userdata
+	// Clear response and header data.
 	userdata = "";
+	headerdata = "";
 
 	// Set up callback function and buffer for initial request
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &userdata);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+
+	// Set up callback function and buffer for header data
+	curl_easy_setopt(curl, CURLOPT_HEADERDATA, (void*) &headerdata);
+	curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
 
 	return curl;
 }
@@ -176,6 +201,7 @@ bool CRAHandle::retrieve_url(string url) {
 
 	// Submit request.
 	if (!submit_curl_request(curl)) {
+		log_last_response();
 		return false;
 	}
 
@@ -262,6 +288,7 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 
 		// Submit request.
 		if (!submit_curl_request(curl)) {
+			log_last_response();
 			return false;
 		}
 
@@ -577,6 +604,7 @@ bool CRAHandle::submit_job(CRAJob& job) {
 
 	// Submit request.
 	if (!submit_curl_request(curl)) {
+		log_last_response();
 		return false;
 	}
 

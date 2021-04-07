@@ -82,6 +82,9 @@ private:
 	// Buffer to store response data from CURL request.
 	string userdata;
 
+	// Buffer to store response headers from CURL request.
+	string headerdata;
+
 	// Number of CRA jobs currently active.
 	// This must stay below some threshold.
 	int active_jobs;
@@ -98,4 +101,7 @@ private:
 	// Last time status of all active jobs in the jobs list was checked.
 	// We rate limit this check.
 	chrono::time_point<std::chrono::system_clock> last_poll;
+
+	// Logs last HTTP response data and header.
+	void log_last_response();
 };
