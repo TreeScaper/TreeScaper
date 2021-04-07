@@ -483,7 +483,7 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 
 		// Loop through jobs and submit unsubmitted jobs.
 		for (CRAJob& job : jobs) {
-			if (active_jobs == active_job_limit) {
+			if (active_jobs >= active_job_limit) {
 				break;
 			}
 
@@ -501,8 +501,16 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 
 		// Build url to request status of all active jobs
 		string url_query = "?";
+		int jobs_queried = 0;
 
 		for (CRAJob& job : jobs) {
+			// The URL cannot be too long, so limit the number of queried jobs to the limit
+			// for active jobs. We may have more jobs than this in total to query, because of
+			// completed but not active jobs.
+			if (jobs_queried++ == active_jobs){
+				break;
+			}
+
 			if (job.status == SUBMITTED) {
 				url_query.append("jh=" + job.handle + "&");
 			}
