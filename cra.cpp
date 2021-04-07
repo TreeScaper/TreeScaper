@@ -37,7 +37,7 @@ const char status_file_delim = '\t';
 
 // Number of jobs that can be active via the CRA at once. This is a limit build
 // into the CRA, but we reproduce it here.
-const int active_job_limit = 50;
+const int active_job_limit = 20;
 
 // Minimum time in milliseconds between REST requests
 const int rate_limit = 5000;
