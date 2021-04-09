@@ -266,6 +266,8 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 		return false;
 	}
 
+	bool output_file_found = false;
+
 	// The document lists all of the output files, each with a name and URL for retrieving the file.
 	// Search through these files until we find the bootstrap results, and then download it with the
 	// associated URL.
@@ -277,6 +279,8 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 		if (filename != output_filename) {
 			continue;
 		}
+
+		output_file_found = true;
 
 		// If filename matches, create a new curl request and download it
 		string file_url = node.child("downloadUri").child("url").child_value();
@@ -303,8 +307,15 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 		outfile.close();
 	}
 
-	// If completed and not failed, the job is considered SUCCESSFUL.
-	change_job_status(*job, SUCCESSFUL);
+	if (!output_file_found) {
+
+		// If the expected output file was not found, mark the job as a failed.
+		change_job_status(*job, FAILED);
+	} else {
+
+		// If completed and not failed, the job is considered SUCCESSFUL.
+		change_job_status(*job, SUCCESSFUL);
+	}
 	return true;
 }
 
