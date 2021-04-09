@@ -535,7 +535,9 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 			last_poll = system_clock::now();
 
 			// Parse status.
-			parse_status_list();
+			if (!parse_status_list()) {
+				return false;
+			}
 		}
 
 		// Check if there are any unfinished jobs.
