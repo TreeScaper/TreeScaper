@@ -40,13 +40,13 @@ const char status_file_delim = '\t';
 const int active_job_limit = 50;
 
 // Minimum time in milliseconds between REST requests
-const int rate_limit = 5000;
+const int rate_limit = 2000;
 
 // Application ID for CRA
 const string cra_application_id = "treescaper_inference_dev-D4DFA6E180C643779DC203C1D5114ED4";
 
 // Increase the poll interval from the minimum allowable as a matter of courtesy.
-const int poll_interval_multiplier = 5;
+const int poll_interval_multiplier = 2;
 
 // Characters output indicating status of each job in the status file
 const map<enum JobStatus, string> status_characters = {
