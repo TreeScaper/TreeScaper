@@ -48,6 +48,12 @@ const string cra_application_id = "treescaper_inference_dev-D4DFA6E180C643779DC2
 // Increase the poll interval from the minimum allowable as a matter of courtesy.
 const int poll_interval_multiplier = 2;
 
+// Number of retry attempts for a given request.
+const int max_retries = 2;
+
+// Duration to wait in milliseconds after a failed request.
+const int retry_wait_duration = 2*60*1000;
+
 // Characters output indicating status of each job in the status file
 const map<enum JobStatus, string> status_characters = {
 	{UNSUBMITTED, "U"},
@@ -89,40 +95,62 @@ bool submit_curl_request(CURL *curl) {
 	// Rate limiting
 	static time_point<system_clock> last_request_time;
 
-	// Calculate the difference in milliseconds since the last request was made.
-	long diff = duration_cast<milliseconds>(system_clock::now() - last_request_time).count();
+	int retry_counter = 0;
+	bool ok_response_recieved = false;
 
-	// If this difference is less than the limit, sleep for the remainder.
-	if (diff < rate_limit) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(rate_limit - diff));
+	while (retry_counter <= max_retries && !ok_response_recieved) {
+
+		// Calculate the difference in milliseconds since the last request was made.
+		long diff = duration_cast<milliseconds>(system_clock::now() - last_request_time).count();
+
+		// By default, wait a minimum amount of time between each request.
+		int wait_duration = rate_limit;
+
+		// If we're retrying a failed request, wait the necessary amount of time.
+		if (retry_counter > 0) {
+			wait_duration = retry_wait_duration;
+		}
+
+		// If this difference is less than the limit, sleep for the remainder.
+		if (diff < wait_duration) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(wait_duration - diff));
+		}
+
+		log_message("Sending request..");
+
+		// Perform the request.
+		CURLcode res = curl_easy_perform(curl);
+
+		curl_easy_cleanup(curl);
+
+		// Reset the last request time.
+		last_request_time = system_clock::now();
+
+		// Check for errors
+		if(res != CURLE_OK) {
+			cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << endl;
+			retry_counter++;
+			continue;
+		}
+
+		long response_code = 0;
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+
+		// Check for HTTP OK response code.
+		if (response_code != 200) {
+			retry_counter++;
+			log_message("FAIL");
+			cerr << "Error: non-200 HTTP response. Response code was " << response_code << "." << endl;
+		} else {
+			log_message("OK");
+			ok_response_recieved = true;
+		}
 	}
 
-	log_message("Sending request..");
-
-	// Perform the request.
-	CURLcode res = curl_easy_perform(curl);
-
-	curl_easy_cleanup(curl);
-
-	// Check for errors
-	if(res != CURLE_OK) {
-		cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << endl;
+	if (!ok_response_recieved) {
+		cerr << "Error: max retry attempts made. Terminating." << endl;
 		return false;
 	}
-
-	long response_code = 0;
-	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-
-	// Check for HTTP OK response code.
-	if (response_code != 200) {
-		log_message("FAIL");
-		cerr << "Error: non-200 HTTP response. Response code was " << response_code << "." << endl;
-		return false;
-	}
-	log_message("OK");
-
-	// Reset the last request time.
-	last_request_time = system_clock::now();
 
 	return true;
 }
