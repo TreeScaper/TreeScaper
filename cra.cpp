@@ -54,6 +54,9 @@ const int max_retries = 2;
 // Duration to wait in milliseconds after a failed request.
 const int retry_wait_duration = 2*60*1000;
 
+// Timeout for HTTP requests in seconds.
+const int request_timeout = 60L;
+
 // Characters output indicating status of each job in the status file
 const map<enum JobStatus, string> status_characters = {
 	{UNSUBMITTED, "U"},
@@ -97,6 +100,9 @@ bool submit_curl_request(CURL *curl) {
 
 	int retry_counter = 0;
 	bool ok_response_recieved = false;
+
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT, request_timeout);
+	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
 
 	while (retry_counter <= max_retries && !ok_response_recieved) {
 
