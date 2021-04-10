@@ -269,7 +269,7 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 	bool failed = (string(status_node.child("failed").child_value()) == string("true"));
 	if (failed) {
 		change_job_status(*job, FAILED);
-		return false;
+		return true;
 	}
 
 	// Check if we have a message that the job completed successfully.
