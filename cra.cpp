@@ -127,8 +127,6 @@ bool submit_curl_request(CURL *curl) {
 		// Perform the request.
 		CURLcode res = curl_easy_perform(curl);
 
-		curl_easy_cleanup(curl);
-
 		// Reset the last request time.
 		last_request_time = system_clock::now();
 
@@ -152,6 +150,8 @@ bool submit_curl_request(CURL *curl) {
 			ok_response_recieved = true;
 		}
 	}
+
+	curl_easy_cleanup(curl);
 
 	if (!ok_response_recieved) {
 		cerr << "Error: max retry attempts made. Terminating." << endl;
