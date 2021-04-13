@@ -176,10 +176,6 @@ void NLDR::init_NLDR()
 	}
 	else
 		parameters.distance_file_type = 0;
-
-	size = D_file.lines();
-
-	D_file.seek(pos);
 	int dim_int = atoi(dim_str);
 
 	if (dim_int < 1)
