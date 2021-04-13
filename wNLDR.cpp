@@ -169,6 +169,13 @@ void NLDR::init_NLDR()
 	D_postfname = D_file.postfix_name_lastof();
 	int pos = D_file.end_header();
 	D_file.seek(pos);
+	size = D_file.lines();
+	if (pos == 0) {
+		parameters.distance_file_type = 1;
+		size--;
+	}
+	else
+		parameters.distance_file_type = 0;
 
 	size = D_file.lines();
 
@@ -758,29 +765,33 @@ void NLDR::NLDR_load_D(String fname)
 		exit(0);
 	}
 	int pos = D_file.end_header();
-
-	//D_file.seek(pos);
-	//D.resize(size, size);
-	//for (int i = 0; i < size; i++)
-	//	for (int j = 0; j <= i; j++)
-	//	{
-	//		D_file >> D.matrix[i][j];
-	//		D.matrix[j][i] = D.matrix[i][j];
-	//	}
-	String tree;
-	double index;
-	size--;
+	D_file.seek(pos);
 	D.resize(size, size);
-	D_file >> tree;
-	for (int i = 0; i < size; i++)
-		D_file >> index;
-	for (int i = 0; i < size; i++)
-	{
-		D_file >> index;
-		for (int j = 0; j <= i; j++)
+
+	if (pos == 0) {
+		String tree;
+		double index;
+		D_file >> tree;
+		for (int i = 0; i < size; i++)
+			D_file >> index;
+		for (int i = 0; i < size; i++)
 		{
-			D_file >> D.matrix[i][j];
-			D.matrix[j][i] = D.matrix[i][j];
+			D_file >> index;
+			for (int j = 0; j <= i; j++)
+			{
+				D_file >> D.matrix[i][j];
+				D.matrix[j][i] = D.matrix[i][j];
+			}
+		}
+	}
+	else {
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j <= i; j++)
+			{
+				D_file >> D.matrix[i][j];
+				D.matrix[j][i] = D.matrix[i][j];
+			}
 		}
 	}
 	// Dense symmetric matrix is stored.
