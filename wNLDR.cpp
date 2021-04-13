@@ -787,9 +787,7 @@ void NLDR::NLDR_load_D(String fname)
 			{
 				D_file >> D.matrix[i][j];
 				D.matrix[j][i] = D.matrix[i][j];
-				std::cout << D.matrix[i][j] << ' ';
 			}
-			std::cout << '\n';
 		}
 	}
 	// Dense symmetric matrix is stored.
