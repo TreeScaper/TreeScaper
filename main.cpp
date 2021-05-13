@@ -93,7 +93,9 @@ int main(int argc, char* argv[]) {
 		map<String, String> paras = read_paras(argc, argv, sizeof(options)/sizeof(String), default_paras, options);
         
         trees_driver(paras);
-    } 
+	} else if ((String) argv[1] == (String) "-version" || (String) argv[1] == (String) "-v") {
+		cout << program_version << endl;
+	}
 
 	return 0;
 }
