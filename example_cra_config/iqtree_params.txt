@@ -1,0 +1,12 @@
+# Parameters used by CRA
+tool=IQTREE_XSEDE
+metadata.statusEmail=true
+vparam.bootstrap_type_=b
+vparam.num_bootreps_=100
+vparam.write_boottrees_=1
+vparam.write_boottrees1_=1
+vparam.specify_runtype_=2
+vparam.specify_numparts_=1
+
+# Parameters used by TreeScaper
+treescaper.output=output.boottrees

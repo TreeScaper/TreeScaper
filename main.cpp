@@ -11,6 +11,7 @@
 #include "zdtreeobj.hpp"
 #include "wstring.hpp"
 #include "version.hpp"
+#include "cra.hpp"
 
 using namespace std;
 
@@ -65,20 +66,37 @@ map<String, String> read_paras(int argc, char* argv[], int key_size, String* def
 }
 
 int main(int argc, char* argv[]) {
+	if (argc == 1) {
+		cerr << "No arguments supplied." << endl;
+		return 1;
+	}
+	if ((String) argv[1] == (String) "-cra") {
+		String default_paras[] = {"", "", ""};
+		String options[] = {"-f", "-p", "-cl"};
 
+		map<String, String> paras = read_paras(argc, argv, sizeof(options)/sizeof(String), default_paras, options);
 
-	if(argc > 1 && (String) argv[1] == (String) "-trees")
-    {
-        String default_paras[7] = {"", 		"postfix", 	"taxon", 	"64", 	"0",	"1",	"Cov"};
-        String options[7] =       {"-f", "	-post", 	"-tm", 		"-bit", "-r",	"-w", 	"-o"};
+		string inputfile = string((char*)paras["-f"]);
+		string paramfile = string((char*)paras["-p"]);
+		cra_log_level = string((char*)paras["-cl"]) == "debug" ? DEBUG : NONE;
+
+		CRAHandle crahandle;
+		if (crahandle.submit_jobs(inputfile, paramfile) == false) {
+			return 1;
+		}
+		return 0;
+
+    } else if(argc > 1 && (String) argv[1] == (String) "-trees") {
+        String default_paras[] = {"", 		"postfix", 	"taxon", 	"64", 	"0",	"1",	"Cov"};
+        String options[] =       {"-f", "	-post", 	"-tm", 		"-bit", "-r",	"-w", 	"-o"};
         
-        map<String, String> paras = read_paras(argc, argv, 7, default_paras, options);
+		map<String, String> paras = read_paras(argc, argv, sizeof(options)/sizeof(String), default_paras, options);
         
         trees_driver(paras);
-    } 
+	} else if ((String) argv[1] == (String) "-version" || (String) argv[1] == (String) "-v") {
+		cout << program_version << endl;
+	}
 
-
-	
 	return 0;
 }
 
@@ -112,7 +130,7 @@ bool trees_driver(map<String, String> paras){
 	int n_tree = 100;
 	std::string fname((char *) paras["-f"]);
 
-	std::cout << "Reading taxa...\n"; 
+	std::cout << "Reading taxa...\n" << endl;
 	start = std::clock();
 
 	TaxonList Taxa;	
