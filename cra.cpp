@@ -65,6 +65,10 @@ const map<enum JobStatus, string> status_characters = {
 	{FAILED, "F"},
 };
 
+// Environment variable names for CRA credentials.
+const string username_env_var = "TS_CRA_USERNAME";
+const string password_env_var = "TS_CRA_PASSWORD";
+
 //
 // Populate user buffer with response data
 //
