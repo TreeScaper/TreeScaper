@@ -21,6 +21,8 @@ enum CRALogLevel {
 };
 
 extern enum CRALogLevel cra_log_level;
+extern const string username_env_var;
+extern const string password_env_var;
 
 // Stores information about a CRA job.
 class CRAJob {
@@ -49,19 +51,20 @@ public:
 		active_jobs(0),
 		min_poll_interval_seconds(60)
 		{
-			// Get CRA username supplied as environment variable.
-			const char *username_env = getenv("TS_CRA_USERNAME");
-			if (username_env == NULL) {
-				throw invalid_argument("Must supply TS_CRA_USERNAME environment variable.");
-			}
-			username = string(username_env);
+			// Get CRA username and password supplied as environment variable.
+			const char *username_env = getenv(username_env_var.c_str());
+			const char *password_env = getenv(password_env_var.c_str());
 
-			// Get CRA password supplied as environment variable.
-			const char *password_env = getenv("TS_CRA_PASSWORD");
-			if (password_env == NULL) {
-				throw invalid_argument("Must supply TS_CRA_PASSWORD environment variable.");
+			if (username_env == NULL || password_env == NULL ) {
+			        throw invalid_argument("Must supply " + username_env_var + " and " + password_env_var + " environment variables.");
 			}
+
+			username = string(username_env);
 			password = string(password_env);
+
+			if (username == "" || password == "") {
+			        throw invalid_argument(username_env_var + " and " + password_env_var + " must not be blank.");
+			}
 		};
 	bool submit_jobs(string filelist, string paramfile);
 private:
