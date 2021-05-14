@@ -337,6 +337,9 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 		ofstream outfile(output_filepath);
 		if (outfile) {
 			outfile << userdata;
+		} else {
+			cerr << "Error opening output file." << endl;
+			return false;
 		}
 		outfile.close();
 	}
