@@ -404,7 +404,6 @@ bool CRAHandle::write_job_status() {
 		string status_character = status_characters.at(job.status);
 		of << job.inputfile << status_file_delim << status_character << status_file_delim << job.handle << endl;
 	}
-	of.close();
 	return true;
 }
 
