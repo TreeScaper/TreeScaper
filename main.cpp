@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 		cerr << "No arguments supplied." << endl;
 		return 1;
 	}
-	if ((String) argv[1] == (String) "-inference") {
+	if ((String) argv[1] == (String) "-cra") {
 		String default_paras[] = {"", "", ""};
 		String options[] = {"-f", "-p", "-cl"};
 
