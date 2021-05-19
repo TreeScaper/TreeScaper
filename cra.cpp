@@ -339,12 +339,11 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 		string inputfile_name = job->inputfile.substr(job->inputfile.find_last_of("/\\") + 1);
 		string output_filepath = cra_output_directory + "/" + inputfile_name + "_" + output_filename;
 		ofstream outfile(output_filepath);
-		if (outfile) {
-			outfile << userdata;
-		} else {
+		if (outfile.fail()) {
 			cerr << "Error opening output file." << endl;
 			return false;
 		}
+		outfile << userdata;
 		outfile.close();
 	}
 
@@ -398,7 +397,7 @@ bool CRAHandle::parse_status_list() {
 //
 bool CRAHandle::write_job_status() {
 	ofstream of(job_status_filepath);
-	if (!of) {
+	if (of.fail()) {
 		cout << "Error opening job status path." << endl;
 		return false;
 	}
@@ -439,6 +438,10 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 
 	// Parse parameters.
 	ifstream param_f(paramfile);
+	if (param_f.fail()) {
+		cerr << "Error opening file " << paramfile << endl;
+		return false;
+	}
 	string param_line;
 	while (getline(param_f, param_line)) {
 
@@ -462,6 +465,10 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 
 	// Create CRAJob objects from input files
 	ifstream list_f(filelist);
+	if (list_f.fail()) {
+		cerr << "Error opening file " << filelist << endl;
+		return false;
+	}
 	string list_line;
 
 	while (getline(list_f, list_line)) {
