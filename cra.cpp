@@ -305,6 +305,8 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 	}
 
 	bool output_file_found = false;
+	string stdout_url;
+	string stderr_url;
 
 	// The document lists all of the output files, each with a name and URL for retrieving the file.
 	// Search through these files until we find the bootstrap results, and then download it with the
@@ -314,7 +316,16 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 		// Check if name matches expected name for bootstrap results.
 		string filename = node.child("filename").child_value();
 		string output_filename = cra_params.at(output_file_param);
+		string file_length = node.child("length").child_value();
+
 		if (filename != output_filename) {
+			if (file_length != "0") {
+				if (filename == "STDOUT") {
+					stdout_url = node.child("downloadUri").child("url").child_value();
+				} else if (filename == "STDERR") {
+					stderr_url = node.child("downloadUri").child("url").child_value();
+				}
+			}
 			continue;
 		}
 
@@ -339,16 +350,35 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 		string inputfile_name = job->inputfile.substr(job->inputfile.find_last_of("/\\") + 1);
 		string output_filepath = cra_output_directory + "/" + inputfile_name + "_" + output_filename;
 		ofstream outfile(output_filepath);
-		if (outfile) {
-			outfile << userdata;
-		} else {
+		if (outfile.fail()) {
 			cerr << "Error opening output file." << endl;
 			return false;
 		}
+		outfile << userdata;
 		outfile.close();
 	}
 
 	if (!output_file_found) {
+		cerr << "Error retrieving output file " << cra_params.at(output_file_param) << "." << endl;
+		if (stderr_url != "") {
+			cerr << "Retrieving standard error. " << endl;
+			if (!retrieve_url(stderr_url)) {
+				cerr << "Error retrieving stderr." << endl;
+			} else {
+				cerr << "Standard error: " << endl;
+				cerr << userdata << endl;
+			}
+		}
+
+		if (stdout_url != "") {
+			cerr << "Retrieving standard out. " << endl;
+			if (!retrieve_url(stdout_url)) {
+				cerr << "Error retrieving stdout." << endl;
+			} else {
+				cerr << "Standard out: " << endl;
+				cerr << userdata << endl;
+			}
+		}
 
 		// If the expected output file was not found, mark the job as a failed.
 		change_job_status(*job, FAILED);
@@ -398,7 +428,7 @@ bool CRAHandle::parse_status_list() {
 //
 bool CRAHandle::write_job_status() {
 	ofstream of(job_status_filepath);
-	if (!of) {
+	if (of.fail()) {
 		cout << "Error opening job status path." << endl;
 		return false;
 	}
@@ -439,6 +469,10 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 
 	// Parse parameters.
 	ifstream param_f(paramfile);
+	if (param_f.fail()) {
+		cerr << "Error opening file " << paramfile << endl;
+		return false;
+	}
 	string param_line;
 	while (getline(param_f, param_line)) {
 
@@ -462,6 +496,10 @@ bool CRAHandle::submit_jobs(string filelist, string paramfile) {
 
 	// Create CRAJob objects from input files
 	ifstream list_f(filelist);
+	if (list_f.fail()) {
+		cerr << "Error opening file " << filelist << endl;
+		return false;
+	}
 	string list_line;
 
 	while (getline(list_f, list_line)) {
