@@ -305,6 +305,8 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 	}
 
 	bool output_file_found = false;
+	string stdout_url;
+	string stderr_url;
 
 	// The document lists all of the output files, each with a name and URL for retrieving the file.
 	// Search through these files until we find the bootstrap results, and then download it with the
@@ -314,7 +316,16 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 		// Check if name matches expected name for bootstrap results.
 		string filename = node.child("filename").child_value();
 		string output_filename = cra_params.at(output_file_param);
+		string file_length = node.child("length").child_value();
+
 		if (filename != output_filename) {
+			if (file_length != "0") {
+				if (filename == "STDOUT") {
+					stdout_url = node.child("downloadUri").child("url").child_value();
+				} else if (filename == "STDERR") {
+					stderr_url = node.child("downloadUri").child("url").child_value();
+				}
+			}
 			continue;
 		}
 
@@ -348,6 +359,26 @@ bool CRAHandle::parse_single_status(pugi::xml_node status_node) {
 	}
 
 	if (!output_file_found) {
+		cerr << "Error retrieving output file " << cra_params.at(output_file_param) << "." << endl;
+		if (stderr_url != "") {
+			cerr << "Retrieving standard error. " << endl;
+			if (!retrieve_url(stderr_url)) {
+				cerr << "Error retrieving stderr." << endl;
+			} else {
+				cerr << "Standard error: " << endl;
+				cerr << userdata << endl;
+			}
+		}
+
+		if (stdout_url != "") {
+			cerr << "Retrieving standard out. " << endl;
+			if (!retrieve_url(stdout_url)) {
+				cerr << "Error retrieving stdout." << endl;
+			} else {
+				cerr << "Standard out: " << endl;
+				cerr << userdata << endl;
+			}
+		}
 
 		// If the expected output file was not found, mark the job as a failed.
 		change_job_status(*job, FAILED);
