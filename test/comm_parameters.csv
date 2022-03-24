@@ -1,0 +1,15 @@
+"""name""","""value"""
+"""-comm-type""",TREE
+"""-comm-size""",-1
+"""-comm-hf""",1
+"""-comm-lf""",0
+"""-cm""",CNM
+"""-lm""",AUTO
+"""-lp""",1
+"""-lps""",0
+"""-lpe""",1
+"""-lpiv""",0
+"""-ln""",1
+"""-lns""",0
+"""-lne""",1
+"""-lniv""",0
