@@ -1,0 +1,116 @@
+======================================================================================================
+CLV-keys
+======================================================================================================
+---------------------------------------------------
+Universial
+---------------------------------------------------
+-f:		File input.
+-post:		File postfix.
+
+-lessprint:	Determine if writing every output to file.
+|--0
+
+
+-key:		File path of csv file that sets all keywords' values.
+
+|---Activated when any value is assigned---|
+
+-trees:		Flag that activate tree module.
+-adj:		Flag that activate adjancey module.
+-nldr:		Flag that activate NLDR module.
+-comm:		Flag that activate CD module.
+-task:		Flag that activate comperhensive task.
+
+|---Intrepert values as csv path if -key is not activated--|
+
+---------------------------------------------------
+-trees
+---------------------------------------------------
+-output:	Indicate object being computed.
+|--DIS:		Distance matrix.
+|--COV:		Covariance matrix.
+
+-r:		Indicate root/unrooted.
+|--0
+|--1
+
+-w:		Indicate weighted/unweighted.
+|--0
+|--1
+
+-tm:		Indicate how taxa are labelled.
+|--TAXON	Taxa are labelled with text.
+|--INT		Taxa are labelled with integer.
+
+-bit:		Container size of bitstring array.
+|--64
+
+-bipart-hf:	Highest bipartition frequency.
+-bipart-lf:	Lowest bipartition frequency
+-sb:		File path of a sub-list of bipartitions being computed.
+-st:		File path of a sub-list of trees being computed.
+-trees-key:	File path of csv file with -trees keys.
+---------------------------------------------------
+-adj
+---------------------------------------------------
+-am		Preprocessing of adjacency matrix
+|--EXP
+|--REC
+
+-adj-type	Node type
+|--TREE		
+|--BIPART
+
+-adj-size	Dimension of the adjacency matrix
+-adj-key:	File path of csv file with -adj keys.
+---------------------------------------------------
+-comm
+---------------------------------------------------
+-comm-type	Indicate node type.
+|--BIPART
+|--TREE
+
+-cm		Cost function used.
+|--CNM
+|--CPM
+|--ERNM
+|--NNM
+
+
+-comm-size	Number of nodes.
+-comm-hf:	Used to be -hf
+-comm-lf:	Used to be -lf
+-lm:
+-lp:
+-lps:
+-lpe:
+-lpiv:
+-ln:
+-lns:
+-lniv:
+-comm-key:	File path of csv file with -comm keys.
+---------------------------------------------------
+-nldr
+---------------------------------------------------
+-nldr-cost:	Cost function used.
+|--CCA
+|--KRUSKAL1
+|--SAMMON
+|--NORMALIZED
+
+-nldr-algo:	Algorithm used.
+|--STOCHASTIC
+|--GAUSS-SEIDEL
+|--MAJORIZATION
+|--METROPOLIS
+
+-nldr-init:	Initialization used.
+|--RAND
+
+-nldr-type:	File type of input matrix.
+|--COR:		Euclidean coordinates.
+|--DIS:		Distance matrix.
+
+-nldr-dim:	Target dimension.
+-nldr-seed:	Random seed used.
+-nldr-key:	File path of csv file with -nldr keys.
