@@ -182,6 +182,14 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 	auto Taxa_ptr = new TaxonList();
 	size_t tree_pos = Taxa_ptr->ReadTaxa(fname);
 
+	String outname_TaxonList("TaxonList");
+	outname_TaxonList.make_stdname(paras);
+	if (!Taxa_ptr->ScanTaxa(fname, tree_pos, std::string((char *)outname_TaxonList)))
+	{
+		std::cout << "Error: Incomplete leaf set detected!\n";
+		exit(1);
+	}
+
 	std::cout << "Reading trees...\n";
 	Taxa_ptr->set_bitstr_size((Container_type)1);
 	// Bipartition<Container_type> Bipart(&Taxa, n_tree);
