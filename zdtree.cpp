@@ -276,6 +276,53 @@ size_t TaxonList::ReadTaxa(std::string fname)
 	return pos;
 }
 
+bool TaxonList::ScanTaxa(std::string fname, size_t pos, std::string outname)
+{
+	std::ifstream fin;
+	fin.open(fname);
+	fin.seekg(pos, std::ios_base::beg);
+	bool *barray = new bool(10 * this->Ind2Taxon.get_size());
+	bool same_taxa = true;
+	size_t tree_id = 0;
+
+	string tree;
+	while(!fin.eof())
+	{
+		std::getline(fin, tree);
+		if(!tree.empty())
+			same_taxa = same_taxa && cmp_taxa(tree, barray);
+	}
+
+	fin.close();
+	if (!same_taxa)
+	{
+		std::ofstream fout;
+		fout.open(outname);
+
+		// Output taxon list;
+		fout << "Translate:";
+		for (auto i = 0; i < size; i++)
+			fout << '\n' << i + 1 << ' ' << Ind2Taxon[i];
+		fout << ";\n";
+		
+		// Report missing taxa
+		fin.open(fname);
+		fin.seekg(pos, std::ios_base::beg);
+		fout << "Trees with missing taxa:\n";
+		while(!fin.eof())
+		{
+			std::getline(fin, tree);
+			if(!tree.empty())
+				report_missing_taxon(tree_id++, tree, barray, fout);
+		}
+		fout.close();
+	}
+
+	fin.close();
+	delete[] barray;
+	return same_taxa;
+}
+
 //TreeArray::TreeArray(string& tree, TaxonList& taxon_list, Array<int>& active_levels,
 //	Array<int>& unlabeled, Array2D<double>& w_temp,
 //	int flag_label, bool ISROOTED) {
