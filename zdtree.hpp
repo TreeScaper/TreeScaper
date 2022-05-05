@@ -59,6 +59,9 @@ public:
 	Array<int> IndB2IndA;
 
 	void push(string item, bool flag_str_format = true);
+	bool cmp_taxa(string &tree, bool* barray);
+	bool report_missing_taxon(size_t tree_id, string &tree, bool* barray, std::ostream& out);
+
 	template <class T>
 	void set_bitstr_size(T ele)
 	{
@@ -75,6 +78,7 @@ public:
 		size++;
 	}
 	size_t ReadTaxa(std::string fname);
+	bool ScanTaxa(std::string fname, size_t tree_pos, std::string outname);
 };
 
 template <class T>
