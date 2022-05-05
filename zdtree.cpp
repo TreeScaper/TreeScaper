@@ -58,6 +58,138 @@ void TaxonList::push(string item, bool flag_str_format)
 	}
 }
 
+bool TaxonList::cmp_taxa(string &tree, bool* barray)
+{// Compare the taxa found in tree string with the existing taxon list. Insert new taxon to the list if found. Report absent taxa.
+	string taxon;
+	bool same_taxa = true;
+	size_t i = 0;
+	for (i = 0; i < size; i++)
+		barray[i] = false;
+
+	i = tree.find_first_of('(');
+	char ch = tree[i];
+	bool flag_internal = true;
+	while (ch != ';' && ch != '\0')
+	{
+		taxon.clear();
+		if (isspace(ch) || ch == ',' || ch == '(' || ch == ')')
+		{ //skip spaces and commas and parentheses
+			if (ch == ')')
+				flag_internal = true;
+			else if (ch == '(' || ch == ',')
+				flag_internal = false;
+			ch = tree[++i];
+		}
+		else if (ch == ':')
+		{ //skip weights
+			i++;
+			ch = read_sequence(tree, i, taxon);
+			flag_internal = false;
+		}
+		else
+		{ //read taxa
+			ch = read_sequence(tree, i, taxon);
+			if (!flag_internal)
+			{
+				auto it = this->Taxon2Ind.find(taxon);
+				if (it == Taxon2Ind.end())
+				{
+					std::cout << "Warning: New taxon "<< taxon <<" encountered. Inserting it to the taxon list. The tree set do not share a common leaf set.\n";
+					Ind2Taxon.push(taxon);
+					Taxon2Ind.insert(std::pair<string, int>(taxon, Ind2Taxon.get_size() - 1));
+					barray[size] = true;
+					size++;
+					same_taxa = false;
+				}
+				else
+				{
+					barray[it->second] = true;
+				}
+			}
+			flag_internal = false;
+		}
+	}
+
+	for (i = 0; i < size; i++)
+	{
+		if (!barray[i])
+		{
+			std::cout << "Warning: Missing taxon " << Ind2Taxon[i] << " detected. The tree set do not share a common leaf set.\n";
+			same_taxa = false;
+		}
+	}
+	return same_taxa;
+}
+
+bool TaxonList::report_missing_taxon(size_t tree_id, string &tree, bool* barray, std::ostream& out)
+{// Assuming the taxon list is complete. Compare the taxa found in tree string with the list and report the absent taxa.
+	string taxon;
+	size_t i = 0;
+	for (i = 0; i < size; i++)
+		barray[i] = false;
+
+	bool flag_internal = true;
+
+	i = tree.find_first_of('(');
+	char ch = tree[i];
+	while (ch != ';' && ch != '\0')
+	{
+		taxon.clear();
+		if (isspace(ch) || ch == ',' || ch == '(' || ch == ')')
+		{ //skip spaces and commas and parentheses
+			if (ch == ')')
+				flag_internal = true;
+			else if (ch == '(' || ch == ',')
+				flag_internal = false;
+			ch = tree[++i];
+		}
+		else if (ch == ':')
+		{ //skip weights
+			i++;
+			ch = read_sequence(tree, i, taxon);
+			flag_internal = false;
+		}
+		else
+		{ //read taxa
+			ch = read_sequence(tree, i, taxon);
+			if (!flag_internal)
+			{
+				auto it = this->Taxon2Ind.find(taxon);
+				if (it == Taxon2Ind.end())
+				{
+					std::cout << "Error: New taxon "<< taxon <<" encountered. Taxon list is not complete. Exit the process.\n";
+					return false;
+				}
+				else
+				{
+					barray[it->second] = true;
+				}
+			}
+			flag_internal = false;
+		}
+	}
+
+	bool printed_tree_id = false;
+	bool is_missing = false;
+	for (i = 0; i < size; i++)
+	{
+		if (!barray[i])
+		{
+			if (!printed_tree_id)
+			{
+				out << tree_id << ":";
+				printed_tree_id = true;
+			}
+			std::cout << "Warning: Missing taxon " << Ind2Taxon[i] << " detected in tree " << tree_id << ". The tree set do not share a common leaf set.\n";
+			out << ' ' << i + 1;
+			is_missing = true;
+		}
+	}
+	if (is_missing)
+		out << '\n';
+	return true;
+}
+
 size_t TaxonList::ReadTaxa(std::string fname)
 {
 	std::ifstream fin;
