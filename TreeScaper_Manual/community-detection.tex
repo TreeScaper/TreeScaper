@@ -1,0 +1,376 @@
+\documentclass[11pt]{article}
+
+% PACKAGES!
+\usepackage{amsmath,amsfonts,amssymb, amsthm}
+\usepackage{graphicx,epsfig,color,epstopdf}
+\graphicspath{ {imagesForManual/} }
+\usepackage{enumerate}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{lscape}
+\usepackage{multirow, multicol}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]{hyperref}
+\usepackage{booktabs,dsfont,rotating,pdflscape}
+\usepackage[small,bf]{caption} % custom caption style: small and bold
+\usepackage{subcaption}
+\usepackage{courier}
+\usepackage{soul}
+\setcounter{MaxMatrixCols}{20}% allow up to 20-column matrices
+\usepackage[margin=1.00in, paperwidth=8.5in, paperheight=11in]{geometry}
+\usepackage[square,authoryear]{natbib}
+\usepackage[nottoc]{tocbibind}
+
+% NEW COMMANDS
+\theoremstyle{definition}
+\newtheorem{cond}{Condition}
+\theoremstyle{definition}
+\newtheorem{eg}{Example}
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[section]
+\theoremstyle{remark}
+\newtheorem{remark}[defn]{Remark}
+\theoremstyle{plain}
+\newtheorem{prop}[defn]{Proposition}
+\newtheorem{coro}[defn]{Corollary}
+
+
+\renewcommand\contentsname{TABLE OF CONTENTS}
+\renewcommand{\tocbibname}{References}
+
+\newcommand{\zdcomm}[1]{ {\color{blue} [#1]\textsubscript{ZDcomm}}}
+
+\title{Notes on community detection in TreeScaper}
+
+
+\begin{document}
+\maketitle
+
+\section{Community detection}
+
+A network is said to have community structure if the nodes of the network can be easily grouped into sets of nodes such that each set of nodes is densely connected internally and sparsely connected between sets. Community detection (CD) problem of a given network is a mathematical formulation of the problem that seeks a grouping of the nodes, denoted as \emph{community assignment}, that accesses the best community structure on the given network. A community assignment can be expressed as a function
+\[
+	\delta:N\times N\to \{0, 1\}
+\]
+where $N$ is the set of nodes and $\delta(i, j) = 1$ if node $i, j$ belong the same community, otherwise, $\delta(i, j) = 0$.
+
+In general, CD problem can be formulated on any graph and allows communities overlap with each other. TreeScaper solves a particular class of CD problem on weighted undirected network that seeks for non-overlaped community assignment. 
+
+Conceptually, TreeScaper seeks for community assignment that appoints nodes of the graph to different clusters such that internal connections within cluster is relatively stronger than the inter-clusters connections. 
+
+\emph{Modularity} is a typical way to quantify the goodness of a community structure regrading to a \emph{reference network}. We will first introduce statisical null models that describe the average network with \textbf{no} community structure under respective statisical setting. Then, the modularity with respect to the null model can be defined as the quantity that measures how far the given network locally is from the average network. With the modularity of null model well defined, the community assignment that access the largest modularity is interpreted as the optimal community assignment that gives clusters with strongest internal connections with respect to the null model. Finally, we point out that the definition of modularity can be generalized to arbitrary reference network other than the average network from a statisical null model, which is the commonly used definition of modularity.
+
+TreeScaper essentially implements two types of $\gamma$-parameterized reference network, the \emph{\textbf{constant Potts model(CPM)}} which is a rescaled Erdős–Rényi null model(ERNM) and the \emph{\textbf{rescaled configuration null model(CNM)}}. The options, ERNM and no-null model(NNM), provided in TreeScaper are special choices of $\gamma$ in CPM.
+
+
+%Note that notion of best community structure is not uniquely defined. Based on different statistic setting(or assumption) on the graph, i.e., different null models, there are different ways to measure the goodness of a community assignment. A scalar can be further introduced to the null model for searching community structure on different level. TreeScaper implements $2$ null models, the Erdős–Rényi null model (ERNM) and the Configuration null model (CNM) and the rescaled ERNM is also known as the constant Potts model (CPM). Rescaling ERNM with parameter $0$ gives the no-null model (NNM).
+
+
+
+\subsection{Average network of null model.}
+
+The null models of the community detection problem on network $G$ considers a set of networks $\mathcal{G}$ that includes $G$ as sample space. Equip $\mathcal{G}$ with uniform distribution and the null model is conceptually stated as followed.
+
+\noindent\textbf{The average network $\overline{\mathcal{G}}$ has no community structure.}
+
+Note that the average here referred to the network consists of edges with edge-wise expected weight among $\mathcal{G}$ as edge weight.
+
+TreeScaper implements the Erdős–Rényi null model(ERNM) and the configuration null model(CNM).
+
+\begin{enumerate}
+	\item \textbf{Erdős–Rényi null model.}
+
+	For a given weighted undirected graph $G$, let $W(G)$ be the sum of all edge weights, referred as edge energy. ERNM considers all graphs that has the same edge energy for given $W$,
+	\begin{equation}
+		\mathcal{G}^{\text{ERNM}}:=\{G: W(G) = W\}
+	\end{equation} 
+	
+	Let $n$ be the number of the common set of nodes in ERNM, then edge weight between node $i$ and node $j$ in the average network of ERNM, $\overline{\mathcal{G}^{\text{ERNM}}}$, is given by
+	\begin{equation}
+		\overline{w_{ij}^{\text{ERNM}}} = \frac{W}{\begin{pmatrix} n\\ 2\end{pmatrix}}.
+	\end{equation}
+
+	\item \textbf{Configuration null model.}
+	
+	For a given weighted undirected graph $G$ with $n$ nodes. Let $\mathbf{d}:=\{d_i\}_{i=1}^n$ be the sequence of degree of node $i$, $i = 1,\cdots, n$, where the degree of node is the sum of edge weights that attached to that node. CNM considers all graphs that has the same degree sequence $\mathbf{d}$: 
+	\begin{equation}
+		\mathcal{G}^{\text{CNM}}:= \left\{G: \sum_{j = 1}^n w_{ij} = d_i ,\forall i\right\}.
+	\end{equation}
+
+	The average network of CNM, $G^{\text{CNM}}$, has edge weight
+	\begin{equation}
+		\overline{w_{ij}^{\text{CNM}}} = \frac{d_i d_j}{2W} = \frac{d_i d_j}{2\sum_{k=1}^n{d_k}}
+	\end{equation}
+\end{enumerate}
+
+From ERNM it is straightforward to conclude that $\overline{\mathcal{G}^{\text{ERNM}}}$ has no community structure in common sense, where all nodes are connected to any node with identical edge weight. The CNM is more subtle but necessary to understand.
+
+Compared to ERNM that distributes the overall edge energy evenly, CNM restricts the idea to distributing the edge energy in every node evenly, as $\forall \hat{G}\in \mathcal{G}^{\text{CNM}}$, any node $i$ in $\hat{G}$ has the same degree with itself in $G$.
+
+This restriction yields a simple implication, those nodes with large degree in $\mathcal{G}^{\text{CNM}}$ has relatively stronger connections to all nodes in $\overline{\mathcal{G}^{\text{CNM}}}$ and vice versa, as any node's degree are distributed evenly with respect to $\mathcal{G}^{\text{CNM}}$ in CNM average network. The following example illustrates the difference between ERNM and CNM on a node that is weakly connected to others in $G$.
+
+\begin{eg}\label{eg:ERNM-CNM}
+	Consider a set of $20$ points in $\mathbb{R}^2$ distributed as Fig. \ref{fig:pts-in-R2}. 
+
+	\begin{figure}[!h]
+		\centering
+		\includegraphics*[width=.6\textwidth]{points.png}
+		\caption{Points on $\mathbb{R}^2$}
+		\label{fig:pts-in-R2}
+	\end{figure}
+
+	Compute the Eucldiean distance $d_{ij}$ between node $i$ and $j$. Then use the reciprocal of distance to define edge weights,
+	\[
+		w_{ij} = 1 - \frac{d_{ij}}{\max_{k,l\in N}d_{kl}},
+	\]
+	denoted as the affinity of node $i,j$. The larger $w_{ij}$ is, the closer node $i$, $j$ are in $\mathbb{R}^2$. The affinity network and its ERNM and CNM reference networks are given in Fig. \ref{fig:affinity-network-reference-network}.
+
+	The following figure illustrates different average network by plotting the internal edges in communities $\{\text{blue}\}$, $\{\text{green}\}$ and $\{\text{black}, \text{purple}, \text{gold}, \text{red}\}$, using thickness to represent edge weights. The inter-community edges are omitted to highlight the difference associated to the red node.
+
+	\begin{figure}[!h]
+		\centering
+		\includegraphics*[width=.8\textwidth]{affinity.png}
+		\caption{Affinity network $G$, internal edges of $\overline{\mathcal{G}^{\text{ERNM}}}$ and internal edges of $\overline{\mathcal{G}^{\text{CNM}}}$}
+		\label{fig:affinity-network-reference-network}
+	\end{figure}
+
+	Notice that for the red node in the top right, has significantly larger distance to all other nodes, which makes the corresponding degrees in affinity network significanltly smaller. In $\overline{\mathcal{G}^{\text{ERNM}}}$, the red node is expected to joined to other nodes with a relatively stronger edge, compared to the corresponding edges in $G$. In $\overline{\mathcal{G}^{\text{CNM}}}$, the model address the issue of the red node being weakly connected and therefore it is expected to have relatively weaker connection in the average network.
+
+	Both null models make sense but they produce different average network and therefore different notion of community structure. One should choose the null model based on their knowledge of the sample space $\mathcal{G}$ and/or their knowledge of the given $G$. 
+	
+	% Notice that $\mathcal{G}^{\text{CNM}}\subsetneq \mathcal{G}^{\text{ERNM}}$ as CNM is restricted from ERNM. A rough strategy is to use more restrict model when examinating , or to use CNM otherwise. For example, when $G$ is affinity network constructed from distance matrix, then 
+
+
+\end{eg}
+
+
+\subsection{Modularity}
+
+We have introduced the null model that specifies network without community structure as the average network of some sample spaces of networks. However, the given $G$ being different from the average network $\overline{\mathcal{G}}$ is only necessary but not sufficent condition for $G$ to have community structure. 
+
+A community structure in $G$ requires not only having edge weights different from the expected edge weights in $\overline{\mathcal{G}}$ but also having those stronger connections being clustered inside communities and those weaker connections being placed in between communities for some community assignment.
+
+Consider ERNM, for example, with a community assignment $\delta$ on $G$ that has perfectly identified community structure in the following sense,
+\begin{subequations}
+	\begin{align}
+		\sum_{\delta(i,j) = 1} w_{i,j} \geq \sum_{\delta(i,j) = 1} \overline{w_{i,j}} \label{subeq:internal-edge}\\
+		\sum_{\delta(i,j) = 0} w_{i,j} \leq \sum_{\delta(i,j) = 0} \overline{w_{i,j}}\label{subeq:inter-edge}
+	\end{align}
+\end{subequations}
+
+One may have noticed that for ERNM, the same total edge weights
+\[
+	W = \sum_{i,j\in N} w_{i,j} = \sum_{\delta(i,j) = 1} w_{i,j} + \sum_{\delta(i,j) = 0} w_{i,j}= \sum_{i,j\in N} \overline{w_{i,j}} = \sum_{\delta(i,j) = 1} \overline{w_{i,j}} + \sum_{\delta(i,j) = 0} \overline{w_{i,j}}
+\] 
+implies that \eqref{subeq:internal-edge} is equivalent with \eqref{subeq:inter-edge} as followed.
+\[
+	\begin{aligned}
+		&\sum_{\delta(i,j) = 1} w_{i,j} + \sum_{\delta(i,j) = 0} w_{i,j}&= &\sum_{\delta(i,j) = 1} \overline{w_{i,j}} + \sum_{\delta(i,j) = 0} \overline{w_{i,j}}\\
+		\Rightarrow& \sum_{\delta(i,j) = 1} w_{i,j} \geq \sum_{\delta(i,j) = 1} \overline{w_{i,j}} &\Leftrightarrow &\sum_{\delta(i,j) = 0} w_{i,j} \leq \sum_{\delta(i,j) = 0} \overline{w_{i,j}}.\\
+	\end{aligned}
+\]
+
+Similar argument is applicable to the CNM but it is not necessarily applicable to all null models. In TreeScaper, it is sufficent to solely consider \eqref{subeq:internal-edge} for either ERNM or CNM, which leads to the following quantity, known as \emph{modularity},  for accessing the goodness of community assignment $\delta$ in $G$ with respect to a null model.
+\begin{equation}\label{eq:modularity-null-model}
+	\rho(\delta, G, \overline{\mathcal{G}}):=\sum_{\delta(i, j) = 1} w_{ij} - \overline{w_{ij}}.
+\end{equation}
+
+By maximizing \eqref{eq:modularity-null-model} over all possible community assignment, the community structure identified in the resulting optimal community assignment is said to be the optimal community structure under the modularity of the null model. The optimization algorithm for maximizing \eqref{eq:modularity-null-model} implemented in TreeScaper is described in \cite{traag2011narrow}.
+
+
+
+Note that the role of null model in the definition of modularity is to define the average network $\overline{\mathcal{G}}$ as a reference of connection strength. The edge in $G$ with weight larger than the expected edge weight in $\overline{\mathcal{G}}$ is connection strong enough and is better to be an internal connection in a community. Therefore, modularity of a null model can be further generlized to the case where the reference network is free to be specified as followed.
+
+\begin{defn}
+	For a given network $G$ and a given reference network $G^{\text{Ref.}}$ that shares the same set of nodes, the modularity of a community assignment $\delta$ is defined as:
+	\begin{equation}\label{eq:modularity}
+		\rho(\delta, G, G^{\text{Ref.}}):=\sum_{\delta(i, j) = 1} w_{ij} - w_{ij}^{\text{Ref.}}.
+	\end{equation}
+
+	An equivalent algebraic definition of \eqref{eq:modularity} in quadratic form is given in \cite{fasino2016generalized} as:
+	\begin{equation}\label{eq:modularity-algebraic}
+		\rho(\delta, G, G^{\text{Ref.}}):= \text{tr}(X_{\delta}^T (A - A^{\text{Ref.}})X_{\delta})
+	\end{equation}
+	where $A, A^{\text{Ref.}}$ are respective adjacency matrices with edge weights on entries and $X_{\delta}$ is a $0,1$-valued node-to-community matrix. Suppose $\delta$ specifies $m$ communities $\{C_j\}_{j=1}^m$ of $n$ nodes $N=\{1,2,\cdots, n\}$, then $X_{\delta}$ is $n\times m$ matrix that can be given by
+	\[
+		[X_{\delta}]_{ij}^{n\times m} = \left\{
+			\begin{aligned}
+				&1, &i\in C_j\\
+				&0, &i\notin C_j.
+			\end{aligned}
+		\right.
+	\]
+\end{defn}
+
+\begin{defn}
+	The optimal community structure of $G$ of modularity with respect to the reference network $G^{\text{Ref.}}$ is given by the maximal $\delta_*$ solves from the maximization problem
+	\begin{equation}
+		\delta_* := \arg\max_{\delta} \rho(\delta, G, G^{\text{Ref.}}).
+	\end{equation}
+\end{defn}
+
+
+
+
+% With the reference network defined, the notion of community structure can be illustrated as how edge weights are distributed around the reference network. Recall that the reference network is an average graph among some set. A graph with community structure is then a graph with its edge energy above average distributed into a community. Suppose $C\subset N$ is a subset of nodes $N$, then the averge edge energy w.r.t. some null model in $C$ is given by $\sum_{i\neq j\in C}w^{\text{Ref.}}_{ij}$ while the actual edge energy in $C$ is $\sum_{i\neq j\in C}w_{ij}$. The difference
+% \[
+% 	\sum_{i\neq j\in C}(w_{ij} - w^{\text{Ref.}}_{ij})
+% \]
+% describes how much energy above average is in community $C$.
+
+
+% Summing up the exceeded energy among all communities in community assignment $\delta$ gives the definition of the \emph{modularity}.
+% \begin{equation}\label{eq:modularity}
+% 	\rho(\delta, G^{\text{Ref.}}) = \sum_{i\neq j}(w_{ij} - w_{ij}^{\text{Ref.}})\delta(i, j) = \sum_{C_k}\sum_{i\neq j\in C_k}(w_{ij} - w_{ij}^{\text{Ref.}})
+% \end{equation}
+% where $w_{ij}^{\text{Ref.}}$ is the edge weight of between node $i$ and $j$ in reference network $G^{\text{Ref.}}$ and $\bigcup_kC_k = N$ are the communities given in $\delta$. Since the modularity describes how much more edge energy is concentrated inside the community, the larger $\rho(\delta, G^{\text{Ref.}})$ is, the better, w.r.t. $G^{\text{Ref.}}$, the community assignment $\delta$ is. 
+
+% Note that the modularity does not consider extrenal edges among communities. The \emph{generalized modularity} takes those edges into consideration but TreeScaper does not include generalized modularity. 
+
+% We can make the following observations on the modularity.
+% \begin{enumerate}
+% 	\item For the trivial community assignment $\delta(i, j) = 1, \forall i,j\in N$, denoted as $\delta_{0}$, assigns all nodes in one community. Both $G^{\text{ERNM}}$ and $G^{\text{CNM}}$ has the same edge energy $E(G^{\text{ERNM}}) = E(G^{\text{CNM}}) = E(G)$, therefore
+% 	\[
+% 		\rho(\delta_0, G^{\text{CNM}}) = \sum_{i\neq j}(w_{ij} - w_{ij}^{\text{CNM}}) = E(G) - E(G^{\text{CNM}}) = 0
+% 	\]
+% 	and, similarly, $\rho(\delta_0,G^{\text{ERNM}}) = 0$.
+
+% 	\item For the trivial community assignment $\delta(i, j) = 0, \forall i, j\in N$, denoted as $\delta_1$, assigns each node in a separate community. For any reference network, the modularity is always $0$:
+% 	\[
+% 		\rho(\delta_1, G^{\text{Ref.}}) = \sum_{i\neq j}(w_{ij} - w_{ij}^{\text{Ref.}})\cdot 0 = 0.
+% 	\]
+
+% 	\item For a community assignment $\delta$, if there is node $k$ in community $C_k:=\{j:\delta(k, j) = 1\}$, such that $w_{kj}\leq w_{kj}^{\text{Ref.}}, \forall j\in C_k$, consider the community assignment $\hat \delta$ that is the same with $\delta$ except it put $k$ in a community with single node, i.e., $\hat\delta(i, j) = 1, \forall i, j \in C_k\setminus\{k\}$ and $\hat\delta(k, j) = 0, \forall j\neq k$. Then we have 
+% 	\[
+% 		\begin{aligned}
+% 			\rho(\hat \delta, G^{\text{Ref.}}) & = \sum_{i\neq j\in N\setminus C_k} (w_{ij} - w_{ij}^{\text{Ref.}})\hat \delta(i, j) + \sum_{i\neq j\in C_k}(w_{ij} - w_{ij}^{\text{Ref.}})\hat \delta(i, j)\\
+% 			&= \sum_{i\neq j\in N\setminus C_k} (w_{ij} - w_{ij}^{\text{Ref.}}) \delta(i, j) + \sum_{i\neq j \in C_k \setminus\{k\}}(w_{ij} - w_{ij}^{\text{Ref.}})\\
+% 			&\geq \sum_{i\neq j\in N\setminus C_k} (w_{ij} - w_{ij}^{\text{Ref.}}) \delta(i, j) + \sum_{i\neq j \in C_k \setminus\{k\}}(w_{ij} - w_{ij}^{\text{Ref.}}) + \sum_{j \neq k}(w_{kj} - w_{kj}^{\text{Ref.}})\\
+% 			&= \sum_{i\neq j\in N\setminus C_k} (w_{ij} - w_{ij}^{\text{Ref.}}) \delta(i, j) + \sum_{i\neq j \in C_k}(w_{ij} - w_{ij}^{\text{Ref.}})\delta(i, j) \\
+% 			&=\rho(\delta, G^{\text{Ref.}}),
+% 		\end{aligned}
+% 	\]
+% 	i.e., community assigment $\hat{\delta}$ is better than $\delta$ in terms of modularty.
+	
+% 	In conclusion, if any node has all attached internal edges weaker than the corresponding edges in reference network, then it is better to split the community into $2$ by assigning that node to a community. 
+
+% 	Similarly, if for a community $C\subset N$, there exists a partition $C_1\cup C_2 = C$ such that $\forall i\in C_1, j\in C_2$, $w_{ij} \leq w_{ij}^{\text{Ref.}}$, then $C$ should be split into $C_1$ and $C_2$.
+
+% 	\item In general, it is not always possible to have the scenarios in 3. Finding the community assignment that obtains largest modularity is NP-hard and requires examining all possible community assignment unless there is special structure assumed on $G$ or $G^{\text{Ref.}}$. 
+% \end{enumerate}
+
+
+\subsection{Rescaled average network as reference network.}
+
+We have introduced the modularity to arbitrary reference network in \eqref{eq:modularity}, it is important to specifiy some rules of the reference network to avoid bad reference network that generate obscure and even useless optimal community structure. 
+
+A common practice is to uniformly rescale the average network from some null models by a parameter, denoted as $\gamma \geq 0$. This is usually used to exploit different community structure on different level. The null model set the relative relation between edges in reference networks. 
+
+\begin{enumerate}
+	\item The modularity of rescaled ERNM is widely known as constant Potts model(CPM) and it has the following formula.
+	\begin{equation}\label{eq:modularity-CPM}
+		\rho(\delta, G, G^{\text{CPM}, \gamma}) := \sum_{\delta(i, j) = 1} w_{ij} - \gamma.
+	\end{equation}
+	\item The modularity of rescaled CNM is given by
+	\begin{equation}\label{eq:modularity-CNM}
+		\rho(\delta, G, G^{\text{CNM}, \gamma}) := \sum_{\delta(i, j) = 1} w_{ij} - \gamma \frac{d_id_j}{2W}.
+	\end{equation}
+\end{enumerate}
+
+As we discussed in previous section, the rescaled ERNM has edges relatively the same in the reference network and the rescaled CNM has edges associated to low degree nodes relatively weaker than other edges. Then the parameter $\gamma$ adjust the absolute level of the reference network. The usage of this one-parameter family of reference networks replies on the observation.
+
+\begin{prop}
+	Let $G^{\text{Ref.}}$ be the reference network of a network $G$. 
+	\begin{enumerate}
+		\item If $w_{ij} \geq w_{ij}^{\text{Ref.}}$, the community assignment, $\delta_0$, that put all nodes in one community, i.e.,
+		\begin{equation}\label{eq:delta-0}
+			\delta_0(i,j) = 1, \forall i,j\in N.
+		\end{equation}
+		obtains an optimal community structure.
+		\item If $w_{ij} \leq w_{ij}^{\text{Ref.}}$, the community assignment, $\delta_0$, that put each node in a respectively one-node-community, i.e.,
+		\begin{equation}\label{eq:delta-1}
+			\delta_1(i,j) = 0, \forall i\neq j\in N.
+		\end{equation}
+		obtains an optimal community structure.
+	\end{enumerate}
+\end{prop}
+\begin{proof}
+	The proof is straight-forward. If $w_{ij} \geq w_{ij}^{\text{Ref.}}$, any edge is stronger than the reference network and therefore all edges should be included as internal edge, which implies $\delta_0$ being the optimal community assignment that includes all edges as internal edge of a big community. 
+
+	To see it algebraically, consider any community assignment $\delta$ different from $\delta_0$, i.e., $\{(i,j):\delta(i,j) = 0\}$ is not empty, such that $\delta(k, l) = 0$. Then
+	\[
+		\begin{aligned}
+			\rho(\delta_0,G, G^{\text{Ref.}}) &= \sum_{i,j} w_{ij}-w^{\text{Ref.}}_{ij}\\
+			&=\sum_{\delta(i,j) = 1} w_{ij}-w^{\text{Ref.}}_{ij} + \sum_{\delta(i,j) = 0} w_{ij}-w^{\text{Ref.}}_{ij}\\
+			&\geq \sum_{\delta(i,j) = 1} w_{ij}-w^{\text{Ref.}}_{ij}\\
+			&=\rho(\delta, G, G^{\text{Ref.}}).
+		\end{aligned}
+	\]
+	The equality holds if and only if $ w_{ij}-w^{\text{Ref.}}_{ij}$ for any $i,j$ that satisfies $\delta(i,j) = 0$.
+
+	Similar proof is easy to generate for the other case.
+\end{proof}
+
+\begin{coro}
+	For one-parameter rescaled network given by adjacency matrix $A^{\text{Ref.}, \gamma} := \gamma \cdot A^{\text{Ref.}, 1}$ with $w^{\text{Ref.}, 1}_{i,j}>0 \forall i,j\in N$, the following statements hold.
+	\begin{enumerate}
+		\item $\delta_0$ obtains an optimal community structure of $G$ with respect to the reference network $G^{\text{Ref.}, 0}$ which has $0$ adjacency matrix.
+		\item $\exists \gamma_{\max}>0$ such that $\forall \gamma >\gamma_{\max}$, $\delta_1$ obtains an optimal community structure of $G$ with respect to the reference network $G^{\text{Ref.}, \gamma}$. In addition, $\gamma_{\max} = 1$ for CPM.
+	\end{enumerate}
+\end{coro}
+
+According to coro, increasing $\delta$ from $0$ to some large enough value, the optimal community structure change from one big community to all nodes being separated from each other, the intermediate optimal community structure during the scan on $\gamma$ is then expected to exploit different level of community strcture. The following Example \ref{eg:weighted-network-CPM} illustrates the idea of scaning over $\gamma$ to exploit different structure.
+
+\begin{eg}\label{eg:weighted-network-CPM}
+	Consider a weighted network $G$ given in Fig. \ref{fig:weighted-network}. Let $\{\{1,2,3,4\}, \{5\}\}$ be the set of communities determined in $\delta_1$ and let $\{\{1,2,3\}, \{4\}, \{5\}\}$ be the set of communities determined in $\delta_2$. Then the internal edges of $\delta_1$ is given in $G_1$ and the internal edges of $\delta_2$ is given in $G_2$.
+
+	\begin{figure}[!h]
+		\centering
+		\includegraphics*[width=.8\textwidth]{weighted-network.PNG}
+		\caption{weighted dense network and reference networks}
+		\label{fig:weighted-network}
+	\end{figure}
+
+
+	The modularity of $\delta_1$ is given by
+	\[
+		\begin{aligned}
+			\rho(\delta_1, G^{\gamma, \text{CPM}}) &= (1 - \gamma)_{\text{node 1, 2}} + (1 - \gamma)_{\text{node 1, 3}} + (0.7 - \gamma)_{\text{node 1, 4}}\\
+			&+(1 - \gamma)_{\text{node 2, 3}}+(0.6 - \gamma)_{\text{node 2, 4}} + (0.8 - \gamma)_{\text{node 3, 4}}\\
+			& = 5.1 - 6\gamma.
+		\end{aligned}
+	\]
+	and
+	\[
+		\begin{aligned}
+			\rho(\delta_2, G^{\gamma, \text{CPM}}) &= (1 - \gamma)_{\text{node 1, 2}} + (1 - \gamma)_{\text{node 1, 3}} + (1 - \gamma)_{\text{node 2, 3}}\\
+			& = 3 - 3\gamma.
+		\end{aligned}
+	\]
+
+	When $\gamma < 0.7$, $P_1$ is better than $P_2$ and when $\gamma > 0.7$, $P_2$ is better than $P_1$. Recall that the $\gamma$ in the reference network represents the reference strenght of the internal connections. When $\gamma < 0.7$, on average, all existing edges are considered contributing to grouping nodes and therefore all nodes should be in a same group. When $\gamma > 0.7$, those edges with $4$ are too weak compared to the reference network and therefore they no longer make credits in grouping $4$ to other nodes.
+\end{eg}
+
+The Example \ref{eg:rescaled-ERNM-CNM} continued from Example \ref{eg:ERNM-CNM} illustrates the implications of the choice of null model, or more precisely the choice of $G^{\text{Ref.}, 1}$.
+
+\begin{eg}\label{eg:rescaled-ERNM-CNM}
+	In CPM, the nodes are joined with idenical edge weights $\gamma$, and by increasing $\gamma$, those groups that are relatively far away from the center are picked up sooner than rescaled CFM, as CFM takes degrees of nodes into consideration and has relative weaker standard for those far-away-points.
+
+	Figures in Fig. \ref{fig:edge-differences} are weight difference $w_{ij} - w^{\text{Ref.},\gamma}_{ij}$ of internal edges and from left to right the figures have increasing $\gamma$. The thickness represents the the absolute difference and the red color indicates negaive difference.
+
+	\begin{figure}[!h]
+		\centering
+		\includegraphics*[width=.8\textwidth]{CPM_diff.PNG}
+		\includegraphics*[width=.8\textwidth]{CNM_diff.PNG}
+		\caption{Edge differences in CPM (on top) and rescaled CNM (below) with $\gamma$ increasing from left to right.}
+		\label{fig:edge-differences}
+	\end{figure}
+\end{eg}
+
+\bibliographystyle{apalike}	% use with package {cite}
+\bibliography{TreeScaperManual_ref}	% use with package {cite}
+
+
+\end{document}
