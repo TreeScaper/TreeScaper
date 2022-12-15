@@ -551,7 +551,7 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 
 			//levels_back_ptr = levels.back_c_ptr();
 
-			levels->back().push(current_ind);							  //parent level.
+			levels->back().push(current_ind);							  // parent level.
 			levels->back().push(levels->ele(current_ind).get_size() - 1); // parent node.
 
 			current_ind = levels->get_size() - 1; //go to the new level in the back.

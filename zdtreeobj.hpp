@@ -21,8 +21,8 @@ private:
 	TaxonList *Taxa;
 
 	SparseMatrix *sb2t_mat;
-	// Matrix<PRECISION>* cov_mat;
-	// Matrix<PRECISION>* dis_mat;
+	//Matrix<PRECISION>* cov_mat;
+	//Matrix<PRECISION>* dis_mat;
 
 	SpecMat::LowerTri<PRECISION> *cov_mat;
 	SpecMat::LowerTri<PRECISION> *dis_mat;
@@ -82,7 +82,7 @@ public:
 
 	void set_weighted(bool weighted) { ISWEIGHTED = weighted; };
 
-	// void sort_BipartId2Tree_by_treeid() {
+	//void sort_BipartId2Tree_by_treeid() {
 	//	// Bubble sort implemented here.
 	//	int temp;
 
@@ -111,39 +111,6 @@ public:
 	//	}
 
 	//}
-
-	Array<int> *Compute_Strict_Consensus_Tree()
-	{
-		sb2t_mat->set_RCS();
-		int bipart_num = sb2t_mat->get_row();
-		int tree_num = sb2t_mat->get_col();
-
-		Array<int> *consensus_bipart_id = new Array<int>(0, row);
-		for (int i = 0; i < bipart_num; i++)
-		{
-			if (sb2t_mat->get_RCS_ind_c_ptr(i)->get_size() == tree_num)
-				consensus_bipart_id->push(i);
-		}
-		consensus_bipart_id->align();
-		return consensus_bipart_id;
-	}
-
-	Array<int> *Compute_Major_Consensus_Tree()
-	{
-		sb2t_mat->set_RCS();
-		int bipart_num = sb2t_mat->get_row();
-		int tree_num = sb2t_mat->get_col();
-
-		Array<int> *consensus_bipart_id = new Array<int>(0, row);
-
-		for (int i = 0; i < bipart_num; i++)
-		{
-			if (2 * sb2t_mat->get_RCS_ind_c_ptr(i)->get_size() >= tree_num)
-				consensus_bipart_id->push(i);
-		}
-		consensus_bipart_id->align();
-		return consensus_bipart_id;
-	}
 
 	void Compute_Bipart()
 	{
@@ -187,7 +154,7 @@ public:
 		assert(unique_bipart > 0);
 		if (cov_mat != nullptr)
 			delete cov_mat;
-		// cov_mat = new Matrix<PRECISION>(unique_bipart, unique_bipart, (PRECISION)0);
+		//cov_mat = new Matrix<PRECISION>(unique_bipart, unique_bipart, (PRECISION)0);
 		cov_mat = new SpecMat::LowerTri<PRECISION>(unique_bipart);
 		cov_mat->form_row_ptr();
 
@@ -225,13 +192,14 @@ public:
 
 		if (cov_mat != nullptr)
 			delete cov_mat;
-		// cov_mat = new Matrix<PRECISION>(unique_bipart, unique_bipart, (PRECISION)0);
+		//cov_mat = new Matrix<PRECISION>(unique_bipart, unique_bipart, (PRECISION)0);
 		cov_mat = new SpecMat::LowerTri<PRECISION>(sub_row);
 		cov_mat->form_row_ptr();
 
 		// Array<PRECISION> c_mean = sb2t_sub_mat->col_mean();
 		// auto sum = sb2t_mat->col_sum();
 		Array<PRECISION> c_sum = sb2t_sub_mat->col_sum();
+		
 
 		for (int i = 0; i < sub_row; i++)
 		{
@@ -260,7 +228,7 @@ public:
 		assert(n_trees > 0);
 		if (dis_mat != nullptr)
 			delete dis_mat;
-		// dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
+		//dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
 		dis_mat = new SpecMat::LowerTri<PRECISION>(n_trees);
 		dis_mat->form_row_ptr();
 		sb2t_mat->set_RCS();
@@ -371,7 +339,7 @@ public:
 
 		if (dis_mat != nullptr)
 			delete dis_mat;
-		// dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
+		//dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
 		dis_mat = new SpecMat::LowerTri<PRECISION>(sub_col);
 		dis_mat->form_row_ptr();
 
@@ -461,18 +429,165 @@ public:
 		}
 	};
 
+	void Compute_RF_Distance_Matrix_new()
+	{
+		// Update formula:
+		// 1) D[j, k] += abs(M[i, j] - M[i, k]), for i in 1:row.
+		// 2) D[j, k] = (D[j, k] + D[k, j]) / 4.
+		// For 2), the computation of 1) guarantee that D is symmetric, which simply makes 2) become D = D / 2.
+		assert(sb2t_mat != nullptr);
+		assert(n_trees > 0);
+		if (dis_mat != nullptr)
+			delete dis_mat;
+		//dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
+		dis_mat = new SpecMat::LowerTri<PRECISION>(n_trees);
+		dis_mat->form_row_ptr();
+		sb2t_mat->set_RCS();
+
+		double t1 = 0, t2 = 0;
+
+		double* total_weight = new double[n_trees];
+
+		for(int i = 0; i < n_trees; i++)
+		{
+			total_weight[i] = 0;
+			auto w_ptr = (*Trees)[i].get_weight();
+			for (auto j = 0; j < w_ptr->get_size(); j++)
+				total_weight[i] += (*w_ptr)[j];
+			// auto col_val_ptr = sb2t_mat->get_CCS_val_c_ptr(i);
+			// for (int j = 0; j < col_val_ptr->get_size(); j++)
+			// 	total_weight[i] += (*col_val_ptr)[j];
+		}
+
+		for(int i = 0; i < n_trees; i++)
+		{
+			for(int j = 0; j < i; j++)
+				(*dis_mat)(i, j) = total_weight[i] + total_weight[j];
+		}
+
+		for(int b = 0; b < unique_bipart; b++)
+		{
+			// The i-th row in B2T matrix.
+			auto col_ind_ptr = sb2t_mat->get_RCS_ind_c_ptr(b);
+			auto CCS_ind_ptr = sb2t_mat->get_RCS_val_c_ptr(b);
+
+			size_t RCS_row_size = (col_ind_ptr == nullptr) ? 0 : col_ind_ptr->get_size();
+
+
+			for (int i = 0; i < RCS_row_size; i++)
+			{
+				for (int j = 0; j < i; j++)
+				{
+					t1 = sb2t_mat->CCS_ele((*col_ind_ptr)[i], (*CCS_ind_ptr)[i]);
+					t2 = sb2t_mat->CCS_ele((*col_ind_ptr)[j], (*CCS_ind_ptr)[j]);
+					if (t2 > t1)
+						(*dis_mat)((*col_ind_ptr)[i], (*col_ind_ptr)[j]) -= t1;
+					else
+						(*dis_mat)((*col_ind_ptr)[i], (*col_ind_ptr)[j]) -= t2;
+
+				}
+			}
+		}
+
+
+		// for (int i = 0; i < unique_bipart; i++)
+		// {
+		// 	// The i-th row in B2T matrix.
+		// 	auto col_ind_ptr = sb2t_mat->get_RCS_ind_c_ptr(i);
+		// 	auto CCS_ind_ptr = sb2t_mat->get_RCS_val_c_ptr(i);
+
+		// 	size_t RCS_row_size = (col_ind_ptr == nullptr) ? 0 : col_ind_ptr->get_size();
+
+		// 	// Handle 0 <= j < cur_col  with M[i, j] = 0 first.
+		// 	for (int j = 0; j < (*col_ind_ptr)[0]; j++)
+		// 	{
+		// 		for (int RCS_next_ind = 0; RCS_next_ind < RCS_row_size; RCS_next_ind++)
+		// 		{
+		// 			// Found all nonzero behind j.
+		// 			size_t next_col = (*col_ind_ptr)[RCS_next_ind];
+		// 			PRECISION next_val = sb2t_mat->CCS_ele(next_col, (*CCS_ind_ptr)[RCS_next_ind]);
+		// 			(*dis_mat)(next_col, j) += next_val;
+		// 			//(*dis_mat)(j, next_col) += next_val;
+		// 		}
+		// 	}
+
+		// 	// Handle j = cur_col with M[i, j] != 0.
+		// 	for (int RCS_ind = 0; RCS_ind < RCS_row_size; RCS_ind++)
+		// 	{
+		// 		// RCS_ind pointing at nonzero entries on the i-th row.
+		// 		size_t cur_col = (*col_ind_ptr)[RCS_ind];
+		// 		PRECISION cur_val = sb2t_mat->CCS_ele(cur_col, (*CCS_ind_ptr)[RCS_ind]);
+
+		// 		size_t RCS_next_ind = (RCS_ind < RCS_row_size - 1) ? RCS_ind + 1 : RCS_ind;
+		// 		size_t next_col = (*col_ind_ptr)[RCS_next_ind];
+		// 		PRECISION next_val = sb2t_mat->CCS_ele(next_col, (*CCS_ind_ptr)[RCS_next_ind]);
+		// 		// Record the next nonzero. If this is the last nonzero in the row, record itself
+		// 		// which will not be triggered in later computation.
+
+		// 		for (int j = cur_col + 1; j < next_col; j++)
+		// 		{
+		// 			// Handle cur_col < j < next_col  with M[i, j] = 0 first.
+		// 			// For here, we only need M[i, k] != 0 with j < k.
+		// 			for (RCS_next_ind; RCS_next_ind < RCS_row_size; RCS_next_ind++)
+		// 			{
+		// 				// Found all nonzero behind j.
+		// 				next_col = (*col_ind_ptr)[RCS_next_ind];
+		// 				next_val = sb2t_mat->CCS_ele(next_col, (*CCS_ind_ptr)[RCS_next_ind]);
+		// 				(*dis_mat)(next_col, j) += next_val;
+		// 				//(*dis_mat)(j, next_col) += next_val;
+		// 			}
+		// 		}
+
+		// 		RCS_next_ind = (RCS_ind < RCS_row_size - 1) ? RCS_ind + 1 : RCS_ind;
+		// 		next_col = (*col_ind_ptr)[RCS_next_ind];
+		// 		next_val = sb2t_mat->CCS_ele(next_col, (*CCS_ind_ptr)[RCS_next_ind]);
+		// 		// Restore the record of the next nonzero.
+
+		// 		// Handle j = cur_col
+		// 		// For here, we need to consider all j < k.
+		// 		for (int k = cur_col + 1; k < n_trees; k++)
+		// 		{
+		// 			// Update D[k, cur_col] with k > cur_col, i.e. the lower triangle part.
+		// 			// Do the same with the upper triangle part, i.e., D[cur_col, k]
+		// 			// D[k, cur_col] += abs(M[i, k] - M[i, cur_col]);
+
+		// 			if (k != next_col)
+		// 			{
+		// 				// M[i, k] = 0;
+		// 				(*dis_mat)(k, cur_col) += cur_val;
+		// 				//(*dis_mat)(cur_col, k) += cur_val;
+		// 			}
+		// 			else
+		// 			{
+		// 				// M[i, k] = next_val
+		// 				PRECISION temp = (cur_val > next_val) ? (cur_val - next_val) : (next_val - cur_val);
+		// 				(*dis_mat)(k, cur_col) += temp;
+		// 				//(*dis_mat)(cur_col, k) += temp;
+
+		// 				// update next nonzero
+		// 				RCS_next_ind = RCS_next_ind + (RCS_next_ind < RCS_row_size - 1);
+		// 				next_col = (*col_ind_ptr)[RCS_next_ind];
+		// 				next_val = sb2t_mat->CCS_ele(next_col, (*CCS_ind_ptr)[RCS_next_ind]);
+		// 			}
+		// 		}
+		// 	}
+		// }
+	}
+
+
 	int get_all_bipart_num() { return all_bipart; };
 	int get_unique_bipart_num() { return unique_bipart; };
 	int get_tree_set_size() { return n_trees; };
 	int get_leaf_set_size() { return n_leaves; };
 	SpecMat::LowerTri<PRECISION> *get_dis_mat() { return dis_mat; };
 	SpecMat::LowerTri<PRECISION> *get_cov_mat() { return cov_mat; };
-	TreeSet<T> *pop_trees()
+	TreeSet<T>* pop_trees()
 	{
 		auto temp = Trees;
 		Trees = nullptr;
 		return temp;
 	}
+	
 
 	void print_Bipart_List(ostream &fout)
 	{
@@ -483,18 +598,6 @@ public:
 			fout << i << " ";
 			(*Bipart)[i].print_BitString(fout);
 			fout << ' ' << (*sb2t_mat).get_RCS_ind_c_ptr(i)->get_size() << '\n';
-		}
-	};
-
-	void print_Bipart_List(ostream &fout, const Array<int> &indices)
-	{
-		int tree_num = sb2t_mat->get_col();
-		int ind = -1;
-		for (int i = 0; i < indices.get_size(); i++)
-		{
-			ind = indices[i];
-			(*Bipart)[ind].print_BitString(fout);
-			fout << ' ' << ((PRECISION)sb2t_mat->get_RCS_ind_c_ptr(ind)->get_size()) / tree_num << '\n';
 		}
 	};
 
@@ -672,5 +775,12 @@ public:
 		}
 
 		bipart_id.align();
+	}
+
+	void release_dis_mat()
+	{
+		if (dis_mat)
+			delete dis_mat;
+		dis_mat = nullptr;
 	}
 };

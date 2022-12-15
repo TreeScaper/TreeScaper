@@ -477,6 +477,13 @@ public:
 	BitString<T> &operator[](size_t i) { return Id2BitString[i]; };
 };
 
+struct LinkedNodeTree
+{
+	int d_num;
+	Array<int> *descendant;
+	Array<int> *leaf;
+};
+
 class TreeArray
 {
 	// This class use edges forms as internal data structure of trees. It translates Newick form to edge form
@@ -493,7 +500,6 @@ private:
 	int **edges;
 	Array<size_t> *t2b;
 	bool issorted;
-
 public:
 	TreeArray() : size(0), levels(nullptr), weights(nullptr),
 				  t2b(nullptr), edges(nullptr), issorted(false){};
