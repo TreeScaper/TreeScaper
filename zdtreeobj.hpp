@@ -21,8 +21,8 @@ private:
 	TaxonList *Taxa;
 
 	SparseMatrix *sb2t_mat;
-	//Matrix<PRECISION>* cov_mat;
-	//Matrix<PRECISION>* dis_mat;
+	// Matrix<PRECISION>* cov_mat;
+	// Matrix<PRECISION>* dis_mat;
 
 	SpecMat::LowerTri<PRECISION> *cov_mat;
 	SpecMat::LowerTri<PRECISION> *dis_mat;
@@ -82,7 +82,7 @@ public:
 
 	void set_weighted(bool weighted) { ISWEIGHTED = weighted; };
 
-	//void sort_BipartId2Tree_by_treeid() {
+	// void sort_BipartId2Tree_by_treeid() {
 	//	// Bubble sort implemented here.
 	//	int temp;
 
@@ -111,6 +111,39 @@ public:
 	//	}
 
 	//}
+
+	Array<int> *Compute_Strict_Consensus_Tree()
+	{
+		sb2t_mat->set_RCS();
+		int bipart_num = sb2t_mat->get_row();
+		int tree_num = sb2t_mat->get_col();
+
+		Array<int> *consensus_bipart_id = new Array<int>(0, row);
+		for (int i = 0; i < bipart_num; i++)
+		{
+			if (sb2t_mat->get_RCS_ind_c_ptr(i)->get_size() == tree_num)
+				consensus_bipart_id->push(i);
+		}
+		consensus_bipart_id->align();
+		return consensus_bipart_id;
+	}
+
+	Array<int> *Compute_Major_Consensus_Tree()
+	{
+		sb2t_mat->set_RCS();
+		int bipart_num = sb2t_mat->get_row();
+		int tree_num = sb2t_mat->get_col();
+
+		Array<int> *consensus_bipart_id = new Array<int>(0, row);
+
+		for (int i = 0; i < bipart_num; i++)
+		{
+			if (2 * sb2t_mat->get_RCS_ind_c_ptr(i)->get_size() >= tree_num)
+				consensus_bipart_id->push(i);
+		}
+		consensus_bipart_id->align();
+		return consensus_bipart_id;
+	}
 
 	void Compute_Bipart()
 	{
@@ -154,7 +187,7 @@ public:
 		assert(unique_bipart > 0);
 		if (cov_mat != nullptr)
 			delete cov_mat;
-		//cov_mat = new Matrix<PRECISION>(unique_bipart, unique_bipart, (PRECISION)0);
+		// cov_mat = new Matrix<PRECISION>(unique_bipart, unique_bipart, (PRECISION)0);
 		cov_mat = new SpecMat::LowerTri<PRECISION>(unique_bipart);
 		cov_mat->form_row_ptr();
 
@@ -192,14 +225,13 @@ public:
 
 		if (cov_mat != nullptr)
 			delete cov_mat;
-		//cov_mat = new Matrix<PRECISION>(unique_bipart, unique_bipart, (PRECISION)0);
+		// cov_mat = new Matrix<PRECISION>(unique_bipart, unique_bipart, (PRECISION)0);
 		cov_mat = new SpecMat::LowerTri<PRECISION>(sub_row);
 		cov_mat->form_row_ptr();
 
 		// Array<PRECISION> c_mean = sb2t_sub_mat->col_mean();
 		// auto sum = sb2t_mat->col_sum();
 		Array<PRECISION> c_sum = sb2t_sub_mat->col_sum();
-		
 
 		for (int i = 0; i < sub_row; i++)
 		{
@@ -228,7 +260,7 @@ public:
 		assert(n_trees > 0);
 		if (dis_mat != nullptr)
 			delete dis_mat;
-		//dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
+		// dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
 		dis_mat = new SpecMat::LowerTri<PRECISION>(n_trees);
 		dis_mat->form_row_ptr();
 		sb2t_mat->set_RCS();
@@ -339,7 +371,7 @@ public:
 
 		if (dis_mat != nullptr)
 			delete dis_mat;
-		//dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
+		// dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
 		dis_mat = new SpecMat::LowerTri<PRECISION>(sub_col);
 		dis_mat->form_row_ptr();
 
@@ -435,13 +467,12 @@ public:
 	int get_leaf_set_size() { return n_leaves; };
 	SpecMat::LowerTri<PRECISION> *get_dis_mat() { return dis_mat; };
 	SpecMat::LowerTri<PRECISION> *get_cov_mat() { return cov_mat; };
-	TreeSet<T>* pop_trees()
+	TreeSet<T> *pop_trees()
 	{
 		auto temp = Trees;
 		Trees = nullptr;
 		return temp;
 	}
-	
 
 	void print_Bipart_List(ostream &fout)
 	{
@@ -452,6 +483,18 @@ public:
 			fout << i << " ";
 			(*Bipart)[i].print_BitString(fout);
 			fout << ' ' << (*sb2t_mat).get_RCS_ind_c_ptr(i)->get_size() << '\n';
+		}
+	};
+
+	void print_Bipart_List(ostream &fout, const Array<int> &indices)
+	{
+		int tree_num = sb2t_mat->get_col();
+		int ind = -1;
+		for (int i = 0; i < indices.get_size(); i++)
+		{
+			ind = indices[i];
+			(*Bipart)[ind].print_BitString(fout);
+			fout << ' ' << ((PRECISION)sb2t_mat->get_RCS_ind_c_ptr(ind)->get_size()) / tree_num << '\n';
 		}
 	};
 

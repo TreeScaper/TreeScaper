@@ -17,7 +17,7 @@
 #include "NLDR.hpp"
 
 using namespace std;
-//using namespace FILEIO;
+// using namespace FILEIO;
 
 typedef unsigned char u_8;
 typedef unsigned int u_32;
@@ -36,11 +36,11 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 template <class Container_type>
 bool reload_driver(map<String, String> &paras, Container_type dummy);
 
-Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis,map<String, String> &paras);
+Matrix<PRECISION> *nldr_driver(SpecMat::LowerTri<PRECISION> *Dis, map<String, String> &paras);
 
-bool adj_driver(SpecMat::LowerTri<PRECISION>* Adj, map<String, String> &paras);
+bool adj_driver(SpecMat::LowerTri<PRECISION> *Adj, map<String, String> &paras);
 
-bool comm_driver(SpecMat::LowerTri<PRECISION>* Adj, map<String, String> &paras);
+bool comm_driver(SpecMat::LowerTri<PRECISION> *Adj, map<String, String> &paras);
 
 template <class Container_type>
 bool task_driver(map<String, String> &paras, Container_type dummy);
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
 	if (argc > 1 && (String)argv[1] == (String) "-trees")
 	{
-		String default_paras[n_tree_key_option] = {"", "postfix", "taxon", "64", "0", "1", "Cov", "1", "0.01", "none", "none", "0", "none", "0"};
+		String default_paras[n_tree_key_option] = {"", "postfix", "taxon", "64", "0", "1", "Covariance", "1", "0.01", "none", "none", "0", "none", "0"};
 		String options[n_tree_key_option] = {"-f", "-post", "-tm", "-bit", "-r", "-w", "-output", "-bipart-hf", "-bipart-lf", "-sb", "-st", "-saveobj", "-trees-key", "-lessprint"};
 
 		map<String, String> paras = read_paras(argc, argv, n_tree_key_option, default_paras, options);
@@ -90,9 +90,9 @@ int main(int argc, char *argv[])
 	}
 	else if (argc > 1 && (String)argv[1] == (String) "-adj")
 	{
-		String default_paras[n_adj_key_option] = { "", "-1", "DIS", "EXP", "time", "none", "0"};
-		String options[n_adj_key_option] = { "-f", "-adj-size", "-adj-type", "-am", "-post", "-adj-key", "-lessprint"};
-		
+		String default_paras[n_adj_key_option] = {"", "-1", "Distance", "Exponential", "time", "none", "0"};
+		String options[n_adj_key_option] = {"-f", "-adj-size", "-adj-type", "-am", "-post", "-adj-key", "-lessprint"};
+
 		map<String, String> paras = read_paras(argc, argv, n_adj_key_option, default_paras, options);
 
 		if (paras["-key"] != (String) "none")
@@ -100,12 +100,12 @@ int main(int argc, char *argv[])
 			std::cout << "Reading parameters from " << paras["-adj-key"] << endl;
 			read_paras_from_csv(paras["-adj-key"], paras, true);
 		}
-		
+
 		adj_driver(nullptr, paras);
 	}
 	else if (argc > 1 && (String)argv[1] == (String) "-nldr")
 	{
-		String default_paras[n_nldr_key_option] = {"", "COR", "postfix", "-1", "2", "CCA", "STOCHASTIC", "RAND", "1", "nldr_parameters.csv", "0"};
+		String default_paras[n_nldr_key_option] = {"", "Coordinate", "postfix", "-1", "2", "CCA", "STOCHASTIC", "RAND", "1", "nldr_parameters.csv", "0"};
 		String options[n_nldr_key_option] = {"-f", "-nldr-type", "-post", "-nldr-size", "-nldr-dim", "-nldr-cost", "-nldr-algo", "-nldr-init", "-nldr-seed", "-nldr-key", "-lessprint"};
 
 		map<String, String> paras = read_paras(argc, argv, n_nldr_key_option, default_paras, options);
@@ -120,10 +120,10 @@ int main(int argc, char *argv[])
 	}
 	else if (argc > 1 && (String)argv[1] == (String) "-comm")
 	{
-		String default_paras[n_comm_key_option] = { "", "BIPART", "-1", "CNM", "1", "0", "1",
-			"0", "1", "0", "1", "0", "1", "0", "AUTO", "comm_parameters.csv", "postfix", "0"};
-		String options[n_comm_key_option] = { "-f", "-comm-type", "-comm-size", "-cm", "-lp", "-lps", "-lpe",
-			"-lpiv", "-ln", "-lns", "-lne", "-lniv", "-comm-hf", "-comm-lf", "-lm", "-comm-key", "-post", "-lessprint"};
+		String default_paras[n_comm_key_option] = {"", "Bipartition", "-1", "CNM", "1", "0", "1",
+												   "0", "1", "0", "1", "0", "1", "0", "Automatic", "comm_parameters.csv", "postfix", "0"};
+		String options[n_comm_key_option] = {"-f", "-comm-type", "-comm-size", "-cm", "-lp", "-lps", "-lpe",
+											 "-lpiv", "-ln", "-lns", "-lne", "-lniv", "-comm-hf", "-comm-lf", "-lm", "-comm-key", "-post", "-lessprint"};
 
 		map<String, String> paras = read_paras(argc, argv, n_comm_key_option, default_paras, options);
 
@@ -133,7 +133,6 @@ int main(int argc, char *argv[])
 			read_paras_from_csv(paras["-comm-key"], paras, true);
 		}
 
-
 		comm_driver(nullptr, paras);
 	}
 	else if (argc > 1 && (String)argv[1] == (String) "-task")
@@ -142,7 +141,6 @@ int main(int argc, char *argv[])
 		String options[n_task_key_option] = {"-f", "-post", "-key", "-trees", "-adj", "-comm", "-nldr", "-lessprint", "-bit"};
 
 		map<String, String> paras = read_paras(argc, argv, n_task_key_option, default_paras, options);
-
 
 		if (paras["-bit"] == (String) "8")
 			task_driver(paras, (u_8)1);
@@ -167,7 +165,7 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 
 	std::cout << (rooted ? "rooted" : "unrooted") << "\t" << (weighted ? "weighted" : "unweighted") << '\n';
 
-	if (paras["-tm"] == (String) "TAXON")
+	if (paras["-tm"] == (String) "Taxon")
 		flag_label = 2;
 	else
 		flag_label = 0;
@@ -248,7 +246,7 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 	fout.close();
 	cout << "Sucessfully printed bipartition-to-tree sparse matrix in Bipartition_" << (char *)paras["-post"] << ".out file.\n\n";
 
-	if (paras["-output"] == (String) "COV")
+	if (paras["-output"] == (String) "Covariance")
 	{
 		Array<size_t> subset, id_mapping;
 		double hf = atof(paras["-bipart-hf"]), lf = atof(paras["-bipart-lf"]);
@@ -305,7 +303,7 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 			cout << "Sucessfully printed covariance matrix in Covariance_" << (char *)paras["-post"] << ".out file.\n\n";
 		}
 	}
-	else if (paras["-output"] == (String) "DIS")
+	else if (paras["-output"] == (String) "Distance")
 	{
 		Array<size_t> subset, id_mapping;
 		bool flag_subtree = false;
@@ -370,9 +368,34 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 		fout.close();
 		cout << "Sucessfully printed distance matrix in Distance_" << (char *)paras["-post"] << ".out file.\n\n";
 	}
-	else if (paras["-output"] == (String) "BOTH")
+	else if (paras["-output"] == (String) "Consensus")
 	{
+		Array<int> *consensus_tree_bipart_id = nullptr;
+		if (paras["-cons-type"] == (String) "Major")
+			consensus_tree_bipart_id = treesobj_ptr->Compute_Major_Consensus_Tree();
+		else if (paras["-cons-type"] == (String) "Strict")
+			consensus_tree_bipart_id = treesobj_ptr->Compute_Strict_Consensus_Tree();
+		else
+		{
+			cout << "Error! Consensus tree type only support ``Major'' or ``Strict''.";
+			throw(1);
+		}
 
+		// Print Bipartition List
+		String outname_Consensus("Consensus_Tree");
+		outname_Consensus.make_stdname(paras);
+		Header_info Header_Consensus;
+		Header_Consensus.insert("created", time_stamp());
+		Header_Consensus.insert("output type", "Consensus tree");
+		Header_Consensus.insert("size", to_string(consensus_tree_bipart_id->get_size()));
+		Header_Consensus.insert("format", "bitstring, appear times / tree number");
+		Header_Consensus.insert("source", paras["-f"]);
+
+		fout.open((char *)outname_Consensus);
+		fout << Header_Consensus;
+		treesobj_ptr->print_Bipart_List(fout, *consensus_tree_bipart_id);
+		fout.close();
+		cout << "Sucessfully printed the consensus tree info in Consensus_Tree_" << paras["-post"] << ".out file.\n\n";
 	}
 	treesobj_ptr->print_summary();
 	if (paras["-saveobj"] == (String) "1")
@@ -520,13 +543,13 @@ bool reload_driver(map<String, String> &paras, Container_type dummy)
 	return true;
 }
 
-Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, String> &paras)
+Matrix<PRECISION> *nldr_driver(SpecMat::LowerTri<PRECISION> *Dis, map<String, String> &paras)
 {
 	Header_info info;
 	int size = 0, file_size = 0;
 	int dim = 0;
 	int seed = atoi((char *)paras["-nldr-seed"]);
-    std::default_random_engine eng{seed};
+	std::default_random_engine eng{seed};
 	bool less_print = (paras["-lessprint"] == (String) "1");
 
 	if (Dis == nullptr) // Adjacency should be read from file.
@@ -539,7 +562,7 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 
 		int size = atoi(paras["-nldr-size"]);
 		int file_size = info.count("size") ? atoi(info["size"]) : get_file_lines(fin);
-		
+
 		if (size < 0)
 			size = file_size;
 		else if (size != file_size)
@@ -551,8 +574,9 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 
 		Dis = new SpecMat::LowerTri<PRECISION>(size, fin);
 
-		if (info.count("distance_type") && !paras.count("-dm")) {
-			std::string dm = (char*) info["distance_type"];
+		if (info.count("distance_type") && !paras.count("-dm"))
+		{
+			std::string dm = (char *)info["distance_type"];
 			if (dm.find("Unweighted Robinson-Foulds") != std::string::npos || dm.find("URF") != std::string::npos)
 				paras["-dm"] = (String) "URF";
 			else if (dm.find("Robinson-Foulds") != std::string::npos || dm.find("RF") != std::string::npos)
@@ -573,17 +597,17 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 	dim = atoi((char *)paras["-nldr-dim"]);
 
 	auto CX = new Matrix<PRECISION>(size, dim);
-	if (paras["-nldr-init"] == (String) "RAND")
+	if (paras["-nldr-init"] == (String) "Random")
 	{
 		PRECISION r_start, r_stop;
 		r_start = atof(paras["RANDOM_START"]);
 		r_stop = atof(paras["RANDOM_STOP"]);
 
-    	uniform_real_distribution<PRECISION> rand(r_start, r_stop);
+		uniform_real_distribution<PRECISION> rand(r_start, r_stop);
 
-    	for (auto i = 0; i < size; i++)
-        	for (auto k = 0; k < dim; k++)
-            	(*CX)(i, k) = rand(eng);
+		for (auto i = 0; i < size; i++)
+			for (auto k = 0; k < dim; k++)
+				(*CX)(i, k) = rand(eng);
 	}
 	else
 	{
@@ -591,22 +615,19 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 		throw(1);
 	}
 
-    SpecMat::LowerTri<PRECISION> DX(size, true);
+	SpecMat::LowerTri<PRECISION> DX(size, true);
 	NLDR::Cor2Dis(*CX, DX);
 	DX.form_row_ptr();
 
-	
 	uniform_int_distribution<> rand_uniform(0, size - 1);
 
-
-
 	unsigned MaxIter = 0;
-    unsigned MaxTime = -1;
-    PRECISION ErrTol = 0;
-    PRECISION DifTol = -1.0;
+	unsigned MaxTime = -1;
+	PRECISION ErrTol = 0;
+	PRECISION DifTol = -1.0;
 
 	PRECISION lambda0 = 12000;
-    PRECISION lambdan = 1;
+	PRECISION lambdan = 1;
 
 	PRECISION *lambda = nullptr;
 	PRECISION *alpha = nullptr;
@@ -614,36 +635,35 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 
 	PRECISION metropolis_T = 0;
 
-
 	if (paras["-nldr-cost"] == (String) "KRUSKAL1" && paras["-nldr-algo"] == (String) "STOCHASTIC")
 	{
-		MaxIter = atoi((char *) paras["KRU_STO_MAXITER"]);
-		MaxTime = atoi((char *) paras["KRU_STO_MAXTIME"]);
+		MaxIter = atoi((char *)paras["KRU_STO_MAXITER"]);
+		MaxTime = atoi((char *)paras["KRU_STO_MAXTIME"]);
 		ErrTol = atof((char *)paras["KRU_STO_ERRTOL"]);
 
 		s_ind = new unsigned[MaxIter];
 		for (auto i = 0; i < MaxIter; i++)
-	        s_ind[i] = rand_uniform(eng);
+			s_ind[i] = rand_uniform(eng);
 
-    	alpha = new PRECISION[MaxIter];
-		PRECISION alpha0 = atof(paras["KRU_STO_ALPHA0"]), alphan = atof(paras["KRU_STO_ALPHAn"]);;
+		alpha = new PRECISION[MaxIter];
+		PRECISION alpha0 = atof(paras["KRU_STO_ALPHA0"]), alphan = atof(paras["KRU_STO_ALPHAn"]);
+		;
 		for (auto i = 0; i < MaxIter; i++)
-        	alpha[i] = alpha0 * pow(alphan, (double)i / (MaxIter - 1));
-		
+			alpha[i] = alpha0 * pow(alphan, (double)i / (MaxIter - 1));
 
 		NLDR::STOCHASTIC(Dis, size, dim, CX, &DX, KRUSKAL1, MaxIter, MaxTime, ErrTol, DifTol, alpha, nullptr, s_ind);
 		delete[] lambda;
 		delete[] s_ind;
 	}
-	else if(paras["-nldr-cost"] == (String) "KRUSKAL1" && paras["-nldr-algo"] == (String) "MAJORIZATION")
+	else if (paras["-nldr-cost"] == (String) "KRUSKAL1" && paras["-nldr-algo"] == (String) "MAJORIZATION")
 	{
-		MaxIter = atoi((char *) paras["KRU_MAJ_MAXITER"]);
-		MaxTime = atoi((char *) paras["KRU_MAJ_MAXTIME"]);
+		MaxIter = atoi((char *)paras["KRU_MAJ_MAXITER"]);
+		MaxTime = atoi((char *)paras["KRU_MAJ_MAXTIME"]);
 		ErrTol = atof((char *)paras["KRU_MAJ_ERRTOL"]);
 
 		NLDR::MAJORIZATION(Dis, size, dim, CX, &DX, KRUSKAL1, MaxIter, MaxTime, ErrTol, DifTol, nullptr);
 	}
-	else if(paras["-nldr-cost"] == (String) "KRUSKAL1" && paras["-nldr-algo"] == (String) "METROPOLIS")
+	else if (paras["-nldr-cost"] == (String) "KRUSKAL1" && paras["-nldr-algo"] == (String) "METROPOLIS")
 	{
 		MaxIter = atoi((char *)paras["KRU_MET_MAXITER"]);
 		MaxTime = atoi((char *)paras["KRU_MET_MAXTIME"]);
@@ -653,7 +673,7 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 
 		NLDR::METROPOLIS(Dis, size, dim, CX, &DX, KRUSKAL1, MaxIter, MaxTime, ErrTol, DifTol, nullptr, &eng, metropolis_T);
 	}
-	else if(paras["-nldr-cost"] == (String) "KRUSKAL1" && paras["-nldr-algo"] == (String) "GAUSS_SEIDEL")
+	else if (paras["-nldr-cost"] == (String) "KRUSKAL1" && paras["-nldr-algo"] == (String) "GAUSS_SEIDEL")
 	{
 		MaxIter = atoi((char *)paras["KRU_GAU_MAXITER"]);
 		MaxTime = atoi((char *)paras["KRU_GAU_MAXTIME"]);
@@ -663,32 +683,33 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 	}
 	else if (paras["-nldr-cost"] == (String) "NORMALIZED" && paras["-nldr-algo"] == (String) "STOCHASTIC")
 	{
-		MaxIter = atoi((char *) paras["NOR_STO_MAXITER"]);
-		MaxTime = atoi((char *) paras["NOR_STO_MAXTIME"]);
+		MaxIter = atoi((char *)paras["NOR_STO_MAXITER"]);
+		MaxTime = atoi((char *)paras["NOR_STO_MAXTIME"]);
 		ErrTol = atof((char *)paras["NOR_STO_ERRTOL"]);
 
 		s_ind = new unsigned int[MaxIter];
 		for (auto i = 0; i < MaxIter; i++)
-	        s_ind[i] = rand_uniform(eng);
+			s_ind[i] = rand_uniform(eng);
 
 		alpha = new PRECISION[MaxIter];
-		PRECISION alpha0 = atof(paras["NOR_STO_ALPHA0"]), alphan = atof(paras["NOR_STO_ALPHAn"]);;
+		PRECISION alpha0 = atof(paras["NOR_STO_ALPHA0"]), alphan = atof(paras["NOR_STO_ALPHAn"]);
+		;
 		for (auto i = 0; i < MaxIter; i++)
-        	alpha[i] = alpha0 * pow(alphan, (double)i / (MaxIter - 1));
+			alpha[i] = alpha0 * pow(alphan, (double)i / (MaxIter - 1));
 
 		NLDR::STOCHASTIC(Dis, size, dim, CX, &DX, NORMALIZED, MaxIter, MaxTime, ErrTol, DifTol, alpha, nullptr, s_ind);
 		delete[] lambda;
 		delete[] s_ind;
 	}
-	else if(paras["-nldr-cost"] == (String) "NORMALIZED" && paras["-nldr-algo"] == (String) "MAJORIZATION")
+	else if (paras["-nldr-cost"] == (String) "NORMALIZED" && paras["-nldr-algo"] == (String) "MAJORIZATION")
 	{
-		MaxIter = atoi((char *) paras["NOR_MAJ_MAXITER"]);
-		MaxTime = atoi((char *) paras["NOR_MAJ_MAXTIME"]);
+		MaxIter = atoi((char *)paras["NOR_MAJ_MAXITER"]);
+		MaxTime = atoi((char *)paras["NOR_MAJ_MAXTIME"]);
 		ErrTol = atof((char *)paras["NOR_MAJ_ERRTOL"]);
 
 		NLDR::MAJORIZATION(Dis, size, dim, CX, &DX, NORMALIZED, MaxIter, MaxTime, ErrTol, DifTol, nullptr);
 	}
-	else if(paras["-nldr-cost"] == (String) "NORMALIZED" && paras["-nldr-algo"] == (String) "METROPOLIS")
+	else if (paras["-nldr-cost"] == (String) "NORMALIZED" && paras["-nldr-algo"] == (String) "METROPOLIS")
 	{
 		MaxIter = atoi((char *)paras["NOR_MET_MAXITER"]);
 		MaxTime = atoi((char *)paras["NOR_MET_MAXTIME"]);
@@ -698,7 +719,7 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 
 		NLDR::METROPOLIS(Dis, size, dim, CX, &DX, NORMALIZED, MaxIter, MaxTime, ErrTol, DifTol, nullptr, &eng, metropolis_T);
 	}
-	else if(paras["-nldr-cost"] == (String) "NORMALIZED" && paras["-nldr-algo"] == (String) "GAUSS_SEIDEL")
+	else if (paras["-nldr-cost"] == (String) "NORMALIZED" && paras["-nldr-algo"] == (String) "GAUSS_SEIDEL")
 	{
 		MaxIter = atoi((char *)paras["NOR_GAU_MAXITER"]);
 		MaxTime = atoi((char *)paras["NOR_GAU_MAXTIME"]);
@@ -708,32 +729,33 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 	}
 	else if (paras["-nldr-cost"] == (String) "SAMMON" && paras["-nldr-algo"] == (String) "STOCHASTIC")
 	{
-		MaxIter = atoi((char *) paras["NLM_STO_MAXITER"]);
-		MaxTime = atoi((char *) paras["NLM_STO_MAXTIME"]);
+		MaxIter = atoi((char *)paras["NLM_STO_MAXITER"]);
+		MaxTime = atoi((char *)paras["NLM_STO_MAXTIME"]);
 		ErrTol = atof((char *)paras["NLM_STO_ERRTOL"]);
 
 		s_ind = new unsigned int[MaxIter];
 		for (auto i = 0; i < MaxIter; i++)
-	        s_ind[i] = rand_uniform(eng);
+			s_ind[i] = rand_uniform(eng);
 
 		alpha = new PRECISION[MaxIter];
-		PRECISION alpha0 = atof(paras["NLM_STO_ALPHA0"]), alphan = atof(paras["NLM_STO_ALPHAn"]);;
+		PRECISION alpha0 = atof(paras["NLM_STO_ALPHA0"]), alphan = atof(paras["NLM_STO_ALPHAn"]);
+		;
 		for (auto i = 0; i < MaxIter; i++)
-        	alpha[i] = alpha0 * pow(alphan, (double)i / (MaxIter - 1));
+			alpha[i] = alpha0 * pow(alphan, (double)i / (MaxIter - 1));
 
 		NLDR::STOCHASTIC(Dis, size, dim, CX, &DX, SAMMON, MaxIter, MaxTime, ErrTol, DifTol, alpha, nullptr, s_ind);
 		delete[] lambda;
 		delete[] s_ind;
 	}
-	else if(paras["-nldr-cost"] == (String) "SAMMON" && paras["-nldr-algo"] == (String) "MAJORIZATION")
+	else if (paras["-nldr-cost"] == (String) "SAMMON" && paras["-nldr-algo"] == (String) "MAJORIZATION")
 	{
-		MaxIter = atoi((char *) paras["NLM_MAJ_MAXITER"]);
-		MaxTime = atoi((char *) paras["NLM_MAJ_MAXTIME"]);
+		MaxIter = atoi((char *)paras["NLM_MAJ_MAXITER"]);
+		MaxTime = atoi((char *)paras["NLM_MAJ_MAXTIME"]);
 		ErrTol = atof((char *)paras["NLM_MAJ_ERRTOL"]);
 
 		NLDR::MAJORIZATION(Dis, size, dim, CX, &DX, SAMMON, MaxIter, MaxTime, ErrTol, DifTol, nullptr);
 	}
-	else if(paras["-nldr-cost"] == (String) "SAMMON" && paras["-nldr-algo"] == (String) "METROPOLIS")
+	else if (paras["-nldr-cost"] == (String) "SAMMON" && paras["-nldr-algo"] == (String) "METROPOLIS")
 	{
 		MaxIter = atoi((char *)paras["NLM_MET_MAXITER"]);
 		MaxTime = atoi((char *)paras["NLM_MET_MAXTIME"]);
@@ -743,7 +765,7 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 
 		NLDR::METROPOLIS(Dis, size, dim, CX, &DX, SAMMON, MaxIter, MaxTime, ErrTol, DifTol, nullptr, &eng, metropolis_T);
 	}
-	else if(paras["-nldr-cost"] == (String) "SAMMON" && paras["-nldr-algo"] == (String) "GAUSS_SEIDEL")
+	else if (paras["-nldr-cost"] == (String) "SAMMON" && paras["-nldr-algo"] == (String) "GAUSS_SEIDEL")
 	{
 		MaxIter = atoi((char *)paras["NLM_GAU_MAXITER"]);
 		MaxTime = atoi((char *)paras["NLM_GAU_MAXTIME"]);
@@ -753,46 +775,47 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 	}
 	else if (paras["-nldr-cost"] == (String) "CCA" && paras["-nldr-algo"] == (String) "STOCHASTIC")
 	{
-		MaxIter = atoi((char *) paras["CCA_STO_MAXITER"]);
-		MaxTime = atoi((char *) paras["CCA_STO_MAXTIME"]);
+		MaxIter = atoi((char *)paras["CCA_STO_MAXITER"]);
+		MaxTime = atoi((char *)paras["CCA_STO_MAXTIME"]);
 		ErrTol = atof((char *)paras["CCA_STO_ERRTOL"]);
 
-		lambda0 = atof((char *) paras["CCA_STO_ALPHA0"]);
-		lambdan = atof((char *) paras["CCA_STO_ALPHAn"]);
+		lambda0 = atof((char *)paras["CCA_STO_ALPHA0"]);
+		lambdan = atof((char *)paras["CCA_STO_ALPHAn"]);
 
 		lambda = new PRECISION[MaxIter];
 		for (auto i = 0; i < MaxIter; i++)
-        	lambda[i] = lambda0 * pow((lambdan / lambda0), (double)i / (MaxIter - 1));
+			lambda[i] = lambda0 * pow((lambdan / lambda0), (double)i / (MaxIter - 1));
 
 		s_ind = new unsigned int[MaxIter];
 		for (auto i = 0; i < MaxIter; i++)
-	        s_ind[i] = rand_uniform(eng);
+			s_ind[i] = rand_uniform(eng);
 
 		alpha = new PRECISION[MaxIter];
-		PRECISION alpha0 = atof(paras["CCA_STO_ALPHA0"]), alphan = atof(paras["CCA_STO_ALPHAn"]);;
+		PRECISION alpha0 = atof(paras["CCA_STO_ALPHA0"]), alphan = atof(paras["CCA_STO_ALPHAn"]);
+		;
 		for (auto i = 0; i < MaxIter; i++)
-        	alpha[i] = alpha0 * pow(alphan, (double)i / (MaxIter - 1));
+			alpha[i] = alpha0 * pow(alphan, (double)i / (MaxIter - 1));
 
 		NLDR::STOCHASTIC(Dis, size, dim, CX, &DX, CCA, MaxIter, MaxTime, ErrTol, DifTol, alpha, lambda, s_ind);
 		delete[] lambda;
 		delete[] s_ind;
 	}
-	else if(paras["-nldr-cost"] == (String) "CCA" && paras["-nldr-algo"] == (String) "MAJORIZATION")
+	else if (paras["-nldr-cost"] == (String) "CCA" && paras["-nldr-algo"] == (String) "MAJORIZATION")
 	{
-		MaxIter = atoi((char *) paras["CCA_MAJ_MAXITER"]);
-		MaxTime = atoi((char *) paras["CCA_MAJ_MAXTIME"]);
+		MaxIter = atoi((char *)paras["CCA_MAJ_MAXITER"]);
+		MaxTime = atoi((char *)paras["CCA_MAJ_MAXTIME"]);
 		ErrTol = atof((char *)paras["CCA_MAJ_ERRTOL"]);
 
-		lambda0 = atof((char *) paras["CCA_MAJ_ALPHA0"]);
-		lambdan = atof((char *) paras["CCA_MAJ_ALPHAn"]);
+		lambda0 = atof((char *)paras["CCA_MAJ_ALPHA0"]);
+		lambdan = atof((char *)paras["CCA_MAJ_ALPHAn"]);
 		lambda = new PRECISION[MaxIter];
 		for (auto i = 0; i < MaxIter; i++)
-        	lambda[i] = lambda0 * pow((lambdan / lambda0), (double)i / (MaxIter - 1));
+			lambda[i] = lambda0 * pow((lambdan / lambda0), (double)i / (MaxIter - 1));
 
 		NLDR::MAJORIZATION(Dis, size, dim, CX, &DX, CCA, MaxIter, MaxTime, ErrTol, DifTol, lambda);
 		delete[] lambda;
 	}
-	else if(paras["-nldr-cost"] == (String) "CCA" && paras["-nldr-algo"] == (String) "METROPOLIS")
+	else if (paras["-nldr-cost"] == (String) "CCA" && paras["-nldr-algo"] == (String) "METROPOLIS")
 	{
 		MaxIter = atoi((char *)paras["CCA_MET_MAXITER"]);
 		MaxTime = atoi((char *)paras["CCA_MET_MAXTIME"]);
@@ -800,27 +823,27 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 
 		metropolis_T = atof((char *)paras["CCA_MET_T"]);
 
-		lambda0 = atof((char *) paras["CCA_MET_ALPHA0"]);
-		lambdan = atof((char *) paras["CCA_MET_ALPHAn"]);
+		lambda0 = atof((char *)paras["CCA_MET_ALPHA0"]);
+		lambdan = atof((char *)paras["CCA_MET_ALPHAn"]);
 		lambda = new PRECISION[MaxIter];
 		for (auto i = 0; i < MaxIter; i++)
-        	lambda[i] = lambda0 * pow((lambdan / lambda0), (double)i / (MaxIter - 1));
+			lambda[i] = lambda0 * pow((lambdan / lambda0), (double)i / (MaxIter - 1));
 
 		NLDR::METROPOLIS(Dis, size, dim, CX, &DX, CCA, MaxIter, MaxTime, ErrTol, DifTol, lambda, &eng, metropolis_T);
 		delete[] lambda;
 	}
-	else if(paras["-nldr-cost"] == (String) "CCA" && paras["-nldr-algo"] == (String) "GAUSS_SEIDEL")
+	else if (paras["-nldr-cost"] == (String) "CCA" && paras["-nldr-algo"] == (String) "GAUSS_SEIDEL")
 	{
 		MaxIter = atoi((char *)paras["CCA_GAU_MAXITER"]);
 		MaxTime = atoi((char *)paras["CCA_GAU_MAXTIME"]);
 		ErrTol = atof((char *)paras["CCA_GAU_ERRTOL"]);
 
-		lambda0 = atof((char *) paras["CCA_GAU_ALPHA0"]);
-		lambdan = atof((char *) paras["CCA_GAU_ALPHAn"]);
+		lambda0 = atof((char *)paras["CCA_GAU_ALPHA0"]);
+		lambdan = atof((char *)paras["CCA_GAU_ALPHAn"]);
 		lambda = new PRECISION[MaxIter];
 		auto sMaxIter = MaxIter * size;
 		for (auto i = 0; i < sMaxIter; i++)
-        	lambda[i] = lambda0 * pow((lambdan / lambda0), (double)i / (sMaxIter - 1));
+			lambda[i] = lambda0 * pow((lambdan / lambda0), (double)i / (sMaxIter - 1));
 
 		NLDR::GAUSS_SEIDEL(Dis, size, dim, CX, &DX, CCA, MaxIter, MaxTime, ErrTol, DifTol, lambda);
 		delete[] lambda;
@@ -837,7 +860,7 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 	String outname_cor("Coordinate");
 	outname_cor.make_stdname(paras);
 	std::ofstream file_Cor;
-	file_Cor.open((char*)outname_cor);
+	file_Cor.open((char *)outname_cor);
 	file_Cor << info;
 	for (int i = 0; i < size; i++)
 	{
@@ -846,7 +869,7 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 		file_Cor << std::endl;
 	}
 
-	if (!less_print)
+	if (!less_print && paras["-nldr-type"] == (String) "Distance")
 	{
 		info.insert("created", time_stamp());
 		info.insert("output_type", "Distance matrix on Euclidean space");
@@ -856,7 +879,7 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 		String outname_nldr("Distance_NLDR");
 		outname_nldr.make_stdname(paras);
 		std::ofstream file_NLDR;
-		file_NLDR.open((char*)outname_nldr);
+		file_NLDR.open((char *)outname_nldr);
 		file_NLDR << info;
 		for (int i = 0; i < size; i++)
 		{
@@ -872,11 +895,11 @@ Matrix<PRECISION>* nldr_driver(SpecMat::LowerTri<PRECISION>* Dis, map<String, St
 		delete[] alpha;
 	if (s_ind != nullptr)
 		delete[] s_ind;
-	
+
 	return CX;
 }
 
-bool adj_driver(SpecMat::LowerTri<PRECISION>* Adj, map<String, String> &paras)
+bool adj_driver(SpecMat::LowerTri<PRECISION> *Adj, map<String, String> &paras)
 {
 	Header_info info;
 	int size = atoi(paras["-adj-size"]);
@@ -889,9 +912,9 @@ bool adj_driver(SpecMat::LowerTri<PRECISION>* Adj, map<String, String> &paras)
 		fin >> info;
 		int pos_header = Header::end_header(fin);
 		fin.seekg(pos_header, ios::beg);
-		
+
 		int file_size = info.count("size") ? atoi(info["size"]) : get_file_lines(fin);
-		
+
 		if (size < 0)
 			size = file_size;
 		else if (size != file_size)
@@ -909,14 +932,12 @@ bool adj_driver(SpecMat::LowerTri<PRECISION>* Adj, map<String, String> &paras)
 	double eps = 1000000;
 	double ratio = 0.1;
 
-
 	info.insert("created", time_stamp());
 	info.insert("output_type", "Affinity matrix");
 	info.insert("size", to_string(size));
 	info.insert("source", paras["-f"]);
 
-
-	if (paras["-am"] == (String) "REC")
+	if (paras["-am"] == (String) "Reciprocal")
 	{
 		for (int i = 0; i < size; i++)
 			for (int j = 0; j <= i; j++)
@@ -930,7 +951,8 @@ bool adj_driver(SpecMat::LowerTri<PRECISION>* Adj, map<String, String> &paras)
 				(*Adj)(i, j) = 1.0 / (eps + (*Adj)(i, j));
 		}
 	}
-	else if ((paras["-am"] == (String) "EXP")) {
+	else if ((paras["-am"] == (String) "Exponential"))
+	{
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j <= i; j++)
@@ -943,7 +965,7 @@ bool adj_driver(SpecMat::LowerTri<PRECISION>* Adj, map<String, String> &paras)
 		String outname_aff("Affinity");
 		outname_aff.make_stdname(paras);
 		std::ofstream file_Aff;
-		file_Aff.open((char*)outname_aff);
+		file_Aff.open((char *)outname_aff);
 		file_Aff << info;
 		for (int i = 0; i < size; i++)
 		{
@@ -953,11 +975,10 @@ bool adj_driver(SpecMat::LowerTri<PRECISION>* Adj, map<String, String> &paras)
 		}
 	}
 
-
 	return true;
 }
 
-bool comm_driver(SpecMat::LowerTri<PRECISION>* Adj, map<String, String> &paras)
+bool comm_driver(SpecMat::LowerTri<PRECISION> *Adj, map<String, String> &paras)
 {
 	Header_info info;
 	if (Adj == nullptr) // Adjacency should be read from file.
@@ -970,7 +991,7 @@ bool comm_driver(SpecMat::LowerTri<PRECISION>* Adj, map<String, String> &paras)
 
 		int size = atoi(paras["-comm-size"]);
 		int file_size = info.count("size") ? atoi(info["size"]) : get_file_lines(fin);
-		
+
 		if (size < 0)
 			size = file_size;
 		else if (size != file_size)
@@ -982,8 +1003,9 @@ bool comm_driver(SpecMat::LowerTri<PRECISION>* Adj, map<String, String> &paras)
 
 		Adj = new SpecMat::LowerTri<PRECISION>(size, fin);
 
-		if (info.count("distance_type") && !paras.count("-dm")) {
-			std::string dm = (char*) info["distance_type"];
+		if (info.count("distance_type") && !paras.count("-dm"))
+		{
+			std::string dm = (char *)info["distance_type"];
 			if (dm.find("Unweighted Robinson-Foulds") != std::string::npos || dm.find("URF") != std::string::npos)
 				paras["-dm"] = "URF";
 			else if (dm.find("Robinson-Foulds") != std::string::npos || dm.find("RF") != std::string::npos)
@@ -997,36 +1019,42 @@ bool comm_driver(SpecMat::LowerTri<PRECISION>* Adj, map<String, String> &paras)
 		}
 	}
 
-	
-
-	if (paras["-comm-type"] == (String) "") {
-		if (info.count("node_type")) {
+	if (paras["-comm-type"] == (String) "")
+	{
+		if (info.count("node_type"))
+		{
 			paras["-comm-type"] = info["node_type"];
 		}
-		else {
+		else
+		{
 			paras["-comm-type"] = "Unknown_node";
 		}
 	}
 
-	if (paras["-lm"] == (String) "MANU") {
-		// if (community_detection_manually(mat, paras)) {
-		// 	cout << "Successfully detected communities of adjacency matrix /" << paras["-f"] << "/ by model: " << paras["-cm"] << ".\n";
-		// 	cout << "Lambdas are chosen manually." << endl;
-		// }
-			cout << "Not supported yet" << endl;
-	} else if (paras["-lm"] == (String) "AUTO") {
-		if (community_detection_automatically(*Adj, paras)) {
+	if (paras["-lm"] == (String) "Manual")
+	{
+		if (community_detection_manually(*Adj, paras))
+		{
+			cout << "Successfully detected communities of adjacency matrix /" << paras["-f"] << "/ by model: " << paras["-cm"] << ".\n";
+			cout << "Lambdas are chosen manually." << endl;
+		}
+		// cout << "Not supported yet" << endl;
+	}
+	else if (paras["-lm"] == (String) "Automatic")
+	{
+		if (community_detection_automatically(*Adj, paras))
+		{
 			cout << "Successfully detected communities of adjacency matrix /" << paras["-f"] << "/ by model: " << paras["-cm"] << " with high freq. bound:" << paras["-comm-hf"] << ", low freq. bound:" << paras["-comm-lf"] << "!" << endl;
 			cout << "Lambdas are chosen automatically." << endl;
 		}
 	}
-	else {
+	else
+	{
 		cout << "Error! Set parameter -lm only have options: auto, manu\n";
 	}
-	
+
 	return true;
 }
-
 
 template <class Container_type>
 bool task_driver(map<String, String> &paras, Container_type dummy)
@@ -1051,12 +1079,12 @@ bool task_driver(map<String, String> &paras, Container_type dummy)
 	}
 	auto treeobj_ptr = trees_driver(paras, dummy);
 
-	SpecMat::LowerTri<PRECISION>* Adj = nullptr;
-	SpecMat::LowerTri<PRECISION>* Dis_NLDR = nullptr;
+	SpecMat::LowerTri<PRECISION> *Adj = nullptr;
+	SpecMat::LowerTri<PRECISION> *Dis_NLDR = nullptr;
 
-	if (paras["-output"] == (String) "DIS")
+	if (paras["-output"] == (String) "Distance")
 		Adj = new SpecMat::LowerTri<PRECISION>(*treeobj_ptr->get_dis_mat());
-	else if (paras["-output"] == (String) "COV")
+	else if (paras["-output"] == (String) "Covariance")
 		Adj = new SpecMat::LowerTri<PRECISION>(*treeobj_ptr->get_cov_mat());
 
 	if (paras["-adj"] != (String) "none")
@@ -1087,6 +1115,6 @@ bool task_driver(map<String, String> &paras, Container_type dummy)
 			read_paras_from_csv(paras["-nldr"], paras, true);
 		}
 		Dis_NLDR = new SpecMat::LowerTri<PRECISION>(treeobj_ptr->get_dis_mat());
-		auto Cordinates = nldr_driver(Dis_NLDR, paras);
+		auto Coordinates = nldr_driver(Dis_NLDR, paras);
 	}
 }

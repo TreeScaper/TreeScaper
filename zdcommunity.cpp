@@ -1,6 +1,6 @@
 #include "zdcommunity.hpp"
 
-void check_self_covariance(SpecMat::LowerTri<PRECISION>& adjacency, double hf, double lf, int& covariance_freeid_size, int* covariance_freeid, int& covariance_nonfree_id_size, int* covariance_nonfree_id)
+void check_self_covariance(SpecMat::LowerTri<PRECISION> &adjacency, double hf, double lf, int &covariance_freeid_size, int *covariance_freeid, int &covariance_nonfree_id_size, int *covariance_nonfree_id)
 {
 	int n = adjacency.dimension();
 	adjacency.form_row_ptr();
@@ -11,7 +11,7 @@ void check_self_covariance(SpecMat::LowerTri<PRECISION>& adjacency, double hf, d
 		bool crit;
 		crit = (adjacency[i][i] <= lf * (1 - lf) || adjacency[i][i] <= hf * (1 - hf));
 
-		if (crit)   //if((*arr)[i][i] != 0)
+		if (crit) // if((*arr)[i][i] != 0)
 		{
 			covariance_freeid[covariance_freeid_size] = i;
 			covariance_freeid_size++;
@@ -49,25 +49,25 @@ Graph *SymmetricOneSliceAdjaceny2Graph(SpecMat::LowerTri<PRECISION> &adjacency, 
 	Array<double> weights(0, 10 * node_size);
 	double w_ij = 0;
 
-	for(int i = 0; i < node_size; i++)
+	for (int i = 0; i < node_size; i++)
 	{
 		pos_node_size_per_node = 0;
 		neg_node_size_per_node = 0;
 		// r_i = adjacency[node_id[i]];
-		for(int j = 0; j < node_size; j++)
+		for (int j = 0; j < node_size; j++)
 		{
 			w_ij = node_id[j] <= node_id[i] ? adjacency[node_id[i]][node_id[j]] : adjacency[node_id[j]][node_id[i]];
 			if (w_ij < -weight_threshold) // Negative weights
 			{
 				neg_node_id_per_node[neg_node_size_per_node] = node_id[j];
 				neg_node_weight_per_node[neg_node_size_per_node++] = -w_ij;
-				total_degree++;	
+				total_degree++;
 			}
 			else if (w_ij > weight_threshold) // Positive weights
 			{
 				pos_node_id_per_node[pos_node_size_per_node] = node_id[j];
 				pos_node_weight_per_node[pos_node_size_per_node++] = w_ij;
-				total_degree++;	
+				total_degree++;
 			}
 		}
 		acc_degree += pos_node_size_per_node;
@@ -83,7 +83,7 @@ Graph *SymmetricOneSliceAdjaceny2Graph(SpecMat::LowerTri<PRECISION> &adjacency, 
 
 		for (int k = 0; k < 2; k++) // one for pos_in, one for pos_out
 		{
-			for(int j = 0; j < pos_node_size_per_node; j++)
+			for (int j = 0; j < pos_node_size_per_node; j++)
 			{
 				links.push(pos_node_id_per_node[j]);
 				weights.push(pos_node_weight_per_node[j]);
@@ -92,14 +92,13 @@ Graph *SymmetricOneSliceAdjaceny2Graph(SpecMat::LowerTri<PRECISION> &adjacency, 
 
 		for (int k = 0; k < 2; k++) // one for neg_in, one for neg_out
 		{
-			for(int j = 0; j < neg_node_size_per_node; j++)
+			for (int j = 0; j < neg_node_size_per_node; j++)
 			{
 				links.push(neg_node_id_per_node[j]);
 				weights.push(neg_node_weight_per_node[j]);
 			}
 		}
 	}
-
 
 	degrees.align();
 	links.align();
@@ -109,7 +108,7 @@ Graph *SymmetricOneSliceAdjaceny2Graph(SpecMat::LowerTri<PRECISION> &adjacency, 
 	auto links_ptr = links.pop_vec();
 	auto weights_ptr = weights.pop_vec();
 
-	Graph* g = new Graph(node_size, 3, total_degree, degrees_ptr, links_ptr, weights_ptr);
+	Graph *g = new Graph(node_size, 3, total_degree, degrees_ptr, links_ptr, weights_ptr);
 	return g;
 }
 
@@ -155,7 +154,7 @@ Graph *SymmetricOneSliceAdjaceny2Graph(SpecMat::LowerTri<PRECISION> &adjacency, 
 // 	return nb_layers;
 // }
 
-void create_resolution(double lp, double ln, int nb_layers, int* sign, double* &lambda)
+void create_resolution(double lp, double ln, int nb_layers, int *sign, double *&lambda)
 {
 	for (int i = 0; i < nb_layers; i++)
 	{
@@ -168,26 +167,22 @@ void create_resolution(double lp, double ln, int nb_layers, int* sign, double* &
 	}
 }
 
-bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<String, String> &paras) {
-	string highfreq = (char*)paras["-hf"];
-	string lowfreq = (char*)paras["-lf"];
+bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<String, String> &paras)
+{
+	string highfreq = (char *)paras["-hf"];
+	string lowfreq = (char *)paras["-lf"];
 	int modelType = 0;
 	if (paras["-cm"] == (String) "CNM")
 		modelType = 3;
-	else
-		if (paras["-cm"] == (String) "CPM")
-			modelType = 4;
-		else
-			if (paras["-cm"] == (String) "ERNM")
-				modelType = 2;
-			else
-				if (paras["-cm"] == (String) "NNM")
-					modelType = 1;
-	int size = atoi((char*)paras["-size"]);
-	bool label_flag = (paras["-ft"] == (String) "Cova"); 
+	else if (paras["-cm"] == (String) "CPM")
+		modelType = 4;
+	else if (paras["-cm"] == (String) "ERNM")
+		modelType = 2;
+	else if (paras["-cm"] == (String) "NNM")
+		modelType = 1;
+	int size = atoi((char *)paras["-size"]);
+	bool label_flag = (paras["-ft"] == (String) "Cova");
 	// label_flag is true when labels are bipartition and false when labels are trees.
-	
-
 
 	srand(time(NULL));
 	int covariance_freeid_size = 0;
@@ -199,8 +194,8 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 
 	String temp = paras["-post"];
 	paras["-post"] = "";
-	String info_item[4] = { "created","output_type","size","source" };
-	String info_content[4] = { time_stamp(),"Comminty detection temp file", paras["-size"], paras["-f"] };
+	String info_item[4] = {"created", "output_type", "size", "source"};
+	String info_content[4] = {time_stamp(), "Comminty detection temp file", paras["-size"], paras["-f"]};
 	Header_info info(info_item, info_content, 3);
 
 	// String temp_file = make_stdname("Community_temp", paras);
@@ -208,11 +203,9 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 	// File file_Comm_temp(temp_file);
 	// file_Comm_temp.clean();
 
-
 	double highfrequence = atof(highfreq.c_str());
 	double lowfrequence = atof(lowfreq.c_str());
-	if (label_flag && (highfrequence > 1.0 || highfrequence < 0.0
-		|| lowfrequence > 1.0 || lowfrequence < 0.0 || (highfrequence - lowfrequence) <= 0.0))
+	if (label_flag && (highfrequence > 1.0 || highfrequence < 0.0 || lowfrequence > 1.0 || lowfrequence < 0.0 || (highfrequence - lowfrequence) <= 0.0))
 	{
 		cout << "Warning: The high and low frequencies must be between 0 and 1!\n\n";
 		return false;
@@ -223,33 +216,30 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 	else
 	{
 		covariance_nonfree_id_size = adj.dimension();
-		for(int i = 0; i < adj.dimension(); i++)
+		for (int i = 0; i < adj.dimension(); i++)
 			covariance_nonfree_id[i] = i;
 	}
 
 	Graph *g = SymmetricOneSliceAdjaceny2Graph(adj, covariance_nonfree_id, covariance_nonfree_id_size, 0.0);
-	
 
 	int is_weighted = 1;
 	int is_directed = 1;
 	int is_single_slice = 0;
 	double interslice_weight = 1.0;
 
-	int* conf = new int[3];
+	int *conf = new int[3];
 	conf[0] = modelType;
 	conf[1] = modelType;
 	conf[2] = 1;
-	int* sign = new int[3];
+	int *sign = new int[3];
 	sign[0] = 1;
 	sign[1] = -1;
 	sign[2] = 1;
 
-	double* lambda = NULL;
-
+	double *lambda = NULL;
 
 	int layers = 3;
 	lambda = new double[layers];
-
 
 	//----------------fixed lambda neg, find two lambda_+ ----------
 	//----------------such that the numbers of community  ----------
@@ -257,7 +247,7 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 
 	double lambda_neg = 0;
 	double lambda_pos_min = -1, lambda_pos_max = 1;
-	Community * community;
+	Community *community;
 	map<double, Community *> LamCommunities;
 	map<double, Community *>::iterator it, it2;
 	map<double, double> mods;
@@ -311,7 +301,7 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 		GreedyLouvain::iterate_randomly = stochastic;
 		GreedyLouvain::detect_communities(community);
 
-		if (paras["-dm"] == (String) "URF")//Affinity matrix from Unweighted RF distance is read.
+		if (paras["-dm"] == (String) "URF") // Affinity matrix from Unweighted RF distance is read.
 		{
 			bool allsametopo = true;
 			// double samevalue = mat(0, 0);
@@ -345,7 +335,6 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 				LamCommunities[lambda_pos_max] = community;
 				break;
 			}
-
 		}
 		if (community->nb_comm == covariance_nonfree_id_size)
 		{
@@ -370,10 +359,10 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 	cout << "lambda neg: " << lambda_neg << endl;
 	cout << "lambda pos min: " << lambda_pos_min << ", lambda pos max: " << lambda_pos_max << endl;
 
-	queue<pair<double, double> > qq;
+	queue<pair<double, double>> qq;
 	pair<double, double> p, pp;
-	vector<pair<double, double> > plateausLb(0);
-	vector<pair<double, double> > plateausUb(0);
+	vector<pair<double, double>> plateausLb(0);
+	vector<pair<double, double>> plateausUb(0);
 	bool SameAsFirst, SameAsSecond;
 	double lambda_pos, plateaubound = 0;
 	int atleastsearchnum = 0;
@@ -494,8 +483,7 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 	cout << "\nThe found plateaus are:" << endl;
 	for (int i = 0; i < plateausLb.size(); i++)
 		cout << "[" << plateausLb[i].first << ", " << plateausLb[i].second
-		<< "], length: " << plateausLb[i].second - plateausLb[i].first << ", number of communities: " <<
-		LamCommunities[plateausLb[i].first]->nb_comm << endl;
+			 << "], length: " << plateausLb[i].second - plateausLb[i].first << ", number of communities: " << LamCommunities[plateausLb[i].first]->nb_comm << endl;
 
 	cout << "\nDetailed check lambda pos are (if necessary):" << endl;
 
@@ -506,7 +494,8 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 	double extstart, extend, max_length = 0;
 	vector<int> totestidix(0);
 
-	do {
+	do
+	{
 		totestidix.resize(0);
 
 		for (int i = 0; i < plateausUb.size(); i++)
@@ -601,9 +590,8 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 	{
 		cout << "Transition lower bound: [" << plateausUb[i].first << ", " << plateausLb[i].first << "]" << endl;
 		cout << "Transition upper bound: [" << plateausLb[i].second << ", " << plateausUb[i].second << "]" << endl;
-		cout << "Updated plateau: [" << plateausLb[i].first << ", " << plateausLb[i].second << "], length: " <<
-			plateausLb[i].second - plateausLb[i].first << ", number of communities: " <<
-			LamCommunities[plateausLb[i].first]->nb_comm << endl << endl;
+		cout << "Updated plateau: [" << plateausLb[i].first << ", " << plateausLb[i].second << "], length: " << plateausLb[i].second - plateausLb[i].first << ", number of communities: " << LamCommunities[plateausLb[i].first]->nb_comm << endl
+			 << endl;
 	}
 
 	int com_info_col = LamCommunities.size() + 1;
@@ -627,7 +615,7 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 
 	com_info[1][1] = it->first;
 	com_info[2][1] = it->second->nb_comm;
-	com_info[3][1] = mods[it->first];//---it->second->modularity();
+	com_info[3][1] = mods[it->first]; //---it->second->modularity();
 	for (int i = 4; i < covariance_nonfree_id_size + 4; i++)
 		com_info[i][1] = it->second->n2c[i - 4];
 
@@ -647,11 +635,11 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 			com_info[i][k + 1] = it->second->n2c[i - 4];
 	}
 
-	//plateaus
+	// plateaus
 	String outname_Pla("CD_Plateaus");
 	outname_Pla.make_stdname(paras);
 	info.insert("output_type", "Plateaus of Community detection result");
-	
+
 	if (label_flag)
 		info.insert("label_type", "Bipartition");
 	else
@@ -659,7 +647,7 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 	info.insert("label_feature", "todo");
 
 	if (modelType == 3)
-		info.insert("CD_model","Configuration Null Model");
+		info.insert("CD_model", "Configuration Null Model");
 	else if (modelType == 4)
 		info.insert("CD_model", "Constant Potts Model");
 	else if (modelType == 2)
@@ -699,9 +687,15 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 		file_Pla << plateausUb[i].second << "\t";
 	file_Pla << "\n";
 	if (label_flag)
-		file_Pla << "Bipartition index" << "\t" << "Community Index" << "\n";
+		file_Pla << "Bipartition index"
+				 << "\t"
+				 << "Community Index"
+				 << "\n";
 	else
-		file_Pla << "Tree index" << "\t" << "Community Index" << "\n";
+		file_Pla << "Tree index"
+				 << "\t"
+				 << "Community Index"
+				 << "\n";
 	for (int i = 0; i < covariance_nonfree_id_size; i++)
 	{
 		file_Pla << covariance_nonfree_id[i] << "\t";
@@ -727,22 +721,29 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 		if (i == 0)
 		{
 			if (label_flag)
-				file_CD << "Same community as previous or not (first number is number of bipartitions)" << "\n";
+				file_CD << "Same community as previous or not (first number is number of bipartitions)"
+						<< "\n";
 			else
-				file_CD << "Same community as previous or not (first number is number of trees)" << "\n";
+				file_CD << "Same community as previous or not (first number is number of trees)"
+						<< "\n";
 		}
 		else if (i == 1)
-			file_CD << "Value of lambda: " << "\n";
+			file_CD << "Value of lambda: "
+					<< "\n";
 		else if (i == 2)
-			file_CD << "Number of communities: " << "\n";
+			file_CD << "Number of communities: "
+					<< "\n";
 		else if (i == 3)
-			file_CD << "Value of modularity: " << "\n";
+			file_CD << "Value of modularity: "
+					<< "\n";
 		else if (i == 4)
 		{
 			if (label_flag)
-				file_CD << "Community index (first column is bipartition index): " << "\n";
+				file_CD << "Community index (first column is bipartition index): "
+						<< "\n";
 			else
-				file_CD << "Community index (first column is tree index): " << "\n";
+				file_CD << "Community index (first column is tree index): "
+						<< "\n";
 		}
 		for (int j = 0; j < com_info_col; j++)
 			file_CD << com_info[i][j] << "\t";
@@ -750,14 +751,14 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 	}
 	file_CD.close();
 
-	//delete temporary file
-	// free(infile);
-	// free(outfile);
-	// free(node_map_file);
-	// free(conf_file);
+	// delete temporary file
+	//  free(infile);
+	//  free(outfile);
+	//  free(node_map_file);
+	//  free(conf_file);
 
-	free(conf);
-	free(sign);
+	delete[] conf;
+	delete[] sign;
 	if (lambda != NULL)
 		delete[] lambda;
 
@@ -766,5 +767,345 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 
 	cout << "Output community results to file: " << outname_CD << endl;
 	cout << "and " << outname_Pla << "\n\n";
+	return true;
+}
+
+bool community_detection_manually(SpecMat::LowerTri<PRECISION> &adj, map<String, String> &paras)
+{
+	string highfreq = (char *)paras["-hf"];
+	string lowfreq = (char *)paras["-lf"];
+	int modelType = 0;
+	if (paras["-cm"] == (String) "CNM")
+		modelType = 3;
+	else if (paras["-cm"] == (String) "CPM")
+		modelType = 4;
+	else if (paras["-cm"] == (String) "ERNM")
+		modelType = 2;
+	else if (paras["-cm"] == (String) "NNM")
+		modelType = 1;
+	int size = atoi((char *)paras["-size"]);
+	bool label_flag = (paras["-comm-type"] == String("Bipartition"));
+
+	double lpiv = atof((char *)paras["-lpiv"]);
+	double lp = atof((char *)paras["-lp"]);
+	double lps = atof((char *)paras["-lps"]);
+	double lpe = atof((char *)paras["-lpe"]);
+	int pos_size = (lpiv == 0) ? 1 : (int)((lpe - lps) / lpiv + 1);
+	Array<double> lambda_pos_list(pos_size);
+
+	if (0 == lpiv)
+	{
+		lambda_pos_list[0] = lp;
+	}
+	else
+	{
+		for (int i = 0; i < pos_size; i++)
+			lambda_pos_list[i] = lps + i * lpiv;
+	}
+
+	double lniv = atof((char *)paras["-lniv"]);
+	double ln = atof((char *)paras["-ln"]);
+	double lns = atof((char *)paras["-lns"]);
+	double lne = atof((char *)paras["-lne"]);
+	int neg_size = (lniv == 0) ? 1 : (int)((lne - lns) / lniv + 1);
+	Array<double> lambda_neg_list(neg_size);
+
+	if (0 == lniv)
+	{
+		lambda_neg_list[0] = ln;
+	}
+	else
+	{
+		for (int i = 0; i < neg_size; i++)
+			lambda_neg_list[i] = lns + i * lniv;
+	}
+
+	srand(time(NULL));
+	int covariance_freeid_size = 0;
+	int *covariance_freeid = NULL;
+	int covariance_nonfree_id_size = 0;
+	int *covariance_nonfree_id = NULL;
+	covariance_freeid = new int[adj.dimension()];
+	covariance_nonfree_id = new int[adj.dimension()];
+
+	// Header_info info;
+	// File file_src(paras["-f"]);
+	// file_src >> info;
+	// info.insert("created", time_stamp());
+	// info.insert("size", paras["-size"]);
+	// info.insert("source", paras["-f"]);
+
+	String temp = paras["-post"];
+	paras["-post"] = "";
+	String info_item[4] = {"created", "output_type", "size", "source"};
+	String info_content[4] = {time_stamp(), "Comminty detection temp file", paras["-size"], paras["-f"]};
+	Header_info info(info_item, info_content, 3);
+
+	double highfrequence = atof(highfreq.c_str());
+	double lowfrequence = atof(lowfreq.c_str());
+	if (label_flag && (highfrequence > 1.0 || highfrequence < 0.0 || lowfrequence > 1.0 || lowfrequence < 0.0 || (highfrequence - lowfrequence) <= 0.0))
+	{
+		cout << "Warning: The high and low frequencies must be between 0 and 1!\n\n";
+		return false;
+	}
+
+	if (label_flag)
+		check_self_covariance(adj, highfrequence, lowfrequence, covariance_freeid_size, covariance_freeid, covariance_nonfree_id_size, covariance_nonfree_id);
+	else
+	{
+		covariance_nonfree_id_size = adj.dimension();
+		for (int i = 0; i < adj.dimension(); i++)
+			covariance_nonfree_id[i] = i;
+	}
+
+	// print_comm_array(mat, size, file_Comm_temp, label_flag, highfrequence, lowfrequence, covariance_freeid_size, covariance_nonfree_id_size, covariance_freeid, covariance_nonfree_id);
+	// info.insert("active_node_size", to_string(covariance_nonfree_id_size));
+
+	// char *infile = strdup((char*)temp_file);
+
+	// String outname_Graph = paras["-path"];
+	// outname_Graph += "CDtemp.bin";
+	// char *outfile = (char*)outname_Graph;
+
+	// String outname_Node = paras["-path"];
+	// outname_Node += "CDtemp_node_map.txt";
+	// char *node_map_file = (char*)outname_Node;
+	// String outname_Conf = paras["-path"];
+	// outname_Conf += "CDtemp.conf";
+	// char *conf_file = (char*)outname_Conf;
+
+	Graph *g = SymmetricOneSliceAdjaceny2Graph(adj, covariance_nonfree_id, covariance_nonfree_id_size, 0.0);
+
+	int is_weighted = 1;
+	int is_directed = 1;
+	int is_single_slice = 0;
+	double interslice_weight = 1.0;
+
+	int *conf = new int[3];
+	conf[0] = modelType;
+	conf[1] = modelType;
+	conf[2] = 1;
+	int *sign = new int[3];
+	sign[0] = 1;
+	sign[1] = -1;
+	sign[2] = 1;
+
+	double *lambda = NULL;
+
+	int layers = 3;
+	lambda = new double[layers];
+	double lambda_pos; // = atof(lambda_pos_list.c_str());
+	double lambda_neg; // = atof(lambda_neg_list.c_str());
+
+	// int is_weighted = 1;
+	// int is_directed = 1;
+	// int is_single_slice = 0;
+	// double interslice_weight = 1.0;
+
+	// int* conf = NULL;
+	// int* sign = NULL;
+	// double* lambda = NULL;
+
+	// Slicer s(infile, (double)interslice_weight, is_directed, is_weighted, is_single_slice);
+	// Graph* g = s.get_graph();
+	// g->display_binary(outfile);
+	// delete g;
+	// s.display_node_mapping(node_map_file);
+	// s.display_conf(conf_file, modelType);
+
+	info.insert("node_type", paras["-node"]);
+
+	if (modelType == 3)
+		info.insert("CD_model", "Configuration Null Model");
+	else if (modelType == 4)
+		info.insert("CD_model", "Constant Potts Model");
+	else if (modelType == 2)
+		info.insert("CD_model", "Erdos-Renyi Null Model");
+	else if (modelType == 1)
+		info.insert("CD_model", "No Null Model");
+	info.insert("Tuning", "Manually");
+	String lnlist = to_string(lambda_neg_list[0]);
+	for (int i = 1; i < lambda_neg_list.get_size(); i++)
+	{
+		lnlist += ",";
+		lnlist += to_string(lambda_neg_list[i]);
+	}
+	info.insert("lambda_neg", lnlist);
+	String lplist = to_string(lambda_pos_list[0]);
+	for (int i = 1; i < lambda_pos_list.get_size(); i++)
+	{
+		lplist += ",";
+		lplist += to_string(lambda_pos_list[i]);
+	}
+	info.insert("lambda_pos", lplist);
+
+	String outname_CD("Community");
+	outname_CD.make_stdname(paras);
+
+	info.insert("output_type", "Community detection result");
+	std::ofstream file_CD;
+	file_CD.open((char *)outname_CD);
+	file_CD << info;
+
+	int lambdasize = 0;
+
+	if (lambda_pos_list.get_size() == 1)
+		lambdasize = lambda_neg_list.get_size();
+	else if (lambda_neg_list.get_size() == 1)
+		lambdasize = lambda_pos_list.get_size();
+	else
+	{
+		cout << "Error: The length of the array of lambda negative or the length of the array lambda positive should be one!\n\n";
+		return false;
+	};
+	int com_info_col = lambdasize + 1;
+
+	double **com_info = new double *[covariance_nonfree_id_size + 4];
+	for (int i = 0; i < covariance_nonfree_id_size + 4; i++)
+		com_info[i] = new double[com_info_col];
+
+	Community **communities = new Community *[lambdasize];
+	Graph *gc = nullptr;
+
+	for (int k = 0; k < lambdasize; k++)
+	{
+		if (lambda_pos_list.get_size() == 1)
+		{
+			lambda_pos = lambda_pos_list[0];
+			lambda_neg = lambda_neg_list[k];
+		}
+		else
+		{
+			lambda_pos = lambda_pos_list[k];
+			lambda_neg = lambda_neg_list[0];
+		}
+		if (modelType != 1)
+		{
+			cout << "Using lambda+ " << lambda_pos << ", lambda- " << lambda_neg << endl;
+		}
+		create_resolution(lambda_pos, lambda_neg, layers, sign, lambda);
+		if (gc != nullptr)
+			delete gc;
+		gc = new Graph(*g);
+		communities[k] = new Community(gc, conf, sign, lambda);
+		int stochastic = 0;
+		GreedyLouvain::iterate_randomly = stochastic;
+		if (stochastic)
+			cout << "Using random node order" << endl;
+		cout << "Network has "
+			 << communities[k]->g->nb_nodes << " nodes, "
+			 << communities[k]->g->nb_links << " links, " << endl;
+
+		GreedyLouvain::detect_communities(communities[k]);
+		double mod = communities[k]->modularity();
+
+		cout << "Value of modularity:" << mod << endl;
+		cout << "Number of communities: " << communities[k]->nb_comm << endl;
+		// co->display_comm2node();
+
+		if (covariance_freeid != NULL && covariance_freeid_size != 0)
+		{
+			for (int i = 0; i < communities[k]->nb_comm; i++)
+			{
+				std::cout << "Community " << i + 1 << " includes nodes: ";
+				for (int j = 0; j < communities[k]->size; j++)
+				{
+					if (communities[k]->n2c[j] == i)
+						std::cout << covariance_nonfree_id[j] << ",";
+				}
+				std::cout << "\n";
+			}
+			std::cout << "Free node index:" << endl;
+			for (int i = 0; i < covariance_freeid_size; i++)
+				std::cout << covariance_freeid[i] << ", ";
+			std::cout << "\n";
+		}
+		else
+		{
+			for (int i = 0; i < communities[k]->nb_comm; i++)
+			{
+				std::cout << "Community " << i + 1 << " includes nodes: ";
+				for (int j = 0; j < communities[k]->size; j++)
+				{
+					if (communities[k]->n2c[j] == i)
+						std::cout << j << ",";
+				}
+				std::cout << "\n";
+			}
+		}
+
+		if (k == 0)
+		{
+			com_info[0][0] = communities[k]->g->nb_nodes;
+
+			if (lambda_pos_list.get_size() == 1)
+				com_info[1][0] = lambda_pos_list[0];
+			else
+				com_info[1][0] = lambda_neg_list[0];
+			com_info[2][0] = 0;
+			com_info[3][0] = 0;
+			for (int i = 0; i < covariance_nonfree_id_size; i++)
+				com_info[i + 4][0] = covariance_nonfree_id[i];
+		}
+
+		if (k == 0)
+			com_info[0][1] = 0;
+		else
+		{
+			if (Community::IsSameCommunity(communities[k - 1], communities[k]))
+				com_info[0][k + 1] = com_info[0][k];
+			else
+				com_info[0][k + 1] = com_info[0][k] + 1;
+		}
+		if (lambda_pos_list.get_size() == 1)
+			com_info[1][k + 1] = lambda_neg_list[k];
+		else
+			com_info[1][k + 1] = lambda_pos_list[k];
+
+		com_info[2][k + 1] = communities[k]->nb_comm;
+		com_info[3][k + 1] = mod;
+
+		for (int i = 4; i < covariance_nonfree_id_size + 4; i++)
+			com_info[i][k + 1] = communities[k]->n2c[i - 4];
+	}
+
+	for (int i = 0; i < covariance_nonfree_id_size + 4; i++)
+	{
+		if (i == 0)
+		{
+			file_CD << "Same community as previous or not (first number is number of " << paras["-node"] << ")\n";
+		}
+		else if (i == 1)
+			file_CD << "Value of lambda: "
+					<< "\n";
+		else if (i == 2)
+			file_CD << "Number of communities: "
+					<< "\n";
+		else if (i == 3)
+			file_CD << "Value of modularity: "
+					<< "\n";
+		else if (i == 4)
+		{
+			file_CD << "Community index (first column is " << paras["-node"] << " index): \n";
+		}
+		for (int j = 0; j < lambdasize + 1; j++)
+			file_CD << com_info[i][j] << "\t";
+		file_CD << "\n";
+	}
+
+	// delete temporary file
+
+	delete[] conf;
+	delete[] sign;
+	free(covariance_freeid);
+	free(covariance_nonfree_id);
+	if (lambda != NULL)
+		delete[] lambda;
+
+	for (int i = 0; i < lambdasize; i++)
+		delete communities[i];
+	delete[] communities;
+
+	cout << "Output community results to file: " << outname_CD << endl;
 	return true;
 }
