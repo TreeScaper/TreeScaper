@@ -941,7 +941,7 @@ void NLDR::MAJORIZATION(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix
     if (A)
         delete[] A;
     if (CX_temp)
-        delete[] CX_temp;
+        delete CX_temp;
 }
 
 void NLDR::STOCHASTIC(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<PRECISION> *Cor_0, LowerTri<PRECISION> *Dis_0,

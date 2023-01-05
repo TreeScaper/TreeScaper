@@ -1,10 +1,11 @@
 """name""","""value"""
-"""-comm-type""",TREE
+"""-comm-type""",Tree
 """-comm-size""",-1
 """-comm-hf""",1
 """-comm-lf""",0
-"""-cm""",CNM
-"""-lm""",AUTO
+"""-modularity-type""",CNM
+"""-lm""",Automatic
+"""-step-type""","""Additive"""
 """-lp""",1
 """-lps""",0
 """-lpe""",1

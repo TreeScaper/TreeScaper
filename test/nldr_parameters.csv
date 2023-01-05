@@ -1,10 +1,10 @@
 """name""","""value"""
-"""-nldr-type""",DIS
+"""-nldr-type""",Distance
 """-nldr-size""",-1
 """-nldr-dim""",2
 """-nldr-cost""",CCA
 """-nldr-algo""",STOCHASTIC
-"""-nldr-init""",RAND
+"""-nldr-init""",Random
 """-nldr-seed""",1
 """length_tru""",11
 """interval_tru""",11

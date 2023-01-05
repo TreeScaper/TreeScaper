@@ -13,12 +13,14 @@ char read_sequence(string &tree, size_t &index, string &temp)
 	{
 		temp = tree.substr(index);
 		index = tree.back();
+		// std::cout << temp << '\n';
 		return '\0';
 	}
 	else
 	{
 		temp = tree.substr(index, found - index);
 		index = found;
+		// std::cout << temp << '\n';
 		return tree[index];
 	}
 }
@@ -207,6 +209,7 @@ size_t TaxonList::ReadTaxa(std::string fname)
 	std::getline(fin, temp);
 	if (temp[0] != '#' || temp.find(string("NEWICK")) != std::string::npos)
 	{
+		std::cout << "Reading Newick raw file.\n";
 		fin.seekg(std::ios_base::beg);
 		while (temp.find_first_of("(") == std::string::npos)
 		{
@@ -214,6 +217,8 @@ size_t TaxonList::ReadTaxa(std::string fname)
 			std::getline(fin, temp);
 		}
 		string taxon;
+
+
 
 		size_t i = temp.find_first_of('(');
 		char ch = temp[i];
@@ -240,13 +245,17 @@ size_t TaxonList::ReadTaxa(std::string fname)
 				if (!flag_internal)
 				{
 					this->push(taxon, false);
+					// std::cout << this->size << '\t' << taxon << "\n";
 				}
 				flag_internal = false;
 			}
+			// std::cout << ch << '\n';
 		}
 	}
 	else if (temp.find(string("NEXUS")) != std::string::npos)
 	{
+		std::cout << "Reading Nexus file.\n";
+
 		while (!fin.eof())
 		{
 			temp.clear();
@@ -273,11 +282,14 @@ size_t TaxonList::ReadTaxa(std::string fname)
 	}
 	fin.close();
 
+	std::cout << "Leaving ReadTaxa().\n";
+
 	return pos;
 }
 
 bool TaxonList::ScanTaxa(std::string fname, size_t pos, std::string outname)
 {
+	std::cout << "Entering ScanTaxa().\n";
 	std::ifstream fin;
 	fin.open(fname);
 	fin.seekg(pos, std::ios_base::beg);
@@ -320,6 +332,9 @@ bool TaxonList::ScanTaxa(std::string fname, size_t pos, std::string outname)
 
 	fin.close();
 	delete[] barray;
+
+	std::cout << "Leaving ScanTaxa().\n";
+
 	return same_taxa;
 }
 
@@ -551,7 +566,7 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 
 			//levels_back_ptr = levels.back_c_ptr();
 
-			levels->back().push(current_ind);							  // parent level.
+			levels->back().push(current_ind);							  //parent level.
 			levels->back().push(levels->ele(current_ind).get_size() - 1); // parent node.
 
 			current_ind = levels->get_size() - 1; //go to the new level in the back.
