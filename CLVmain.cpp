@@ -1122,7 +1122,7 @@ bool task_driver(map<String, String> &paras, Container_type dummy)
 			std::cout << "Initiate -nldr module.\nLoading parameters from " << paras["-nldr"] << ".\n";
 			read_paras_from_csv(paras["-nldr"], paras, true);
 		}
-		Dis_NLDR = new SpecMat::LowerTri<PRECISION>(treeobj_ptr->get_dis_mat());
+		Dis_NLDR = new SpecMat::LowerTri<PRECISION>(*treeobj_ptr->get_dis_mat());
 		auto Coordinates = nldr_driver(Dis_NLDR, paras);
 	}
 }
