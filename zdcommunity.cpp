@@ -172,16 +172,17 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 	string highfreq = (char *)paras["-hf"];
 	string lowfreq = (char *)paras["-lf"];
 	int modelType = 0;
-	if (paras["-cm"] == (String) "CNM")
+	if (paras["-modularity-type"] == (String) "CNM")
 		modelType = 3;
-	else if (paras["-cm"] == (String) "CPM")
+	else if (paras["-modularity-type"] == (String) "CPM")
 		modelType = 4;
-	else if (paras["-cm"] == (String) "ERNM")
+	else if (paras["-modularity-type"] == (String) "ERNM")
 		modelType = 2;
-	else if (paras["-cm"] == (String) "NNM")
+	else if (paras["-modularity-type"] == (String) "NNM")
 		modelType = 1;
 	int size = atoi((char *)paras["-size"]);
 	bool label_flag = (paras["-ft"] == (String) "Cova");
+	bool additive_step = (paras["-step-type"] == (String) "Additive");
 	// label_flag is true when labels are bipartition and false when labels are trees.
 
 	srand(time(NULL));
@@ -376,7 +377,10 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 	{
 		pp = qq.front();
 		qq.pop();
-		lambda_pos = (pp.first + pp.second) / 2;
+		if (additive_step)
+			lambda_pos = (pp.first + pp.second) / 2;
+		else
+			lambda_pos = sqrt(pp.first * pp.second);
 		cout << lambda_pos << ", ";
 		std::cout.flush();
 		create_resolution(lambda_pos, lambda_neg, layers, sign, lambda);
@@ -533,8 +537,10 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 			for (int i = 0; i < totestidix.size(); i++)
 			{
 				int idx = totestidix[i];
-
-				lambda_pos = (plateausUb[idx].first + plateausLb[idx].first) / 2;
+				if (additive_step)
+					lambda_pos = (plateausUb[idx].first + plateausLb[idx].first) / 2;
+				else
+					lambda_pos = sqrt(plateausUb[idx].first * plateausLb[idx].first);
 				if (LamCommunities.find(lambda_pos) == LamCommunities.end())
 				{
 					cout << lambda_pos << ", ";
@@ -557,7 +563,12 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 					plateausLb[idx].first = lambda_pos;
 				else
 					plateausUb[idx].first = lambda_pos;
-				lambda_pos = (plateausLb[idx].second + plateausUb[idx].second) / 2;
+
+				if (additive_step)
+					lambda_pos = (plateausLb[idx].second + plateausUb[idx].second) / 2;
+				else
+					lambda_pos = sqrt(plateausLb[idx].second * plateausUb[idx].second);
+
 				if (LamCommunities.find(lambda_pos) == LamCommunities.end())
 				{
 					cout << lambda_pos << ", ";
@@ -775,16 +786,18 @@ bool community_detection_manually(SpecMat::LowerTri<PRECISION> &adj, map<String,
 	string highfreq = (char *)paras["-hf"];
 	string lowfreq = (char *)paras["-lf"];
 	int modelType = 0;
-	if (paras["-cm"] == (String) "CNM")
+	if (paras["-modularity-type"] == (String) "CNM")
 		modelType = 3;
-	else if (paras["-cm"] == (String) "CPM")
+	else if (paras["-modularity-type"] == (String) "CPM")
 		modelType = 4;
-	else if (paras["-cm"] == (String) "ERNM")
+	else if (paras["-modularity-type"] == (String) "ERNM")
 		modelType = 2;
-	else if (paras["-cm"] == (String) "NNM")
+	else if (paras["-modularity-type"] == (String) "NNM")
 		modelType = 1;
 	int size = atoi((char *)paras["-size"]);
 	bool label_flag = (paras["-comm-type"] == String("Bipartition"));
+	bool additive_step = (paras["-step-type"] == (String) "Additive");
+
 
 	double lpiv = atof((char *)paras["-lpiv"]);
 	double lp = atof((char *)paras["-lp"]);
@@ -799,8 +812,16 @@ bool community_detection_manually(SpecMat::LowerTri<PRECISION> &adj, map<String,
 	}
 	else
 	{
-		for (int i = 0; i < pos_size; i++)
-			lambda_pos_list[i] = lps + i * lpiv;
+		if (additive_step)
+			for (int i = 0; i < pos_size; i++)
+				lambda_pos_list[i] = lps + i * lpiv;
+		else
+		{
+			double multiplicative_stepsize = pow(lpe/lps, 1.0/(pos_size - 1));
+			lambda_pos_list[0] = lps;
+			for (int i = 1; i < pos_size; i++)
+				lambda_pos_list[i] = lambda_pos_list[i - 1] * multiplicative_stepsize;
+		}
 	}
 
 	double lniv = atof((char *)paras["-lniv"]);
@@ -816,8 +837,19 @@ bool community_detection_manually(SpecMat::LowerTri<PRECISION> &adj, map<String,
 	}
 	else
 	{
-		for (int i = 0; i < neg_size; i++)
-			lambda_neg_list[i] = lns + i * lniv;
+		// for (int i = 0; i < neg_size; i++)
+		// 	lambda_neg_list[i] = lns + i * lniv;
+
+		if (additive_step)
+			for (int i = 0; i < neg_size; i++)
+				lambda_neg_list[i] = lns + i * lniv;
+		else
+		{
+			double multiplicative_stepsize = pow(lpe/lps, 1.0/(neg_size - 1));
+			lambda_neg_list[0] = lns;
+			for (int i = 1; i < neg_size; i++)
+				lambda_neg_list[i] = lambda_neg_list[i - 1] * multiplicative_stepsize;
+		}
 	}
 
 	srand(time(NULL));

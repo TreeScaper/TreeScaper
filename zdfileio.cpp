@@ -310,7 +310,7 @@ SpecMat::LowerTri<PRECISION> *binary_read_lowertri(std::istream &input)
     {
         input.read((char *)&val[i], sizeof(PRECISION));
     }
-    SpecMat::LowerTri<PRECISION> *Ans = new SpecMat::LowerTri(n, val);
+    SpecMat::LowerTri<PRECISION> *Ans = new SpecMat::LowerTri<PRECISION>(n, val);
     return Ans;
 }
 

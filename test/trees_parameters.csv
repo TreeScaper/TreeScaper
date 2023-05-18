@@ -1,9 +1,10 @@
 """name""","""value"""
-"""-tm""","""TAXON"""
+"""-tm""","""Taxon"""
 """-bit""",64
 """-r""",0
 """-w""",1
-"""-output""","""DIS"""
+"""-output""","""Distance"""
+"""-consensus-type""","""Major"""
 """-bipart-hf""",1
 """-bipart-lf""",0
 """-sb""","""none"""
