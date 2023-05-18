@@ -9,12 +9,12 @@
 #  libraries. Make sure it is consistent with PLAT in CLAPACK/make.inc
 #  and the postfix of the CLAPACK libraries lapack_XXX.a and bla
 #
-PLAT = _LINUX
+PLAT = _MAC
 #
 #  CLAPACK path. It is strongly recommended to placed the CLPACK 
 #  outside the GitHub repository to avoid recompling it.
 #
-CLAPPATH = ../../CLAPACK-3.2.1
+CLAPPATH = ~/TreeScaper/CLAPACK-3.2.1
 #
 #  See more detailed instruction in /CLAPACK-3.2.1/README.install
 #  for using different version of CLAPACK.

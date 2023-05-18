@@ -336,14 +336,14 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 			cout << "Sucessfully printed tree id of sub-distance matrix in Tree_ID_for_Dis" << (char *)paras["-post"] << ".out file.\n\n";
 		}
 
-		std::cout << "Computing RF-distance matrix...\n";
+		std::cout << "Computing distance matrix...\n";
 		start = std::clock();
 		if (flag_subtree)
 			treesobj_ptr->Compute_RF_Distance_Matrix(subset, id_mapping);
 		else
 			treesobj_ptr->Compute_RF_Distance_Matrix();
 		end = std::clock();
-		cout << "Compute RF-distance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
+		cout << "Compute distance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
 
 		// Print Distance Matrix
 		String outname_Dist("Distance");
@@ -370,11 +370,14 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 	}
 	else if (paras["-output"] == (String) "Consensus")
 	{
-		Array<int> *consensus_tree_bipart_id = nullptr;
+		int *consensus_tree_bipart_id = new int[treesobj_ptr->sb2t_mat->get_row()];
+		PRECISION *consensus_tree_weights = new PRECISION[treesobj_ptr->sb2t_mat->get_row()];
+		int num_consensus_tree_edge = 0;
+
 		if (paras["-cons-type"] == (String) "Major")
-			consensus_tree_bipart_id = treesobj_ptr->Compute_Major_Consensus_Tree();
+			num_consensus_tree_edge = treesobj_ptr->Compute_Major_Consensus_Tree(consensus_tree_bipart_id, consensus_tree_weights);
 		else if (paras["-cons-type"] == (String) "Strict")
-			consensus_tree_bipart_id = treesobj_ptr->Compute_Strict_Consensus_Tree();
+			num_consensus_tree_edge = treesobj_ptr->Compute_Strict_Consensus_Tree(consensus_tree_bipart_id, consensus_tree_weights);
 		else
 		{
 			cout << "Error! Consensus tree type only support ``Major'' or ``Strict''.";
@@ -393,6 +396,8 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 
 		fout.open((char *)outname_Consensus);
 		fout << Header_Consensus;
+		treesobj_ptr->print_Consensus_Tree(fout, consensus_tree_bipart_id, consensus_tree_weights, num_consensus_tree_edge);
+		fout << "\n";
 		treesobj_ptr->print_Bipart_List(fout, *consensus_tree_bipart_id);
 		fout.close();
 		cout << "Sucessfully printed the consensus tree info in Consensus_Tree_" << paras["-post"] << ".out file.\n\n";
@@ -549,7 +554,7 @@ Matrix<PRECISION> *nldr_driver(SpecMat::LowerTri<PRECISION> *Dis, map<String, St
 	int size = 0, file_size = 0;
 	int dim = 0;
 	int seed = atoi((char *)paras["-nldr-seed"]);
-	std::default_random_engine eng{seed};
+	std::default_random_engine eng(seed);
 	bool less_print = (paras["-lessprint"] == (String) "1");
 
 	if (Dis == nullptr) // Adjacency should be read from file.
@@ -568,7 +573,7 @@ Matrix<PRECISION> *nldr_driver(SpecMat::LowerTri<PRECISION> *Dis, map<String, St
 		else if (size != file_size)
 		{
 			std::cout << "Error: Matrix size indicated in parameters, " << file_size << " , is different than the dimension found from the input file, " << size << ".";
-			return;
+			return nullptr;
 		}
 		paras["-nldr-size"] = to_string(size);
 
@@ -920,7 +925,7 @@ bool adj_driver(SpecMat::LowerTri<PRECISION> *Adj, map<String, String> &paras)
 		else if (size != file_size)
 		{
 			std::cout << "Error: Dimension indicates in parameters, " << size << " , is different than the dimension found from the input file, " << file_size << ".";
-			return;
+			return false;
 		}
 		paras["-adj-size"] = to_string(size);
 
@@ -997,7 +1002,7 @@ bool comm_driver(SpecMat::LowerTri<PRECISION> *Adj, map<String, String> &paras)
 		else if (size != file_size)
 		{
 			std::cout << "Error: Number of nodes indicated in parameters, " << size << " , is different than the number of nodes found from the input file, " << file_size << ".";
-			return;
+			return false;
 		}
 		paras["-comm-size"] = to_string(size);
 
@@ -1114,7 +1119,7 @@ bool task_driver(map<String, String> &paras, Container_type dummy)
 			std::cout << "Initiate -nldr module.\nLoading parameters from " << paras["-nldr"] << ".\n";
 			read_paras_from_csv(paras["-nldr"], paras, true);
 		}
-		Dis_NLDR = new SpecMat::LowerTri<PRECISION>(treeobj_ptr->get_dis_mat());
+		Dis_NLDR = new SpecMat::LowerTri<PRECISION>(*(treeobj_ptr->get_dis_mat()));
 		auto Coordinates = nldr_driver(Dis_NLDR, paras);
 	}
 }

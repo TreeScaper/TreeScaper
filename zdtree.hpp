@@ -59,8 +59,8 @@ public:
 	Array<int> IndB2IndA;
 
 	void push(string item, bool flag_str_format = true);
-	bool cmp_taxa(string &tree, bool* barray);
-	bool report_missing_taxon(size_t tree_id, string &tree, bool* barray, std::ostream& out);
+	bool cmp_taxa(string &tree, bool *barray);
+	bool report_missing_taxon(size_t tree_id, string &tree, bool *barray, std::ostream &out);
 
 	template <class T>
 	void set_bitstr_size(T ele)
@@ -106,11 +106,25 @@ public:
 	{
 		if (n > 0)
 		{
-			memset(vec, 0, length * sizeof(T));
-			int pos_byte = index / (8 * sizeof(T));
-			int pos_bit = index % (8 * sizeof(T));
-			T bit = 1;
-			vec[pos_byte] |= bit << pos_bit;
+			if (index >= 0)
+			{
+				memset(vec, 0, length * sizeof(T));
+				int pos_byte = index / (8 * sizeof(T));
+				int pos_bit = index % (8 * sizeof(T));
+				T bit = 1;
+				vec[pos_byte] |= bit << pos_bit;
+			}
+			else // This can be done more efficiently
+			{
+				memset(vec, 0, length * sizeof(T));
+				T bit = 1;
+				for (int i = 0; i < b_size; i++)
+				{
+					int pos_byte = i / (8 * sizeof(T));
+					int pos_bit = i % (8 * sizeof(T));
+					vec[pos_byte] |= bit << pos_bit;
+				}
+			}
 		}
 	}
 	BitString(int n, int b_size, T *src) : length(n), bit_size(b_size), vec(n > 0 ? new T[n] : nullptr)
@@ -263,8 +277,16 @@ public:
 
 	bool is_normalized() const
 	{
-		//assert(this->length != 0);
+		// assert(this->length != 0);
 		return !((bool)(vec[0] & (T)1));
+	}
+
+	int popcount()
+	{
+		int population = 0;
+		for (int i = 0; i < this->length; i++)
+			population += std::popcount(this->vec[i]);
+		return population;
 	}
 
 	void print_BitString(ostream &fout)
@@ -292,9 +314,36 @@ public:
 		}
 	}
 
+	int popcount()
+	{
+		int population = 0;
+		for (int i = 0; i < this->length; i++)
+			population += std::popcount(this->vec[i]);
+		return population;
+	}
+
 	T *get_vec() { return vec; };
 	size_t get_length() { return length; };
 	size_t get_bitsize() { return bit_size; };
+
+	int get_taxon_id()
+	{
+		int pos_bit = 0;
+		int pos_byte = 0;
+
+		for (int i = 0; i < length; i++)
+		{
+			if (vec[i] != 0)
+			{
+				pos_byte = i;
+				while (vec[i] >> (pos_bit + 1) != 0)
+					pos_bit += 1;
+				break;
+			}
+		}
+
+		return 8 * sizeof(T) * pos_byte + pos_bit;
+	}
 };
 
 template <class T>
@@ -305,10 +354,10 @@ private:
 	TaxonList *Taxa;
 	T hash_bound;
 	Array<BitString<T>> Id2BitString;
-	//darray_dc<int>* Hash2Id;
+	// darray_dc<int>* Hash2Id;
 	Array2D<int> *Hash2Id;
 	T invariant_hashing;
-	//map<BitString<T>, int> BitStr2Id;
+	// map<BitString<T>, int> BitStr2Id;
 
 	bool issorted;
 
@@ -383,7 +432,7 @@ public:
 			result += bs(i) % hash_bound;
 			result %= hash_bound;
 		}
-		if (bs.is_normalized()) //Is there a better way to access the top bit?
+		if (bs.is_normalized()) // Is there a better way to access the top bit?
 			return result;
 		else
 			return (result > invariant_hashing ? hash_bound + invariant_hashing - result : invariant_hashing - result);
@@ -419,11 +468,11 @@ public:
 
 	void set_invariant()
 	{
-		//compute the hash value of the sum of normalized bitstring and its complement.
-		// example: taxa size: 6, bit size of T: 4
-		// bitstring:	0010 0001
-		// complement:	1101 0010
-		// sum:			1111 0011
+		// compute the hash value of the sum of normalized bitstring and its complement.
+		//  example: taxa size: 6, bit size of T: 4
+		//  bitstring:	0010 0001
+		//  complement:	1101 0010
+		//  sum:			1111 0011
 		T result = 0, comp = -1;
 		int bitstr_size = Taxa->bitstr_size;
 		int remainder = bitstr_size * (8 * sizeof(T)) - Taxa->size;
@@ -433,7 +482,7 @@ public:
 			result += comp % hash_bound;
 			result %= hash_bound;
 		}
-		comp = comp >> remainder; //fill zeros in the last container.
+		comp = comp >> remainder; // fill zeros in the last container.
 		result += comp % hash_bound;
 		result %= hash_bound;
 		invariant_hashing = result;
@@ -454,9 +503,9 @@ public:
 	T get_invariant_hashing() const { return invariant_hashing; };
 	Array2D<int> *get_hash_table() const { return Hash2Id; };
 	bool get_issorted() const { return issorted; };
-	//darray_dc<int>* get_Id2Tree_ptr() { return &(Id2Tree); };
+	// darray_dc<int>* get_Id2Tree_ptr() { return &(Id2Tree); };
 
-	//void print_Bipart(ostream& fout, int n_tree) {
+	// void print_Bipart(ostream& fout, int n_tree) {
 	//	size_t n = Id2BitString.get_size();
 	//	fout << Taxa->size << '\t' << n << '\n';
 	//	for (int i = 0; i < n; i++){
@@ -467,7 +516,7 @@ public:
 	//		else
 	//			fout << ' ' << Id2Tree[i].get_size() << '\n';
 	//	}
-	//}
+	// }
 
 	void print_Bipart(ostream &fout, size_t i)
 	{
@@ -487,9 +536,9 @@ class TreeArray
 
 private:
 	int size;
-	//darray<darray<int> > levels;
+	// darray<darray<int> > levels;
 	Array<Array<int>> *levels;
-	Array<double> *weights; // weights will be kept and used in generalizing B2T matrix.
+	Array<PRECISION> *weights; // weights will be kept and used in generalizing B2T matrix.
 	int **edges;
 	Array<size_t> *t2b;
 	bool issorted;
@@ -505,29 +554,29 @@ public:
 		delete t2b;
 	};
 	TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_rows, Array<int> &level_flag, int flag_label, bool ISROOTED, bool ISWEIGHTED);
-	//TreeArray(string& tree, TaxonList& taxon_list, Array<int>& active_rows, Array<int>& level_flag, Array2D<double>& w_temp, int flag_label, bool ISROOTED);
+	// TreeArray(string& tree, TaxonList& taxon_list, Array<int>& active_rows, Array<int>& level_flag, Array2D<PRECISION>& w_temp, int flag_label, bool ISROOTED);
 
-	//void print_level(std::ostream& output) { levels.print(output); };
+	// void print_level(std::ostream& output) { levels.print(output); };
 
 	void label_internal_node(Array<int> &active_rows, Array<int> &unlabeled);
-	void label_internal_node(Array<int> &active_rows, Array<int> &unlabeled, Array<Array<double>> &w_temp);
+	void label_internal_node(Array<int> &active_rows, Array<int> &unlabeled, Array<Array<PRECISION>> &w_temp);
 
 	template <class T>
 	void compute_bitstring(Bipartition<T> *Bipart)
 	{
 
-		//std::cout << "------------------Bitstring computation started----------------------\n";
+		// std::cout << "------------------Bitstring computation started----------------------\n";
 		t2b = new Array<size_t>(size);
 		t2b->resize(size, (size_t)-1);
 		T *index_hash = new T[size];
 		memset(index_hash, 0, size * sizeof(T));
 
-		//darray<int>* t2b_ptr = TreeId2Bipart->get_c_ptr(tree_id);
+		// darray<int>* t2b_ptr = TreeId2Bipart->get_c_ptr(tree_id);
 
-		//if (!t2b_ptr->is_empty())
+		// if (!t2b_ptr->is_empty())
 		//	t2b_ptr->resize(size, -1);
 
-		//t2b_ptr->resize(size, -1);
+		// t2b_ptr->resize(size, -1);
 
 		BitString<T> *bs = new BitString<T>[size];
 		T iv_h = Bipart->get_invariant_hashing();
@@ -586,8 +635,8 @@ public:
 		delete[] edges;
 		edges = nullptr;
 
-		//weights.release();
-		//weights is needed for B2T matrix
+		// weights.release();
+		// weights is needed for B2T matrix
 	}
 
 	void release_level()
@@ -649,15 +698,15 @@ public:
 		return b_ptr;
 	};
 
-	Array<double> *get_weight()
+	Array<PRECISION> *get_weight()
 	{
 		assert(weights != nullptr);
 		return weights;
 	};
 
-	Array<double> *pop_weight()
+	Array<PRECISION> *pop_weight()
 	{
-		Array<double> *w_ptr = weights;
+		Array<PRECISION> *w_ptr = weights;
 		weights = nullptr;
 		return w_ptr;
 	};
@@ -672,17 +721,21 @@ private:
 	Bipartition<T> *Bipart;
 	TaxonList *Taxa;
 
+	BitString<T> *Full_Taxa;
+
 public:
 	TreeSet(size_t N) : size(0), trees(Array<TreeArray *>(0, N)),
-						Bipart(nullptr), Taxa(nullptr){};
+						Bipart(nullptr), Taxa(nullptr), Full_Taxa(nullptr){};
 	TreeSet() : size(0), trees(Array<TreeArray *>(0, 100)),
-				Bipart(nullptr), Taxa(nullptr){};
+				Bipart(nullptr), Taxa(nullptr), Full_Taxa(nullptr){};
 	TreeSet(Bipartition<T> *bipart, TaxonList *taxa) : size(0), trees(Array<TreeArray *>(0, 100)),
-													   Bipart(bipart), Taxa(taxa){};
+													   Bipart(bipart), Taxa(taxa), Full_Taxa(new BitString<T>(Taxa->bitstr_size, Taxa->size, -1)){};
 	~TreeSet()
 	{
 		for (int i = 0; i < size; i++)
 			delete trees[i];
+
+		delete Full_Taxa;
 	}
 
 	void push(TreeArray *tree)
@@ -750,5 +803,181 @@ public:
 			delete trees[i];
 		trees.release();
 		size = 0;
+	}
+};
+
+template <class T>
+class TreeDirectedEdge
+{
+public:
+	int num_next_edges;
+	int num_population;
+	PRECISION weight;
+	BitString<T> bitstr;
+	TreeDirectedEdge **next_edges;
+
+	TreeDirectedEdge() : num_next_edges(0), num_population(0), bitstr(), next_edges(nullptr){};
+	TreeDirectedEdge(const BitString<T> &bs, PRECISION w)
+	{
+		weight = w;
+		bitstr = bs;
+
+		num_population = bs.popcount();
+		num_next_edges = 0;
+
+		if (num_population == 1)
+			next_edges = nullptr;
+		else
+		{
+			next_edges = new TreeDirectedEdge *[num_population];
+			for (int i = 0; i < num_population; i++)
+				next_edges[i] = nullptr;
+		}
+	}
+	~TreeDirectedEdge()
+	{
+		for (int i = 0; i < num_next_edges; i++)
+			if (next_edges[i] != nullptr)
+			{
+				std::cout << "Error in deconstructing TreeDirectedEdge object: non-empty adjoint edge at position " << i << ".\n";
+				throw(1);
+			}
+
+		delete[] this->next_edges;
+	}
+};
+
+template <class T>
+class TreeLinkedList
+{
+public:
+	TreeDirectedEdge *full_taxa;
+
+	TreeLinkedList() : full_taxa(nullptr){};
+	TreeLinkedList(const BitString<T> &bs, PRECISION w) : full_taxa(new TreeDirectedEdge<T>(bs, w)){};
+
+	TreeLinkedList(const BitString<T> &full, BitString<T> **bitstrs, PRECISION *weights, int num_edges) : full_taxa(new TreeDirectedEdge<T>(full, 0.0))
+	{
+		for (int i = 0; i < num_edges; i++)
+			insert_edge(*(bitstrs[i]), weights[i]);
+	}
+	~TreeLinkedList()
+	{
+		release_edge(full_taxa);
+	}
+
+	TreeLinkedList(const BitString<T> &full, int *bitstrs, PRECISION *weights, int num_edges, Bipartition<T> *Bipart) : full_taxa(new TreeDirectedEdge<T>(full, 0.0))
+	{
+		for (int i = 0; i < num_edges; i++)
+			insert_edge((*Bipart)[bitstrs[i]], weights[i]);
+	}
+
+	~TreeLinkedList()
+	{
+		release_edge(full_taxa);
+	}
+
+	void release_edge(TreeDirectedEdge *cur_edge)
+	{
+
+		for (int i = cur_edge->num_next_edges - 1; i >= 0; i++)
+		{
+			release_edge(cur_edge->next_edges[i]);
+			cur_edge->next_edges[i] = nullptr;
+			cur_edge->num_next_edges = cur_edge->num_next_edges - 1;
+		}
+
+		delete cur_edge;
+	}
+
+	TreeDirectedEdge<T> *locate_edge(TreeDirectedEdge<T> *new_edge, TreeDirectedEdge<T> *cur_edge)
+	{
+		if (is_subset(new_edge->bitstr, cur_edge->bitstr))
+		{
+			if (cur_edge->num_next_edges == 0)
+				return cur_edge;
+			else
+			{
+				auto found_edge = nullptr;
+				for (int i = 0; i < cur_edge->num_next_edges; i++)
+				{
+					found_edge = locate_edge(new_edge, cur_edge->next_edges[i]);
+					if (found_edge != nullptr)
+						return found_edge;
+				}
+				return nullptr;
+			}
+		}
+		else
+			return nullptr;
+	}
+
+	void insert_edge(const BitString<T> &bs, PRECISION w)
+	{
+		auto e = new TreeDirectedEdge<T>(bs, w);
+		auto c = new TreeDirectedEdge<T>(full_taxa->bitstr - bs, w);
+
+		if (full_taxa->num_next_edges == 0)
+		{
+			full_taxa->next_edges[0] = e;
+			full_taxa->next_edges[1] = c;
+			full_taxa->num_next_edges == 2;
+		}
+		else
+		{
+			auto found_edge = locate_edge(e, full_taxa);
+			auto new_edge = e;
+
+			if (found_edge == nullptr)
+			{
+				found_edge = locate_edge(c, full_taxa);
+				new_edge = c;
+				delete e;
+			}
+			else
+				delete c;
+
+			for (int i = 0; i < found_edge->num_next_edges; i++)
+			{
+				if (is_subset(found_edge->next_edges[i]->bitstr, new_edge->bitstr))
+				{
+					new_edge->next_edges[new_edge->num_next_edges++] = found_edge->next_edges[i];
+					for (int j = i + 1; j < found_edge->num_next_edges; j++)
+						found_edge->next_edges[j - 1] = found_edge->next_edges[j];
+					found_edge->num_next_edges = found_edge->num_next_edges - 1;
+					i--;
+				}
+			}
+			found_edge->next_edges[found_edge->num_next_edges++] = new_edge;
+		}
+	}
+
+	void print_NewickStr(ostream &out, TreeDirectedEdge<T> *cur_edge, const TaxonList &taxa)
+	{
+		if (cur_edge->num_population == 1)
+		{
+			int taxon_id = cur_edge->bitstr.get_taxon_id();
+			out << taxa.Ind2Taxon[taxon_id] << ':' << cur_edge->weight;
+		}
+		else
+		{
+			out << '(';
+			for (int i = 0; i < cur_edge->num_next_edges - 1; i++)
+			{
+				print_NewickStr(out, cur_edge->next_edges[i], taxa);
+				out << ',';
+			}
+			print_NewickStr(out, cur_edge->next_edges[cur_edge->num_next_edges - 1], taxa);
+			out << "):" << cur_edge->weight;
+		}
+	}
+
+	void print_NewickStr(ostream &out, const TaxonList &taxa)
+	{
+		out << '(';
+		print_NewickStr(out, full_taxa->next_edges[0], taxa);
+		out << ',';
+		print_NewickStr(out, full_taxa->next_edges[0], taxa);
+		out << "):" << full_taxa->weight << '\n';
 	}
 };

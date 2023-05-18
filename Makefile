@@ -16,7 +16,7 @@ LDLIBS = $(CLAPLIB) $(BLASLIB) $(F2CLIB) -lm
 
 #CFLAG = -c $(INCDIRS) $(LIBDIRS) -lblas -lf2c -llapack
 # CPPFLAG = -w -std=c++17 -fpermissive $(INCDIRS) -c
-CPPFLAG = -w -g -std=c++17 -fpermissive $(INCDIRS) -c
+CPPFLAG = -w -g -std=c++17 -Wno-register -fpermissive $(INCDIRS) -c
 #LFLAG = -std=c++17 -DNDEBUG $(INCDIRS) $(LIBDIRS) -lblas -lf2c -llapack
 LFLAG = -w -std=c++17 -fpermissive -DNDEBUG $(INCDIRS) $(LDLIBS)
 

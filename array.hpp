@@ -82,7 +82,7 @@ public:
 
 	// Array(int n, const T& ele) : Array(n, n, ele) {};
 
-	//Copy-constructor.
+	// Copy-constructor.
 	Array(const Array<T> &arr) : Array(arr.size, arr.container)
 	{
 		for (int i = 0; i < size; i++)
@@ -101,7 +101,7 @@ public:
 			T *temp = new T[max_size];
 			for (int i = 0; i < size; i++)
 				temp[i] = vec[i];
-			//memcpy(temp, vec, length * sizeof(T)); // Cause copy constructor and destructor issues.
+			// memcpy(temp, vec, length * sizeof(T)); // Cause copy constructor and destructor issues.
 			delete[] vec;
 			vec = temp;
 		}
@@ -117,7 +117,7 @@ public:
 			return;
 		else
 		{
-			//for (int i = pos; i < size - 1; i++)
+			// for (int i = pos; i < size - 1; i++)
 			//	memcpy(vec + i + 1, vec + i, sizeof(T));
 			memmove(vec + pos + 1, vec + pos, (size - pos - 1) * sizeof(T));
 			vec[pos] = ele;
@@ -157,8 +157,9 @@ public:
 
 	T *get_vec() const { return vec; };
 
-	T *pop_vec() {
-		T* temp = vec; 
+	T *pop_vec()
+	{
+		T *temp = vec;
 		vec = nullptr;
 		size = 0;
 		max_size = 0;
@@ -169,8 +170,8 @@ public:
 
 	void clean() { size = 0; };
 
-	void release() 
-	{ 
+	void release()
+	{
 		size = 0;
 		max_size = 0;
 		delete[] vec;
@@ -514,9 +515,9 @@ public:
 			size--;
 		ptr_container[i] = nullptr;
 		return temp;
-		//if (ptr_container[i] == nullptr)
+		// if (ptr_container[i] == nullptr)
 		//	return nullptr;
-		//else
+		// else
 		//	return ptr_container[i];
 	}
 
@@ -856,11 +857,11 @@ public:
 		if (Broadcast == 'r' || Broadcast == 'R')
 			for (auto i = 0; i < mat.row; i++)
 				for (auto j = 0; j < mat.col; j++)
-					mat.vec[i][j] += displace[j];
+					mat.vec[i][j] += displace(j);
 		else if (Broadcast == 'c' || Broadcast == 'C')
 			for (auto i = 0; i < mat.row; i++)
 				for (auto j = 0; j < mat.col; j++)
-					mat.vec[i][j] += displace[i];
+					mat.vec[i][j] += displace(i);
 		else
 		{
 			std::cout << "Error! Broadcast pattern not found! Use `r' / `R' for Broadcast_By_Row or `c' / `C' for Broadcast_By_Column.\n";
@@ -868,7 +869,8 @@ public:
 		}
 	}
 
-	friend void row_sum(Matrix<T> &mat, Array<T> &r_s){
+	friend void row_sum(Matrix<T> &mat, Array<T> &r_s)
+	{
 		for (auto j = 0; j < mat.col; j++)
 			r_s[j] = 0;
 		for (auto i = 0; i < mat.row; i++)
@@ -876,7 +878,8 @@ public:
 				r_s[j] += mat.vec[i][j];
 	}
 
-	friend void row_mean(Matrix<T> &mat, Array<T> &r_m){
+	friend void row_mean(Matrix<T> &mat, Array<T> &r_m)
+	{
 		row_sum(mat, r_m);
 		for (auto j = 0; j < mat.col; j++)
 			r_m[j] /= mat.row;

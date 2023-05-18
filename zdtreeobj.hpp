@@ -112,37 +112,54 @@ public:
 
 	//}
 
-	Array<int> *Compute_Strict_Consensus_Tree()
+	int Compute_Strict_Consensus_Tree(int *bipart_id, PRECISION *weights)
 	{
 		sb2t_mat->set_RCS();
 		int bipart_num = sb2t_mat->get_row();
 		int tree_num = sb2t_mat->get_col();
 
-		Array<int> *consensus_bipart_id = new Array<int>(0, row);
+		// Array<int> *consensus_bipart_id = new Array<int>(0, row);
+		// Array<int> *consensus_bipart_id = new Array<int>(0, bipart_num);
+		int num_con_edge = 0;
+
 		for (int i = 0; i < bipart_num; i++)
-		{
 			if (sb2t_mat->get_RCS_ind_c_ptr(i)->get_size() == tree_num)
-				consensus_bipart_id->push(i);
-		}
-		consensus_bipart_id->align();
-		return consensus_bipart_id;
+			{
+				bipart_id[num_con_edge] = i;
+				weights[num_con_edge] = 1.0;
+				num_con_edge += 1;
+			}
+		return num_con_edge;
 	}
 
-	Array<int> *Compute_Major_Consensus_Tree()
+	int Compute_Major_Consensus_Tree(int *bipart_id, PRECISION *weights)
 	{
 		sb2t_mat->set_RCS();
 		int bipart_num = sb2t_mat->get_row();
 		int tree_num = sb2t_mat->get_col();
 
-		Array<int> *consensus_bipart_id = new Array<int>(0, row);
+		// Array<int> *consensus_bipart_id = new Array<int>(0, row);
+		// Array<int> *consensus_bipart_id = new Array<int>(0, bipart_num);
+		int num_con_edge = 0;
+		PRECISION w = 0.0;
 
 		for (int i = 0; i < bipart_num; i++)
 		{
-			if (2 * sb2t_mat->get_RCS_ind_c_ptr(i)->get_size() >= tree_num)
-				consensus_bipart_id->push(i);
+			w = sb2t_mat->get_RCS_ind_c_ptr(i)->get_size() / tree_num;
+			if (w > 0.5)
+			{
+				bipart_id[num_con_edge] = i;
+				weights[num_con_edge] = w;
+				num_con_edge += 1;
+			}
 		}
-		consensus_bipart_id->align();
-		return consensus_bipart_id;
+		return num_con_edge;
+	}
+
+	void print_Consensus_Tree(std::ostream &out, int *bipart_id, PRECISION *weights, int num_edge)
+	{
+		auto tree_ll = TreeLinkedList<T>(*Trees->Full_Taxa, bipart_id, weights, num_edge, Bipart);
+		tree_ll.print_NewickStr(out, *Taxa);
 	}
 
 	void Compute_Bipart()
@@ -491,6 +508,18 @@ public:
 		int tree_num = sb2t_mat->get_col();
 		int ind = -1;
 		for (int i = 0; i < indices.get_size(); i++)
+		{
+			ind = indices(i);
+			(*Bipart)[ind].print_BitString(fout);
+			fout << ' ' << ((PRECISION)sb2t_mat->get_RCS_ind_c_ptr(ind)->get_size()) / tree_num << '\n';
+		}
+	};
+
+	void print_Bipart_List(ostream &fout, int *indices, int num_bipart)
+	{
+		int tree_num = sb2t_mat->get_col();
+		int ind = -1;
+		for (int i = 0; i < num_bipart; i++)
 		{
 			ind = indices[i];
 			(*Bipart)[ind].print_BitString(fout);

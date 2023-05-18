@@ -91,7 +91,7 @@ void NLDR::Cor2Dis_with_paras(NLDR_Var *X, NLDR::NLDR_Paras *Paras)
     PRECISION &rho = *(X->rho);
     eta = 0;
     rho = 0;
-    
+
     auto CX_ = CX.get_vec();
 
     for (auto i = 0; i < n; i++)
@@ -212,7 +212,8 @@ void NLDR::Cor2Dis_no_paras(NLDR_Var *X, NLDR::NLDR_Paras *Paras)
 //     Paras->VarDiff->rho = rho;
 // }
 
-void NLDR::update_distance_row_from_VarDiff(NLDR_Var *X, NLDR_Var *Y, NLDR_Dir *Dir, PRECISION stepsize, NLDR_Paras_GAU *Paras){
+void NLDR::update_distance_row_from_VarDiff(NLDR_Var *X, NLDR_Var *Y, NLDR_Dir *Dir, PRECISION stepsize, NLDR_Paras_GAU *Paras)
+{
     unsigned i = Paras->VarDiff->activated_row;
     unsigned k = Paras->VarDiff->activated_coo;
     unsigned n = X->Cor->get_row();
@@ -229,7 +230,7 @@ void NLDR::update_distance_row_from_VarDiff(NLDR_Var *X, NLDR_Var *Y, NLDR_Dir *
     DY_(i, i) = 0;
     for (auto j = i + 1; j < n; j++)
         DY_(j, i) = newD[j];
-    
+
     *Y->eta = Paras->VarDiff->eta;
     *Y->eta_d = Paras->eta_d;
     *Y->rho = Paras->VarDiff->rho;
@@ -370,7 +371,6 @@ void NLDR::update_distance_row_from_VarDiff(NLDR_Var *X, NLDR_Var *Y, NLDR_Dir *
 //                     A[i * dim + k] += BX_[j][i] * XC_[j][k];
 //                 // Efficient scan. (using operator () that converts the indices will bring in multiple conversions and if-check's)
 //             }
-                
 
 //         for (auto i = 0; i < n; i++)
 //             for (auto k = 0; k < dim; k++)
@@ -538,7 +538,7 @@ void NLDR::update_MAJORIZATION(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 void NLDR::update_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind)
 {
-    
+
     // in-place update
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
@@ -553,7 +553,6 @@ void NLDR::update_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind)
         Cor2Dis_with_paras(X, paras);
         paras->pre_stress = KRUSKAL1_stress_by_parameter(X, paras);
     }
-
 };
 
 void NLDR::direction_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind)
@@ -692,7 +691,7 @@ bool NLDR::accept_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //         Dir->activated_coo = Dir->activated_coo + 1;
 //         return;
 //     }
-    
+
 //     auto paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
 //     auto n = paras->Dis->dimension();
 
@@ -722,7 +721,8 @@ bool NLDR::accept_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //     }
 // }
 
-void NLDR::slope_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind){
+void NLDR::slope_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
+{
     NLDR_Dir *Delta = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     PRECISION &s = *reinterpret_cast<PRECISION *>(kws.arg(ind[2]));
 
@@ -760,7 +760,7 @@ void NLDR::slope_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind){
 //     DY_(i, i) = newD[i];
 //     for (auto j = i + 1; j < n; j++)
 //         DY_(j, i) = newD[j];
-    
+
 //     *Y->eta = Paras->VarDiff->eta;
 //     *Y->eta_d = Paras->eta_d;
 //     *Y->rho = Paras->VarDiff->rho;
@@ -769,22 +769,21 @@ void NLDR::slope_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind){
 void NLDR::cost_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
 {
     auto *X = reinterpret_cast<NLDR_Var *>(kws.arg(1));
-    auto *fx = reinterpret_cast<PRECISION *>(kws.arg(2));  
-    // This is dangerous. The updated cost need the old point for fast computation 
-    // but on the scope of OptimLib_Search_StepSize::Wolfe_1st_Condition::Cost, 
+    auto *fx = reinterpret_cast<PRECISION *>(kws.arg(2));
+    // This is dangerous. The updated cost need the old point for fast computation
+    // but on the scope of OptimLib_Search_StepSize::Wolfe_1st_Condition::Cost,
     // only the current point is visible, referenced in ind[0] = 6. The old point,
     // on the global scope of OptimLib_Search_StepSize is referenced in 1.
     NLDR_Var *Y = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     PRECISION *f = reinterpret_cast<PRECISION *>(kws.arg(ind[1]));
     NLDR::NLDR_Paras *Paras = reinterpret_cast<NLDR::NLDR_Paras *>(kws.carg(0));
 
-
     if (Paras->nst == KRUSKAL1 || Paras->nst == NORMALIZED)
         *f = stress_raw(Y, Paras); // Use new point
     else if (Paras->nst == SAMMON)
         SAMMON_stress_by_index(X, *f, Paras); // Use old point with update info stored in Paras->Var_Diff.
     else if (Paras->nst == CCA)
-        CCA_stress_by_index(X, *f, Paras);    // Use old point with update info stored in Paras->Var_Diff.
+        CCA_stress_by_index(X, *f, Paras); // Use old point with update info stored in Paras->Var_Diff.
     else
     {
         std::cout << "Cost function type in NLDR_Paras not found!\n";
@@ -798,13 +797,13 @@ void NLDR::cost_GAUSS_SEIDEL_iteration(OptimLib::Optim_KwArg &kws, unsigned *ind
     // Every nk-iterations(entire coordinates get updated), compute the error.
     auto X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     auto fx = reinterpret_cast<PRECISION *>(kws.arg(ind[1]));
-    auto Y = reinterpret_cast<NLDR_Var *>(kws.arg(10)); 
+    auto Y = reinterpret_cast<NLDR_Var *>(kws.arg(10));
 
     auto Paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
     auto a_c = Paras->VarDiff->activated_coo;
     auto a_r = Paras->VarDiff->activated_row;
     if (a_c == (Paras->dim - 1) && Paras->nst == CCA)
-            *fx = CCA_stress_by_distance_lambda(X->Dis, Paras->Dis, Paras->lambda[*Paras->iter / Paras->dim + 1]);
+        *fx = CCA_stress_by_distance_lambda(X->Dis, Paras->Dis, Paras->lambda[*Paras->iter / Paras->dim + 1]);
 
     if (a_r == (Paras->Dis->dimension() - 1) && a_c == (Paras->dim - 1))
     {
@@ -822,7 +821,8 @@ void NLDR::cost_GAUSS_SEIDEL_iteration(OptimLib::Optim_KwArg &kws, unsigned *ind
     }
 }
 
-void NLDR::copy_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind){
+void NLDR::copy_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
+{
     auto src = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     auto des = reinterpret_cast<NLDR_Var *>(kws.arg(ind[1]));
     auto Paras = reinterpret_cast<NLDR_Paras_GAU *>(kws.carg(0));
@@ -841,7 +841,6 @@ void NLDR::copy_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *i
     *(des->rho) = *(src->rho);
 }
 
-
 void NLDR::MAJORIZATION(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<PRECISION> *Cor_0, LowerTri<PRECISION> *Dis_0,
                         NLDR_STRESS_TYPE stress_type, unsigned MaxIter, unsigned MaxTime, PRECISION ErrTol, PRECISION DifTol,
                         PRECISION *lambda)
@@ -859,12 +858,8 @@ void NLDR::MAJORIZATION(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix
     Matrix<PRECISION> *V = nullptr;
     Matrix<PRECISION> *CX_temp = nullptr;
     Array<PRECISION> *A = nullptr;
-   
+
     Array<PRECISION> row_sum(n);
-
-
-    
-
 
     NLDR_Paras nldr_paras(Dis, &BX, nullptr, d, nullptr, lambda, 100);
     nldr_paras.set_stress_type(stress_type);
@@ -908,7 +903,6 @@ void NLDR::MAJORIZATION(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix
 
     std::cout << "\tInitial components in X...\n";
 
-    
     // Get inital info.
 
     std::cout << "\tInitial stress:\t" << stressX << "\n";
@@ -1084,8 +1078,8 @@ void NLDR::METROPOLIS(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<P
 }
 
 void NLDR::GAUSS_SEIDEL(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<PRECISION> *Cor_0, LowerTri<PRECISION> *Dis_0,
-                      NLDR_STRESS_TYPE stress_type, unsigned MaxIter, unsigned MaxTime, PRECISION ErrTol, PRECISION DifTol,
-                      PRECISION *lambda)
+                        NLDR_STRESS_TYPE stress_type, unsigned MaxIter, unsigned MaxTime, PRECISION ErrTol, PRECISION DifTol,
+                        PRECISION *lambda)
 {
     using namespace OptimLib;
 
@@ -1093,8 +1087,6 @@ void NLDR::GAUSS_SEIDEL(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix
     PRECISION err = 100, diff = 100, nD = 0;
 
     Optim_Paras o_paras(MaxIter, MaxTime, ErrTol, DifTol);
-
-    
 
     NLDR_Paras_GAU nldr_paras(Dis, d);
 
@@ -1120,7 +1112,6 @@ void NLDR::GAUSS_SEIDEL(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix
     PRECISION etaX = 0, eta_d = nldr_paras.eta_d, rhoX = 0, stressX;
     NLDR_Var X(&CX, &DX, &etaX, &eta_d, &rhoX);
     Init_X(&X, Dis_0, Dis);
-    
 
     Matrix<PRECISION> CY(*Cor_0);
     LowerTri<PRECISION> DY(DX);
@@ -1142,33 +1133,32 @@ void NLDR::GAUSS_SEIDEL(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix
     Optim_KwArg kws_wolfe(WOLFE_1ST_STEPSIZE_SEARCH, 1);
     kws_wolfe.init_wolfe1st_variable(&err, (void *)&X, &stressX, (void *)&DirX, &slope, &stepsize, (void *)&Y, &stressY);
     kws_wolfe.set_carg(&nldr_paras, 0);
-    
 
     if (stress_type == KRUSKAL1)
     {
-        kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_KRUSKAL1_GAUSS_SEIDEL, nullOptimFunc, nullOptimFunc);  
-        kws_wolfe.init_wolfe1st_routine(cost_KRUSKAL1_GAUSS_SEIDEL_line_search, update_KRUSKAL1_GAUSS_SEIDEL_line_search, copy_GAUSS_SEIDEL_line_search); 
+        kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_KRUSKAL1_GAUSS_SEIDEL, nullOptimFunc, nullOptimFunc);
+        kws_wolfe.init_wolfe1st_routine(cost_KRUSKAL1_GAUSS_SEIDEL_line_search, update_KRUSKAL1_GAUSS_SEIDEL_line_search, copy_GAUSS_SEIDEL_line_search);
         stressX = KRUSKAL1_stress_by_parameter(&X);
         stressY = stressX;
     }
     else if (stress_type == NORMALIZED)
     {
-        kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_NORMALIZED_GAUSS_SEIDEL, nullOptimFunc, nullOptimFunc);  
-        kws_wolfe.init_wolfe1st_routine(cost_NORMALIZED_GAUSS_SEIDEL_line_search, update_NORMALIZED_GAUSS_SEIDEL_line_search, copy_GAUSS_SEIDEL_line_search); 
+        kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_NORMALIZED_GAUSS_SEIDEL, nullOptimFunc, nullOptimFunc);
+        kws_wolfe.init_wolfe1st_routine(cost_NORMALIZED_GAUSS_SEIDEL_line_search, update_NORMALIZED_GAUSS_SEIDEL_line_search, copy_GAUSS_SEIDEL_line_search);
         stressX = NORMALIZED_stress_by_parameter(&X);
         stressY = stressX;
     }
     else if (stress_type == SAMMON)
     {
-        kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_SAMMON_GAUSS_SEIDEL, nullOptimFunc, nullOptimFunc);  
-        kws_wolfe.init_wolfe1st_routine(cost_SAMMON_GAUSS_SEIDEL_line_search, update_SAMMON_GAUSS_SEIDEL_line_search, copy_GAUSS_SEIDEL_line_search); 
+        kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_SAMMON_GAUSS_SEIDEL, nullOptimFunc, nullOptimFunc);
+        kws_wolfe.init_wolfe1st_routine(cost_SAMMON_GAUSS_SEIDEL_line_search, update_SAMMON_GAUSS_SEIDEL_line_search, copy_GAUSS_SEIDEL_line_search);
         stressX = SAMMON_stress_by_distance(&X, Dis, nldr_paras.total_d);
         stressY = stressX;
     }
     else if (stress_type == CCA)
     {
-        kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_CCA_GAUSS_SEIDEL, nullOptimFunc, nullOptimFunc);  
-        kws_wolfe.init_wolfe1st_routine(cost_CCA_GAUSS_SEIDEL_line_search, update_CCA_GAUSS_SEIDEL_line_search, copy_GAUSS_SEIDEL_line_search); 
+        kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_CCA_GAUSS_SEIDEL, nullOptimFunc, nullOptimFunc);
+        kws_wolfe.init_wolfe1st_routine(cost_CCA_GAUSS_SEIDEL_line_search, update_CCA_GAUSS_SEIDEL_line_search, copy_GAUSS_SEIDEL_line_search);
         nldr_paras.lambda = lambda;
         nldr_paras.cur_lambda = lambda;
         stressX = CCA_stress_by_distance_lambda(&DX, Dis, *lambda);
@@ -1187,11 +1177,10 @@ void NLDR::GAUSS_SEIDEL(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix
 
     Optim_Update_Solver o_solver(&o_paras, &o_iter);
 
-    //Optim_Stepping_Solver o_solver(&o_paras, &o_iter, &o_stepsize);
-    //Optim_Stepping_Solver o_solver(&o_paras, &o_iter, &o_cstepsize);
+    // Optim_Stepping_Solver o_solver(&o_paras, &o_iter, &o_stepsize);
+    // Optim_Stepping_Solver o_solver(&o_paras, &o_iter, &o_cstepsize);
 
     o_solver.solve();
-
 
     std::cout << "Final stress:\t" << stressX << "\t computed time:\t" << (double)ti / CLOCKS_PER_SEC << ".\n";
 
@@ -1201,7 +1190,6 @@ void NLDR::GAUSS_SEIDEL(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix
 
     delete[] new_distance_row;
 }
-
 
 /****************************************KRUSKAL1****************************************/
 
@@ -1267,7 +1255,8 @@ void NLDR::compute_BX_KRUSKAL1(NLDR_Var *X, NLDR_Paras *Paras)
         auto D_i = D[i];
         auto BX_i = BX[i];
         for (auto j = 0; j < i; j++)
-            if (DX_i[j] != 0){
+            if (DX_i[j] != 0)
+            {
                 BX_i[j] = -D_i[j] / DX_i[j];
                 row_sum[i] += BX_i[j];
                 row_sum[j] += BX_i[j];
@@ -1293,7 +1282,7 @@ void NLDR::update_cor_by_BX_KRUSKAL1(NLDR_Var *X, NLDR_Paras *Paras)
 
     for (auto i = 0; i < n; i++)
         memcpy(CX_temp_[i], XC_[i], dim * sizeof(PRECISION));
-    
+
     for (auto i = 0; i < n; i++)
         for (auto k = 0; k < dim; k++)
         {
@@ -1346,21 +1335,21 @@ void NLDR::direction_KRUSKAL1_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *i
     PRECISION **Delta_ = Delta.get_vec();
 
     PRECISION a = 0, b = 0, c = 0, temp = 0, eta = *(X->eta);
-    //time_t start = clock();
-    // for (auto D_i = D.row_begin(a_row), DX_i = DX.row_begin(a_row), end = D.row_end(a_row) ; D_i != end; D_i++, DX_i++)
-    // {
-    //     //temp = (D(a_row, j) - DX(a_row, j));
-    //     temp = (*D_i) - (*DX_i);
-    //     b += temp * temp;
-    // }
+    // time_t start = clock();
+    //  for (auto D_i = D.row_begin(a_row), DX_i = DX.row_begin(a_row), end = D.row_end(a_row) ; D_i != end; D_i++, DX_i++)
+    //  {
+    //      //temp = (D(a_row, j) - DX(a_row, j));
+    //      temp = (*D_i) - (*DX_i);
+    //      b += temp * temp;
+    //  }
 
-    for(int j = 0; j < i; j++)
+    for (int j = 0; j < i; j++)
     {
         temp = D(i, j) - DX(i, j);
         b += temp * temp;
     }
 
-    for(int j = i + 1; j < n; j++)
+    for (int j = i + 1; j < n; j++)
     {
         temp = D(j, i) - DX(j, i);
         b += temp * temp;
@@ -1399,7 +1388,7 @@ void NLDR::direction_KRUSKAL1_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *i
                 c += (CX_[j][k] - CX_[i][k]);
             Delta_[j][k] = -(a - b * c) / eta / eta;
         }
-    
+
     for (auto k = 0; k < dim; k++)
         Delta_[i][k] = 0;
 
@@ -1417,7 +1406,7 @@ void NLDR::direction_KRUSKAL1_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *i
                 c += (CX_[j][k] - CX_[i][k]);
             Delta_[j][k] = -(a - b * c) / eta / eta;
         }
-    //std::cout << "\t Computation time: " << (clock() - start) / (double) CLOCKS_PER_SEC << "\n";
+    // std::cout << "\t Computation time: " << (clock() - start) / (double) CLOCKS_PER_SEC << "\n";
 }
 
 void NLDR::direction_KRUSKAL1_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
@@ -1465,8 +1454,6 @@ void NLDR::direction_KRUSKAL1_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *i
             }
             DeltaX_[i][k] = 2.0 / eta / eta * (n1 * eta + eta_d * n2 - 2 * rho * n2);
         }
-
-    
 }
 
 // KRUSKAL1_GAUSS_SEIDEL
@@ -1506,7 +1493,7 @@ void NLDR::pre_update_by_index_KRUSKAL1_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir,
         for (auto l = 0; l < dim; l++)
         {
             if (l != k)
-                temp = C_[i][l]- C_[j][l];
+                temp = C_[i][l] - C_[j][l];
             else
             {
                 if (i != j)
@@ -1531,7 +1518,7 @@ void NLDR::pre_update_by_index_KRUSKAL1_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir,
         for (auto l = 0; l < dim; l++)
         {
             if (l != k)
-                temp = C_[i][l]- C_[j][l];
+                temp = C_[i][l] - C_[j][l];
             else
             {
                 if (i != j)
@@ -1573,7 +1560,7 @@ void NLDR::cost_KRUSKAL1_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, un
 }
 
 void NLDR::direction_KRUSKAL1_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU *paras, unsigned a_row,
-        PRECISION** XD_, PRECISION** XD2_, PRECISION* DTX_, PRECISION* DTX3_)
+                                           PRECISION **XD_, PRECISION **XD2_, PRECISION *DTX_, PRECISION *DTX3_)
 {
 
     auto n = paras->pts;
@@ -1590,11 +1577,12 @@ void NLDR::direction_KRUSKAL1_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Para
     auto Delta_ = Dir->Delta->get_vec();
 
     PRECISION a, b, c, n2, n3, n4, DX_ij, D_ij, eta = *(X->eta), eta_d = paras->eta_d, rho = *(X->rho);
-    
 
     /**************************Form XD, XD2**************************/
-    for (auto j = 0; j < n; j++){
-        for (auto k = 0; k < d; k++){
+    for (auto j = 0; j < n; j++)
+    {
+        for (auto k = 0; k < d; k++)
+        {
             XD_[j][k] = C_[i][k] - C_[j][k];
             XD2_[j][k] = XD_[j][k] * XD_[j][k];
         }
@@ -1602,7 +1590,8 @@ void NLDR::direction_KRUSKAL1_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Para
     /**************************Form XD, XD2**************************/
 
     /**************************Form DTX, DTX3**************************/
-    for (auto j = 0; j < i; j++){
+    for (auto j = 0; j < i; j++)
+    {
         DX_ij = DX(i, j);
         D_ij = D(i, j);
         if (DX_ij > 1e-8)
@@ -1620,7 +1609,8 @@ void NLDR::direction_KRUSKAL1_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Para
     DTX_[i] = 0;
     DTX3_[i] = 0;
 
-    for (auto j = i + 1; j < n; j++){
+    for (auto j = i + 1; j < n; j++)
+    {
         DX_ij = DX(j, i);
         D_ij = D(j, i);
         if (DX_ij > 1e-8)
@@ -1636,25 +1626,25 @@ void NLDR::direction_KRUSKAL1_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Para
     }
     /**************************Form DTX, DTX32**************************/
 
-    for (auto k = 0; k < d; k++){
-        a = 0; 
-        for(auto j = 0; j < n; j++)
+    for (auto k = 0; k < d; k++)
+    {
+        a = 0;
+        for (auto j = 0; j < n; j++)
             a += DTX_[j] * XD_[j][k];
         a *= eta;
         b = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             b += XD_[j][k];
         n2 = b * eta_d;
         n3 = b * rho;
         Delta_[0][k] = -2 * (a + n2 - 2 * n3) / eta / eta;
         n4 = 0;
-        for(auto j = 0; j < n; j++)
-            n4 += - DTX3_[j] * XD2_[j][k] + DTX_[j];
+        for (auto j = 0; j < n; j++)
+            n4 += -DTX3_[j] * XD2_[j][k] + DTX_[j];
         n4 *= eta;
-        Delta_[1][k] = -2 * ((n4 + (n - 1) * eta_d - 2 * (n - 1) * rho) * eta * eta - (a + n2 - 2 * n3) * 4 * eta * b ) / eta / eta / eta / eta;
+        Delta_[1][k] = -2 * ((n4 + (n - 1) * eta_d - 2 * (n - 1) * rho) * eta * eta - (a + n2 - 2 * n3) * 4 * eta * b) / eta / eta / eta / eta;
         Delta_[1][k] = fabs(Delta_[1][k]);
     }
-
 }
 
 void NLDR::update_KRUSKAL1_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
@@ -1679,20 +1669,21 @@ void NLDR::update_KRUSKAL1_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *in
 
     auto Delta_ = Dir->Delta->get_vec();
 
-    for(auto i = 0; i < n; i++)
+    for (auto i = 0; i < n; i++)
     {
         direction_KRUSKAL1_GAUSS_SEIDEL(X, Dir, paras, i, XD_, XD2_, DTX_, DTX3_);
-        for(auto k = 0; k < d; k++)
+        for (auto k = 0; k < d; k++)
         {
             Dir->activated_coo = k;
             slope = -Delta_[0][k] * Delta_[0][k] / Delta_[1][k];
             wolfe.stepsize();
         }
     }
-     centralize(*X->Cor);
+    centralize(*X->Cor);
     e = (f_pre - f) / f;
     std::cout << "stress value : " << f << '\n';
-    std::cout << "rel error : " << e << '\n' << '\n';
+    std::cout << "rel error : " << e << '\n'
+              << '\n';
 }
 
 /****************************************KRUSKAL1****************************************/
@@ -1764,7 +1755,7 @@ void NLDR::update_cor_by_BX_NORMALIZED(NLDR_Var *X, NLDR_Paras *Paras)
 
     for (auto i = 0; i < n; i++)
         memcpy(CX_temp_[i], XC_[i], dim * sizeof(PRECISION));
-    
+
     for (auto i = 0; i < n; i++)
         for (auto k = 0; k < dim; k++)
         {
@@ -1833,7 +1824,7 @@ void NLDR::direction_NORMALIZED_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned 
             Delta_[j][k] *= 2 * scalar;
     }
 
-    scalar = - 1.0;
+    scalar = -1.0;
     for (auto k = 0; k < dim; k++)
         Delta_[i][k] *= 2 * scalar;
 
@@ -1897,13 +1888,13 @@ void NLDR::direction_NORMALIZED_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigne
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
-    
+
     auto n = X->Cor->get_row();
     auto d = X->Cor->get_col();
     auto C_ = X->Cor->get_vec();
     LowerTri<PRECISION> &DX = *(X->Dis);
     LowerTri<PRECISION> &D = *(paras->Dis);
-    
+
     auto i = Dir->activated_row;
 
     Matrix<PRECISION> XD(n, d);
@@ -1917,14 +1908,17 @@ void NLDR::direction_NORMALIZED_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigne
 
     PRECISION a, b, c, DX_ij, D_ij, eta = *(X->eta), eta_d = paras->eta_d, rho = *(X->rho);
 
-    for (auto j = 0; j < n; j++){
-        for (auto k = 0; k < d; k++){
+    for (auto j = 0; j < n; j++)
+    {
+        for (auto k = 0; k < d; k++)
+        {
             XD_[j][k] = C_[i][k] - C_[j][k];
             XD2_[j][k] = XD_[j][k] * XD_[j][k];
         }
     }
 
-    for (auto j = 0; j < n; j++){
+    for (auto j = 0; j < n; j++)
+    {
         DX_ij = DX(i, j);
         D_ij = D(i, j);
         if (DX_ij > 1e-8)
@@ -1939,16 +1933,17 @@ void NLDR::direction_NORMALIZED_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigne
         }
     }
 
-    for (auto k = 0; k < d; k++){
-        a = 0; 
-        for(auto j = 0; j < n; j++)
+    for (auto k = 0; k < d; k++)
+    {
+        a = 0;
+        for (auto j = 0; j < n; j++)
             a += DTX[j] - 1;
         b = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             b += (DTX[j] - 1) * XD_[j][k];
         Delta_[0][k] = -2 * b / eta_d;
         c = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             c += DTX3[j] * XD2_[j][k];
         Delta_[1][k] = -2 * (a - c) / eta_d;
         Delta_[1][k] = fabs(Delta_[1][k]);
@@ -1992,7 +1987,7 @@ void NLDR::pre_update_by_index_NORMALIZED_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Di
         for (auto l = 0; l < dim; l++)
         {
             if (l != k)
-                temp = C_[i][l]- C_[j][l];
+                temp = C_[i][l] - C_[j][l];
             else
             {
                 if (i != j)
@@ -2017,7 +2012,7 @@ void NLDR::pre_update_by_index_NORMALIZED_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Di
         for (auto l = 0; l < dim; l++)
         {
             if (l != k)
-                temp = C_[i][l]- C_[j][l];
+                temp = C_[i][l] - C_[j][l];
             else
             {
                 if (i != j)
@@ -2059,7 +2054,7 @@ void NLDR::cost_NORMALIZED_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, 
 }
 
 void NLDR::direction_NORMALIZED_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU *paras, unsigned a_row,
-        PRECISION** XD_, PRECISION** XD2_, PRECISION* DTX_, PRECISION* DTX3_)
+                                             PRECISION **XD_, PRECISION **XD2_, PRECISION *DTX_, PRECISION *DTX3_)
 {
 
     auto n = paras->pts;
@@ -2077,14 +2072,17 @@ void NLDR::direction_NORMALIZED_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Pa
 
     PRECISION a, b, c, DX_ij, D_ij, eta = *(X->eta), eta_d = paras->eta_d, rho = *(X->rho);
 
-    for (auto j = 0; j < n; j++){
-        for (auto k = 0; k < d; k++){
+    for (auto j = 0; j < n; j++)
+    {
+        for (auto k = 0; k < d; k++)
+        {
             XD_[j][k] = C_[i][k] - C_[j][k];
             XD2_[j][k] = XD_[j][k] * XD_[j][k];
         }
     }
 
-    for (auto j = 0; j < i; j++){
+    for (auto j = 0; j < i; j++)
+    {
         DX_ij = DX(i, j);
         D_ij = D(i, j);
         if (DX_ij > 1e-8)
@@ -2101,7 +2099,8 @@ void NLDR::direction_NORMALIZED_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Pa
     DTX_[i] = 0;
     DTX3_[i] = 0;
 
-    for (auto j = i + 1; j < n; j++){
+    for (auto j = i + 1; j < n; j++)
+    {
         DX_ij = DX(j, i);
         D_ij = D(j, i);
         if (DX_ij > 1e-8)
@@ -2116,21 +2115,21 @@ void NLDR::direction_NORMALIZED_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Pa
         }
     }
 
-    for (auto k = 0; k < d; k++){
-        a = 0; 
-        for(auto j = 0; j < n; j++)
+    for (auto k = 0; k < d; k++)
+    {
+        a = 0;
+        for (auto j = 0; j < n; j++)
             a += DTX_[j] - 1;
         b = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             b += (DTX_[j] - 1) * XD_[j][k];
         Delta_[0][k] = -2 * b / eta_d;
         c = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             c += DTX3_[j] * XD2_[j][k];
         Delta_[1][k] = -2 * (a - c) / eta_d;
         Delta_[1][k] = fabs(Delta_[1][k]);
     }
-
 }
 
 void NLDR::update_NORMALIZED_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
@@ -2155,10 +2154,10 @@ void NLDR::update_NORMALIZED_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *
 
     auto Delta_ = Dir->Delta->get_vec();
 
-    for(auto i = 0; i < n; i++)
+    for (auto i = 0; i < n; i++)
     {
         direction_NORMALIZED_GAUSS_SEIDEL(X, Dir, paras, i, XD_, XD2_, DTX_, DTX3_);
-        for(auto k = 0; k < d; k++)
+        for (auto k = 0; k < d; k++)
         {
             Dir->activated_coo = k;
             slope = -Delta_[0][k] * Delta_[0][k] / Delta_[1][k];
@@ -2168,9 +2167,9 @@ void NLDR::update_NORMALIZED_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *
     centralize(*X->Cor);
     e = (f_pre - f) / f;
     std::cout << "stress value : " << f << '\n';
-    std::cout << "rel error : " << e << '\n' << '\n';
+    std::cout << "rel error : " << e << '\n'
+              << '\n';
 }
-
 
 /****************************************NORMALIZED**************************************/
 
@@ -2199,7 +2198,7 @@ PRECISION NLDR::SAMMON_stress_by_distance(NLDR_Var *X, NLDR_Paras *Paras)
         }
     }
 
-    //std::cout << "Total_d:\t" << Paras->total_d << "\n";
+    // std::cout << "Total_d:\t" << Paras->total_d << "\n";
     stress /= Paras->total_d;
 
     return stress;
@@ -2354,14 +2353,15 @@ void NLDR::update_cor_by_BX_SAMMON(NLDR_Var *X, NLDR_Paras *Paras)
     auto A = Paras->A->get_vec();
     memset(A, 0, n * dim * sizeof(PRECISION));
     for (auto i = 0; i < n; i++)
-        for (auto k = 0; k < dim; k++){
+        for (auto k = 0; k < dim; k++)
+        {
             for (auto j = 0; j <= i; j++)
                 A[i * dim + k] += BX(i, j) * XC_[j][k];
             for (auto j = i + 1; j < n; j++)
                 A[i * dim + k] += BX(j, i) * XC_[j][k];
             // Efficient scan. (using operator () that converts the indices will bring in multiple conversions and if-check's)
         }
-            
+
     for (auto i = 0; i < n; i++)
         for (auto k = 0; k < dim; k++)
         {
@@ -2370,7 +2370,6 @@ void NLDR::update_cor_by_BX_SAMMON(NLDR_Var *X, NLDR_Paras *Paras)
                 XC_[i][k] += V_[i][j] * A[j * dim + k];
         }
 }
-
 
 void NLDR::update_SAMMON_MAJORIZATION(OptimLib::Optim_KwArg &kws, unsigned *ind)
 {
@@ -2481,14 +2480,16 @@ void NLDR::direction_SAMMON_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind
         for (auto k = 0; k < dim; k++)
         {
             DeltaX_[i][k] = 0;
-            for (auto j = 0; j < i; j++){
+            for (auto j = 0; j < i; j++)
+            {
                 D_ij = D(i, j);
                 DX_ij = DX(i, j);
                 if (DX_ij > 1e-8 && D_ij > 1e-8)
                     DeltaX_[i][k] += (D_ij - DX_ij) / DX_ij / D_ij * (CX_[i][k] - CX_[j][k]);
             }
 
-            for (auto j = i + 1; j < n; j++){
+            for (auto j = i + 1; j < n; j++)
+            {
                 D_ij = D(j, i);
                 DX_ij = DX(j, i);
                 if (DX_ij > 1e-8 && D_ij > 1e-8)
@@ -2504,16 +2505,15 @@ void NLDR::direction_SAMMON_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *i
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
 
-
     if (Dir->activated_coo != 0)
         return;
-    
+
     auto n = X->Cor->get_row();
     auto d = X->Cor->get_col();
     auto C_ = X->Cor->get_vec();
     LowerTri<PRECISION> &DX = *(X->Dis);
     LowerTri<PRECISION> &D = *(paras->Dis);
-    
+
     auto i = Dir->activated_row;
 
     Matrix<PRECISION> XD(n, d);
@@ -2527,14 +2527,17 @@ void NLDR::direction_SAMMON_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *i
 
     PRECISION a, b, c, DX_ij, D_ij, eta = *(X->eta), eta_d = paras->eta_d, rho = *(X->rho), total_d = paras->total_d;
 
-    for (auto j = 0; j < n; j++){
-        for (auto k = 0; k < d; k++){
+    for (auto j = 0; j < n; j++)
+    {
+        for (auto k = 0; k < d; k++)
+        {
             XD_[j][k] = C_[i][k] - C_[j][k];
             XD2_[j][k] = XD_[j][k] * XD_[j][k];
         }
     }
 
-    for (auto j = 0; j < n; j++){
+    for (auto j = 0; j < n; j++)
+    {
         DX_ij = DX(i, j);
         D_ij = D(i, j);
         if (DX_ij > 1e-8 && D_ij > 1e-8)
@@ -2549,22 +2552,22 @@ void NLDR::direction_SAMMON_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *i
         }
     }
 
-    for (auto k = 0; k < d; k++){
-        a = 0; 
-        for(auto j = 0; j < n; j++)
+    for (auto k = 0; k < d; k++)
+    {
+        a = 0;
+        for (auto j = 0; j < n; j++)
             a += DTX[j];
         b = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             b += DTX[j] * XD_[j][k];
         Delta_[0][k] = -2.0 * b / total_d;
         c = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             c += DTX3[j] * XD2_[j][k];
         Delta_[1][k] = -2.0 * (a - c) / total_d;
         Delta_[1][k] = fabs(Delta_[1][k]);
     }
 }
-
 
 // SAMMON_GAUSS_SEIDEL
 
@@ -2593,7 +2596,7 @@ void NLDR::pre_update_by_index_SAMMON_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, P
     auto C_ = C.get_vec();
 
     PRECISION temp = 0;
-    
+
     for (auto j = 0; j < n; j++)
     {
         newD_i[j] = 0;
@@ -2605,7 +2608,7 @@ void NLDR::pre_update_by_index_SAMMON_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, P
             //     temp = xcnew - C_[j][k];
 
             if (l != k)
-                temp = C_[i][l]- C_[j][l];
+                temp = C_[i][l] - C_[j][l];
             else
             {
                 if (i != j)
@@ -2617,7 +2620,6 @@ void NLDR::pre_update_by_index_SAMMON_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, P
         }
         newD_i[j] = sqrt(newD_i[j]);
     }
-
 }
 
 void NLDR::update_SAMMON_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
@@ -2646,7 +2648,7 @@ void NLDR::cost_SAMMON_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsi
 }
 
 void NLDR::direction_SAMMON_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU *paras, unsigned a_row,
-        PRECISION** XD_, PRECISION** XD2_, PRECISION* DTX_, PRECISION* DTX3_)
+                                         PRECISION **XD_, PRECISION **XD2_, PRECISION *DTX_, PRECISION *DTX3_)
 {
 
     auto n = paras->pts;
@@ -2664,14 +2666,17 @@ void NLDR::direction_SAMMON_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_
 
     PRECISION a, b, c, DX_ij, D_ij, eta = *(X->eta), eta_d = paras->eta_d, rho = *(X->rho), total_d = paras->total_d;
 
-    for (auto j = 0; j < n; j++){
-        for (auto k = 0; k < d; k++){
+    for (auto j = 0; j < n; j++)
+    {
+        for (auto k = 0; k < d; k++)
+        {
             XD_[j][k] = C_[i][k] - C_[j][k];
             XD2_[j][k] = XD_[j][k] * XD_[j][k];
         }
     }
 
-    for (auto j = 0; j < i; j++){
+    for (auto j = 0; j < i; j++)
+    {
         DX_ij = DX(i, j);
         D_ij = D(i, j);
         if (DX_ij > 1e-8 && D_ij > 1e-8)
@@ -2689,7 +2694,8 @@ void NLDR::direction_SAMMON_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_
     DTX_[i] = 0;
     DTX3_[i] = 0;
 
-    for (auto j = i + 1; j < n; j++){
+    for (auto j = i + 1; j < n; j++)
+    {
         DX_ij = DX(j, i);
         D_ij = D(j, i);
         if (DX_ij > 1e-8 && D_ij > 1e-8)
@@ -2704,16 +2710,17 @@ void NLDR::direction_SAMMON_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_
         }
     }
 
-    for (auto k = 0; k < d; k++){
-        a = 0; 
-        for(auto j = 0; j < n; j++)
+    for (auto k = 0; k < d; k++)
+    {
+        a = 0;
+        for (auto j = 0; j < n; j++)
             a += DTX_[j];
         b = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             b += DTX_[j] * XD_[j][k];
         Delta_[0][k] = -2.0 * b / total_d;
         c = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             c += DTX3_[j] * XD2_[j][k];
         Delta_[1][k] = -2.0 * (a - c) / total_d;
         Delta_[1][k] = fabs(Delta_[1][k]);
@@ -2742,10 +2749,10 @@ void NLDR::update_SAMMON_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
     auto Delta_ = Dir->Delta->get_vec();
 
-    for(auto i = 0; i < n; i++)
+    for (auto i = 0; i < n; i++)
     {
         direction_SAMMON_GAUSS_SEIDEL(X, Dir, paras, i, XD_, XD2_, DTX_, DTX3_);
-        for(auto k = 0; k < d; k++)
+        for (auto k = 0; k < d; k++)
         {
             Dir->activated_coo = k;
             slope = -Delta_[0][k] * Delta_[0][k] / Delta_[1][k];
@@ -2755,10 +2762,9 @@ void NLDR::update_SAMMON_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
     centralize(*X->Cor);
     e = (f_pre - f) / f;
     std::cout << "stress value : " << f << '\n';
-    std::cout << "rel error : " << e << '\n' << '\n';
+    std::cout << "rel error : " << e << '\n'
+              << '\n';
 }
-
-
 
 /****************************************SAMMON******************************************/
 /****************************************CCA*********************************************/
@@ -2772,7 +2778,8 @@ PRECISION NLDR::compute_lambda(NLDR_Var *X, NLDR_Paras *Paras)
 
     PRECISION **DX_ = new PRECISION *[n];
     PRECISION **D_ = new PRECISION *[n];
-    for (auto i = 0; i < n; i++){
+    for (auto i = 0; i < n; i++)
+    {
         DX_[i] = DX[i];
         D_[i] = D[i];
     }
@@ -2785,9 +2792,8 @@ PRECISION NLDR::compute_lambda(NLDR_Var *X, NLDR_Paras *Paras)
         for (auto j = i + 1; j < n; j++)
             if (lambda < (DX_[j][i] - D_[j][i]))
                 lambda = (DX_[j][i] - D_[j][i]) / 2.0;
-        //Efficient row scan
+        // Efficient row scan
     }
-        
 
     delete[] DX_;
     delete[] D_;
@@ -2806,7 +2812,7 @@ PRECISION NLDR::CCA_stress_by_distance(NLDR_Var *X, NLDR_Paras *Paras)
     PRECISION temp = 0;
     PRECISION stress = 0;
     PRECISION c_l = Paras->lambda[(*Paras->iter)];
-    //PRECISION c_l = Paras->cur_lambda;
+    // PRECISION c_l = Paras->cur_lambda;
 
     for (auto i = 0; i < n; i++)
     {
@@ -2859,7 +2865,7 @@ void NLDR::CCA_stress_by_index(NLDR_Var *X, PRECISION &stress, NLDR_Paras *Paras
     unsigned dim = Paras->dim;
 
     PRECISION c_l = Paras->lambda[(*Paras->iter) / dim];
-    //PRECISION c_l = Paras->cur_lambda;
+    // PRECISION c_l = Paras->cur_lambda;
 
     for (auto j = 0; j < i; j++)
     {
@@ -2932,7 +2938,7 @@ void NLDR::compute_BX_CCA(NLDR_Var *X, NLDR_Paras *Paras)
         for (auto j = 0; j < i; j++)
             if (DX_i[j] != 0)
             {
-                
+
                 BX_i[j] = -D_i[j] / DX_i[j] * exp(-DX_i[j] / Paras->lambda[*Paras->iter]);
 
                 row_sum[i] += BX_i[j];
@@ -2986,14 +2992,15 @@ void NLDR::update_cor_by_BX_CCA(NLDR_Var *X, NLDR_Paras *Paras)
     auto A = Paras->A->get_vec();
     memset(A, 0, n * dim * sizeof(PRECISION));
     for (auto i = 0; i < n; i++)
-        for (auto k = 0; k < dim; k++){
+        for (auto k = 0; k < dim; k++)
+        {
             for (auto j = 0; j <= i; j++)
                 A[i * dim + k] += BX(i, j) * XC_[j][k];
             for (auto j = i + 1; j < n; j++)
                 A[i * dim + k] += BX(j, i) * XC_[j][k];
             // Efficient scan. (using operator () that converts the indices will bring in multiple conversions and if-check's)
         }
-            
+
     for (auto i = 0; i < n; i++)
         for (auto k = 0; k < dim; k++)
         {
@@ -3116,20 +3123,21 @@ void NLDR::direction_CCA_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
         for (auto k = 0; k < dim; k++)
         {
             DeltaX_[i][k] = 0;
-            for (auto j = 0; j < i; j++){
+            for (auto j = 0; j < i; j++)
+            {
                 D_ij = D(i, j);
                 DX_ij = DX(i, j);
                 if (DX_ij > 1e-8 && D_ij > 1e-8)
                     DeltaX_[i][k] += (D_ij - DX_ij) / DX_ij * (CX_[i][k] - CX_[j][k]) * (2.0 + (D_ij - DX_ij) / lambda) * exp(-DX_ij / lambda);
             }
 
-            for (auto j = i + 1; j < n; j++){
+            for (auto j = i + 1; j < n; j++)
+            {
                 D_ij = D(j, i);
                 DX_ij = DX(j, i);
                 if (DX_ij > 1e-8 && D_ij > 1e-8)
                     DeltaX_[i][k] += (D_ij - DX_ij) / DX_ij * (CX_[i][k] - CX_[j][k]) * (2.0 + (D_ij - DX_ij) / lambda) * exp(-DX_ij / lambda);
             }
-
         }
 }
 
@@ -3139,10 +3147,9 @@ void NLDR::direction_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
 
-
     if (Dir->activated_coo != 0)
         return;
-    
+
     auto n = X->Cor->get_row();
     auto d = X->Cor->get_col();
     auto C_ = X->Cor->get_vec();
@@ -3166,8 +3173,10 @@ void NLDR::direction_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
     PRECISION a, b, c, DX_ij, D_ij, eta = *(X->eta), eta_d = paras->eta_d, rho = *(X->rho), total_d = paras->total_d;
 
-    for (auto j = 0; j < n; j++){
-        for (auto k = 0; k < d; k++){
+    for (auto j = 0; j < n; j++)
+    {
+        for (auto k = 0; k < d; k++)
+        {
             XD_[j][k] = C_[i][k] - C_[j][k];
             XD2_[j][k] = XD_[j][k] * XD_[j][k];
         }
@@ -3181,44 +3190,45 @@ void NLDR::direction_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
         DPJ[j] = sqrt(DPJ[j]);
     }
 
-    for (auto j = 0; j < n; j++){
+    for (auto j = 0; j < n; j++)
+    {
         DQ[j] = D(j, i) - DPJ[j];
-        if (c_l < - DQ[j])
+        if (c_l < -DQ[j])
             c_l = -DQ[j];
     }
 
     for (auto j = 0; j < n; j++)
         DR[j] = (2 + DQ[j] / c_l) * exp(-D(j, i) / c_l);
 
-    for(auto j = 0; j < n; j++)
+    for (auto j = 0; j < n; j++)
         if (fabs(DPJ[j]) > 1e-7)
             DQ[j] *= (DR[j] / DPJ[j]);
         else
             DQ[j] = 0;
-    
-    for(auto k = 0; k < d; k++)
+
+    for (auto k = 0; k < d; k++)
     {
         Delta_[0][k] = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             Delta_[0][k] -= XD_[j][k] * DQ[j];
     }
 
-    for(auto j = 0; j < n; j++){
+    for (auto j = 0; j < n; j++)
+    {
         D_ij = D(j, i);
-        if(fabs(DPJ[j]) > 1e-11)
-            DR[j] = (DPJ[j] * DPJ[j] *(2 * D_ij + 3 * c_l - DPJ[j]) - (DPJ[j] + c_l) * D_ij * (D_ij + 2 * c_l)) / DPJ[j] / DPJ[j] / DPJ[j] / c_l / c_l * exp(-D_ij / c_l);
+        if (fabs(DPJ[j]) > 1e-11)
+            DR[j] = (DPJ[j] * DPJ[j] * (2 * D_ij + 3 * c_l - DPJ[j]) - (DPJ[j] + c_l) * D_ij * (D_ij + 2 * c_l)) / DPJ[j] / DPJ[j] / DPJ[j] / c_l / c_l * exp(-D_ij / c_l);
         else
             DR[j] = 0;
     }
-    for(auto k = 0; k < d; k++)
+    for (auto k = 0; k < d; k++)
     {
         Delta_[1][k] = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             Delta_[1][k] -= (DQ[j] + XD2_[j][k] * DR[j]);
         Delta_[1][k] = fabs(Delta_[1][k]);
     }
 }
-
 
 // CCA_GAUSS_SEIDEL
 
@@ -3247,7 +3257,7 @@ void NLDR::pre_update_by_index_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, PREC
     auto C_ = C.get_vec();
 
     PRECISION temp = 0;
-    
+
     for (auto j = 0; j < n; j++)
     {
         newD_i[j] = 0;
@@ -3259,7 +3269,7 @@ void NLDR::pre_update_by_index_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, PREC
             //     temp = xcnew - C_[j][k];
 
             if (l != k)
-                temp = C_[i][l]- C_[j][l];
+                temp = C_[i][l] - C_[j][l];
             else
             {
                 if (i != j)
@@ -3271,7 +3281,6 @@ void NLDR::pre_update_by_index_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, PREC
         }
         newD_i[j] = sqrt(newD_i[j]);
     }
-
 }
 
 void NLDR::update_CCA_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
@@ -3300,7 +3309,7 @@ void NLDR::cost_CCA_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigne
 }
 
 void NLDR::direction_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU *paras, unsigned a_row,
-        PRECISION** XD_, PRECISION** XD2_, PRECISION* DPJ_, PRECISION* DQ_, PRECISION* DR_)
+                                      PRECISION **XD_, PRECISION **XD2_, PRECISION *DPJ_, PRECISION *DQ_, PRECISION *DR_)
 {
 
     auto n = paras->pts;
@@ -3319,8 +3328,10 @@ void NLDR::direction_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU
 
     PRECISION a, b, c, DX_ij, D_ij, eta = *(X->eta), eta_d = paras->eta_d, rho = *(X->rho), total_d = paras->total_d;
 
-    for (auto j = 0; j < n; j++){
-        for (auto k = 0; k < d; k++){
+    for (auto j = 0; j < n; j++)
+    {
+        for (auto k = 0; k < d; k++)
+        {
             XD_[j][k] = C_[i][k] - C_[j][k];
             XD2_[j][k] = XD_[j][k] * XD_[j][k];
         }
@@ -3334,19 +3345,21 @@ void NLDR::direction_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU
         DPJ_[j] = sqrt(DPJ_[j]);
     }
 
-    for (auto j = 0; j < i; j++){
+    for (auto j = 0; j < i; j++)
+    {
         DQ_[j] = D(i, j) - DPJ_[j];
-        if (c_l < - DQ_[j])
+        if (c_l < -DQ_[j])
             c_l = -DQ_[j];
     }
 
-    DQ_[i] = - DPJ_[i];
-    if (c_l < - DQ_[i])
+    DQ_[i] = -DPJ_[i];
+    if (c_l < -DQ_[i])
         c_l = -DQ_[i];
 
-    for (auto j = i + 1; j < n; j++){
+    for (auto j = i + 1; j < n; j++)
+    {
         DQ_[j] = D(j, i) - DPJ_[j];
-        if (c_l < - DQ_[j])
+        if (c_l < -DQ_[j])
             c_l = -DQ_[j];
     }
 
@@ -3358,23 +3371,24 @@ void NLDR::direction_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU
     for (auto j = i + 1; j < n; j++)
         DR_[j] = (2 + DQ_[j] / c_l) * exp(-D(j, i) / c_l);
 
-    for(auto j = 0; j < n; j++)
+    for (auto j = 0; j < n; j++)
         if (fabs(DPJ_[j]) > 1e-7)
             DQ_[j] *= (DR_[j] / DPJ_[j]);
         else
             DQ_[j] = 0;
-    
-    for(auto k = 0; k < d; k++)
+
+    for (auto k = 0; k < d; k++)
     {
         Delta_[0][k] = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             Delta_[0][k] -= XD_[j][k] * DQ_[j];
     }
 
-    for(auto j = 0; j < i; j++){
+    for (auto j = 0; j < i; j++)
+    {
         D_ij = D(i, j);
-        if(fabs(DPJ_[j]) > 1e-11)
-            DR_[j] = (DPJ_[j] * DPJ_[j] *(2 * D_ij + 3 * c_l - DPJ_[j]) - (DPJ_[j] + c_l) * D_ij * (D_ij + 2 * c_l)) / DPJ_[j] / DPJ_[j] / DPJ_[j] / c_l / c_l * exp(-D_ij / c_l);
+        if (fabs(DPJ_[j]) > 1e-11)
+            DR_[j] = (DPJ_[j] * DPJ_[j] * (2 * D_ij + 3 * c_l - DPJ_[j]) - (DPJ_[j] + c_l) * D_ij * (D_ij + 2 * c_l)) / DPJ_[j] / DPJ_[j] / DPJ_[j] / c_l / c_l * exp(-D_ij / c_l);
         else
             DR_[j] = 0;
     }
@@ -3382,18 +3396,19 @@ void NLDR::direction_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU
     // DPJ[i] = 0;
     DR_[i] = 0;
 
-    for(auto j = i + 1; j < n; j++){
+    for (auto j = i + 1; j < n; j++)
+    {
         D_ij = D(j, i);
-        if(fabs(DPJ_[j]) > 1e-11)
-            DR_[j] = (DPJ_[j] * DPJ_[j] *(2 * D_ij + 3 * c_l - DPJ_[j]) - (DPJ_[j] + c_l) * D_ij * (D_ij + 2 * c_l)) / DPJ_[j] / DPJ_[j] / DPJ_[j] / c_l / c_l * exp(-D_ij / c_l);
+        if (fabs(DPJ_[j]) > 1e-11)
+            DR_[j] = (DPJ_[j] * DPJ_[j] * (2 * D_ij + 3 * c_l - DPJ_[j]) - (DPJ_[j] + c_l) * D_ij * (D_ij + 2 * c_l)) / DPJ_[j] / DPJ_[j] / DPJ_[j] / c_l / c_l * exp(-D_ij / c_l);
         else
             DR_[j] = 0;
     }
 
-    for(auto k = 0; k < d; k++)
+    for (auto k = 0; k < d; k++)
     {
         Delta_[1][k] = 0;
-        for(auto j = 0; j < n; j++)
+        for (auto j = 0; j < n; j++)
             Delta_[1][k] -= (DQ_[j] + XD2_[j][k] * DR_[j]);
         Delta_[1][k] = fabs(Delta_[1][k]);
     }
@@ -3421,10 +3436,10 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
     auto Delta_ = Dir->Delta->get_vec();
 
-    for(auto i = 0; i < n; i++)
+    for (auto i = 0; i < n; i++)
     {
         direction_CCA_GAUSS_SEIDEL(X, Dir, paras, i, XD_, XD2_, DPJ_, DQ_, DR_);
-        for(auto k = 0; k < d; k++)
+        for (auto k = 0; k < d; k++)
         {
             Dir->activated_coo = k;
             slope = -Delta_[0][k] * Delta_[0][k] / Delta_[1][k];
@@ -3436,11 +3451,9 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
     CCA_stress_by_distance_lambda(X->Dis, paras->Dis, *paras->cur_lambda);
     e = (f_pre - f) / f;
     std::cout << "stress value : " << f << '\n';
-    std::cout << "rel error : " << e << '\n' << '\n';
+    std::cout << "rel error : " << e << '\n'
+              << '\n';
 }
-
-
-
 
 /****************************************CCA*********************************************/
 
