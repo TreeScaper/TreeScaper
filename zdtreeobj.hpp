@@ -515,6 +515,18 @@ public:
 		}
 	};
 
+	void print_Bipart_List(ostream &fout, int *indices, int num_bipart)
+	{
+		int tree_num = sb2t_mat->get_col();
+		int ind = -1;
+		for (int i = 0; i < num_bipart; i++)
+		{
+			ind = indices[i];
+			(*Bipart)[ind].print_BitString(fout);
+			fout << ' ' << ((PRECISION)sb2t_mat->get_RCS_ind_c_ptr(ind)->get_size()) / tree_num << '\n';
+		}
+	};
+
 	void print_Bipart2Tree_Matrix(ostream &fout, SparseMatrixOutputType smtype) { (*sb2t_mat).print(fout, smtype); };
 
 	void print_Covariance_Matrix(ostream &fout) { (*cov_mat).print(fout); };
