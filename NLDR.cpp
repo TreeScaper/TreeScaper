@@ -910,7 +910,7 @@ void NLDR::MAJORIZATION(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix
     std::cout << "\tInitial Optim_Iter object...\n";
 
     Optim_KwArg kws_iter(OPTIM_ITERATION, 1);
-    kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_MAJORIZATION, nullOptimFunc, nullOptimFunc);
+    kws_iter.init_iter_routine((void *)nullOptimFunc, (void *)nullOptimFunc, (void *)update_MAJORIZATION, (void *)nullOptimFunc, (void *)nullOptimFunc);
     kws_iter.init_iter_variable(&it, &ti, &err, &diff, (void *)&X, &stressX, nullptr, nullptr, &nD, nullptr);
     kws_iter.set_carg(&nldr_paras, 0);
     Optim_Iter o_iter(&kws_iter);
@@ -970,7 +970,7 @@ void NLDR::STOCHASTIC(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<P
     Optim_Computed_StepSize o_stepsize(alpha);
 
     Optim_KwArg kws_iter(OPTIM_ITERATION, 1);
-    kws_iter.init_iter_routine(nullOptimFunc, direction_STOCHASTIC, update_STOCHASTIC, nullOptimFunc, nullOptimFunc);
+    kws_iter.init_iter_routine((void *)nullOptimFunc, (void *)direction_STOCHASTIC, (void *)update_STOCHASTIC, (void *)nullOptimFunc, (void *)nullOptimFunc);
     kws_iter.init_iter_variable(&it, &ti, &err, &diff, (void *)&X, &stressX, (void *)&DirX, nullptr, &nD, &stepsize);
     kws_iter.set_carg(&nldr_paras, 0);
     Optim_Iter o_iter(&kws_iter);
@@ -1031,7 +1031,7 @@ void NLDR::METROPOLIS(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<P
     bool accepted = true;
 
     Optim_KwArg kws_iter(OPTIM_ITERATION, 1);
-    kws_iter.init_iter_routine(stress, direction_METROPOLIS, update_METROPOLIS, nullOptimFunc, NLDR_Var_Copy);
+    kws_iter.init_iter_routine((void *)stress, (void *)direction_METROPOLIS, (void *)update_METROPOLIS, (void *)nullOptimFunc, (void *)NLDR_Var_Copy);
     kws_iter.init_iter_variable(&it, &ti, &err, &diff, (void *)&X, &stressX, (void *)&DirX,
                                 nullptr, &nD, &stepsize, (void *)&Y, &stressY, &accepted);
     kws_iter.set_carg(&nldr_paras, 0);
@@ -1136,29 +1136,29 @@ void NLDR::GAUSS_SEIDEL(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix
 
     if (stress_type == KRUSKAL1)
     {
-        kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_KRUSKAL1_GAUSS_SEIDEL, nullOptimFunc, nullOptimFunc);
-        kws_wolfe.init_wolfe1st_routine(cost_KRUSKAL1_GAUSS_SEIDEL_line_search, update_KRUSKAL1_GAUSS_SEIDEL_line_search, copy_GAUSS_SEIDEL_line_search);
+        kws_iter.init_iter_routine((void *)nullOptimFunc, (void *)nullOptimFunc, (void *)update_KRUSKAL1_GAUSS_SEIDEL, (void *)nullOptimFunc, (void *)nullOptimFunc);
+        kws_wolfe.init_wolfe1st_routine((void *)cost_KRUSKAL1_GAUSS_SEIDEL_line_search, (void *)update_KRUSKAL1_GAUSS_SEIDEL_line_search, (void *)copy_GAUSS_SEIDEL_line_search);
         stressX = KRUSKAL1_stress_by_parameter(&X);
         stressY = stressX;
     }
     else if (stress_type == NORMALIZED)
     {
-        kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_NORMALIZED_GAUSS_SEIDEL, nullOptimFunc, nullOptimFunc);
-        kws_wolfe.init_wolfe1st_routine(cost_NORMALIZED_GAUSS_SEIDEL_line_search, update_NORMALIZED_GAUSS_SEIDEL_line_search, copy_GAUSS_SEIDEL_line_search);
+        kws_iter.init_iter_routine((void *)nullOptimFunc, (void *)nullOptimFunc, (void *)update_NORMALIZED_GAUSS_SEIDEL, (void *)nullOptimFunc, (void *)nullOptimFunc);
+        kws_wolfe.init_wolfe1st_routine((void *)cost_NORMALIZED_GAUSS_SEIDEL_line_search, (void *)update_NORMALIZED_GAUSS_SEIDEL_line_search, (void *)copy_GAUSS_SEIDEL_line_search);
         stressX = NORMALIZED_stress_by_parameter(&X);
         stressY = stressX;
     }
     else if (stress_type == SAMMON)
     {
-        kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_SAMMON_GAUSS_SEIDEL, nullOptimFunc, nullOptimFunc);
-        kws_wolfe.init_wolfe1st_routine(cost_SAMMON_GAUSS_SEIDEL_line_search, update_SAMMON_GAUSS_SEIDEL_line_search, copy_GAUSS_SEIDEL_line_search);
+        kws_iter.init_iter_routine((void *)nullOptimFunc, (void *)nullOptimFunc, (void *)update_SAMMON_GAUSS_SEIDEL, (void *)nullOptimFunc, (void *)nullOptimFunc);
+        kws_wolfe.init_wolfe1st_routine((void *)cost_SAMMON_GAUSS_SEIDEL_line_search, (void *)update_SAMMON_GAUSS_SEIDEL_line_search, (void *)copy_GAUSS_SEIDEL_line_search);
         stressX = SAMMON_stress_by_distance(&X, Dis, nldr_paras.total_d);
         stressY = stressX;
     }
     else if (stress_type == CCA)
     {
-        kws_iter.init_iter_routine(nullOptimFunc, nullOptimFunc, update_CCA_GAUSS_SEIDEL, nullOptimFunc, nullOptimFunc);
-        kws_wolfe.init_wolfe1st_routine(cost_CCA_GAUSS_SEIDEL_line_search, update_CCA_GAUSS_SEIDEL_line_search, copy_GAUSS_SEIDEL_line_search);
+        kws_iter.init_iter_routine((void *)nullOptimFunc, (void *)nullOptimFunc, (void *)update_CCA_GAUSS_SEIDEL, (void *)nullOptimFunc, (void *)nullOptimFunc);
+        kws_wolfe.init_wolfe1st_routine((void *)cost_CCA_GAUSS_SEIDEL_line_search, (void *)update_CCA_GAUSS_SEIDEL_line_search, (void *)copy_GAUSS_SEIDEL_line_search);
         nldr_paras.lambda = lambda;
         nldr_paras.cur_lambda = lambda;
         stressX = CCA_stress_by_distance_lambda(&DX, Dis, *lambda);
