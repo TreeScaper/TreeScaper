@@ -91,6 +91,30 @@ public:
 
 	~Array() { delete[] vec; };
 
+	friend Array<T> join(const Array<T> &lhs, const Array<T> &rhs)
+	{
+		T *data = new T[lhs.size + rhs.size];
+		for (auto i = 0; i < lhs.size; i++)
+			data[i] = lhs(i);
+		for (auto i = 0; i < rhs.size; i++)
+			data[i + lhs.size] = rhs(i);
+		return Array<T>(lhs.size + rhs.size, data);
+	}
+
+	friend Array<T> duplicate(int n, const Array<T> &src, bool entrywise = false)
+	{
+		T *data = new T[n * src.size];
+		if (entrywise)
+			for (auto i = 0; i < src.size; i++)
+				for (auto j = 0; j < n; j++)
+					data[i * n + j] = src(i);
+		else
+			for (auto i = 0; i < n; i++)
+				for (auto j = 0; j < src.size; j++)
+					data[i * src.size + j] = src(j);
+		return Array<T>(n * src.size, data);
+	}
+
 	void push(const T &ele)
 	{
 		if (size == max_size)
@@ -154,6 +178,16 @@ public:
 		size--;
 		return vec[size];
 	};
+
+	T pop(int index)
+	{
+		assert(index >= size);
+		auto val = vec[index];
+		for (int i = index + 1; i < size; i++)
+			vec[i - 1] = vec[i];
+		size--;
+		return val;
+	}
 
 	T *get_vec() const { return vec; };
 
