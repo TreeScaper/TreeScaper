@@ -286,7 +286,7 @@ namespace OptimLib
 
         PRECISION stepsize();
     };
-    
+
     class Optim_Iter
     {
         typedef void (*Cost)(Optim_KwArg &, unsigned int *ind);
@@ -301,7 +301,7 @@ namespace OptimLib
         unsigned d_ind[3] = {4, 6, 8};                   // Get update direction: x, Delta, n
         unsigned u_ip_ind[5] = {4, 6, 9, 5, 2};          // Inplace update: x, Delta, t, f, e
         unsigned u_nip_ind[7] = {4, 6, 9, 10, 5, 11, 2}; // Inplace update: x, Delta, t, y, fx, fy, e
-        unsigned sl_ind[3] = {4, 6, 7};                  //Compute slope: x, Delta, s
+        unsigned sl_ind[3] = {4, 6, 7};                  // Compute slope: x, Delta, s
         unsigned cp_ind[4] = {4, 5, 10, 11};             // Copy x to y : x, fx, y, fy
         unsigned cp_ind_rev[4] = {10, 11, 4, 5};         // Copy y to x : y, fy, x, fx
 
@@ -449,11 +449,13 @@ namespace OptimLib
 
         void one_step();
     };
-    class Optim_Gauss_Seidel_Solver : public Optim_Solver{
+    class Optim_Gauss_Seidel_Solver : public Optim_Solver
+    {
     private:
         typedef bool (*Loop)(Optim_KwArg &);
         Loop Loop_Check;
         unsigned *inner_iter;
+
     public:
         Optim_Gauss_Seidel_Solver(Optim_Paras *pa, Optim_Iter *it, Optim_StepSize *s, Loop loop_check, unsigned *loop_iter)
             : Optim_Solver(pa, it, s)
