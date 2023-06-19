@@ -1,7 +1,7 @@
-
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <algorithm>
 #include "zdtree.hpp"
 
 using std::string;
@@ -33,7 +33,7 @@ void TaxonList::push(string item, bool flag_str_format)
 		i++;
 	}
 
-	//Skip space.
+	// Skip space.
 
 	if (i == item.size())
 	{
@@ -60,8 +60,8 @@ void TaxonList::push(string item, bool flag_str_format)
 	}
 }
 
-bool TaxonList::cmp_taxa(string &tree, bool* barray)
-{// Compare the taxa found in tree string with the existing taxon list. Insert new taxon to the list if found. Report absent taxa.
+bool TaxonList::cmp_taxa(string &tree, bool *barray)
+{ // Compare the taxa found in tree string with the existing taxon list. Insert new taxon to the list if found. Report absent taxa.
 	string taxon;
 	bool same_taxa = true;
 	size_t i = 0;
@@ -75,7 +75,7 @@ bool TaxonList::cmp_taxa(string &tree, bool* barray)
 	{
 		taxon.clear();
 		if (isspace(ch) || ch == ',' || ch == '(' || ch == ')')
-		{ //skip spaces and commas and parentheses
+		{ // skip spaces and commas and parentheses
 			if (ch == ')')
 				flag_internal = true;
 			else if (ch == '(' || ch == ',')
@@ -83,20 +83,20 @@ bool TaxonList::cmp_taxa(string &tree, bool* barray)
 			ch = tree[++i];
 		}
 		else if (ch == ':')
-		{ //skip weights
+		{ // skip weights
 			i++;
 			ch = read_sequence(tree, i, taxon);
 			flag_internal = false;
 		}
 		else
-		{ //read taxa
+		{ // read taxa
 			ch = read_sequence(tree, i, taxon);
 			if (!flag_internal)
 			{
 				auto it = this->Taxon2Ind.find(taxon);
 				if (it == Taxon2Ind.end())
 				{
-					std::cout << "Warning: New taxon "<< taxon <<" encountered. Inserting it to the taxon list. The tree set do not share a common leaf set.\n";
+					std::cout << "Warning: New taxon " << taxon << " encountered. Inserting it to the taxon list. The tree set do not share a common leaf set.\n";
 					Ind2Taxon.push(taxon);
 					Taxon2Ind.insert(std::pair<string, int>(taxon, Ind2Taxon.get_size() - 1));
 					barray[size] = true;
@@ -123,8 +123,8 @@ bool TaxonList::cmp_taxa(string &tree, bool* barray)
 	return same_taxa;
 }
 
-bool TaxonList::report_missing_taxon(size_t tree_id, string &tree, bool* barray, std::ostream& out)
-{// Assuming the taxon list is complete. Compare the taxa found in tree string with the list and report the absent taxa.
+bool TaxonList::report_missing_taxon(size_t tree_id, string &tree, bool *barray, std::ostream &out)
+{ // Assuming the taxon list is complete. Compare the taxa found in tree string with the list and report the absent taxa.
 	string taxon;
 	size_t i = 0;
 	for (i = 0; i < size; i++)
@@ -138,7 +138,7 @@ bool TaxonList::report_missing_taxon(size_t tree_id, string &tree, bool* barray,
 	{
 		taxon.clear();
 		if (isspace(ch) || ch == ',' || ch == '(' || ch == ')')
-		{ //skip spaces and commas and parentheses
+		{ // skip spaces and commas and parentheses
 			if (ch == ')')
 				flag_internal = true;
 			else if (ch == '(' || ch == ',')
@@ -146,20 +146,20 @@ bool TaxonList::report_missing_taxon(size_t tree_id, string &tree, bool* barray,
 			ch = tree[++i];
 		}
 		else if (ch == ':')
-		{ //skip weights
+		{ // skip weights
 			i++;
 			ch = read_sequence(tree, i, taxon);
 			flag_internal = false;
 		}
 		else
-		{ //read taxa
+		{ // read taxa
 			ch = read_sequence(tree, i, taxon);
 			if (!flag_internal)
 			{
 				auto it = this->Taxon2Ind.find(taxon);
 				if (it == Taxon2Ind.end())
 				{
-					std::cout << "Error: New taxon "<< taxon <<" encountered. Taxon list is not complete. Exit the process.\n";
+					std::cout << "Error: New taxon " << taxon << " encountered. Taxon list is not complete. Exit the process.\n";
 					return false;
 				}
 				else
@@ -218,15 +218,13 @@ size_t TaxonList::ReadTaxa(std::string fname)
 		}
 		string taxon;
 
-
-
 		size_t i = temp.find_first_of('(');
 		char ch = temp[i];
 		while (ch != ';' && ch != '\0')
 		{
 			taxon.clear();
 			if (isspace(ch) || ch == ',' || ch == '(' || ch == ')')
-			{ //skip spaces and commas and parentheses
+			{ // skip spaces and commas and parentheses
 				if (ch == ')')
 					flag_internal = true;
 				else if (ch == '(' || ch == ',')
@@ -234,13 +232,13 @@ size_t TaxonList::ReadTaxa(std::string fname)
 				ch = temp[++i];
 			}
 			else if (ch == ':')
-			{ //skip weights
+			{ // skip weights
 				i++;
 				ch = read_sequence(temp, i, taxon);
 				flag_internal = false;
 			}
 			else
-			{ //read taxa
+			{ // read taxa
 				ch = read_sequence(temp, i, taxon);
 				if (!flag_internal)
 				{
@@ -298,10 +296,10 @@ bool TaxonList::ScanTaxa(std::string fname, size_t pos, std::string outname)
 	size_t tree_id = 0;
 
 	string tree;
-	while(!fin.eof())
+	while (!fin.eof())
 	{
 		std::getline(fin, tree);
-		if(!tree.empty())
+		if (!tree.empty())
 			same_taxa = same_taxa && cmp_taxa(tree, barray);
 	}
 
@@ -314,17 +312,18 @@ bool TaxonList::ScanTaxa(std::string fname, size_t pos, std::string outname)
 		// Output taxon list;
 		fout << "Translate:";
 		for (auto i = 0; i < size; i++)
-			fout << '\n' << i + 1 << ' ' << Ind2Taxon[i];
+			fout << '\n'
+				 << i + 1 << ' ' << Ind2Taxon[i];
 		fout << ";\n";
-		
+
 		// Report missing taxa
 		fin.open(fname);
 		fin.seekg(pos, std::ios_base::beg);
 		fout << "Trees with missing taxa:\n";
-		while(!fin.eof())
+		while (!fin.eof())
 		{
 			std::getline(fin, tree);
-			if(!tree.empty())
+			if (!tree.empty())
 				report_missing_taxon(tree_id++, tree, barray, fout);
 		}
 		fout.close();
@@ -338,7 +337,7 @@ bool TaxonList::ScanTaxa(std::string fname, size_t pos, std::string outname)
 	return same_taxa;
 }
 
-//TreeArray::TreeArray(string& tree, TaxonList& taxon_list, Array<int>& active_levels,
+// TreeArray::TreeArray(string& tree, TaxonList& taxon_list, Array<int>& active_levels,
 //	Array<int>& unlabeled, Array2D<double>& w_temp,
 //	int flag_label, bool ISROOTED) {
 //	issorted = false;
@@ -488,7 +487,7 @@ bool TaxonList::ScanTaxa(std::string fname, size_t pos, std::string outname)
 //	this->label_internal_node(active_levels, unlabeled, w_temp);
 //
 //	this->release_level();
-//}
+// }
 
 TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_levels,
 					 Array<int> &unlabeled, int flag_label, bool ISROOTED, bool ISWEIGHTED)
@@ -497,51 +496,61 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 	weights = nullptr;
 	t2b = nullptr;
 	edges = nullptr;
+	this->leafsize = 0;
 
 	issorted = false;
-	int leaf_size = taxon_list.size;
+	// int leaf_size = taxon_list.size;
+	int edgesize = std::count(tree.begin(), tree.end(), ':');
 	bool flag_internal = false;
 	char ch;
 
-	levels = new Array<Array<int>>(0, 2 * leaf_size - 3);
+	int leaf_index = -1;
+	int max_leaf_index = -1;
 
-	Array<Array<double>> w_temp = Array<Array<double>>(0, 2 * leaf_size - 3);
+	levels = new Array<Array<int>>(0, edgesize);
+	Array<Array<double>> w_temp = Array<Array<double>>(0, edgesize);
+	// The usage of edgesize reduce the memory of the readding process, but it need a std::count.
+	// For faster performance with identical leaf set, edgesize can be bounded and therefore
+	// replaced by the 2 l - 3, where l is the size of the shared leaf set.
+	// Note that it is not recommended to drop the initialization of levels. Dynamic array
+	// in lower level read-and-writes can be problematic.
+
 	active_levels.clean();
 	unlabeled.clean();
 
 	int current_ind = -1;
 	string temp;
 
-	//darray<int>* levels_back_ptr;
-	//darray<int>* levels_cur_ptr;
+	// darray<int>* levels_back_ptr;
+	// darray<int>* levels_cur_ptr;
 
-	//Build dummy level.
+	// Build dummy level.
 
 	levels->push(Array<int>(0, 10));
 	unlabeled.push(0);
-	//levels_back_ptr = levels.back_container();
-	levels->back().push(current_ind); //parent level.
-	levels->back().push(-1);		  //parent node.
+	// levels_back_ptr = levels.back_container();
+	levels->back().push(current_ind); // parent level.
+	levels->back().push(-1);		  // parent node.
 
-	levels->back().push(-1); //dummy root.
+	levels->back().push(-1); // dummy root.
 	unlabeled.back()--;
 	current_ind++;
 
-	w_temp.push(Array<double>(0, 10)); //build the similar array for weights.
-									   //Note that weights array do not have the first two columns for locating parent node.
+	w_temp.push(Array<double>(0, 10)); // build the similar array for weights.
+									   // Note that weights array do not have the first two columns for locating parent node.
 
-	//Build first level.
+	// Build first level.
 
 	levels->push(Array<int>(0, 10));
 	unlabeled.push(0);
-	levels->back().push(current_ind);							  //parent level.
-	levels->back().push(levels->ele(current_ind).get_size() - 1); //parent node.
+	levels->back().push(current_ind);							  // parent level.
+	levels->back().push(levels->ele(current_ind).get_size() - 1); // parent node.
 
 	w_temp.push(Array<double>(0, 10));
 
 	current_ind++;
 
-	//Start scanning/
+	// Start scanning/
 
 	size_t i = tree.find_first_of('(') + 1;
 	ch = tree[i];
@@ -550,7 +559,7 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 	{
 		temp.clear();
 		if (isspace(ch))
-			ch = tree[++i]; //skip spaces
+			ch = tree[++i]; // skip spaces
 		else if (ch == ',')
 		{
 			ch = tree[++i];
@@ -559,17 +568,17 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 		else if (ch == '(')
 		{
 			levels->ele(current_ind).push(-1);
-			levels->push(Array<int>(0, 10)); //add level.
+			levels->push(Array<int>(0, 10)); // add level.
 			w_temp.push(Array<double>(0, 10));
 			unlabeled.push(0);
-			unlabeled[current_ind]--; //accumulate unlabeled point.
+			unlabeled[current_ind]--; // accumulate unlabeled point.
 
-			//levels_back_ptr = levels.back_c_ptr();
+			// levels_back_ptr = levels.back_c_ptr();
 
-			levels->back().push(current_ind);							  //parent level.
+			levels->back().push(current_ind);							  // parent level.
 			levels->back().push(levels->ele(current_ind).get_size() - 1); // parent node.
 
-			current_ind = levels->get_size() - 1; //go to the new level in the back.
+			current_ind = levels->get_size() - 1; // go to the new level in the back.
 			ch = tree[++i];
 			flag_internal = false;
 		}
@@ -594,18 +603,22 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 			else
 			{
 				ch = read_sequence(tree, i, temp);
+				this->leafsize += 1;
 				if (!flag_internal)
 				{
-					if (flag_label == 0) //labeled with integer
-						levels->ele(current_ind).push(ISROOTED ? atoi(temp.c_str()) : (atoi(temp.c_str()) - 1));
-					else if (flag_label == 1) //labeled with different normalization
-						levels->ele(current_ind).push(taxon_list.IndB2IndA[atoi(temp.c_str())]);
+					if (flag_label == 0) // labeled with integer
+						// levels->ele(current_ind).push(ISROOTED ? atoi(temp.c_str()) : (atoi(temp.c_str()) - 1));
+						leaf_index = ISROOTED ? atoi(temp.c_str()) : (atoi(temp.c_str()) - 1);
+					else if (flag_label == 1) // labeled with different normalization
+						// levels->ele(current_ind).push(taxon_list.IndB2IndA[atoi(temp.c_str())]);
+						leaf_index = taxon_list.IndB2IndA[atoi(temp.c_str())];
 					else if (flag_label == 2)
 					{ // labeled with taxon
 						string taxon(temp.c_str());
 						auto it = taxon_list.Taxon2Ind.find(taxon);
 						if (it != taxon_list.Taxon2Ind.end())
-							levels->ele(current_ind).push(it->second);
+							// levels->ele(current_ind).push(it->second);
+							leaf_index = it->second;
 						else
 						{
 							std::cout << "Error: Attempt to find taxon: ``" << taxon << "'' that is not in the leaf set.\n";
@@ -618,6 +631,9 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 						throw(1);
 					}
 
+					levels->ele(current_ind).push(leaf_index);
+					if (leaf_index > max_leaf_index)
+						max_leaf_index = leaf_index;
 					active_levels.push(current_ind);
 				}
 				flag_internal = false;
@@ -637,31 +653,31 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 
 	// Get edge size(bipartition size).
 
-	size = 0;
+	this->size = 0;
 
 	for (int i = 1; i < levels->get_size(); i++)
-		size += levels->ele(i).get_size() - 2;
+		this->size += levels->ele(i).get_size() - 2;
 
-	//When first level has only 2 nodes, their parent node can be compressed.
-	//Therefore the first level becomes 2 points connected by 1 edge.
+	// When first level has only 2 nodes, their parent node can be compressed.
+	// Therefore the first level becomes 2 points connected by 1 edge.
 	if (levels->ele(1).get_size() == 4)
-		size--;
+		this->size--;
 
 	edges = new int *[2];
-	edges[0] = new int[size]; // node far-from-leaf
-	edges[1] = new int[size]; // node close-to-leaf
+	edges[0] = new int[this->size]; // node far-from-leaf
+	edges[1] = new int[this->size]; // node close-to-leaf
 
 	if (ISWEIGHTED)
-		this->label_internal_node(active_levels, unlabeled, w_temp);
+		this->label_internal_node(active_levels, unlabeled, w_temp, max_leaf_index + 1);
 	else
-		this->label_internal_node(active_levels, unlabeled);
+		this->label_internal_node(active_levels, unlabeled, max_leaf_index + 1);
 
 	this->release_level();
 }
 
-void TreeArray::label_internal_node(Array<int> &active_levels, Array<int> &unlabeled)
+void TreeArray::label_internal_node(Array<int> &active_levels, Array<int> &unlabeled, int node_index)
 {
-	int node_index = active_levels.get_size();
+	// int node_index = active_levels.get_size();
 	int edge_index = 0;
 	int cur_level, parent_level;
 	// start labels of internal node from the number of leaves, N.
@@ -690,9 +706,9 @@ void TreeArray::label_internal_node(Array<int> &active_levels, Array<int> &unlab
 		edges[0][size - 1] = (edges[1][size - 1] == (*levels)[1][2] ? (*levels)[1][3] : (*levels)[1][2]);
 }
 
-void TreeArray::label_internal_node(Array<int> &active_levels, Array<int> &unlabeled, Array<Array<double>> &w_temp)
+void TreeArray::label_internal_node(Array<int> &active_levels, Array<int> &unlabeled, Array<Array<double>> &w_temp, int node_index)
 {
-	int node_index = active_levels.get_size();
+	// int node_index = active_levels.get_size();
 	assert(weights == nullptr);
 	weights = new Array<double>(0, this->size);
 	int edge_index = 0;
