@@ -156,16 +156,21 @@ public:
 		return num_con_edge;
 	}
 
-	void print_Consensus_Tree(std::ostream &out, int *bipart_id, PRECISION *weights, int num_edge)
-	{
-		auto tree_ll = TreeLinkedList<T>(*Trees->Full_Taxa, bipart_id, weights, num_edge, Bipart);
-		tree_ll.print_NewickStr(out, *Taxa);
-	}
+	// void print_Consensus_Tree(std::ostream &out, int *bipart_id, PRECISION *weights, int num_edge)
+	// {
+	// 	assert(Trees->issameleaf());
+	// 	auto tree_ll = TreeLinkedList<T>(*Trees->get_uniform_leafset(), bipart_id, weights, num_edge, Bipart);
+	// 	tree_ll.print_NewickStr(out, *Taxa);
+	// }
 
 	void Compute_Bipart()
 	{
+		std::cout << "-----Enter Compute_Bipart-----\n\n";
+
+
 		if (Bipart->is_empty())
 		{
+			std::cout << "Initializing bipartition set...";
 			for (int i = 0; i < Taxa->size; i++)
 			{
 				BitString<T> temp = BitString<T>(Taxa->bitstr_size, Taxa->size, i);
@@ -173,11 +178,32 @@ public:
 			}
 		}
 
-		for (int i = 0; i < n_trees; i++)
-			Trees->ele(i).compute_bitstring(Bipart);
+		if(Trees->issameleaf())
+		{
+			std::cout << "Computing bitstring of the uniform leaf set...";
+			BitString<T>* uniform_leafset = new BitString<T>(Taxa->bitstr_size, Taxa->size);
+			auto tree = Trees->ele(0);
+			auto bitstrs = *Trees->ele(0).get_t2b();
+			// for (int i = 0; i < tree.get_size(); i++)
+			// 	(*uniform_leafset) |= (*Bipart)(bitstrs(i));
+			
+			Trees->set_uniform_leafset(uniform_leafset);
+
+			for (int i = 0; i < n_trees; i++)
+				Trees->ele(i).compute_bitstring(Bipart);
+		}
+		else
+		{
+			Trees->init_leafsets();
+			for (int i = 0; i < n_trees; i++)
+				Trees->set_leafsets(i, Trees->ele(i).compute_bitstring(Bipart));
+		}
 
 		// Update unique bipartition number
 		unique_bipart = Bipart->get_size();
+
+		std::cout << "-----Leave Compute_Bipart-----\n\n";
+
 	};
 
 	void Compute_Bipart_Matrix()
@@ -188,12 +214,36 @@ public:
 			sb2t_mat = nullptr;
 		}
 
-		sb2t_mat = new SparseMatrix(unique_bipart, n_trees);
+		if (Trees->issameleaf())
+			sb2t_mat = new SparseMatrix(unique_bipart, n_trees);
+		else
+			sb2t_mat = new SparseMatrix(2 * unique_bipart, n_trees);
 
 		sb2t_mat->initialize_CCS();
 
 		for (int i = 0; i < n_trees; i++)
-			sb2t_mat->push_CCS_col(Trees->ele(i).pop_t2b(), Trees->ele(i).pop_weight());
+			if (Trees->issameleaf())
+				sb2t_mat->push_CCS_col(Trees->ele(i).pop_t2b(), Trees->ele(i).pop_weight());
+			else
+			{
+				auto bipart_lower = Trees->ele(i).pop_t2b();
+				auto bipart_upper = Trees->ele(i).pop_t2b_upper();
+
+				auto weight_lower = Trees->ele(i).pop_weight();
+
+				// pointers above will be released while existing.
+
+				auto full_treevec = new Array<size_t>(join(*bipart_lower, *bipart_upper));
+				auto full_weights = new Array<PRECISION>(duplicate(2, *weight_lower));
+
+				// pointers above will be sent to the sparse matrix and held there.
+
+				sb2t_mat->push_CCS_col(full_treevec, full_weights);
+
+				delete bipart_lower;
+				delete bipart_upper;
+				delete weight_lower;
+			}
 
 		sb2t_mat->set_RCS();
 	}
@@ -364,6 +414,12 @@ public:
 				}
 			}
 		}
+		if (!Trees->issameleaf())
+		{
+			for (auto j = 0; j < n_trees; j++)
+				for (auto i = j + 1; i < n_trees; i++)
+					(*dis_mat)(i, j) = (*dis_mat)(i, j) / 2.0;
+		}
 	}
 
 	void Compute_RF_Distance_Matrix(const Array<size_t> &sub_tree_id, Array<size_t> &bipart_id_mapping)
@@ -476,12 +532,20 @@ public:
 				}
 			}
 		}
+
+		if (!Trees->issameleaf())
+		{
+			for (auto j = 0; j < sub_col; j++)
+				for (auto i = j + 1; i < sub_col; i++)
+					(*dis_mat)(i, j) = (*dis_mat)(i, j) / 2.0;
+		}
 	};
 
 	int get_all_bipart_num() { return all_bipart; };
 	int get_unique_bipart_num() { return unique_bipart; };
 	int get_tree_set_size() { return n_trees; };
 	int get_leaf_set_size() { return n_leaves; };
+	auto get_sb2t() const {return this->sb2t_mat;}
 	SpecMat::LowerTri<PRECISION> *get_dis_mat() { return dis_mat; };
 	SpecMat::LowerTri<PRECISION> *get_cov_mat() { return cov_mat; };
 	TreeSet<T> *pop_trees()
@@ -509,7 +573,7 @@ public:
 		int ind = -1;
 		for (int i = 0; i < indices.get_size(); i++)
 		{
-			ind = indices[i];
+			ind = indices(i);
 			(*Bipart)[ind].print_BitString(fout);
 			fout << ' ' << ((PRECISION)sb2t_mat->get_RCS_ind_c_ptr(ind)->get_size()) / tree_num << '\n';
 		}
