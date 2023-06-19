@@ -23,7 +23,7 @@ typedef unsigned char u_8;
 typedef unsigned int u_32;
 typedef unsigned long long u_64;
 
-#define n_tree_key_option 15
+#define n_tree_key_option 16
 #define n_reload_key_option 12
 #define n_nldr_key_option 11
 #define n_comm_key_option 19
@@ -50,8 +50,8 @@ int main(int argc, char *argv[])
 
 	if (argc > 1 && (String)argv[1] == (String) "-trees")
 	{
-		String default_paras[n_tree_key_option] = {"", "postfix", "Taxon", "64", "0", "1", "Covariance", "Major", "1", "0.01", "none", "none", "0", "none", "0"};
-		String options[n_tree_key_option] = {"-f", "-post", "-tm", "-bit", "-r", "-w", "-output", "-consensus-type", "-bipart-hf", "-bipart-lf", "-sb", "-st", "-saveobj", "-trees-key", "-lessprint"};
+		String default_paras[n_tree_key_option] = {"", "postfix", "Taxon", "64", "0", "1", "Covariance", "Major", "1", "1", "0.01", "none", "none", "0", "none", "0"};
+		String options[n_tree_key_option] = {"-f", "-post", "-tm", "-bit", "-r", "-w", "-output", "-consensus-type", "-same-leaf", "-bipart-hf", "-bipart-lf", "-sb", "-st", "-saveobj", "-trees-key", "-lessprint"};
 
 		map<String, String> paras = read_paras(argc, argv, n_tree_key_option, default_paras, options);
 
@@ -193,7 +193,7 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 	// Bipartition<Container_type> Bipart(&Taxa, n_tree);
 	auto Bipart_ptr = new Bipartition<Container_type>(Taxa_ptr, n_tree);
 	std::cout << "Bipartition initialized...\n";
-	TreeSet<Container_type> trees(Bipart_ptr, Taxa_ptr);
+	TreeSet<Container_type> trees(Bipart_ptr, Taxa_ptr, paras["-same-leaf"] == (String) "1");
 	trees.ReadTree(fname, tree_pos, flag_label, rooted, weighted);
 	end = std::clock();
 	cout << "Read tree time(s):\t\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
@@ -372,8 +372,8 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 	}
 	else if (paras["-output"] == (String) "Consensus")
 	{
-		int *consensus_tree_bipart_id = new int[treesobj_ptr->sb2t_mat->get_row()];
-		PRECISION *consensus_tree_weights = new PRECISION[treesobj_ptr->sb2t_mat->get_row()];
+		int *consensus_tree_bipart_id = new int[treesobj_ptr->get_sb2t()->get_row()];
+		PRECISION *consensus_tree_weights = new PRECISION[treesobj_ptr->get_sb2t()->get_row()];
 		int num_consensus_tree_edge = 0;
 
 		if (paras["-cons-type"] == (String) "Major")
@@ -386,19 +386,23 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 			throw(1);
 		}
 
+		NewickEdge<Container_type>* newick_tree = new NewickEdge<Container_type>(*(trees.get_uniform_leafset())) ;
+		newick_tree->Build_Newick_Tree(Bipart_ptr, consensus_tree_bipart_id, consensus_tree_weights, num_consensus_tree_edge);
+
 		// Print Bipartition List
 		String outname_Consensus("Consensus_Tree");
 		outname_Consensus.make_stdname(paras);
 		Header_info Header_Consensus;
 		Header_Consensus.insert("created", time_stamp());
 		Header_Consensus.insert("output type", "Consensus tree");
-		Header_Consensus.insert("size", to_string(consensus_tree_bipart_id->get_size()));
+		Header_Consensus.insert("size", to_string(num_consensus_tree_edge));
 		Header_Consensus.insert("format", "bitstring, appear times / tree number");
 		Header_Consensus.insert("source", paras["-f"]);
 
 		fout.open((char *)outname_Consensus);
 		fout << Header_Consensus;
-		treesobj_ptr->print_Consensus_Tree(fout, consensus_tree_bipart_id, consensus_tree_weights, num_consensus_tree_edge);
+		// treesobj_ptr->print_Consensus_Tree(fout, consensus_tree_bipart_id, consensus_tree_weights, num_consensus_tree_edge);
+		newick_tree->Print_Newick_Tree(fout, *Taxa_ptr);
 		fout << "\n";
 		treesobj_ptr->print_Bipart_List(fout, *consensus_tree_bipart_id);
 		fout.close();
