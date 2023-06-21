@@ -59,6 +59,7 @@ public:
 	Array<int> IndB2IndA;
 
 	void push(string item, bool flag_str_format = true);
+	void insert(string item);
 	bool cmp_taxa(string &tree, bool *barray);
 	bool report_missing_taxon(size_t tree_id, string &tree, bool *barray, std::ostream &out);
 
@@ -78,6 +79,7 @@ public:
 		size++;
 	}
 	size_t ReadTaxa(std::string fname);
+	size_t ReadTaxa(std::string fname, bool same_leaf);
 	bool ScanTaxa(std::string fname, size_t tree_pos, std::string outname);
 	string operator()(int i) const { return Ind2Taxon(i); };
 	string get_Taxon(int i) const { return Ind2Taxon(i); };
@@ -118,14 +120,15 @@ public:
 			}
 			else // This can be done more efficiently
 			{
-				memset(vec, 0, length * sizeof(T));
-				T bit = 1;
-				for (int i = 0; i < b_size; i++)
-				{
-					int pos_byte = i / (8 * sizeof(T));
-					int pos_bit = i % (8 * sizeof(T));
-					vec[pos_byte] |= bit << pos_bit;
-				}
+				throw(1);
+				// memset(vec, 0, length * sizeof(T));
+				// T bit = 1;
+				// for (int i = 0; i < b_size; i++)
+				// {
+				// 	int pos_byte = i / (8 * sizeof(T));
+				// 	int pos_bit = i % (8 * sizeof(T));
+				// 	vec[pos_byte] |= bit << pos_bit;
+				// }
 			}
 		}
 	}
@@ -244,6 +247,16 @@ public:
 		}
 		return false;
 	}
+	
+	friend int bitstr_cmp(const BitString<T> &lhs, const BitString<T> &rhs)
+	{
+		for (int i = 0; i < lhs.length; i++)
+			if (lhs.vec[i] > rhs.vec[i])
+				return 1;
+			else if(lhs.vec[i] < rhs.vec[i])
+				return -1;
+		return 0;
+	}
 
 	friend bool operator<(const BitString<T> &lhs, const BitString<T> &rhs)
 	{
@@ -268,6 +281,8 @@ public:
 			return true;
 	}
 
+	friend bool operator>(const BitString<T> &lhs, const BitString<T> &rhs) {return bitstr_cmp(lhs, rhs) == 1;};
+
 	bool operator!=(const BitString<T> &rhs)
 	{
 		if (length != rhs.length)
@@ -284,6 +299,15 @@ public:
 			return false;
 		}
 	}
+
+	BitString<T> &set_bit(int index)
+	{
+		int pos_byte = index / (8 * sizeof(T));
+		int pos_bit = index % (8 * sizeof(T));
+		T bit = 1;
+		this->vec[pos_byte] |= (bit << pos_bit);
+		return *this;
+	};
 
 	T &operator[](size_t i) { return vec[i]; };
 
@@ -322,7 +346,7 @@ public:
 		// For more stable check on arbitrary bitstrings, use check_subset instead, which is slower but includes sanity check.
 
 		for (int i = 0; i < lhs.length; i++)
-			if (lhs.vec[i] & rhs.vec[i] != lhs.vec[i])
+			if ((lhs.vec[i] & rhs.vec[i]) != lhs.vec[i])
 				return false;
 		return true;
 	}
@@ -433,14 +457,17 @@ public:
 			this->push(BitString<T>(Taxa->bitstr_size, Taxa->size, i).normalized());
 	};
 
-	Bipartition(TaxonList *taxa, int n_tree) : Taxa(taxa), Id2BitString(Array<BitString<T>>(0, 1000)),
-											   Hash2Id(nullptr), issorted(false)
+	Bipartition(TaxonList *taxa, int n_tree, bool sameleaf) : Taxa(taxa), Id2BitString(Array<BitString<T>>(0, 1000)),
+											   				  Hash2Id(nullptr), issorted(false)
 	{
 		this->set_hash_bound(n_tree);
 		this->set_invariant();
 
 		for (int i = 0; i < Taxa->size; i++)
-			this->push(BitString<T>(Taxa->bitstr_size, Taxa->size, i).normalized());
+			if (sameleaf)
+				this->push(BitString<T>(Taxa->bitstr_size, Taxa->size, i).normalized());
+			else
+				this->push_full(BitString<T>(Taxa->bitstr_size, Taxa->size, i));
 	};
 
 	bool is_empty() { return Id2BitString.is_empty(); };
@@ -482,7 +509,7 @@ public:
 	{
 
 		if (index_hash == -1)
-			index_hash = hashing(bs);
+			index_hash = hashing_mod(bs);
 		int index = -1;
 		if (Hash2Id->get_c_ptr(index_hash) == nullptr)
 		{
@@ -624,7 +651,7 @@ public:
 		Id2BitString[i].print_BitString(fout);
 	}
 
-	BitString<T> &operator[](size_t i) { return Id2BitString.ele(i); };
+	BitString<T> &operator[](size_t i) { return Id2BitString[i]; };
 
 	// BitString<T> &operator()(size_t i) const { return Id2BitString[i]; };
 };
@@ -640,6 +667,7 @@ class TreeArray
 private:
 	int size;
 	int leafsize;
+	int maxleaflabel;
 	// darray<darray<int> > levels;
 	Array<Array<int>> *levels;
 	Array<PRECISION> *weights; // weights will be kept and used in generalizing B2T matrix.
@@ -651,7 +679,8 @@ private:
 	bool sameleaf;
 
 public:
-	TreeArray() : size(0), leafsize(0), levels(nullptr), weights(nullptr), edges(nullptr),
+	TreeArray() : size(0), leafsize(0), maxleaflabel(-1),
+				  levels(nullptr), weights(nullptr), edges(nullptr),
 				  t2b(nullptr), t2b_upper(nullptr),
 				  issorted(false), sameleaf(true){};
 	~TreeArray()
@@ -673,7 +702,7 @@ public:
 
 	void label_internal_node(Array<int> &active_rows, Array<int> &unlabeled, int leaf_size);
 	void label_internal_node(Array<int> &active_rows, Array<int> &unlabeled, Array<Array<PRECISION>> &w_temp, int leaf_size);
-
+	void set_same_leaf(bool sl) {sameleaf = sl;};
 	// template <class T>
 	// void compute_bitstring(Bipartition<T> *Bipart)
 	// {
@@ -756,8 +785,7 @@ public:
 		// std::cout << "------------------Bitstring computation started----------------------\n";
 		t2b = new Array<size_t>(size);
 		t2b->resize(size, (size_t)-1);
-		T *index_hash = new T[size];
-		memset(index_hash, 0, size * sizeof(T));
+
 
 		// darray<int>* t2b_ptr = TreeId2Bipart->get_c_ptr(tree_id);
 
@@ -766,26 +794,38 @@ public:
 
 		// t2b_ptr->resize(size, -1);
 
-		BitString<T> *bs = new BitString<T>[size];
 		T iv_h = Bipart->get_invariant_hashing();
 		T h_b = Bipart->get_hash_bound();
 		int bitstr_size = Bipart->get_bitstr_size();
 		int all_leaf_size = Bipart->get_leaf_size();
 
+		// BitString<T> *bs = new BitString<T>[size];
+		// T *index_hash = new T[size];
+		// memset(index_hash, 0, size * sizeof(T));
+		// When the node labels are not sequential, it is not ideal to use simple array for reverse reference is required.
+		// They are sequential only when all trees share the same leafset that is identical to the provided taxon list.
+
+		std::map<int, BitString<T>> bs;
+		std::map<int, T> index_hash;
+
+
 		for (int i = 0; i < size; i++)
 		{
-			if (edges[1][i] < all_leaf_size)
+			if (edges[1][i] <= maxleaflabel)
 			{
-				bs[i] = BitString<T>(bitstr_size, all_leaf_size, edges[1][i]);
-				index_hash[i] = Bipart->hashing_mod(bs[i]);
+				bs[edges[1][i]] = BitString<T>(bitstr_size, all_leaf_size, edges[1][i]);
+				index_hash[edges[1][i]] = Bipart->hashing(bs[edges[1][i]]);
+
+				// bs[edges[1][i]].print_BitString(std::cout);
+				// std::cout << "\n";
 			}
 			else
-				bs[i] = BitString<T>(bitstr_size, all_leaf_size);
+				bs[edges[1][i]] = BitString<T>(bitstr_size, all_leaf_size);
 		}
 
 		for (int i = 0; i < size; i++)
 		{
-			if (edges[1][i] < all_leaf_size)
+			if (edges[1][i] <= maxleaflabel)
 				t2b->ele(i) = edges[1][i];
 			else
 			{
@@ -803,11 +843,17 @@ public:
 				bs[edges[0][i]] |= bs[edges[1][i]];
 				index_hash[edges[0][i]] += index_hash[edges[1][i]];
 				index_hash[edges[0][i]] = index_hash[edges[0][i]] % h_b;
+
+				// std::cout << "\n";
+				// bs[edges[1][i]].print_BitString(std::cout);
+				// std::cout << "\n>>\n";
+				// bs[edges[0][i]].print_BitString(std::cout);
+				// std::cout << "\n";
 			}
 		}
 
-		delete[] index_hash;
-		delete[] bs;
+		// delete[] index_hash;
+		// delete[] bs;
 
 		// weights.release();
 		// Weights record have been transferred to a table referenced by bipartition, which helps inquiry for computing distance.
@@ -837,27 +883,37 @@ public:
 		int bitstr_size = Bipart->get_bitstr_size();
 		int all_leaf_size = Bipart->get_leaf_size();
 
-		BitString<T> *bs = new BitString<T>[all_leaf_size + size - leafsize];
+		// BitString<T> *bs = new BitString<T>[all_leaf_size + size - leafsize];
+		std::map<int, BitString<T>> bs;
 
 		auto leafset = new BitString<T>(bitstr_size, all_leaf_size);
 
 		for (int i = 0; i < size; i++)
 		{
-			if (edges[1][i] < all_leaf_size)
+			if (edges[1][i] <= maxleaflabel)
 			{
 				bs[edges[1][i]] = BitString<T>(bitstr_size, all_leaf_size, edges[1][i]);
-				(*leafset) |= bs[edges[1][i]];
+				leafset->set_bit(edges[1][i]);
 			}
 			else
 				bs[edges[1][i]] = BitString<T>(bitstr_size, all_leaf_size);
 		}
+		// leafset->print_BitString(std::cout);
+		// std::cout<<"\n";
 
 		for (int i = 0; i < size; i++)
 		{
-			if (edges[1][i] < all_leaf_size)
+			if (edges[1][i] <= maxleaflabel)
 			{
 				auto cbs = (*leafset) % bs[edges[1][i]];
-				if (cbs > bs[edges[1][i]])
+
+				// std::cout << "Original bitstring\n";
+				// bs[edges[1][i]].print_BitString(std::cout);
+				// std::cout << "\nComplementary bitstring\n";
+				// cbs.print_BitString(std::cout);
+				// std::cout << '\n';
+
+				if (bitstr_cmp(cbs, bs[edges[1][i]]) == 1)
 				{
 					t2b->ele(i) = edges[1][i];
 					t2b_upper->ele(i) = Bipart->push_full(cbs);
@@ -871,7 +927,14 @@ public:
 			else
 			{
 				auto cbs = (*leafset) % bs[edges[1][i]];
-				if (cbs > bs[edges[1][i]])
+
+				// std::cout << "Original bitstring\n";
+				// bs[edges[1][i]].print_BitString(std::cout);
+				// std::cout << "\nComplementary bitstring\n";
+				// cbs.print_BitString(std::cout);
+				// std::cout << '\n';
+
+				if (bitstr_cmp(cbs, bs[edges[1][i]]) == 1)
 				{
 					t2b->ele(i) = Bipart->push_full(bs[edges[1][i]]);
 					t2b_upper->ele(i) = Bipart->push_full(cbs);
@@ -881,19 +944,41 @@ public:
 					t2b_upper->ele(i) = Bipart->push_full(bs[edges[1][i]]);
 					t2b->ele(i) = Bipart->push_full(cbs);
 				}
+
+				
+				// std::cout << "\n";
+				// (*Bipart)[t2b->ele(i)].print_BitString(std::cout);
+				// std::cout << "\n";
+				// (*Bipart)[t2b_upper->ele(i)].print_BitString(std::cout);
+				// std::cout << "\n";
 			}
 
 			if (edges[0][i] < size)
 				bs[edges[0][i]] |= bs[edges[1][i]];
 		}
 
-		delete[] bs;
 		// weights.release();
 		// Weights record have been transferred to a table referenced by bipartition, which helps inquiry for computing distance.
 		// By keeping this weights, we can keep fast inquiry from tree, but then it keeps two copies of the weights info.
 
 		return leafset;
 	}
+
+	template <class T>
+	BitString<T> *compute_bitstring_leafset(Bipartition<T> *Bipart)
+	{
+
+		int bitstr_size = Bipart->get_bitstr_size();
+		int all_leaf_size = Bipart->get_leaf_size();
+
+		auto leafset = new BitString<T>(bitstr_size, all_leaf_size);
+
+		for (int i = 0; i < size; i++)
+			if (edges[1][i] < all_leaf_size)
+				leafset->set_bit(edges[1][i]);
+		return leafset;
+	}
+
 
 	void release_edge_form()
 	{
@@ -1041,7 +1126,12 @@ public:
 
 	TreeArray &ele(size_t i) { return *(trees[i]); };
 
+	TreeArray &ele(int i) { return *(trees[i]); };
+
 	TreeArray &operator[](size_t i) { return this->ele(i); };
+
+	TreeArray &operator[](int i) { return this->ele(i); };
+
 
 	void ReadTree(std::string fname, size_t pos, int flag_label, bool flag_rooted, bool flag_weighted)
 	{
@@ -1061,7 +1151,9 @@ public:
 			std::getline(fin, temp, ';');
 			if (temp.find('(') != std::string::npos)
 			{
-				this->push(new TreeArray(temp, *Taxa, active_levels, unlabeled, flag_label, flag_rooted, flag_weighted));
+				auto tree = new TreeArray(temp, *Taxa, active_levels, unlabeled, flag_label, flag_rooted, flag_weighted);
+				tree->set_same_leaf(sameleaf);
+				this->push(tree);
 			}
 		}
 
@@ -1090,7 +1182,11 @@ public:
 		LeafSets[ind] = leafset;
 	}
 
-	void set_uniform_leafset(BitString<T> *leafset) { Uniform_LeafSet = leafset; }
+	void set_uniform_leafset(BitString<T> *leafset) { Uniform_LeafSet = leafset; };
+
+	BitString<T>* compute_leafset(int i) { return trees[i]->compute_bitstring_leafset(Bipart); };
+
+	BitString<T>* compute_uniform_leafset() { Uniform_LeafSet = trees[0]->compute_bitstring_leafset(Bipart); return Uniform_LeafSet; };
 
 	bool issameleaf() const { return sameleaf; };
 
@@ -1163,18 +1259,28 @@ public:
 	{
 		auto bitstr = edge->get_leafstr();
 
+		// std::cout << "Current Edge\t";
+		// this->leafstr.print_BitString(std::cout);
+		// std::cout << "\nIncoming Edge\t";
+		// edge->get_leafstr().print_BitString(std::cout);
+		// std::cout << "\n\n";
+
+		for (int i = 0; i < child.get_size(); i++)
+		{
+			if (is_subset(this->child[i]->get_leafstr(), bitstr))
+			{
+				auto sub_edge = this->child.pop(i);
+				edge->insert_edge(sub_edge);
+				i--;
+			}
+		}
+
 		for (int i = 0; i < child.get_size(); i++)
 		{
 			if (is_subset(bitstr, this->child[i]->get_leafstr()))
 			{
 				this->child[i]->newick_push(edge);
 				return;
-			}
-			else
-			{
-				auto sub_edge = this->child.pop(i);
-				edge->insert_edge(sub_edge);
-				i--;
 			}
 		}
 		this->child.push(edge);
@@ -1186,20 +1292,34 @@ public:
 	void Build_Newick_Tree(Bipartition<T> *Bipart, int *bipart_id, PRECISION *weights, int edge_num)
 	{
 		// This function assumes the current NewickEdge being the dummy edge with full leaf set.
-		int label = get_taxon_id(Bipart->get_BitString(bipart_id[0]), this->leafstr);
-		this->newick_push(new NewickEdge(Bipart->get_BitString(bipart_id[0]), weights[0], label));
-		this->newick_push(new NewickEdge(this->leafstr % Bipart->get_BitString(bipart_id[0]), weights[0], label));
+		int label = get_taxon_id((*Bipart)[bipart_id[0]], this->leafstr);
+
+		if (label == 0)
+		{
+			this->insert_edge(new NewickEdge((*Bipart)[bipart_id[0]], weights[0], -1));
+			this->insert_edge(new NewickEdge(this->leafstr % (*Bipart)[bipart_id[0]], weights[0], label));
+		}
+		else if(label != -1)
+		{
+			this->insert_edge(new NewickEdge((*Bipart)[bipart_id[0]], weights[0], label));
+			this->insert_edge(new NewickEdge(this->leafstr % (*Bipart)[bipart_id[0]], weights[0], -1));
+		}
+		else
+		{
+			this->insert_edge(new NewickEdge((*Bipart)[bipart_id[0]], weights[0], -1));
+			this->insert_edge(new NewickEdge(this->leafstr % (*Bipart)[bipart_id[0]], weights[0], -1));
+		}
 
 		for (int i = 1; i < edge_num; i++)
 		{
-			label = get_taxon_id(Bipart->get_BitString(bipart_id[i]), this->leafstr);
-			if (is_subset(Bipart->get_BitString(bipart_id[i]), child[0]->get_leafstr()))
-				child[0]->newick_push(Bipart->get_BitString(bipart_id[i]), weights[i], label);
-			else if (is_subset(Bipart->get_BitString(bipart_id[i]), child[1]->get_leafstr()))
-				child[1]->newick_push(Bipart->get_BitString(bipart_id[i]), weights[i], label);
+			label = get_taxon_id((*Bipart)[bipart_id[i]], this->leafstr);
+			if (is_subset((*Bipart)[bipart_id[i]], child[0]->get_leafstr()))
+				child[0]->newick_push((*Bipart)[bipart_id[i]], weights[i], label);
+			else if (is_subset((*Bipart)[bipart_id[i]], child[1]->get_leafstr()))
+				child[1]->newick_push((*Bipart)[bipart_id[i]], weights[i], label);
 			else
 			{
-				auto comp_leafstr = this->leafstr % Bipart->get_BitString(bipart_id[i]);
+				auto comp_leafstr = this->leafstr % (*Bipart)[bipart_id[i]];
 				if (is_subset(comp_leafstr, child[0]->get_leafstr()))
 					child[0]->newick_push(comp_leafstr, weights[i], label);
 				else
@@ -1232,7 +1352,7 @@ public:
 		out << "(";
 		this->child[0]->Print_Newick_Edge(out, taxa);
 		this->child[1]->Print_Newick_Edge(out, taxa);
-		out << "):0.0";
+		out << "):0.0;\n";
 	};
 };
 
