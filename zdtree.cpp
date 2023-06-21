@@ -6,7 +6,7 @@
 
 using std::string;
 
-char read_sequence(string &tree, size_t &index, string &temp)
+char read_sequence(string &tree, int &index, string &temp)
 {
 	size_t found = tree.find_first_of(",): ", index);
 	if (found == std::string::npos)
@@ -54,6 +54,19 @@ void TaxonList::push(string item, bool flag_str_format)
 	}
 	else
 	{
+		if (Taxon2Ind.find(item) == Taxon2Ind.end())
+		{
+			Ind2Taxon.push(item);
+			Taxon2Ind.insert(std::pair<string, int>(item, Ind2Taxon.get_size() - 1));
+			size++;
+		}
+	}
+}
+
+void TaxonList::insert(string item)
+{
+	if (Taxon2Ind.find(item) == Taxon2Ind.end())
+	{
 		Ind2Taxon.push(item);
 		Taxon2Ind.insert(std::pair<string, int>(item, Ind2Taxon.get_size() - 1));
 		size++;
@@ -64,7 +77,7 @@ bool TaxonList::cmp_taxa(string &tree, bool *barray)
 { // Compare the taxa found in tree string with the existing taxon list. Insert new taxon to the list if found. Report absent taxa.
 	string taxon;
 	bool same_taxa = true;
-	size_t i = 0;
+	int i = 0;
 	for (i = 0; i < size; i++)
 		barray[i] = false;
 
@@ -126,7 +139,7 @@ bool TaxonList::cmp_taxa(string &tree, bool *barray)
 bool TaxonList::report_missing_taxon(size_t tree_id, string &tree, bool *barray, std::ostream &out)
 { // Assuming the taxon list is complete. Compare the taxa found in tree string with the list and report the absent taxa.
 	string taxon;
-	size_t i = 0;
+	int i = 0;
 	for (i = 0; i < size; i++)
 		barray[i] = false;
 
@@ -218,7 +231,7 @@ size_t TaxonList::ReadTaxa(std::string fname)
 		}
 		string taxon;
 
-		size_t i = temp.find_first_of('(');
+		int i = temp.find_first_of('(');
 		char ch = temp[i];
 		while (ch != ';' && ch != '\0')
 		{
@@ -284,6 +297,140 @@ size_t TaxonList::ReadTaxa(std::string fname)
 
 	return pos;
 }
+
+size_t TaxonList::ReadTaxa(std::string fname, bool same_leaf)
+{
+	std::cout << "-----Enter Read_Taxa-----\n";
+	std::ifstream fin;
+	fin.open(fname);
+	if (!fin.is_open())
+	{
+		std::cout << "File `" << fname << "' not opened.\n";
+		throw(1);
+	}
+
+	size_t pos = std::ios_base::beg;
+	bool flag_internal = false;
+
+	string temp;
+	std::getline(fin, temp);
+	if (temp[0] != '#' || temp.find(string("NEWICK")) != std::string::npos)
+	{
+		std::cout << "Reading Newick raw file.\n";
+		fin.seekg(std::ios_base::beg);
+		while (temp.find_first_of("(") == std::string::npos)
+		{
+			pos = fin.tellg();
+			std::getline(fin, temp);
+		}
+		string taxon;
+
+		int i = temp.find_first_of('(');
+		char ch = temp[i];
+		while ((ch != ';' && ch != '\0'))
+		{
+			taxon.clear();
+			if (isspace(ch) || ch == ',' || ch == '(' || ch == ')')
+			{ // skip spaces and commas and parentheses
+				if (ch == ')')
+					flag_internal = true;
+				else if (ch == '(' || ch == ',')
+					flag_internal = false;
+				ch = temp[++i];
+			}
+			else if (ch == ':')
+			{ // skip weights
+				i++;
+				ch = read_sequence(temp, i, taxon);
+				flag_internal = false;
+			}
+			else
+			{ // read taxa
+				ch = read_sequence(temp, i, taxon);
+				if (!flag_internal)
+				{
+					this->push(taxon, false);
+				}
+				flag_internal = false;
+			}
+		}
+		if (!same_leaf)
+		{
+			while(std::getline(fin, temp))
+			{
+				if (temp.find_first_of("(") != std::string::npos)
+				{
+					i = temp.find_first_of('(');
+					ch = temp[i];
+					while ((ch != ';' && ch != '\0'))
+					{
+						taxon.clear();
+						if (isspace(ch) || ch == ',' || ch == '(' || ch == ')')
+						{ // skip spaces and commas and parentheses
+							if (ch == ')')
+								flag_internal = true;
+							else if (ch == '(' || ch == ',')
+								flag_internal = false;
+							ch = temp[++i];
+						}
+						else if (ch == ':')
+						{ // skip weights
+							i++;
+							ch = read_sequence(temp, i, taxon);
+							flag_internal = false;
+						}
+						else
+						{ // read taxa
+							ch = read_sequence(temp, i, taxon);
+							if (!flag_internal)
+							{
+								this->push(taxon, false);
+							}
+							flag_internal = false;
+						}
+					}
+				}
+			}
+
+		}
+
+	}
+	else if (temp.find(string("NEXUS")) != std::string::npos)
+	{
+		std::cout << "Reading Nexus file.\n";
+
+		while (!fin.eof())
+		{
+			temp.clear();
+			std::getline(fin, temp);
+			if (temp.find(string("Translate")) != std::string::npos)
+			{
+				break;
+			}
+		}
+		if (fin.eof())
+		{
+			std::cout << "Error! Cannot find taxon list in Nexus format.\n";
+			throw(1);
+		}
+		while (!fin.eof())
+		{
+			temp.clear();
+			std::getline(fin, temp);
+			this->push(temp);
+			if (temp.find(';') != std::string::npos)
+				break;
+		}
+		pos = fin.tellg();
+	}
+	fin.close();
+
+		std::cout << "-----Leave Read_Taxa-----\n";
+
+
+	return pos;
+}
+
 
 bool TaxonList::ScanTaxa(std::string fname, size_t pos, std::string outname)
 {
@@ -505,7 +652,7 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 	char ch;
 
 	int leaf_index = -1;
-	int max_leaf_index = -1;
+	maxleaflabel = -1;
 
 	levels = new Array<Array<int>>(0, edgesize);
 	Array<Array<double>> w_temp = Array<Array<double>>(0, edgesize);
@@ -552,7 +699,7 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 
 	// Start scanning/
 
-	size_t i = tree.find_first_of('(') + 1;
+	int i = tree.find_first_of('(') + 1;
 	ch = tree[i];
 
 	while (ch != ';' && ch != '\0')
@@ -632,8 +779,8 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 					}
 
 					levels->ele(current_ind).push(leaf_index);
-					if (leaf_index > max_leaf_index)
-						max_leaf_index = leaf_index;
+					if (leaf_index > maxleaflabel)
+						maxleaflabel = leaf_index;
 					active_levels.push(current_ind);
 				}
 				flag_internal = false;
@@ -668,9 +815,9 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 	edges[1] = new int[this->size]; // node close-to-leaf
 
 	if (ISWEIGHTED)
-		this->label_internal_node(active_levels, unlabeled, w_temp, max_leaf_index + 1);
+		this->label_internal_node(active_levels, unlabeled, w_temp, maxleaflabel + 1);
 	else
-		this->label_internal_node(active_levels, unlabeled, max_leaf_index + 1);
+		this->label_internal_node(active_levels, unlabeled, maxleaflabel + 1);
 
 	this->release_level();
 }
