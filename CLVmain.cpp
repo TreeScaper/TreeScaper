@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 	}
 	else if (argc > 1 && (String)argv[1] == (String) "-reload")
 	{
-		String default_paras[n_reload_key_option] = {"", "obj", "postfix", "64", "0", "1", "COV", "1", "0.01", "none", "none", "none"};
+		String default_paras[n_reload_key_option] = {"", "obj", "postfix", "64", "0", "1", "COV", "1.0", "0.0", "none", "none", "none"};
 		String options[n_reload_key_option] = {"-f", "-ft", "-post", "-bit", "-r", "-w", "-output", "-hf", "-lf", "-sb", "-st", "-reload-key"};
 
 		map<String, String> paras = read_paras(argc, argv, n_reload_key_option, default_paras, options);
@@ -178,7 +178,7 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 	std::cout << "Reading taxa...\n";
 	start = std::clock();
 	auto Taxa_ptr = new TaxonList();
-	size_t tree_pos = Taxa_ptr->ReadTaxa(fname);
+	size_t tree_pos = Taxa_ptr->ReadTaxa(fname, paras["-same-leaf"] == (String) "1");
 
 	// String outname_TaxonList("TaxonList");
 	// outname_TaxonList.make_stdname(paras);
@@ -191,7 +191,7 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 	std::cout << "Reading trees...\n";
 	Taxa_ptr->set_bitstr_size((Container_type)1);
 	// Bipartition<Container_type> Bipart(&Taxa, n_tree);
-	auto Bipart_ptr = new Bipartition<Container_type>(Taxa_ptr, n_tree);
+	auto Bipart_ptr = new Bipartition<Container_type>(Taxa_ptr, n_tree, paras["-same-leaf"] == (String) "1");
 	std::cout << "Bipartition initialized...\n";
 	TreeSet<Container_type> trees(Bipart_ptr, Taxa_ptr, paras["-same-leaf"] == (String) "1");
 	trees.ReadTree(fname, tree_pos, flag_label, rooted, weighted);
@@ -376,18 +376,31 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 		PRECISION *consensus_tree_weights = new PRECISION[treesobj_ptr->get_sb2t()->get_row()];
 		int num_consensus_tree_edge = 0;
 
-		if (paras["-cons-type"] == (String) "Major")
+		std::cout << "-----Enter Compute_Consensus-----\n";
+		std::cout << "Consensus tree type: " << paras["-consensus-type"] << '\n';
+
+		if (paras["-consensus-type"] == (String) "Major")
 			num_consensus_tree_edge = treesobj_ptr->Compute_Major_Consensus_Tree(consensus_tree_bipart_id, consensus_tree_weights);
-		else if (paras["-cons-type"] == (String) "Strict")
+		else if (paras["-consensus-type"] == (String) "Strict")
 			num_consensus_tree_edge = treesobj_ptr->Compute_Strict_Consensus_Tree(consensus_tree_bipart_id, consensus_tree_weights);
 		else
 		{
-			cout << "Error! Consensus tree type only support ``Major'' or ``Strict''.";
+			cout << "Error! Consensus tree type only support ``Major'' or ``Strict''. Received " << paras["-consensus-type"];
 			throw(1);
+		}
+
+		for(int i = 0; i < num_consensus_tree_edge; i++)
+		{
+			std::cout << i << '\t' << consensus_tree_bipart_id[i] << '\t';
+			(*Bipart_ptr)[consensus_tree_bipart_id[i]].print_BitString(std::cout);
+			std::cout << "\t" << consensus_tree_weights[i] << '\n';
 		}
 
 		NewickEdge<Container_type>* newick_tree = new NewickEdge<Container_type>(*(trees.get_uniform_leafset())) ;
 		newick_tree->Build_Newick_Tree(Bipart_ptr, consensus_tree_bipart_id, consensus_tree_weights, num_consensus_tree_edge);
+
+
+		std::cout << "-----Leave Compute_Consensus-----\n";
 
 		// Print Bipartition List
 		String outname_Consensus("Consensus_Tree");
@@ -403,8 +416,12 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 		fout << Header_Consensus;
 		// treesobj_ptr->print_Consensus_Tree(fout, consensus_tree_bipart_id, consensus_tree_weights, num_consensus_tree_edge);
 		newick_tree->Print_Newick_Tree(fout, *Taxa_ptr);
-		fout << "\n";
-		treesobj_ptr->print_Bipart_List(fout, *consensus_tree_bipart_id);
+		for(int i = 0; i < num_consensus_tree_edge; i++)
+		{
+			fout << consensus_tree_bipart_id[i] << '\t';
+			(*Bipart_ptr)[consensus_tree_bipart_id[i]].print_BitString(fout);
+			fout << "\t" << consensus_tree_weights[i] << '\n';
+		}
 		fout.close();
 		cout << "Sucessfully printed the consensus tree info in Consensus_Tree_" << paras["-post"] << ".out file.\n\n";
 	}
