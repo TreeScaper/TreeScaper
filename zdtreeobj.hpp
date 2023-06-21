@@ -136,7 +136,7 @@ public:
 	{
 		sb2t_mat->set_RCS();
 		int bipart_num = sb2t_mat->get_row();
-		int tree_num = sb2t_mat->get_col();
+		PRECISION tree_num = sb2t_mat->get_col();
 
 		// Array<int> *consensus_bipart_id = new Array<int>(0, row);
 		// Array<int> *consensus_bipart_id = new Array<int>(0, bipart_num);
@@ -145,6 +145,7 @@ public:
 
 		for (int i = 0; i < bipart_num; i++)
 		{
+			int frequency = sb2t_mat->get_RCS_ind_c_ptr(i)->get_size();
 			w = sb2t_mat->get_RCS_ind_c_ptr(i)->get_size() / tree_num;
 			if (w > 0.5)
 			{
@@ -174,29 +175,43 @@ public:
 			for (int i = 0; i < Taxa->size; i++)
 			{
 				BitString<T> temp = BitString<T>(Taxa->bitstr_size, Taxa->size, i);
-				Bipart->push(temp);
+				if (Trees->issameleaf())
+					Bipart->push(temp);
+				else
+					Bipart->push_full(temp);
 			}
 		}
 
 		if(Trees->issameleaf())
 		{
-			std::cout << "Computing bitstring of the uniform leaf set...";
-			BitString<T>* uniform_leafset = new BitString<T>(Taxa->bitstr_size, Taxa->size);
-			auto tree = Trees->ele(0);
-			auto bitstrs = *Trees->ele(0).get_t2b();
-			// for (int i = 0; i < tree.get_size(); i++)
-			// 	(*uniform_leafset) |= (*Bipart)(bitstrs(i));
-			
-			Trees->set_uniform_leafset(uniform_leafset);
-
+			std::cout << "Computing bitstrings of given treesets...\n";
 			for (int i = 0; i < n_trees; i++)
 				Trees->ele(i).compute_bitstring(Bipart);
+			
+
+			std::cout << "Computing bitstring of the uniform leaf set...\n";
+			
+			Trees->compute_uniform_leafset();
+
+			Trees->get_uniform_leafset()->print_BitString(std::cout);
+			std::cout << '\n';
 		}
 		else
 		{
+			std::cout << "Computing bitstrings of given treesets their leaf sets...\n";
+
 			Trees->init_leafsets();
 			for (int i = 0; i < n_trees; i++)
 				Trees->set_leafsets(i, Trees->ele(i).compute_bitstring(Bipart));
+			
+			std::cout << "First 10 leaf sets:\n";
+			auto leafsets = Trees->get_leafsets();
+			for (int i = 0; i < min(10, n_trees); i++)
+			{
+				leafsets[i]->print_BitString(std::cout);
+				std::cout << '\n';
+			}
+
 		}
 
 		// Update unique bipartition number
@@ -222,6 +237,16 @@ public:
 		sb2t_mat->initialize_CCS();
 
 		for (int i = 0; i < n_trees; i++)
+		{
+			// auto t2b = *(Trees->ele(i).get_t2b());
+			// auto w = *(Trees->ele(i).get_weight());
+			// for (int j = 0; j < t2b.get_size(); j++)
+			// {
+			// 	std::cout << t2b[j] << "\t";
+			// 	(*Bipart)[t2b[j]].print_BitString(std::cout);
+			// 	std::cout << "\t" << w[j] << '\n';
+			// }
+
 			if (Trees->issameleaf())
 				sb2t_mat->push_CCS_col(Trees->ele(i).pop_t2b(), Trees->ele(i).pop_weight());
 			else
@@ -243,7 +268,18 @@ public:
 				delete bipart_lower;
 				delete bipart_upper;
 				delete weight_lower;
+
+
+				// std::cout << "Tree " << i << '\n';
+				// for(int j = 0; j < full_treevec->get_size(); j++)
+				// {
+				// 	std::cout << (*full_treevec)[j] << "\t";
+				// 	(*Bipart)[(*full_treevec)[j]].print_BitString(std::cout);
+				// 	std::cout << "\t" << (*full_weights)[j] << '\n';
+				// }
+				
 			}
+		}
 
 		sb2t_mat->set_RCS();
 	}
@@ -626,8 +662,16 @@ public:
 		std::cout << "\tTree set size:\t\t\t\t" << n_trees << ",\n";
 		std::cout << "\tLeaf set size:\t\t\t\t" << n_leaves << ",\n";
 		std::cout << "\tAll bipartitions encounted:\t\t" << all_bipart << ",\n";
-		std::cout << "\tNumber of Distinct bipartition:\t\t" << unique_bipart << ",\n";
-		std::cout << "\tNumber of computed bipartitions:\t" << n_sub_bipart << ",\n";
+		if (Trees->issameleaf())
+		{
+			std::cout << "\tNumber of Distinct bipartition:\t\t" << unique_bipart << ",\n";
+			std::cout << "\tNumber of computed bipartitions:\t" << n_sub_bipart << ",\n";
+		}
+		else
+		{
+			std::cout << "\tNumber of Distinct bipartition:\t\t" << unique_bipart / 2 << ",\n";
+			std::cout << "\tNumber of computed bipartitions:\t" << n_sub_bipart / 2 << ",\n";
+		}
 		std::cout << "\tNumber of computed trees:\t\t" << n_sub_trees << ".\n\n";
 		std::cout << "\tHash container size:\t\t\t" << hash_bound << ",\n";
 		std::cout << "\tEmpty container:\t\t\t" << empty_cnt << ",\n";
