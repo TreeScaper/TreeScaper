@@ -89,7 +89,7 @@ public:
 			vec[i] = arr.vec[i];
 	}
 
-	~Array() { delete[] vec; };
+	~Array() { if (vec) delete[] vec; };
 
 	friend Array<T> join(const Array<T> &lhs, const Array<T> &rhs)
 	{
@@ -181,7 +181,7 @@ public:
 
 	T pop(int index)
 	{
-		assert(index >= size);
+		assert(index < size);
 		auto val = vec[index];
 		for (int i = index + 1; i < size; i++)
 			vec[i - 1] = vec[i];
