@@ -248,13 +248,28 @@ public:
 			// }
 
 			if (Trees->issameleaf())
-				sb2t_mat->push_CCS_col(Trees->ele(i).pop_t2b(), Trees->ele(i).pop_weight());
+			{
+				if (ISWEIGHTED)
+					sb2t_mat->push_CCS_col(Trees->ele(i).pop_t2b(), Trees->ele(i).pop_weight());
+				else
+				{
+					auto weight_vec = new Array<PRECISION>(Trees->ele(i).get_size(), Trees->ele(i).get_size(), 1.0);
+					sb2t_mat->push_CCS_col(Trees->ele(i).pop_t2b(), weight_vec);
+				}
+
+			}
 			else
 			{
 				auto bipart_lower = Trees->ele(i).pop_t2b();
 				auto bipart_upper = Trees->ele(i).pop_t2b_upper();
 
-				auto weight_lower = Trees->ele(i).pop_weight();
+				Array<PRECISION>* weight_lower;
+				if (ISWEIGHTED)
+					weight_lower = Trees->ele(i).pop_weight();
+				else
+					weight_lower = new Array<PRECISION>(Trees->ele(i).get_size(), Trees->ele(i).get_size(), 1.0);
+
+
 
 				// pointers above will be released while existing.
 
