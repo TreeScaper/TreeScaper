@@ -4,12 +4,23 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <sstream>
+
 
 #include "array.hpp"
 #include "sparse.hpp"
 #include "SpecMat.hpp"
 #include "zdtree.hpp"
 #include "zdfileio.hpp"
+
+#include "rspr.hpp"
+extern "C" {
+#include "hungarian.h"
+}
+
+// rspr.hpp for SPR distance
+// hungarian.h for matching distance
+
 
 template <class T>
 class TreeSetObjects
@@ -299,6 +310,27 @@ public:
 		sb2t_mat->set_RCS();
 	}
 
+	NewickEdge<T> *Build_Newick_Tree(int i) const
+	{
+		assert(sb2t_mat != nullptr);
+
+		NewickEdge<T>* newick_tree = nullptr;
+		if (Trees->issameleaf())
+			newick_tree = new NewickEdge<T>(*(Trees->get_uniform_leafset()));
+		else
+		{
+			auto leafsets = Trees->get_leafsets();
+
+			assert(leafsets != nullptr);
+
+			newick_tree = new NewickEdge<T>(*(leafsets[i]));
+		}
+
+		newick_tree->Build_Newick_Tree(Bipart, sb2t_mat->get_CCS_ind_c_ptr(i), sb2t_mat->get_CCS_val_c_ptr(i));
+
+		return newick_tree;
+	}
+
 	void Compute_Covariance_Matrix()
 	{
 		assert(sb2t_mat != nullptr);
@@ -367,6 +399,36 @@ public:
 				(*cov_mat)(i, j) /= (this->n_trees - 1);
 		delete sb2t_sub_mat;
 	};
+
+	void Compute_Distance_Matrix(DISTANCE_TYPE dist_type, const Array<size_t> &sub_bipart_id, Array<size_t> &bipart_id_mapping)
+	{
+		if (dist_type == ROBINSONFOULDS)
+			Compute_RF_Distance_Matrix(sub_bipart_id, bipart_id_mapping);
+		else if (dist_type == MATCHING_DIST)
+			Compute_Matching_Distance_Matrix(sub_bipart_id, bipart_id_mapping);
+		else if (dist_type == SPR_DISTANCE)
+			Compute_SPR_Distance_Matrix(sub_bipart_id, bipart_id_mapping);
+		else
+		{
+			std::cout << "Distance type not found!\n";
+			throw(1);
+		}
+	}
+
+	void Compute_Distance_Matrix(DISTANCE_TYPE dist_type)
+	{
+		if (dist_type == ROBINSONFOULDS)
+			Compute_RF_Distance_Matrix();
+		else if (dist_type == MATCHING_DIST)
+			Compute_Matching_Distance_Matrix();
+		else if (dist_type == SPR_DISTANCE)
+			Compute_SPR_Distance_Matrix();
+		else
+		{
+			std::cout << "Distance type not found!\n";
+			throw(1);
+		}
+	}
 
 	void Compute_RF_Distance_Matrix()
 	{
@@ -591,6 +653,320 @@ public:
 					(*dis_mat)(i, j) = (*dis_mat)(i, j) / 2.0;
 		}
 	};
+
+	void Compute_Matching_Distance_Matrix()
+	{
+		// bipart_id_mapping is redundancy from RF_Distance, where a sub-b2t matrix is computed and worth storing.
+		// For matching distance, b2t matrix is not needed in this implementation, therefore, the full b2t is not assumed.
+
+		assert(sb2t_mat != nullptr);
+
+		std::cout << "\tComputing matching distance matrix...\n";
+
+		if (dis_mat != nullptr)
+			delete dis_mat;
+		// dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
+		dis_mat = new SpecMat::LowerTri<PRECISION>(n_trees);
+		dis_mat->form_row_ptr();
+
+		int workspace_size = 0;
+		int **workspace = nullptr;
+
+		BitString<T>* bipart_k = nullptr;
+		BitString<T>* bipart_l = nullptr;
+
+
+		for (int j = 0; j < n_trees; j++)
+		{
+			dis_mat[j][j] = 0;
+			auto bipart_ind_tree_j = sb2t_mat->get_CCS_val_c(j);
+			int num_internal_bipart_tree_j = bipart_ind_tree_j.get_size() - n_leaves;
+			for (int i = (j + 1); i < num_sub_tree; i++)
+			{
+				auto bipart_ind_tree_i = sb2t_mat->get_CCS_val_c(i);
+				int num_internal_bipart_tree_i = bipart_ind_tree_i.get_size() - n_leaves;
+				if (workspace == nullptr)
+				{
+					workspace_size = num_internal_bipart_tree_i > num_internal_bipart_tree_j ? num_internal_bipart_tree_i : num_internal_bipart_tree_j;
+					workspace = new int*[workspace_size];
+					for (int k = 0; k < workspace_size; k++)
+						workspace[k] = new int[workspace_size];
+				}
+				else
+				{
+					int temp_size = num_internal_bipart_tree_i > num_internal_bipart_tree_j ? num_internal_bipart_tree_i : num_internal_bipart_tree_j
+					if (workspace_size != temp_size)
+					{
+						// Re-allocate workspace
+						for (int k = 0; k < workspace_size; k++)
+							delete[] workspace[k];
+						delete[] workspace;
+
+						workspace_size = temp_size;
+
+						workspace = new int*[workspace_size];
+						for (int k = 0; k < workspace_size; k++)
+							workspace[k] = new int[workspace_size];
+					}
+				}
+
+				for (int k = 0; k < workspace_size; k++)
+				{
+					for (int l = 0; l < workspace_size; l++)
+					{
+						// Assign the normalized hamming distance between the k-th bipartition/bitstring in tree i and the l-th bipartition/bitstring in tree j to the entry i,j at workspace.
+						// For the case where the number of bipartitions not equal, those extra entries are assinged with the normalized hamming distance with all-one bitstring.
+
+						// Since the first k-row in sb2t are all leaf-bipartition, the internal bipartition records starts with an offset of n_leaves.
+
+
+
+						if((k + n_leaves) >= num_internal_bipart_tree_i)
+						{
+							bipart_k = &(Bipart->get_BitString(bipart_ind_tree_i(k + n_leaves)));
+							bipart_l = Trees->get_uniform_leafset();
+						}
+						else if ((l + n_leaves) >= num_internal_bipart_tree_j)
+						{
+							bipart_k = Trees->get_uniform_leafset();
+							bipart_l = &(Bipart->get_BitString(bipart_ind_tree_j(l + n_leaves)));
+						}
+						else
+						{
+							bipart_k = &(Bipart->get_BitString(bipart_ind_tree_i(k + n_leaves)));
+							bipart_l = &(Bipart->get_BitString(bipart_ind_tree_j(l + n_leaves)));
+						}
+						workspace[k][l] = normalized_hamming(*bipart_k, *bipart_l);
+
+			            hungarian_problem_t p;
+
+						hungarian_init(&p, workspace, workspace_size, workspace_size, HUNGARIAN_MODE_MINIMIZE_COST) ;
+            			int mdist = hungarian_solve(&p);
+            			dis_mat[i][j] = mdist;
+            			hungarian_free(&p);
+					}
+				}
+			}
+		}
+
+		if (workspace)
+		{
+			for (int k = 0; k < workspace_size; k++)
+				delete[] workspace[k];
+			delete[] workspace;
+		}
+	};
+
+	void Compute_Matching_Distance_Matrix(const Array<size_t> &sub_tree_id, Array<size_t> &bipart_id_mapping)
+	{
+		// bipart_id_mapping is redundancy from RF_Distance, where a sub-b2t matrix is computed and worth storing.
+		// For matching distance, b2t matrix is not needed in this implementation, therefore, the full b2t is not assumed.
+
+		assert(sb2t_mat != nullptr);
+		assert(sub_tree_id.get_size() > 0);
+
+		std::cout << "\tComputing matching distance matrix...\n";
+
+		int num_sub_tree = sub_tree_id.get_size();
+
+		if (dis_mat != nullptr)
+			delete dis_mat;
+		// dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
+		dis_mat = new SpecMat::LowerTri<PRECISION>(num_sub_tree);
+		dis_mat->form_row_ptr();
+
+		int workspace_size = 0;
+		int **workspace = nullptr;
+
+		BitString<T>* bipart_k = nullptr;
+		BitString<T>* bipart_l = nullptr;
+
+
+		for (int j = 0; j < num_sub_tree; j++)
+		{
+			dis_mat[j][j] = 0;
+			auto bipart_ind_tree_j = sb2t_mat->get_CCS_val_c(sub_tree_id[j]);
+			int num_internal_bipart_tree_j = bipart_ind_tree_j.get_size() - n_leaves;
+			for (int i = (j + 1); i < num_sub_tree; i++)
+			{
+				auto bipart_ind_tree_i = sb2t_mat->get_CCS_val_c(sub_tree_id[i]);
+				int num_internal_bipart_tree_i = bipart_ind_tree_i.get_size() - n_leaves;
+				if (workspace == nullptr)
+				{
+					workspace_size = num_internal_bipart_tree_i > num_internal_bipart_tree_j ? num_internal_bipart_tree_i : num_internal_bipart_tree_j;
+					workspace = new int*[workspace_size];
+					for (int k = 0; k < workspace_size; k++)
+						workspace[k] = new int[workspace_size];
+				}
+				else
+				{
+					int temp_size = num_internal_bipart_tree_i > num_internal_bipart_tree_j ? num_internal_bipart_tree_i : num_internal_bipart_tree_j
+					if (workspace_size != temp_size)
+					{
+						// Re-allocate workspace
+						for (int k = 0; k < workspace_size; k++)
+							delete[] workspace[k];
+						delete[] workspace;
+
+						workspace_size = temp_size;
+
+						workspace = new int*[workspace_size];
+						for (int k = 0; k < workspace_size; k++)
+							workspace[k] = new int[workspace_size];
+					}
+				}
+
+				for (int k = 0; k < workspace_size; k++)
+				{
+					for (int l = 0; l < workspace_size; l++)
+					{
+						// Assign the normalized hamming distance between the k-th bipartition/bitstring in tree i and the l-th bipartition/bitstring in tree j to the entry i,j at workspace.
+						// For the case where the number of bipartitions not equal, those extra entries are assinged with the normalized hamming distance with all-one bitstring.
+
+						// Since the first k-row in sb2t are all leaf-bipartition, the internal bipartition records starts with an offset of n_leaves.
+
+
+
+						if((k + n_leaves) >= num_internal_bipart_tree_i)
+						{
+							bipart_k = &(Bipart->get_BitString(bipart_ind_tree_i(k + n_leaves)));
+							bipart_l = Trees->get_uniform_leafset();
+						}
+						else if ((l + n_leaves) >= num_internal_bipart_tree_j)
+						{
+							bipart_k = Trees->get_uniform_leafset();
+							bipart_l = &(Bipart->get_BitString(bipart_ind_tree_j(l + n_leaves)));
+						}
+						else
+						{
+							bipart_k = &(Bipart->get_BitString(bipart_ind_tree_i(k + n_leaves)));
+							bipart_l = &(Bipart->get_BitString(bipart_ind_tree_j(l + n_leaves)));
+						}
+						workspace[k][l] = normalized_hamming(*bipart_k, *bipart_l);
+
+			            hungarian_problem_t p;
+
+						hungarian_init(&p, workspace, workspace_size, workspace_size, HUNGARIAN_MODE_MINIMIZE_COST) ;
+            			int mdist = hungarian_solve(&p);
+            			dis_mat[i][j] = mdist;
+            			hungarian_free(&p);
+					}
+				}
+			}
+		}
+
+		if (workspace)
+		{
+			for (int k = 0; k < workspace_size; k++)
+				delete[] workspace[k];
+			delete[] workspace;
+		}
+	};
+
+	void Compute_SPR_Distance_Matrix()
+	{
+		// bipart_id_mapping is redundancy from RF_Distance, where a sub-b2t matrix is computed and worth storing.
+		// For matching distance, b2t matrix is not needed in this implementation, therefore, the full b2t is not assumed.
+
+		assert(sb2t_mat != nullptr);
+
+		std::cout << "\tComputing SPR distance matrix...\n";
+
+
+    	std::map<std::string, int> label_map = std::map<std::string, int>();
+    	std::map<int, std::string> reverse_label_map = std::map<int, std::string>();
+		// Not sure if these maps are necessary for just computing the SPR distance.
+		// As they may affect speed (string comparison vs integer comparison), it is still included in this implementation
+
+		if (dis_mat != nullptr)
+			delete dis_mat;
+		// dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
+		dis_mat = new SpecMat::LowerTri<PRECISION>(n_trees);
+		dis_mat->form_row_ptr();
+
+		SPRNode **sprtrees = new SPRNode *[n_trees];
+
+		for (int i = 0; i < n_trees; i++)
+		{
+			auto newick_tree = this->Build_Newick_Tree(i);
+
+			std::ostringstream sstream;
+			newick_tree->Print_Newick_Tree(sstream, *Taxa_ptr);
+			std::string newick_str = sstream.str();
+            sprtrees[i] = spr_building_tree(newick_str);
+			sprtrees[i]->labels_to_numbers(&label_map, &reverse_label_map);
+			// Not sure if these maps are necessary for just computing the SPR distance.
+			// As they may affect speed (string comparison vs integer comparison), it is still included in this implementation
+
+			delete newick_tree;
+		}
+
+		for(int j = 0; j < n_trees; j++)
+    	{
+        	dis_mat[j][j] = 0;
+			for(int i = (j + 1); i < n_trees; i++)
+				dis_mat[i][j] = rSPR_branch_and_bound_simple_clustering(sprtrees[i], sprtrees[j]);
+		}
+
+		// clean
+		for (int i = 0; i < n_trees; i++)
+			sprtrees[i]->delete_tree();
+
+	};
+
+	void Compute_SPR_Distance_Matrix(const Array<size_t> &sub_tree_id, Array<size_t> &bipart_id_mapping)
+	{
+		// bipart_id_mapping is redundancy from RF_Distance, where a sub-b2t matrix is computed and worth storing.
+		// For matching distance, b2t matrix is not needed in this implementation, therefore, the full b2t is not assumed.
+
+		assert(sb2t_mat != nullptr);
+		assert(sub_tree_id.get_size() > 0);
+
+		std::cout << "\tComputing SPR distance matrix...\n";
+
+		int num_sub_tree = sub_tree_id.get_size();
+
+    	std::map<std::string, int> label_map = std::map<std::string, int>();
+    	std::map<int, std::string> reverse_label_map = std::map<int, std::string>();
+		// Not sure if these maps are necessary for just computing the SPR distance.
+		// As they may affect speed (string comparison vs integer comparison), it is still included in this implementation
+
+		if (dis_mat != nullptr)
+			delete dis_mat;
+		// dis_mat = new Matrix<PRECISION>(n_trees, n_trees, (PRECISION)0);
+		dis_mat = new SpecMat::LowerTri<PRECISION>(num_sub_tree);
+		dis_mat->form_row_ptr();
+
+		SPRNode **sprtrees = new SPRNode *[num_sub_tree];
+
+		for (int i = 0; i < num_sub_tree; i++)
+		{
+			auto newick_tree = this->Build_Newick_Tree(sub_tree_id[i]);
+
+			std::ostringstream sstream;
+			newick_tree->Print_Newick_Tree(sstream, *Taxa_ptr);
+			std::string newick_str = sstream.str();
+            sprtrees[i] = spr_building_tree(newick_str);
+			sprtrees[i]->labels_to_numbers(&label_map, &reverse_label_map);
+			// Not sure if these maps are necessary for just computing the SPR distance.
+			// As they may affect speed (string comparison vs integer comparison), it is still included in this implementation
+
+			delete newick_tree;
+		}
+
+		for(int j = 0; j < num_sub_tree; j++)
+    	{
+        	dis_mat[j][j] = 0;
+			for(int i = (j + 1); i < num_sub_tree; i++)
+				dis_mat[i][j] = rSPR_branch_and_bound_simple_clustering(sprtrees[i], sprtrees[j]);
+		}
+
+		// clean
+		for (int i = 0; i < num_sub_tree; i++)
+			sprtrees[i]->delete_tree();
+
+	};
+
 
 	int get_all_bipart_num() { return all_bipart; };
 	int get_unique_bipart_num() { return unique_bipart; };

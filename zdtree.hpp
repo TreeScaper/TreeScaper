@@ -88,7 +88,7 @@ public:
 template <class T>
 class BitString
 {
-	// This is a bitstring representing the bipartition. It must normalized with 0 at the first bit.
+	// This is a bitstring representing the bipartition.
 	// T must be unsigned.
 private:
 	size_t length;
@@ -165,6 +165,7 @@ public:
 			temp[i] = vec[i] - rhs.vec[i];
 		return BitString<T>(length, bit_size, temp);
 	}
+
 
 	friend BitString<T> operator%(const BitString<T> &lhs, const BitString<T> &rhs)
 	{
@@ -422,6 +423,23 @@ public:
 			else
 				return -1;
 		}
+	}
+
+	friend int hamming(const BitString<T> &a, const BitString<T> &b)
+	{
+		int num_diff_bits = 0;
+		for (int i = 0; i < a.length; i++)
+			num_diff_bits += __builtin_popcount(a.vec[i] ^ b.vec[i]);
+		return num_diff_bits;
+	}
+
+	friend int normalized_hamming(const BitString<T> &a, const BitString<T> &b)
+	{
+		int hamming_dist = hamming(a, b);
+		if (hamming_dist + hamming_dist > a.bit_size)
+			return a.bit_size - hamming_dist;
+		else
+			return hamming_dist;
 	}
 };
 
@@ -1326,6 +1344,11 @@ public:
 					child[1]->newick_push(comp_leafstr, weights[i], label);
 			}
 		}
+	}
+
+	void Build_Newick_Tree(Bipartition<T> *Bipart, Array<int> *bipart_id, Array<PRECISION> *weights)
+	{
+		this->Build_Newick_Tree(Bipart, bipart_id->get_vec(), weights->get_vec(), bipart_id->get_size());
 	}
 
 	void Print_Newick_Edge(std::ostream &out, const TaxonList &taxa)

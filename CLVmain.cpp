@@ -23,12 +23,19 @@ typedef unsigned char u_8;
 typedef unsigned int u_32;
 typedef unsigned long long u_64;
 
-#define n_tree_key_option 16
+#define n_tree_key_option 17
 #define n_reload_key_option 12
 #define n_nldr_key_option 11
 #define n_comm_key_option 19
 #define n_adj_key_option 7
 #define n_task_key_option 9
+
+enum DISTANCE_TYPE
+{
+	ROBINSONFOULDS,
+	MATCHING_DIST,
+	SPR_DISTANCE
+};
 
 template <class Container_type>
 TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Container_type dummy);
@@ -50,8 +57,8 @@ int main(int argc, char *argv[])
 
 	if (argc > 1 && (String)argv[1] == (String) "-trees")
 	{
-		String default_paras[n_tree_key_option] = {"", "postfix", "Taxon", "64", "0", "1", "Covariance", "Major", "1", "1", "0.01", "none", "none", "0", "none", "0"};
-		String options[n_tree_key_option] = {"-f", "-post", "-tm", "-bit", "-r", "-w", "-output", "-consensus-type", "-same-leaf", "-bipart-hf", "-bipart-lf", "-sb", "-st", "-saveobj", "-trees-key", "-lessprint"};
+		String default_paras[n_tree_key_option] = {"", "postfix", "Taxon", "64", "0", "1", "Covariance", "Major", "RF", "1", "1", "0.01", "none", "none", "0", "none", "0"};
+		String options[n_tree_key_option] = {"-f", "-post", "-tm", "-bit", "-r", "-w", "-output", "-consensus-type", "-distance-type", "-same-leaf", "-bipart-hf", "-bipart-lf", "-sb", "-st", "-saveobj", "-trees-key", "-lessprint"};
 
 		map<String, String> paras = read_paras(argc, argv, n_tree_key_option, default_paras, options);
 
@@ -304,7 +311,7 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 		}
 	}
 	else if (paras["-output"] == (String) "Distance")
-	{
+	{			
 		Array<size_t> subset, id_mapping;
 		bool flag_subtree = false;
 		if (paras["-st"] != (String) "none")
@@ -337,11 +344,23 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 		}
 
 		std::cout << "Computing distance matrix...\n";
+		DISTANCE_TYPE dist_type;
+		if (paras["-distance-type"] == (String) "RF" || paras["-distance-type"] == (String) "URF" || paras["-distance-type"] == (String) "Robinson-Foulds")
+			dist_type = ROBINSONFOULDS;
+		else if(paras["-distance-type"] == (String) "MATCH" || paras["-distance-type"] == (String) "MAT" || paras["-distance-type"] == (String) "Matching")
+			dist_type = MATCHING_DIST;
+		else if (paras["-distance-type"] == (String) "SPR")
+			dist_type = SPR_DISTANCE;
+		else
+		{
+			std::cout << "Distance type:\t" << paras["-distance-type"] << " not found!\n";
+			throw(1);
+		}
 		start = std::clock();
 		if (flag_subtree)
-			treesobj_ptr->Compute_RF_Distance_Matrix(subset, id_mapping);
+			treesobj_ptr->Compute_Distance_Matrix(dist_type, subset, id_mapping);
 		else
-			treesobj_ptr->Compute_RF_Distance_Matrix();
+			treesobj_ptr->Compute_Distance_Matrix(dist_type);
 		end = std::clock();
 		cout << "Compute distance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
 
@@ -396,7 +415,7 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 			std::cout << "\t" << consensus_tree_weights[i] << '\n';
 		}
 
-		NewickEdge<Container_type>* newick_tree = new NewickEdge<Container_type>(*(trees.get_uniform_leafset())) ;
+		NewickEdge<Container_type>* newick_tree = new NewickEdge<Container_type>(*(trees.get_uniform_leafset()));
 		newick_tree->Build_Newick_Tree(Bipart_ptr, consensus_tree_bipart_id, consensus_tree_weights, num_consensus_tree_edge);
 
 
@@ -527,15 +546,27 @@ bool reload_driver(map<String, String> &paras, Container_type dummy)
 			}
 
 			std::cout << "Computing RF-distance matrix...\n";
+			DISTANCE_TYPE dist_type;
+			if (paras["-distance-type"] == (String) "RF" || paras["-distance-type"] == (String) "URF" || paras["-distance-type"] == (String) "Robinson-Foulds")
+				dist_type = ROBINSONFOULDS;
+			else if(paras["-distance-type"] == (String) "MATCH" || paras["-distance-type"] == (String) "MAT" || paras["-distance-type"] == (String) "Matching")
+				dist_type = MATCHING_DIST;
+			else if (paras["-distance-type"] == (String) "SPR")
+				dist_type = SPR_DISTANCE;
+			else
+			{
+				std::cout << "Distance type:\t" << paras["-distance-type"] << " not found!\n";
+				throw(1);
+			}
 			start = std::clock();
 			std::cout << subset.get_size() << '\n';
 
 			if (subset.get_size() != 0)
 				tree_s = true;
 			if (tree_s)
-				treesobj.Compute_RF_Distance_Matrix(subset, id_mapping);
+				treesobj.Compute_Distance_Matrix(dist_type, id_mapping);
 			else
-				treesobj.Compute_RF_Distance_Matrix();
+				treesobj.Compute_Distance_Matrix(dist_type);
 
 			// treesobj.Compute_RF_Distance_Matrix(subset, id_mapping);
 			end = std::clock();

@@ -214,9 +214,9 @@ class SparseMatrix
 	typedef SparseMatrix self_type;
 	typedef Array2D_tuple<size_t, PRECISION> CCS_arr_type;
 	typedef Array2D_tuple<size_t, size_t> RCS_arr_type;
-	typedef size_t ind_type;
+	typedef int ind_type;
 	typedef PRECISION val_type;
-	typedef size_t add_type;
+	typedef int add_type;
 
 private:
 	size_t row;
