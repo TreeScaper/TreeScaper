@@ -4205,8 +4205,8 @@ bool Trees::Compute_Matching_dist()
     int n_taxa = leaveslabelsmaps.size();
     int btlength = (int)((n_taxa + 7) / 8);
     char* tempbitstr = new char[btlength];
-    memset(tempbitstr, 1, sizeof(char) * btlength);
-    memset(tempbitstr, 0, sizeof(char) * btlength - n_taxa);
+    memset(tempbitstr, 1, 8 * sizeof(char) * btlength);
+    memset(tempbitstr, 0, 8 * sizeof(char) * btlength - n_taxa);
     Array<char> OneBitstr(btlength, tempbitstr);
     int max_numberofbipartition = 0;
     int idx = 0;

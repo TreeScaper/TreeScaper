@@ -1442,6 +1442,71 @@ void TreeOPE::printTree_nex(NEWICKNODE *node, int length, char *gzbuff, int dept
 }
 
 /* print Nexus tree in Newick format*/
+// void TreeOPE::printTree_new(NEWICKNODE *node, char **str, char *gzbuff, int depth, int N)
+// {
+//     depth++;
+//     int bufflen, i;
+//     if (node->Nchildren == 0)
+//     {
+//         bufflen = strlen(gzbuff);
+//         if (bufflen > N - 100)
+//             gzbuff = (char*)realloc(gzbuff, 2*N);
+//         if (node->weight == 0.0)
+//             sprintf(gzbuff + bufflen, "%s:%0.6f", str[atoi(node->label)-1], 1.0);
+//         else
+//             sprintf(gzbuff + bufflen, "%s:%0.6f", str[atoi(node->label)-1], node->weight);
+//     }
+//     else
+//     {
+//         bufflen = strlen(gzbuff);
+//         sprintf(gzbuff + bufflen, "(");
+//         for (i = 0; i < node->Nchildren; i++)
+//         {
+//             printTree_new(node->child[i], str, gzbuff, depth, N);
+//             if (i != node->Nchildren-1)
+//             {
+//                 bufflen = strlen(gzbuff);
+//                 if (bufflen > N - 100)
+//                     gzbuff = (char*) realloc(gzbuff, 2 * N);
+//                 sprintf(gzbuff + bufflen, ",");
+//             }
+//         }
+//         if (node->label != NULL)
+//         {
+//             bufflen = strlen(gzbuff);
+//             if (bufflen > N - 100)
+//                 gzbuff = (char*)realloc(gzbuff, 2*N);
+//             if (depth != 1)
+//             {
+//                 if (node->weight == 0.0)
+//                     sprintf(gzbuff + bufflen, "%s:%0.6f", str[atoi(node->label)-1], 1.0);
+//                 else
+//                     sprintf(gzbuff + bufflen, "%s:%0.6f", str[atoi(node->label)-1], node->weight);
+//             }
+//             else
+//                 sprintf(gzbuff + bufflen, "%s", str[atoi(node->label) - 1]);
+//         }
+//         else
+//         {
+//             bufflen = strlen(gzbuff);
+//             if (bufflen > N-100)
+//             {
+//                 gzbuff = (char*)realloc(gzbuff, 2*N);
+//             }
+//             if(depth != 1)
+//             {
+//                 if (node->weight == 0.0)
+//                     sprintf(gzbuff + bufflen, "):%0.6f", 1.0);
+//                 else
+//                     sprintf(gzbuff + bufflen, "):%0.6f", node->weight);
+//             }
+//             else
+//                 sprintf(gzbuff + bufflen, ")");
+//         }
+//     }
+// }
+
+/* zd fixed version, the internal labels will be ignored.*/
 void TreeOPE::printTree_new(NEWICKNODE *node, char **str, char *gzbuff, int depth, int N)
 {
     depth++;
@@ -1471,7 +1536,7 @@ void TreeOPE::printTree_new(NEWICKNODE *node, char **str, char *gzbuff, int dept
                 sprintf(gzbuff + bufflen, ",");
             }
         }
-        if (node->label != NULL)
+        if (node->label != NULL && node->Nchildren < 2)
         {
             bufflen = strlen(gzbuff);
             if (bufflen > N - 100)
