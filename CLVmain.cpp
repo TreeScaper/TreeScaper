@@ -30,18 +30,18 @@ typedef unsigned long long u_64;
 #define n_adj_key_option 7
 #define n_task_key_option 9
 
-enum DISTANCE_TYPE
-{
-	ROBINSONFOULDS,
-	MATCHING_DIST,
-	SPR_DISTANCE
-};
+// enum DISTANCE_TYPE
+// {
+// 	ROBINSONFOULDS,
+// 	MATCHING_DIST,
+// 	SPR_DISTANCE
+// };
 
 template <class Container_type>
 TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Container_type dummy);
 
-template <class Container_type>
-bool reload_driver(map<String, String> &paras, Container_type dummy);
+// template <class Container_type>
+// bool reload_driver(map<String, String> &paras, Container_type dummy);
 
 Matrix<PRECISION> *nldr_driver(SpecMat::LowerTri<PRECISION> *Dis, map<String, String> &paras);
 
@@ -76,25 +76,25 @@ int main(int argc, char *argv[])
 		else
 			std::cout << "Bitstring container size not supported. Please choose value from {8, 32, 64} for key `-bit'.\n";
 	}
-	else if (argc > 1 && (String)argv[1] == (String) "-reload")
-	{
-		String default_paras[n_reload_key_option] = {"", "obj", "postfix", "64", "0", "1", "COV", "1.0", "0.0", "none", "none", "none"};
-		String options[n_reload_key_option] = {"-f", "-ft", "-post", "-bit", "-r", "-w", "-output", "-hf", "-lf", "-sb", "-st", "-reload-key"};
+	// else if (argc > 1 && (String)argv[1] == (String) "-reload")
+	// {
+	// 	String default_paras[n_reload_key_option] = {"", "obj", "postfix", "64", "0", "1", "COV", "1.0", "0.0", "none", "none", "none"};
+	// 	String options[n_reload_key_option] = {"-f", "-ft", "-post", "-bit", "-r", "-w", "-output", "-hf", "-lf", "-sb", "-st", "-reload-key"};
 
-		map<String, String> paras = read_paras(argc, argv, n_reload_key_option, default_paras, options);
+	// 	map<String, String> paras = read_paras(argc, argv, n_reload_key_option, default_paras, options);
 
-		if (paras["-key"] != (String) "none")
-			read_paras_from_csv(paras["-reload-key"], paras, true);
+	// 	if (paras["-key"] != (String) "none")
+	// 		read_paras_from_csv(paras["-reload-key"], paras, true);
 
-		if (paras["-bit"] == (String) "8")
-			reload_driver(paras, (u_8)1);
-		else if (paras["-bit"] == (String) "32")
-			reload_driver(paras, (u_32)1);
-		else if (paras["-bit"] == (String) "64")
-			reload_driver(paras, (u_64)1);
-		else
-			std::cout << "Bitstring container size not supported. Please choose value from {8, 32, 64} for key `-bit'.\n";
-	}
+	// 	if (paras["-bit"] == (String) "8")
+	// 		reload_driver(paras, (u_8)1);
+	// 	else if (paras["-bit"] == (String) "32")
+	// 		reload_driver(paras, (u_32)1);
+	// 	else if (paras["-bit"] == (String) "64")
+	// 		reload_driver(paras, (u_64)1);
+	// 	else
+	// 		std::cout << "Bitstring container size not supported. Please choose value from {8, 32, 64} for key `-bit'.\n";
+	// }
 	else if (argc > 1 && (String)argv[1] == (String) "-adj")
 	{
 		String default_paras[n_adj_key_option] = {"", "-1", "Distance", "Exponential", "time", "none", "0"};
@@ -185,7 +185,7 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 	std::cout << "Reading taxa...\n";
 	start = std::clock();
 	auto Taxa_ptr = new TaxonList();
-	size_t tree_pos = Taxa_ptr->ReadTaxa(fname, paras["-same-leaf"] == (String) "1");
+	int tree_pos = Taxa_ptr->ReadTaxa(fname, paras["-same-leaf"] == (String) "1");
 
 	// String outname_TaxonList("TaxonList");
 	// outname_TaxonList.make_stdname(paras);
@@ -255,7 +255,7 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 
 	if (paras["-output"] == (String) "Covariance")
 	{
-		Array<size_t> subset, id_mapping;
+		Array<int> subset, id_mapping;
 		double hf = atof(paras["-bipart-hf"]), lf = atof(paras["-bipart-lf"]);
 		if (paras["-sb"] != (String) "none")
 		{
@@ -298,8 +298,8 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 			Header_info Header_Cova;
 			Header_Cova.insert("created", time_stamp());
 			Header_Cova.insert("output type", "Covariance matrix");
-			string cov_size_temp = to_string(subset.get_size()) + (string) " x " + to_string(subset.get_size());
-			Header_Cova.insert("size", cov_size_temp);
+			string cov_intemp = to_string(subset.get_size()) + (string) " x " + to_string(subset.get_size());
+			Header_Cova.insert("size", cov_intemp);
 			Header_Cova.insert("bipartition id", outname_ID);
 			Header_Cova.insert("source", paras["-f"]);
 
@@ -312,7 +312,7 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 	}
 	else if (paras["-output"] == (String) "Distance")
 	{			
-		Array<size_t> subset, id_mapping;
+		Array<int> subset, id_mapping;
 		bool flag_subtree = false;
 		if (paras["-st"] != (String) "none")
 		{
@@ -371,14 +371,14 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 		Header_info Header_Dist;
 		Header_Dist.insert("created", time_stamp());
 		Header_Dist.insert("output type", "Distance matrix");
-		string dist_size_temp;
+		string dist_intemp;
 		if (flag_subtree)
-			// dist_size_temp = to_string(subset.get_size()) + (string) " x " + to_string(subset.get_size());
-			dist_size_temp = to_string(subset.get_size());
+			// dist_intemp = to_string(subset.get_size()) + (string) " x " + to_string(subset.get_size());
+			dist_intemp = to_string(subset.get_size());
 		else
-			// dist_size_temp = to_string(treesobj_ptr->get_tree_set_size()) + (string) " x " + to_string(treesobj_ptr->get_tree_set_size());
-			dist_size_temp = to_string(treesobj_ptr->get_tree_set_size());
-		Header_Dist.insert("size", dist_size_temp);
+			// dist_intemp = to_string(treesobj_ptr->get_tree_set_size()) + (string) " x " + to_string(treesobj_ptr->get_tree_set_size());
+			dist_intemp = to_string(treesobj_ptr->get_tree_set_size());
+		Header_Dist.insert("size", dist_intemp);
 		if (flag_subtree)
 			Header_Dist.insert("Tree id", outname_ID);
 		Header_Dist.insert("source", paras["-f"]);
@@ -457,150 +457,150 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 	return treesobj_ptr;
 }
 
-template <class Container_type>
-bool reload_driver(map<String, String> &paras, Container_type dummy)
-{
-	std::clock_t start, end;
-	bool rooted = (paras["-r"] == (String) "1");
-	bool weighted = (paras["-w"] == (String) "1");
-	bool filetype = (paras["-ft"] == (String) "obj");
-	bool tree_s = (paras["-st"] != (String) "none");
-	bool bipart_s = (paras["-sb"] != (String) "none");
+// template <class Container_type>
+// bool reload_driver(map<String, String> &paras, Container_type dummy)
+// {
+// 	std::clock_t start, end;
+// 	bool rooted = (paras["-r"] == (String) "1");
+// 	bool weighted = (paras["-w"] == (String) "1");
+// 	bool filetype = (paras["-ft"] == (String) "obj");
+// 	bool tree_s = (paras["-st"] != (String) "none");
+// 	bool bipart_s = (paras["-sb"] != (String) "none");
 
-	std::cout << "reloading " << (rooted ? "rooted" : "unrooted") << "\t" << (weighted ? "weighted" : "unweighted") << (filetype ? "Tree objects\n" : "Treeset\n");
+// 	std::cout << "reloading " << (rooted ? "rooted" : "unrooted") << "\t" << (weighted ? "weighted" : "unweighted") << (filetype ? "Tree objects\n" : "Treeset\n");
 
-	if (filetype)
-	{
-		TreeSetObjects<Container_type> treesobj;
-		treesobj.read_treeobj(paras["-f"]);
+// 	if (filetype)
+// 	{
+// 		TreeSetObjects<Container_type> treesobj;
+// 		treesobj.read_treeobj(paras["-f"]);
 
-		Array<size_t> subset, id_mapping;
+// 		Array<int> subset, id_mapping;
 
-		if (paras["-output"] == (String) "COV")
-		{
-			double hf = atof(paras["-hf"]), lf = atof(paras["-lf"]);
-			if (bipart_s)
-			{
-				if (!read_subset(paras["-sb"], subset))
-				{
-					std::cout << "Fail to open file for subset of bipartitions. Using default frequency setting (lf, hf) = \t(" << lf << ", " << hf << ").\n";
-					treesobj.bipart_frequency_check(lf, hf, subset);
-				}
-			}
-			else
-			{
-				std::cout << "Using default frequency setting (lf, hf) = \t(" << lf << ", " << hf << ") for computing covariance matrix.\n";
-				treesobj.bipart_frequency_check(lf, hf, subset);
-			}
+// 		if (paras["-output"] == (String) "COV")
+// 		{
+// 			double hf = atof(paras["-hf"]), lf = atof(paras["-lf"]);
+// 			if (bipart_s)
+// 			{
+// 				if (!read_subset(paras["-sb"], subset))
+// 				{
+// 					std::cout << "Fail to open file for subset of bipartitions. Using default frequency setting (lf, hf) = \t(" << lf << ", " << hf << ").\n";
+// 					treesobj.bipart_frequency_check(lf, hf, subset);
+// 				}
+// 			}
+// 			else
+// 			{
+// 				std::cout << "Using default frequency setting (lf, hf) = \t(" << lf << ", " << hf << ") for computing covariance matrix.\n";
+// 				treesobj.bipart_frequency_check(lf, hf, subset);
+// 			}
 
-			std::cout << "Computing covariance matrix...\n";
-			start = std::clock();
-			treesobj.Compute_Covariance_Matrix(subset, id_mapping);
-			end = std::clock();
-			cout << "Compute covariance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
+// 			std::cout << "Computing covariance matrix...\n";
+// 			start = std::clock();
+// 			treesobj.Compute_Covariance_Matrix(subset, id_mapping);
+// 			end = std::clock();
+// 			cout << "Compute covariance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
 
-			// Print Covariance Matrix
-			String outname_ID("Bipart_ID_for_Cov");
-			outname_ID.make_stdname(paras);
-			Header_info Header_ID;
-			Header_ID.insert("created", time_stamp());
-			Header_ID.insert("output type", "Bipartition id of the covariance matrix");
-			Header_ID.insert("size", to_string(subset.get_size()));
+// 			// Print Covariance Matrix
+// 			String outname_ID("Bipart_ID_for_Cov");
+// 			outname_ID.make_stdname(paras);
+// 			Header_info Header_ID;
+// 			Header_ID.insert("created", time_stamp());
+// 			Header_ID.insert("output type", "Bipartition id of the covariance matrix");
+// 			Header_ID.insert("size", to_string(subset.get_size()));
 
-			std::ofstream fout;
-			fout.open((char *)outname_ID);
-			fout << Header_ID;
-			for (int i = 0; i < subset.get_size(); i++)
-				fout << subset[i] << '\n';
-			fout.close();
-			cout << "Sucessfully printed bipartition id of sub-covariance matrix in Bipart_ID_for_Cov" << (char *)paras["-post"] << ".out file.\n\n";
+// 			std::ofstream fout;
+// 			fout.open((char *)outname_ID);
+// 			fout << Header_ID;
+// 			for (int i = 0; i < subset.get_size(); i++)
+// 				fout << subset[i] << '\n';
+// 			fout.close();
+// 			cout << "Sucessfully printed bipartition id of sub-covariance matrix in Bipart_ID_for_Cov" << (char *)paras["-post"] << ".out file.\n\n";
 
-			// Print Covariance Matrix
-			String outname_Cova("Covariance");
-			outname_Cova.make_stdname(paras);
-			Header_info Header_Cova;
-			Header_Cova.insert("created", time_stamp());
-			Header_Cova.insert("output type", "Covariance matrix");
-			string cov_size_temp = to_string(subset.get_size()) + (string) " x " + to_string(subset.get_size());
-			Header_Cova.insert("size", cov_size_temp);
-			Header_Cova.insert("bipartition id", outname_ID);
-			Header_Cova.insert("source", paras["-f"]);
+// 			// Print Covariance Matrix
+// 			String outname_Cova("Covariance");
+// 			outname_Cova.make_stdname(paras);
+// 			Header_info Header_Cova;
+// 			Header_Cova.insert("created", time_stamp());
+// 			Header_Cova.insert("output type", "Covariance matrix");
+// 			string cov_intemp = to_string(subset.get_size()) + (string) " x " + to_string(subset.get_size());
+// 			Header_Cova.insert("size", cov_intemp);
+// 			Header_Cova.insert("bipartition id", outname_ID);
+// 			Header_Cova.insert("source", paras["-f"]);
 
-			fout.open((char *)outname_Cova);
-			fout << Header_Cova;
-			treesobj.print_Covariance_Matrix(fout);
-			fout.close();
-			cout << "Sucessfully printed covariance matrix in Covariance_" << (char *)paras["-post"] << ".out file.\n\n";
-		}
-		else if (paras["-output"] == (String) "DIS")
-		{
-			if (tree_s)
-			{
-				if (!read_subset(paras["-st"], subset))
-				{
-					std::cout << "Fail to open file for subset of tree. Compute the full tree set.\n";
-					tree_s = false;
-				}
-				else
-					tree_s = false;
-			}
+// 			fout.open((char *)outname_Cova);
+// 			fout << Header_Cova;
+// 			treesobj.print_Covariance_Matrix(fout);
+// 			fout.close();
+// 			cout << "Sucessfully printed covariance matrix in Covariance_" << (char *)paras["-post"] << ".out file.\n\n";
+// 		}
+// 		else if (paras["-output"] == (String) "DIS")
+// 		{
+// 			if (tree_s)
+// 			{
+// 				if (!read_subset(paras["-st"], subset))
+// 				{
+// 					std::cout << "Fail to open file for subset of tree. Compute the full tree set.\n";
+// 					tree_s = false;
+// 				}
+// 				else
+// 					tree_s = false;
+// 			}
 
-			std::cout << "Computing RF-distance matrix...\n";
-			DISTANCE_TYPE dist_type;
-			if (paras["-distance-type"] == (String) "RF" || paras["-distance-type"] == (String) "URF" || paras["-distance-type"] == (String) "Robinson-Foulds")
-				dist_type = ROBINSONFOULDS;
-			else if(paras["-distance-type"] == (String) "MATCH" || paras["-distance-type"] == (String) "MAT" || paras["-distance-type"] == (String) "Matching")
-				dist_type = MATCHING_DIST;
-			else if (paras["-distance-type"] == (String) "SPR")
-				dist_type = SPR_DISTANCE;
-			else
-			{
-				std::cout << "Distance type:\t" << paras["-distance-type"] << " not found!\n";
-				throw(1);
-			}
-			start = std::clock();
-			std::cout << subset.get_size() << '\n';
+// 			std::cout << "Computing RF-distance matrix...\n";
+// 			DISTANCE_TYPE dist_type;
+// 			if (paras["-distance-type"] == (String) "RF" || paras["-distance-type"] == (String) "URF" || paras["-distance-type"] == (String) "Robinson-Foulds")
+// 				dist_type = ROBINSONFOULDS;
+// 			else if(paras["-distance-type"] == (String) "MATCH" || paras["-distance-type"] == (String) "MAT" || paras["-distance-type"] == (String) "Matching")
+// 				dist_type = MATCHING_DIST;
+// 			else if (paras["-distance-type"] == (String) "SPR")
+// 				dist_type = SPR_DISTANCE;
+// 			else
+// 			{
+// 				std::cout << "Distance type:\t" << paras["-distance-type"] << " not found!\n";
+// 				throw(1);
+// 			}
+// 			start = std::clock();
+// 			std::cout << subset.get_size() << '\n';
 
-			if (subset.get_size() != 0)
-				tree_s = true;
-			if (tree_s)
-				treesobj.Compute_Distance_Matrix(dist_type, id_mapping);
-			else
-				treesobj.Compute_Distance_Matrix(dist_type);
+// 			if (subset.get_size() != 0)
+// 				tree_s = true;
+// 			if (tree_s)
+// 				treesobj->Compute_Distance_Matrix(dist_type, id_mapping);
+// 			else
+// 				treesobj->Compute_Distance_Matrix(dist_type);
 
-			// treesobj.Compute_RF_Distance_Matrix(subset, id_mapping);
-			end = std::clock();
-			cout << "Compute RF-distance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
+// 			// treesobj.Compute_RF_Distance_Matrix(subset, id_mapping);
+// 			end = std::clock();
+// 			cout << "Compute RF-distance matrix time(s):\t" << (end - start) / (double)CLOCKS_PER_SEC << "\n";
 
-			String outname_Dist("Distance");
-			outname_Dist.make_stdname(paras);
+// 			String outname_Dist("Distance");
+// 			outname_Dist.make_stdname(paras);
 
-			Header_info Header_Dist;
-			Header_Dist.insert("created", time_stamp());
-			Header_Dist.insert("output type", "Distance matrix");
-			string dist_size_temp;
-			if (tree_s)
-				dist_size_temp = to_string(subset.get_size()) + (string) " x " + to_string(subset.get_size());
-			else
-				dist_size_temp = to_string(treesobj.get_tree_set_size()) + (string) " x " + to_string(treesobj.get_tree_set_size());
-			Header_Dist.insert("size", dist_size_temp);
-			if (tree_s)
-				Header_Dist.insert("Tree id", paras["-st"]);
-			Header_Dist.insert("source", paras["-f"]);
+// 			Header_info Header_Dist;
+// 			Header_Dist.insert("created", time_stamp());
+// 			Header_Dist.insert("output type", "Distance matrix");
+// 			string dist_intemp;
+// 			if (tree_s)
+// 				dist_intemp = to_string(subset.get_size()) + (string) " x " + to_string(subset.get_size());
+// 			else
+// 				dist_intemp = to_string(treesobj.get_tree_set_size()) + (string) " x " + to_string(treesobj.get_tree_set_size());
+// 			Header_Dist.insert("size", dist_intemp);
+// 			if (tree_s)
+// 				Header_Dist.insert("Tree id", paras["-st"]);
+// 			Header_Dist.insert("source", paras["-f"]);
 
-			std::ofstream fout;
-			fout.open((char *)outname_Dist);
-			fout << Header_Dist;
-			treesobj.print_Distance_Matrix(fout);
-			fout.close();
-			cout << "Sucessfully printed distance matrix in Distance_" << (char *)paras["-post"] << ".out file.\n\n";
-		}
+// 			std::ofstream fout;
+// 			fout.open((char *)outname_Dist);
+// 			fout << Header_Dist;
+// 			treesobj.print_Distance_Matrix(fout);
+// 			fout.close();
+// 			cout << "Sucessfully printed distance matrix in Distance_" << (char *)paras["-post"] << ".out file.\n\n";
+// 		}
 
-		treesobj.print_summary();
-	}
+// 		treesobj.print_summary();
+// 	}
 
-	return true;
-}
+// 	return true;
+// }
 
 Matrix<PRECISION> *nldr_driver(SpecMat::LowerTri<PRECISION> *Dis, map<String, String> &paras)
 {
@@ -686,8 +686,8 @@ Matrix<PRECISION> *nldr_driver(SpecMat::LowerTri<PRECISION> *Dis, map<String, St
 
 	uniform_int_distribution<> rand_uniform(0, size - 1);
 
-	unsigned MaxIter = 0;
-	unsigned MaxTime = -1;
+	int MaxIter = 0;
+	int MaxTime = -1;
 	PRECISION ErrTol = 0;
 	PRECISION DifTol = -1.0;
 
@@ -696,7 +696,7 @@ Matrix<PRECISION> *nldr_driver(SpecMat::LowerTri<PRECISION> *Dis, map<String, St
 
 	PRECISION *lambda = nullptr;
 	PRECISION *alpha = nullptr;
-	unsigned *s_ind = nullptr;
+	int *s_ind = nullptr;
 
 	PRECISION metropolis_T = 0;
 
@@ -706,13 +706,13 @@ Matrix<PRECISION> *nldr_driver(SpecMat::LowerTri<PRECISION> *Dis, map<String, St
 		MaxTime = atoi((char *)paras["KRU_STO_MAXTIME"]);
 		ErrTol = atof((char *)paras["KRU_STO_ERRTOL"]);
 
-		s_ind = new unsigned[MaxIter];
+		s_ind = new int[MaxIter];
 		for (auto i = 0; i < MaxIter; i++)
 			s_ind[i] = rand_uniform(eng);
 
 		alpha = new PRECISION[MaxIter];
 		PRECISION alpha0 = atof(paras["KRU_STO_ALPHA0"]), alphan = atof(paras["KRU_STO_ALPHAn"]);
-		;
+		
 		for (auto i = 0; i < MaxIter; i++)
 			alpha[i] = alpha0 * pow(alphan, (double)i / (MaxIter - 1));
 
@@ -752,7 +752,7 @@ Matrix<PRECISION> *nldr_driver(SpecMat::LowerTri<PRECISION> *Dis, map<String, St
 		MaxTime = atoi((char *)paras["NOR_STO_MAXTIME"]);
 		ErrTol = atof((char *)paras["NOR_STO_ERRTOL"]);
 
-		s_ind = new unsigned int[MaxIter];
+		s_ind = new int[MaxIter];
 		for (auto i = 0; i < MaxIter; i++)
 			s_ind[i] = rand_uniform(eng);
 
@@ -798,7 +798,7 @@ Matrix<PRECISION> *nldr_driver(SpecMat::LowerTri<PRECISION> *Dis, map<String, St
 		MaxTime = atoi((char *)paras["NLM_STO_MAXTIME"]);
 		ErrTol = atof((char *)paras["NLM_STO_ERRTOL"]);
 
-		s_ind = new unsigned int[MaxIter];
+		s_ind = new int[MaxIter];
 		for (auto i = 0; i < MaxIter; i++)
 			s_ind[i] = rand_uniform(eng);
 
@@ -851,7 +851,7 @@ Matrix<PRECISION> *nldr_driver(SpecMat::LowerTri<PRECISION> *Dis, map<String, St
 		for (auto i = 0; i < MaxIter; i++)
 			lambda[i] = lambda0 * pow((lambdan / lambda0), (double)i / (MaxIter - 1));
 
-		s_ind = new unsigned int[MaxIter];
+		s_ind = new int[MaxIter];
 		for (auto i = 0; i < MaxIter; i++)
 			s_ind[i] = rand_uniform(eng);
 
