@@ -19,6 +19,8 @@ extern "C"
 #define ARRAY_CONTAINER 100
 
 #define PRECISION double
+#define INTEGER_TYPE int
+
 
 enum MAT_NORM_TYPE
 {
@@ -133,7 +135,7 @@ public:
 		size++;
 	}
 
-	void push(const T &ele, size_t pos)
+	void push(const T &ele, INTEGER_TYPE pos)
 	{
 		assert(pos <= size);
 		this->push(ele);
@@ -438,8 +440,8 @@ class Array2D
 	// recording pointer to a container implemented as Array<T>.
 private:
 	Array<Array<T> *> ptr_container;
-	size_t size;
-	size_t max_size;
+	INTEGER_TYPE size;
+	INTEGER_TYPE max_size;
 
 public:
 	Array2D() : size(0), max_size(0), ptr_container(Array<Array<T> *>()){};
@@ -488,9 +490,9 @@ public:
 
 	Array<T> *get_c_ptr(int i) { return ptr_container[i]; };
 
-	size_t get_max_size() { return max_size; };
+	INTEGER_TYPE get_max_size() { return max_size; };
 
-	size_t get_size() { return size; };
+	INTEGER_TYPE get_size() { return size; };
 
 	T &ele(int i, int j) { return ptr_container[i]->ele(j); };
 
@@ -524,7 +526,7 @@ public:
 
 	void push(const T &src, int i)
 	{
-		size_t ind = (i >= 0) ? i : (size + i);
+		INTEGER_TYPE ind = (i >= 0) ? i : (size + i);
 		Array<T> *c_ptr = ptr_container[ind];
 		if (c_ptr == nullptr)
 		{
@@ -605,8 +607,8 @@ class Array2D_tuple
 private:
 	key_arr_type key_;
 	val_arr_type val_;
-	size_t size;
-	size_t max_size;
+	INTEGER_TYPE size;
+	INTEGER_TYPE max_size;
 
 public:
 	Array2D_tuple() : size(0), max_size(0), key_(key_arr_type()), val_(val_arr_type()){};
@@ -667,9 +669,9 @@ public:
 		max_size = c;
 	}
 
-	size_t get_max_size() { return max_size; }
+	INTEGER_TYPE get_max_size() { return max_size; }
 
-	size_t get_size() { return size; };
+	INTEGER_TYPE get_size() { return size; };
 
 	void set_c(int i, Array<key_type> *src_key_ptr, Array<val_type> *src_val_ptr)
 	{
@@ -729,7 +731,7 @@ public:
 		}
 	}
 
-	void resize(size_t n)
+	void resize(INTEGER_TYPE n)
 	{
 		key_.resize(n);
 		val_.resize(n);
@@ -744,12 +746,12 @@ class Matrix
 	typedef Matrix<T> self_type;
 
 private:
-	size_t row;
-	size_t col;
+	INTEGER_TYPE row;
+	INTEGER_TYPE col;
 	T **vec;
 
 public:
-	Matrix<T>(size_t r, size_t c) : row(r), col(c), vec((r > 0) ? new T *[row] : nullptr)
+	Matrix<T>(INTEGER_TYPE r, INTEGER_TYPE c) : row(r), col(c), vec((r > 0) ? new T *[row] : nullptr)
 	{
 		if ((row > 0) && (col > 0))
 		{
@@ -758,7 +760,7 @@ public:
 		}
 	};
 	Matrix<T>() : Matrix(0, 0){};
-	Matrix<T>(size_t r, size_t c, const T &ele) : Matrix(r, c)
+	Matrix<T>(INTEGER_TYPE r, INTEGER_TYPE c, const T &ele) : Matrix(r, c)
 	{
 		for (int i = 0; i < row; i++)
 			for (int j = 0; j < col; j++)
@@ -799,9 +801,9 @@ public:
 
 	T ele(int i, int j) const { return vec[i][j]; };
 
-	size_t get_row() const { return row; };
+	INTEGER_TYPE get_row() const { return row; };
 
-	size_t get_col() const { return col; };
+	INTEGER_TYPE get_col() const { return col; };
 
 	T **get_vec() { return vec; };
 
@@ -812,7 +814,7 @@ public:
 		vec[i] = src;
 	}
 
-	void resize(size_t r, size_t c)
+	void resize(INTEGER_TYPE r, INTEGER_TYPE c)
 	{
 		if (r != row || c != col)
 		{
@@ -931,7 +933,7 @@ public:
 	friend bool inverse(Matrix<T> &mat)
 	{
 		assert(mat.row == mat.col);
-		unsigned row = mat.row, col = mat.col;
+		INTEGER_TYPE row = mat.row, col = mat.col;
 
 		real *V = new real[row * col];
 		real *Vn = new real[row * col];
