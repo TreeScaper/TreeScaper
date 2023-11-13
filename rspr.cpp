@@ -2521,9 +2521,13 @@ int rSPR_branch_and_bound_simple_clustering(SPRNode *T1, SPRNode *T2, bool verbo
                     }
                 }
                 //IN_SPLIT_APPROX = false;
-                num_splits++;
+
+                // zd edit: ++ operand acting on bool value is not supported in C++17
+                // num_splits++;
+                num_splits += 1;
+
             }
-            
+
             // TODO: approx again? seperate approxes ?
         }
     }
