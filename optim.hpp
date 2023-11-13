@@ -19,7 +19,7 @@
 
 // This libiary require a strict rules in ordering pointers. In general, type KwArg kept null pointers to all parameters needed for specific objects.
 // For objects in optimization library, the following partitions on pointers holds:
-//      1) The first part keeps all methods/function needed for this object. They all take KwArg type and several unsigned indices as argument.
+//      1) The first part keeps all methods/function needed for this object. They all take KwArg type and several int indices as argument.
 //      2) The second part keeps variable/points and all associated mutable data structure
 
 #define PROBLEM_ROUT_NUM 6
@@ -50,20 +50,20 @@ namespace OptimLib
     public:
         KwArg routine;
         KwArg arg;
-        unsigned int CUS_IND;
+        int CUS_IND;
 
         Optim_KwArg() : routine(KwArg()), arg(KwArg()), CUS_IND(0){};
 
-        Optim_KwArg(unsigned int m_num, unsigned int a_num, unsigned int ca_num)
+        Optim_KwArg(int m_num, int a_num, int ca_num)
         {
             routine = KwArg(m_num);
             arg = KwArg(a_num + ca_num);
             CUS_IND = a_num;
         }
 
-        Optim_KwArg(OPTIM_TYPE ot, unsigned int cus_var_num)
+        Optim_KwArg(OPTIM_TYPE ot, int cus_var_num)
         {
-            unsigned int m_n, a_n, ca_n;
+            int m_n, a_n, ca_n;
             ca_n = cus_var_num;
             switch (ot)
             {
@@ -102,7 +102,7 @@ namespace OptimLib
             this->set_routine(copy, 4);
         };
 
-        void init_iter_variable(unsigned int *c_iter, unsigned int *c_time, PRECISION *c_err, PRECISION *c_diff,
+        void init_iter_variable(int *c_iter, int *c_time, PRECISION *c_err, PRECISION *c_diff,
                                 void *x, PRECISION *f, void *D, PRECISION *slope, PRECISION *D_norm, PRECISION *stepsize)
         {
             this->set_arg(c_iter, 0);
@@ -117,7 +117,7 @@ namespace OptimLib
             this->set_arg(stepsize, 9);
         };
 
-        void init_iter_variable(unsigned int *c_iter, unsigned int *c_time, PRECISION *c_err, PRECISION *c_diff,
+        void init_iter_variable(int *c_iter, int *c_time, PRECISION *c_err, PRECISION *c_diff,
                                 void *x, PRECISION *fx, void *D, PRECISION *slope, PRECISION *D_norm, PRECISION *stepsize,
                                 void *y, PRECISION *fy, bool *accepted)
         {
@@ -175,14 +175,14 @@ namespace OptimLib
             this->set_routine(copy, 5);
         };
 
-        void *carg(unsigned i) { return this->arg[CUS_IND + i]; };
+        void *carg(int i) { return this->arg[CUS_IND + i]; };
 
         template <class T>
-        void set_routine(T *arg, unsigned i) { routine.set(arg, i); };
+        void set_routine(T *arg, int i) { routine.set(arg, i); };
         template <class T>
-        void set_arg(T *arg_ptr, unsigned i) { arg.set(arg_ptr, i); };
+        void set_arg(T *arg_ptr, int i) { arg.set(arg_ptr, i); };
         template <class T>
-        void set_carg(T *arg_ptr, unsigned i) { arg.set(arg_ptr, i + CUS_IND); };
+        void set_carg(T *arg_ptr, int i) { arg.set(arg_ptr, i + CUS_IND); };
     };
 
     class Optim_StepSize
@@ -214,7 +214,7 @@ namespace OptimLib
     {
     protected:
         PRECISION *a;
-        unsigned ind;
+        int ind;
 
     public:
         Optim_Computed_StepSize(PRECISION *x) : Optim_StepSize(COMPUTED_STEPSIZE), a(x), ind(0){};
@@ -227,7 +227,7 @@ namespace OptimLib
     };
     class Optim_Search_Stepsize : public Optim_StepSize
     {
-        typedef PRECISION (*Search)(Optim_KwArg &, unsigned int *ind);
+        typedef PRECISION (*Search)(Optim_KwArg &, int *ind);
 
     protected:
         Optim_KwArg *kws;
@@ -238,7 +238,7 @@ namespace OptimLib
         // if there is an efficient implemention restricted to given direction, provided with current status.
     private:
         Search search;
-        unsigned int ind_stepsize[3] = {0, 1, 2};
+        int ind_stepsize[3] = {0, 1, 2};
         // For general Optim_Search_Stepsize, the search implementation must be provided from outside.
         // Note that this member wont be inherited to derived Stepsize structure, as they usually have
         // a more structual searching model implemented themselves.
@@ -251,16 +251,16 @@ namespace OptimLib
     };
     class Wolfe_1st_StepSize : public Optim_Search_Stepsize
     {
-        typedef void (*Cost)(Optim_KwArg &, unsigned int *ind);
-        typedef void (*Update)(Optim_KwArg &, unsigned int *ind);
-        typedef void (*Copy)(Optim_KwArg &, unsigned int *ind);
-        typedef void (*Slope)(Optim_KwArg &, unsigned int *ind);
+        typedef void (*Cost)(Optim_KwArg &, int *ind);
+        typedef void (*Update)(Optim_KwArg &, int *ind);
+        typedef void (*Copy)(Optim_KwArg &, int *ind);
+        typedef void (*Slope)(Optim_KwArg &, int *ind);
 
     private:
-        unsigned int new_c_ind[2] = {6, 7};            // Cost value of y: y, f_y
-        unsigned int cp_ind[2] = {1, 6};               // Copy x to y: x, y
-        unsigned int cp_rev_ind[2] = {6, 1};           // Copy y to x: y, x
-        unsigned int u_ind[7] = {1, 3, 5, 6, 2, 7, 0}; // general update: x, Delta, t, y, f_y, e
+        int new_c_ind[2] = {6, 7};            // Cost value of y: y, f_y
+        int cp_ind[2] = {1, 6};               // Copy x to y: x, y
+        int cp_rev_ind[2] = {6, 1};           // Copy y to x: y, x
+        int u_ind[7] = {1, 3, 5, 6, 2, 7, 0}; // general update: x, Delta, t, y, f_y, e
 
     protected:
         PRECISION alpha;
@@ -289,21 +289,21 @@ namespace OptimLib
 
     class Optim_Iter
     {
-        typedef void (*Cost)(Optim_KwArg &, unsigned int *ind);
-        typedef void (*Direction)(Optim_KwArg &, unsigned int *ind);
-        typedef void (*Update)(Optim_KwArg &, unsigned int *ind);
-        typedef void (*Slope)(Optim_KwArg &, unsigned int *ind);
-        typedef void (*Copy)(Optim_KwArg &, unsigned int *ind);
+        typedef void (*Cost)(Optim_KwArg &, int *ind);
+        typedef void (*Direction)(Optim_KwArg &, int *ind);
+        typedef void (*Update)(Optim_KwArg &, int *ind);
+        typedef void (*Slope)(Optim_KwArg &, int *ind);
+        typedef void (*Copy)(Optim_KwArg &, int *ind);
 
     private:
-        unsigned c_x_ind[2] = {4, 5};                    // Cost of x: x, fx
-        unsigned c_y_ind[2] = {10, 11};                  // Cost of y: y fy
-        unsigned d_ind[3] = {4, 6, 8};                   // Get update direction: x, Delta, n
-        unsigned u_ip_ind[5] = {4, 6, 9, 5, 2};          // Inplace update: x, Delta, t, f, e
-        unsigned u_nip_ind[7] = {4, 6, 9, 10, 5, 11, 2}; // Inplace update: x, Delta, t, y, fx, fy, e
-        unsigned sl_ind[3] = {4, 6, 7};                  // Compute slope: x, Delta, s
-        unsigned cp_ind[4] = {4, 5, 10, 11};             // Copy x to y : x, fx, y, fy
-        unsigned cp_ind_rev[4] = {10, 11, 4, 5};         // Copy y to x : y, fy, x, fx
+        int c_x_ind[2] = {4, 5};                    // Cost of x: x, fx
+        int c_y_ind[2] = {10, 11};                  // Cost of y: y fy
+        int d_ind[3] = {4, 6, 8};                   // Get update direction: x, Delta, n
+        int u_ip_ind[5] = {4, 6, 9, 5, 2};          // Inplace update: x, Delta, t, f, e
+        int u_nip_ind[7] = {4, 6, 9, 10, 5, 11, 2}; // Inplace update: x, Delta, t, y, fx, fy, e
+        int sl_ind[3] = {4, 6, 7};                  // Compute slope: x, Delta, s
+        int cp_ind[4] = {4, 5, 10, 11};             // Copy x to y : x, fx, y, fy
+        int cp_ind_rev[4] = {10, 11, 4, 5};         // Copy y to x : y, fy, x, fx
 
     protected:
         Optim_KwArg *kws;
@@ -314,8 +314,8 @@ namespace OptimLib
         Slope SL;
         Copy CP;
 
-        unsigned int *iter;
-        unsigned int *acc_time;
+        int *iter;
+        int *acc_time;
         PRECISION *err;
         PRECISION *diff;
         PRECISION *cur_step;
@@ -337,8 +337,8 @@ namespace OptimLib
             SL = reinterpret_cast<Slope>(kws->routine(3));
             CP = reinterpret_cast<Copy>(kws->routine(4));
 
-            iter = reinterpret_cast<unsigned int *>(kws->arg(0));
-            acc_time = reinterpret_cast<unsigned int *>(kws->arg(1));
+            iter = reinterpret_cast<int *>(kws->arg(0));
+            acc_time = reinterpret_cast<int *>(kws->arg(1));
             err = reinterpret_cast<PRECISION *>(kws->arg(2));
             diff = reinterpret_cast<PRECISION *>(kws->arg(3));
             nD = reinterpret_cast<PRECISION *>(kws->arg(8));
@@ -358,17 +358,17 @@ namespace OptimLib
         void accept_trial_step();
 
         Optim_KwArg *get_current_states() { return kws; };
-        unsigned int *get_cur_iter() { return iter; };
-        unsigned int *get_cur_time() { return acc_time; };
+        int *get_cur_iter() { return iter; };
+        int *get_cur_time() { return acc_time; };
         PRECISION *get_cur_err() { return err; };
         PRECISION *get_cur_diff() { return diff; };
 
-        void set_cur_iter(unsigned int *arg)
+        void set_cur_iter(int *arg)
         {
             kws->set_arg(arg, 0);
             iter = arg;
         };
-        void set_cur_time(unsigned int *arg)
+        void set_cur_time(int *arg)
         {
             kws->set_arg(arg, 1);
             acc_time = arg;
@@ -408,8 +408,8 @@ namespace OptimLib
         Optim_StepSize *ss;
 
         Optim_KwArg *cur_states;
-        unsigned int *cur_iter;
-        unsigned int *cur_time;
+        int *cur_iter;
+        int *cur_time;
         PRECISION *cur_err;
         PRECISION *cur_diff;
 
@@ -454,10 +454,10 @@ namespace OptimLib
     private:
         typedef bool (*Loop)(Optim_KwArg &);
         Loop Loop_Check;
-        unsigned *inner_iter;
+        int *inner_iter;
 
     public:
-        Optim_Gauss_Seidel_Solver(Optim_Paras *pa, Optim_Iter *it, Optim_StepSize *s, Loop loop_check, unsigned *loop_iter)
+        Optim_Gauss_Seidel_Solver(Optim_Paras *pa, Optim_Iter *it, Optim_StepSize *s, Loop loop_check, int *loop_iter)
             : Optim_Solver(pa, it, s)
         {
             // Optim_Iter keeps the inner iterator
@@ -472,12 +472,12 @@ namespace OptimLib
 
     class Optim_Trial_Stepping_Solver : public Optim_Stepping_Solver
     {
-        typedef bool (*Accept)(Optim_KwArg &kws, unsigned *ind);
+        typedef bool (*Accept)(Optim_KwArg &kws, int *ind);
 
     protected:
         Accept A;
         bool *accepted;
-        unsigned ind_A[6] = {0, 2, 4, 5, 10, 11}; // cur_iter, cur_err, x, fx, y, fy
+        int ind_A[6] = {0, 2, 4, 5, 10, 11}; // cur_iter, cur_err, x, fx, y, fy
 
     public:
         Optim_Trial_Stepping_Solver(Optim_Paras *pa, Optim_Iter *it, Optim_StepSize *s,
@@ -501,5 +501,5 @@ namespace OptimLib
     //     bool solve();
     // };
 
-    void nullOptimFunc(Optim_KwArg &, unsigned *);
+    void nullOptimFunc(Optim_KwArg &, int *);
 }

@@ -16,7 +16,7 @@ void SparseMatrix::transpose_inplace() {
 		auto cur_col_ind_ptr = this->RCS->pop_key_c(i);
 		auto cur_CCS_ind_ptr = this->RCS->pop_val_c(i);
 		if (cur_col_ind_ptr != nullptr) {
-			size_t row_size = cur_col_ind_ptr->get_size();
+			INTEGER_TYPE row_size = cur_col_ind_ptr->get_size();
 			if (row_size) {
 				auto val_in_row = new Array<val_type>(0, row_size);
 				for (int j = 0; j < row_size; j++)
@@ -64,7 +64,7 @@ SparseMatrix SparseMatrix::transpose() {
 		auto temp_col_ind_ptr = this->RCS->get_key_ptr(i);
 		auto temp_row_CCS_ptr = this->RCS->get_val_ptr(i);
 		if (temp_col_ind_ptr != nullptr) {
-			size_t row_size = temp_col_ind_ptr->get_size();
+			INTEGER_TYPE row_size = temp_col_ind_ptr->get_size();
 			if (row_size) {
 				auto col_ind_in_row = new Array<ind_type>(0, row_size);
 				auto val_in_row = new Array<val_type>(0, row_size);
@@ -103,7 +103,7 @@ SparseMatrix SparseMatrix::transpose() {
 }
 
 SparseMatrix* SparseMatrix::subMat_col(const Array<ind_type>& col_subset, Array<ind_type>& ind_mapping) {
-	size_t sub_col = col_subset.get_size();
+	INTEGER_TYPE sub_col = col_subset.get_size();
 	SparseMatrix* Ans = new SparseMatrix(sub_col);
 	
 	
@@ -133,7 +133,7 @@ SparseMatrix* SparseMatrix::subMat_col(const Array<ind_type>& col_subset, Array<
 }
 
 SparseMatrix* SparseMatrix::subMat_row(const Array<ind_type>& row_subset, Array<ind_type>& ind_mapping) {
-	size_t sub_row = row_subset.get_size();
+	INTEGER_TYPE sub_row = row_subset.get_size();
 	SparseMatrix* Ans = new SparseMatrix(sub_row);
 
 	Ans->initialize_CCS();
@@ -164,11 +164,11 @@ SparseMatrix* SparseMatrix::subMat_row(const Array<ind_type>& row_subset, Array<
 	return Ans;
 }
 
-void SparseMatrix::compress_indices(Array<ind_type>** ind, size_t n, Array<ind_type>& ind_mapping) {
-	size_t* row_ind = new size_t[n];
-	size_t* row_val = new size_t[n];
-	memset(row_ind, 0, n * sizeof(size_t));
-	memset(row_val, 0, n * sizeof(size_t));
+void SparseMatrix::compress_indices(Array<ind_type>** ind, INTEGER_TYPE n, Array<ind_type>& ind_mapping) {
+	INTEGER_TYPE* row_ind = new INTEGER_TYPE[n];
+	INTEGER_TYPE* row_val = new INTEGER_TYPE[n];
+	memset(row_ind, 0, n * sizeof(INTEGER_TYPE));
+	memset(row_val, 0, n * sizeof(INTEGER_TYPE));
 
 	Array<ind_type> active(0, n);
 	Array<ind_type> indices(0, n);
@@ -180,7 +180,7 @@ void SparseMatrix::compress_indices(Array<ind_type>** ind, size_t n, Array<ind_t
 		indices.push(i, pos);
 	}
 
-	size_t r = 0;
+	INTEGER_TYPE r = 0;
 
 	while (!active.is_empty()) {
 		int temp = active.back();

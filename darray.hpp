@@ -6,10 +6,14 @@
 #define ADDRESS_CONTAINER 10
 #define DYNAMIC_ARRAY_CONTAINER 100
 
+#ifndef INTEGER_TYPE
+#define INTEGER_TYPE int
+#endif
+
 class address_list {
 public:
 	address_list() : vec(nullptr), size(0), max_size(0) {};
-	address_list(size_t n) : size(0), max_size(n) { 
+	address_list(INTEGER_TYPE n) : size(0), max_size(n) { 
 		vec = new void* [n]; 
 		for (int i = 0; i < n; i++)
 			vec[i] = nullptr;
@@ -50,7 +54,7 @@ public:
 	}
 
 	template<class S>
-	void release_vector(size_t j, S& junk) {
+	void release_vector(INTEGER_TYPE j, S& junk) {
 		if (vec[j] != nullptr) {
 			S* temp = (S*)vec[j];
 			delete[] temp;
@@ -94,7 +98,7 @@ public:
 		return ptr;
 	}
 
-	void* pop(size_t i) {
+	void* pop(INTEGER_TYPE i) {
 		assert((i >= 0) || (i < size));
 		if (i == (size - 1))
 			return pop();
@@ -108,35 +112,35 @@ public:
 		}
 	}
 
-	size_t get_size() const { return size; };
+	INTEGER_TYPE get_size() const { return size; };
 
-	size_t get_max_size() const { return max_size; };
+	INTEGER_TYPE get_max_size() const { return max_size; };
 
-	void* operator[](size_t i) { return vec[i]; };
+	void* operator[](INTEGER_TYPE i) { return vec[i]; };
 
-	void* ele(size_t i) { return vec[i]; };
+	void* ele(INTEGER_TYPE i) { return vec[i]; };
 
 	template<class T>
-	void set_ele(size_t i, T* ptr) { vec[i] = (void*)ptr; };
+	void set_ele(INTEGER_TYPE i, T* ptr) { vec[i] = (void*)ptr; };
 
-	void set_ele(size_t i, void* ptr) { vec[i] = ptr; };
+	void set_ele(INTEGER_TYPE i, void* ptr) { vec[i] = ptr; };
 
-	void set_size(size_t i) { assert(i <= max_size); size = i; }
+	void set_size(INTEGER_TYPE i) { assert(i <= max_size); size = i; }
 
 	void* back() { return vec[size - 1]; };
 
 private:
 	void** vec;
-	size_t size;
-	size_t max_size;
+	INTEGER_TYPE size;
+	INTEGER_TYPE max_size;
 };
 
 template <class T>
 class darray {
 public:
 	darray() : container(DYNAMIC_ARRAY_CONTAINER), size(0), address(new address_list), end_ptr(nullptr) {};
-	darray(size_t c) : container(c), size(0), address(new address_list()), end_ptr(nullptr) {};
-	darray(size_t n, T* src_ptr) : container(n), size(n), address(new address_list(1)), end_ptr(src_ptr + (n - 1)) {
+	darray(INTEGER_TYPE c) : container(c), size(0), address(new address_list()), end_ptr(nullptr) {};
+	darray(INTEGER_TYPE n, T* src_ptr) : container(n), size(n), address(new address_list(1)), end_ptr(src_ptr + (n - 1)) {
 		// Construction from shallow copy of given array.
 		address->set_ele(0, src_ptr);
 		src_ptr = nullptr; 
@@ -148,26 +152,26 @@ public:
 			end_ptr = nullptr;
 		}
 		else{
-			size_t q = (size - 1) / container + 1; // All containers
-			size_t r = size - (q - 1) * container; // Vaild entries number of the last container
+			INTEGER_TYPE q = (size - 1) / container + 1; // All containers
+			INTEGER_TYPE r = size - (q - 1) * container; // Vaild entries number of the last container
 			address = new address_list(q);
 			T* dest_vec = nullptr;
 			T* src_vec = nullptr;
-			for (unsigned i = 0; i < q; i++) {
+			for (INTEGER_TYPE i = 0; i < q; i++) {
 				 dest_vec = new T[container];
 				 src_vec = src.get_vec_const(i);
-				 for (unsigned j = 0; j < container; j++)
+				 for (INTEGER_TYPE j = 0; j < container; j++)
 					 dest_vec[j] = src_vec[j];
 				 address->set_ele(i, dest_vec);
 			}
 			end_ptr = dest_vec + (r - 1);
 		}
 	}
-	darray(size_t c, size_t s, const address_list& adds, T* endptr = nullptr) : container(c), size(s), address(adds), end_ptr(endptr) {
+	darray(INTEGER_TYPE c, INTEGER_TYPE s, const address_list& adds, T* endptr = nullptr) : container(c), size(s), address(adds), end_ptr(endptr) {
 		// This is a construction by shallow copy. The argument is usually sent from a dynamic array that is about to be released.
 		if (size > 0 && end_ptr == nullptr) {
-			size_t q = (size - 1) / container;	// Container indices
-			size_t r = size - q * container;	// Vaild entries number of the last container
+			INTEGER_TYPE q = (size - 1) / container;	// Container indices
+			INTEGER_TYPE r = size - q * container;	// Vaild entries number of the last container
 			end_ptr = (T*)address->ele(q);
 			end_ptr += (r - 1);
 		}
@@ -195,7 +199,7 @@ public:
 		typedef T* pointer;
 
 		darray<T>::iterator() : cur_block(-1), cur_index(-1), container(0), address(nullptr), ptr_(nullptr) {};
-		darray<T>::iterator(size_t b, size_t i, size_t c, address_list* a, pointer ptr) : cur_block(b), cur_index(i), container(c), address(a), ptr_(ptr) {};
+		darray<T>::iterator(INTEGER_TYPE b, INTEGER_TYPE i, INTEGER_TYPE c, address_list* a, pointer ptr) : cur_block(b), cur_index(i), container(c), address(a), ptr_(ptr) {};
 		//darray<T>::iterator(self_type&& src) : iterator() {
 		//	swap(*this, src);
 		//	std::cout << "this iterator:\t" << cur_block << '\t' << cur_index << '\n';
@@ -203,7 +207,7 @@ public:
 		//};
 		darray<T>::iterator(const self_type& src) : cur_block(src.cur_block), cur_index(src.cur_index), container(src.container), address(src.address), ptr_(src.ptr_) {};
 
-		//darray<T>::iterator(size_t b, size_t i, size_t c, address_list* a, pointer ptr) {
+		//darray<T>::iterator(INTEGER_TYPE b, INTEGER_TYPE i, INTEGER_TYPE c, address_list* a, pointer ptr) {
 		//	cur_block = b;
 		//	cur_index = i;
 		//	container = c;
@@ -289,9 +293,9 @@ public:
 		bool operator!=(const self_type& rhs) { return ((cur_block != rhs.cur_block) || (cur_index != rhs.cur_index)); }
 		self_type& get_ref() { return *this; }
 	private:
-		size_t cur_block;
-		size_t cur_index;
-		size_t container;
+		INTEGER_TYPE cur_block;
+		INTEGER_TYPE cur_index;
+		INTEGER_TYPE container;
 		address_list* address;
 		pointer ptr_;
 	};
@@ -304,7 +308,7 @@ public:
 		typedef T* pointer;
 
 		const_iterator() : cur_block(-1), cur_index(-1), container(0), address(nullptr), ptr_(nullptr) {};
-		const_iterator(size_t b, size_t i, size_t c, address_list* a, pointer ptr) : cur_block(b), cur_index(i), container(c), address(a), ptr_(ptr) {};
+		const_iterator(INTEGER_TYPE b, INTEGER_TYPE i, INTEGER_TYPE c, address_list* a, pointer ptr) : cur_block(b), cur_index(i), container(c), address(a), ptr_(ptr) {};
 		const_iterator(const self_type& src) : cur_block(src.cur_block), cur_index(src.cur_index), container(src.container), address(src.address), ptr_(src.ptr_) {};
 
 		friend void swap(self_type& lhs, self_type& rhs) {
@@ -372,9 +376,9 @@ public:
 		bool operator==(const self_type& rhs) { return ((cur_block == rhs.cur_block) && (cur_index == rhs.cur_index)); }
 		bool operator!=(const self_type& rhs) { return ((cur_block != rhs.cur_block) || (cur_index != rhs.cur_index)); }
 	private:
-		size_t cur_block;
-		size_t cur_index;
-		size_t container;
+		INTEGER_TYPE cur_block;
+		INTEGER_TYPE cur_index;
+		INTEGER_TYPE container;
 		address_list* address;
 		pointer ptr_;
 	};
@@ -450,42 +454,42 @@ public:
 		return *this;
 	}
 
-	T& ele(size_t index) {
+	T& ele(INTEGER_TYPE index) {
 		// start from 0
 		return *ele_ptr(index);
 	};
 
-	T* ele_ptr(size_t index) {
+	T* ele_ptr(INTEGER_TYPE index) {
 		// start from 0
 		assert(index < size);
-		size_t q = index / container;
-		size_t r = index - q * container;
+		INTEGER_TYPE q = index / container;
+		INTEGER_TYPE r = index - q * container;
 		T* found = (T*)address->ele(q);
 		found += r;
 		return found;
 	};
 
-	T& operator[](size_t index) { return this->ele(index); };
+	T& operator[](INTEGER_TYPE index) { return this->ele(index); };
 
-	T* get_vec(size_t index = 0) { return (T*)address->ele(index); };
+	T* get_vec(INTEGER_TYPE index = 0) { return (T*)address->ele(index); };
 
-	T* get_vec_const(size_t index = 0) const { return (T*)address->ele(index); };
+	T* get_vec_const(INTEGER_TYPE index = 0) const { return (T*)address->ele(index); };
 
 	address_list* get_address() { return address; };
 
-	size_t get_container_size() { return container; };
+	INTEGER_TYPE get_container_size() { return container; };
 
-	size_t get_size() const { return (end_ptr == nullptr) ? 0 : size; };
+	INTEGER_TYPE get_size() const { return (end_ptr == nullptr) ? 0 : size; };
 
 	T* get_end_ptr() { return end_ptr; };
 
-	void resize(size_t n) {
-		size_t max_size = address->get_size() * container;
+	void resize(INTEGER_TYPE n) {
+		INTEGER_TYPE max_size = address->get_size() * container;
 		if (n > max_size) {
-			size_t r = n - max_size; // r > 0
-			size_t q = (r - 1) / container + 1; // q > 0
+			INTEGER_TYPE r = n - max_size; // r > 0
+			INTEGER_TYPE q = (r - 1) / container + 1; // q > 0
 			r = n - (address->get_size() + q - 1) * container;
-			for (unsigned i = 0; i < q; i++)
+			for (INTEGER_TYPE i = 0; i < q; i++)
 				address->push(new T[container]);
 			end_ptr = (T*)address->back();
 			end_ptr += (r - 1);
@@ -499,7 +503,7 @@ public:
 
 	void set_value(const T& ele) {
 		assert(size != 0);
-		size_t q = (size - 1) / container + 1;
+		INTEGER_TYPE q = (size - 1) / container + 1;
 		T* cur_vec;
 		for (int i = 0; i < q; i++) {
 			cur_vec = (T*)address->ele(i);
@@ -508,7 +512,7 @@ public:
 		}
 	}
 
-	void resize(size_t n, const T& ele) {
+	void resize(INTEGER_TYPE n, const T& ele) {
 		this->resize(n);
 		this->set_value(ele);
 	}
@@ -561,8 +565,8 @@ public:
 	T& front() { return *(this->front_ptr()); };
 
 private:
-	size_t container;
-	size_t size;
+	INTEGER_TYPE container;
+	INTEGER_TYPE size;
 	address_list* address;
 	T* end_ptr;
 
@@ -572,10 +576,10 @@ template <class T>
 class darray_dc {
 public:
 	darray_dc() : c_size(0), e_size(0), address(new address_list()) {};
-	darray_dc(size_t n) : c_size(0), e_size(0), address(new address_list(n)) {};
-	darray_dc(size_t n, size_t c) : darray_dc(n) { this->initial_container(c); c_size = n; };
-	darray_dc(size_t n, size_t c, T& ele) : c_size(n), e_size(n* c), address(new address_list(n)) {
-		for (size_t i = 0; i < c_size; i++) {
+	darray_dc(INTEGER_TYPE n) : c_size(0), e_size(0), address(new address_list(n)) {};
+	darray_dc(INTEGER_TYPE n, INTEGER_TYPE c) : darray_dc(n) { this->initial_container(c); c_size = n; };
+	darray_dc(INTEGER_TYPE n, INTEGER_TYPE c, T& ele) : c_size(n), e_size(n* c), address(new address_list(n)) {
+		for (INTEGER_TYPE i = 0; i < c_size; i++) {
 			darray<T>* temp = new darray<T>(c);
 			temp->resize(c, ele);
 			address->set_size(n);
@@ -585,7 +589,7 @@ public:
 	darray_dc(const darray_dc<T>& src) : c_size(src.c_size), e_size(src.e_size) {
 		this->address = new address_list(*src.address);
 		darray<T>* temp_src;
-		for (size_t i = 0; i < c_size; i++) {
+		for (INTEGER_TYPE i = 0; i < c_size; i++) {
 			temp_src = (darray<T>*) src.address->ele(i);
 			if (temp_src != nullptr) {
 				auto temp = new darray<T>(*temp_src); //deep copy.
@@ -602,8 +606,8 @@ public:
 		delete this->address;
 	}
 
-	void initial_container(size_t c = DYNAMIC_ARRAY_CONTAINER) {
-		for (size_t i = 0; i < c_size; i++)
+	void initial_container(INTEGER_TYPE c = DYNAMIC_ARRAY_CONTAINER) {
+		for (INTEGER_TYPE i = 0; i < c_size; i++)
 			address->set_ele(i, new darray<T>(c));
 	}
 
@@ -618,7 +622,7 @@ public:
 		typedef typename darray<T>::iterator c_iterator;
 
 		darray_dc<T>::iterator() : cur_block(-1), cur_index(-1), cur_iterator(typename darray<T>::iterator().get_ref()), address(nullptr), cur_block_ptr(nullptr) {};
-		darray_dc<T>::iterator(size_t b, size_t i, address_list* a, c_iterator it, c_ptr cur_b_p) : cur_block(b), cur_index(i), address(a), cur_iterator(it), cur_block_ptr(cur_b_p) {};
+		darray_dc<T>::iterator(INTEGER_TYPE b, INTEGER_TYPE i, address_list* a, c_iterator it, c_ptr cur_b_p) : cur_block(b), cur_index(i), address(a), cur_iterator(it), cur_block_ptr(cur_b_p) {};
 		darray_dc<T>::iterator(const self_type& src) : cur_block(src.cur_block), cur_index(src.cur_index), address(src.address), cur_iterator(src.cur_iterator), cur_block_ptr(src.cur_block_ptr) {};
 
 		friend void swap(self_type& lhs, self_type& rhs) {
@@ -683,8 +687,8 @@ public:
 			else {
 				if (cur_block == 0) {
 					cur_iterator = cur_block_ptr->rbegin();
-					cur_index = (size_t)-1;
-					cur_block = (size_t)-1;
+					cur_index = (INTEGER_TYPE)-1;
+					cur_block = (INTEGER_TYPE)-1;
 					cur_block_ptr = nullptr;
 				}
 				else {
@@ -702,8 +706,8 @@ public:
 			else {
 				if (cur_block == 0) {
 					cur_iterator = cur_block_ptr->rbegin();
-					cur_index = (size_t)-1;
-					cur_block = (size_t)-1;
+					cur_index = (INTEGER_TYPE)-1;
+					cur_block = (INTEGER_TYPE)-1;
 					cur_block_ptr = nullptr;
 				}
 				else {
@@ -720,11 +724,11 @@ public:
 		bool operator==(const self_type& rhs) { return ((cur_block == rhs.cur_block) && (cur_index == rhs.cur_index)); }
 		bool operator!=(const self_type& rhs) { return ((cur_block != rhs.cur_block) || (cur_index != rhs.cur_index)); }
 
-		size_t get_block_ind() { return cur_block; };
-		size_t get_entry_ind() { return cur_index; };
+		INTEGER_TYPE get_block_ind() { return cur_block; };
+		INTEGER_TYPE get_entry_ind() { return cur_index; };
 	private:
-		size_t cur_block;
-		size_t cur_index;
+		INTEGER_TYPE cur_block;
+		INTEGER_TYPE cur_index;
 		address_list* address;
 		c_iterator cur_iterator;
 		c_ptr cur_block_ptr;
@@ -741,7 +745,7 @@ public:
 		typedef typename darray<T>::const_iterator& c_iterator;
 
 		const_iterator() : cur_block(0), cur_index(0), address(nullptr), cur_iterator(darray<T>::iterator()), cur_block_ptr(nullptr) {};
-		const_iterator(size_t b, size_t i, address_list* a, c_iterator it, c_ptr cur_b_p) : cur_block(b), cur_index(i), address(a), cur_iterator(it), cur_block_ptr(cur_b_p) {};
+		const_iterator(INTEGER_TYPE b, INTEGER_TYPE i, address_list* a, c_iterator it, c_ptr cur_b_p) : cur_block(b), cur_index(i), address(a), cur_iterator(it), cur_block_ptr(cur_b_p) {};
 		const_iterator(const self_type& src) : cur_block(src.cur_block), cur_index(src.cur_index), address(src.address), cur_iterator(src.cur_iterator), cur_block_ptr(src.cur_block_ptr) {};
 
 		friend void swap(self_type& lhs, self_type& rhs) {
@@ -805,8 +809,8 @@ public:
 			else {
 				if (cur_block == 0) {
 					cur_iterator = cur_block_ptr->rbegin();
-					cur_index = (size_t)-1;
-					cur_block = (size_t)-1;
+					cur_index = (INTEGER_TYPE)-1;
+					cur_block = (INTEGER_TYPE)-1;
 					cur_block_ptr = nullptr;
 				}
 				else {
@@ -824,8 +828,8 @@ public:
 			else {
 				if (cur_block == 0) {
 					cur_iterator = cur_block_ptr->rbegin();
-					cur_index = (size_t)-1;
-					cur_block = (size_t)-1;
+					cur_index = (INTEGER_TYPE)-1;
+					cur_block = (INTEGER_TYPE)-1;
 					cur_block_ptr = nullptr;
 				}
 				else {
@@ -842,11 +846,11 @@ public:
 		bool operator==(const self_type& rhs) { return ((cur_block == rhs.cur_block) && (cur_index == rhs.cur_index)); }
 		bool operator!=(const self_type& rhs) { return ((cur_block != rhs.cur_block) || (cur_index != rhs.cur_index)); }
 
-		size_t get_block_ind() { return cur_block; };
-		size_t get_entry_ind() { return cur_index; };
+		INTEGER_TYPE get_block_ind() { return cur_block; };
+		INTEGER_TYPE get_entry_ind() { return cur_index; };
 	private:
-		size_t cur_block;
-		size_t cur_index;
+		INTEGER_TYPE cur_block;
+		INTEGER_TYPE cur_index;
 		address_list* address;
 		c_iterator cur_iterator;
 		c_ptr cur_block_ptr;
@@ -913,7 +917,7 @@ public:
 
 	void push(const T& ele, int c_index) {
 		darray<T>* c_ptr = nullptr;
-		size_t ind = (c_index >= 0) ? c_index : c_size + c_index;
+		INTEGER_TYPE ind = (c_index >= 0) ? c_index : c_size + c_index;
 
 		if (this->get_c_ptr(ind) == nullptr)
 			this->set_c(ind, new darray<T>());
@@ -924,9 +928,9 @@ public:
 
 	void push(const T& ele) { push(ele, c_size - 1); e_size++; };
 
-	void set_c(size_t i, darray<T>* src_container) {
+	void set_c(INTEGER_TYPE i, darray<T>* src_container) {
 		assert(i < address->get_max_size());
-		size_t size = 0;
+		INTEGER_TYPE size = 0;
 		if (address->ele(i) != nullptr) {
 			size = ((darray<T>*)address->ele(i))->get_size();
 			if (size)
@@ -954,7 +958,7 @@ public:
 		c_size--;
 	}
 
-	darray<T>* pop_c(size_t i) {
+	darray<T>* pop_c(INTEGER_TYPE i) {
 		assert((i >= 0) && (i < c_size));
 		darray<T>* ptr = (darray<T>*)address->pop(i);
 		e_size -= ptr->get_size();
@@ -968,7 +972,7 @@ public:
 		swap(*lhs.address, *rhs.address);
 	}
 
-	void earse_block(size_t i) {
+	void earse_block(INTEGER_TYPE i) {
 		assert(i < c_size);
 		darray<T>* cur_block = (darray<T>*)address->ele(i);
 		if (cur_block->get_size())
@@ -981,16 +985,16 @@ public:
 		return *this;
 	}
 
-	T* ele_ptr(size_t c, size_t i) { auto c_ptr = get_c_ptr(c); return c_ptr->ele_ptr(i); };
+	T* ele_ptr(INTEGER_TYPE c, INTEGER_TYPE i) { auto c_ptr = get_c_ptr(c); return c_ptr->ele_ptr(i); };
 
-	T& ele(size_t c, size_t i) { return *ele_ptr(c, i); };
+	T& ele(INTEGER_TYPE c, INTEGER_TYPE i) { return *ele_ptr(c, i); };
 	
-	T& ele(size_t n) {
+	T& ele(INTEGER_TYPE n) {
 		// This is not suggested to use for heavy computation. Dynamic container makes the inquiry without
 		// container address hard to locate.
 		assert(n < e_size);
-		size_t accumulate = 0;
-		for (size_t i = 0; i < address->get_size(); i++) {
+		INTEGER_TYPE accumulate = 0;
+		for (INTEGER_TYPE i = 0; i < address->get_size(); i++) {
 			auto c_ptr = get_c_ptr(i);
 			if (n < (accumulate + c_ptr->get_size())) // found.
 				return c_ptr->ele(n - accumulate);
@@ -1000,18 +1004,18 @@ public:
 		throw(1);
 	}
 
-	T& operator()(size_t c, size_t i) { return this->ele(c, i); };
+	T& operator()(INTEGER_TYPE c, INTEGER_TYPE i) { return this->ele(c, i); };
 
 
 	// This inquiry is not recommended, especially for repeated inequires. Since the indices convertion is nontrivial 
 	// for dynamic container, which is called in every inquiry.
-	T& operator()(size_t n) { return this->ele(n); };
+	T& operator()(INTEGER_TYPE n) { return this->ele(n); };
 
-	darray<T>* get_c_ptr(size_t c) { return (darray<T>*)address->ele(c); };
+	darray<T>* get_c_ptr(INTEGER_TYPE c) { return (darray<T>*)address->ele(c); };
 
-	darray<T>& get_c(size_t c) { return *(this->get_c_ptr(c)); };
+	darray<T>& get_c(INTEGER_TYPE c) { return *(this->get_c_ptr(c)); };
 
-	darray<T>& operator[](size_t c) { return get_c(c); };
+	darray<T>& operator[](INTEGER_TYPE c) { return get_c(c); };
 
 	darray<T>* back_c_ptr() { return this->get_c_ptr(c_size - 1); };
 
@@ -1021,17 +1025,17 @@ public:
 
 	T* back() { return &(this->back_ptr()); }
 
-	size_t get_c_size() { return c_size; };
+	INTEGER_TYPE get_c_size() { return c_size; };
 
-	size_t get_size() { return e_size; };
+	INTEGER_TYPE get_size() { return e_size; };
 
 	bool is_empty() { return (e_size == 0); };
 
 	void print(std::ostream& output, char c_breaker = '\n') {
-		for (size_t i = 0; i < c_size; i++) {
+		for (INTEGER_TYPE i = 0; i < c_size; i++) {
 			darray<T>* c_ptr = this->get_c_ptr(i);
 			auto it_end = c_ptr->end();
-			size_t size = c_ptr->get_size(), cur_ind = 0;
+			INTEGER_TYPE size = c_ptr->get_size(), cur_ind = 0;
 			for (auto it = c_ptr->begin(); it != it_end; it++, cur_ind++){
 				if (cur_ind == size - 1)
 					output << *it << c_breaker;
@@ -1043,10 +1047,10 @@ public:
 	}
 
 	//void release() {
-	//	size_t n = address->get_max_size();
+	//	INTEGER_TYPE n = address->get_max_size();
 	//	darray<T>* ptr;
 	//	T junk;
-	//	for (size_t i = 0; i < n; i++) 
+	//	for (INTEGER_TYPE i = 0; i < n; i++) 
 	//		delete this->get_c_ptr(i);
 	//		
 	//	c_size = 0;
@@ -1079,8 +1083,8 @@ public:
 
 
 private:
-	size_t c_size;
-	size_t e_size;
+	INTEGER_TYPE c_size;
+	INTEGER_TYPE e_size;
 	address_list* address;
 
 };

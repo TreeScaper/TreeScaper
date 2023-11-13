@@ -222,4 +222,4 @@ void OptimLib::Optim_Trial_Stepping_Solver::solve()
     }
 }
 
-void OptimLib::nullOptimFunc(Optim_KwArg &, unsigned *){};
+void OptimLib::nullOptimFunc(Optim_KwArg &, int *){};

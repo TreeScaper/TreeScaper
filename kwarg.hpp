@@ -7,19 +7,19 @@ private:
     // Users are responsible for type casting.
     // This class only keep pointers to existing data and never release their memory.
     // A copy of (the pointer of) data must be kept in order for releasing memories.
-    unsigned int N;
+    int N;
     void **args;
 
 public:
     KwArg() : N(0), args(nullptr){};
-    KwArg(unsigned int len) : N(len), args(len ? new void *[len] : nullptr)
+    KwArg(int len) : N(len), args(len ? new void *[len] : nullptr)
     {
         for (auto i = 0; i < N; i++)
             args[i] = nullptr;
     };
-    KwArg(unsigned int len, void **KWARGS) : N(len), args(len ? new void *[len] : nullptr)
+    KwArg(int len, void **KWARGS) : N(len), args(len ? new void *[len] : nullptr)
     {
-        for (unsigned int i = 0; i < N; i++)
+        for (int i = 0; i < N; i++)
             args[i] = KWARGS[i];
     };
     KwArg(const KwArg &src) : KwArg(src.N, src.args){};
@@ -45,7 +45,7 @@ public:
     }
 
     template <class T>
-    void set(T *arg, unsigned int ind) { args[ind] = reinterpret_cast<void *>(arg); };
+    void set(T *arg, int ind) { args[ind] = reinterpret_cast<void *>(arg); };
 
     void *operator[](int ind) { return args[ind]; };
 

@@ -60,7 +60,7 @@ String get_path(String fname)
 {
     String path = fname;
     std::string temp = (char *)path;
-    size_t loc_slash = temp.find_last_of('/');
+    INTEGER_TYPE loc_slash = temp.find_last_of('/');
     if (loc_slash != string::npos)
         path = path(0, loc_slash + 1);
     else
@@ -68,16 +68,16 @@ String get_path(String fname)
     return path;
 }
 
-bool read_subset(String fname, Array<size_t> &subset)
+bool read_subset(String fname, Array<INTEGER_TYPE> &subset)
 {
     std::ifstream fin;
     fin.open(fname);
     if (!fin.is_open())
         return false;
-    size_t n = 0;
+    INTEGER_TYPE n = 0;
     fin >> n;
 
-    size_t temp = 0;
+    INTEGER_TYPE temp = 0;
     subset.resize(n, 0);
     subset.erase();
     for (int i = 0; i < n; i++)
@@ -208,21 +208,21 @@ map<String, String> read_paras(int argc, char *argv[], int key_size, String *def
 void binary_print_smat(std::ostream &output, SparseMatrix *sb2t_mat)
 {
     Array<PRECISION> *val_c_ptr;
-    Array<size_t> *row_ind_c_ptr;
+    Array<INTEGER_TYPE> *row_ind_c_ptr;
     PRECISION *val_ptr;
-    size_t *row_ind_ptr;
-    size_t container_size;
+    INTEGER_TYPE *row_ind_ptr;
+    INTEGER_TYPE container_size;
 
-    size_t r, c;
+    INTEGER_TYPE r, c;
     r = sb2t_mat->get_row();
     c = sb2t_mat->get_col();
 
-    output.write((char *)&r, sizeof(size_t));
-    output.write((char *)&c, sizeof(size_t));
+    output.write((char *)&r, sizeof(INTEGER_TYPE));
+    output.write((char *)&c, sizeof(INTEGER_TYPE));
 
-    size_t col = sb2t_mat->get_col();
+    INTEGER_TYPE col = sb2t_mat->get_col();
 
-    for (size_t i = 0; i < col; i++)
+    for (INTEGER_TYPE i = 0; i < col; i++)
     {
         row_ind_c_ptr = sb2t_mat->get_CCS_ind_c_ptr(i);
         val_c_ptr = sb2t_mat->get_CCS_val_c_ptr(i);
@@ -232,14 +232,14 @@ void binary_print_smat(std::ostream &output, SparseMatrix *sb2t_mat)
 
         container_size = row_ind_c_ptr->get_size();
 
-        output.write((char *)&container_size, sizeof(size_t));
-        size_t ind;
+        output.write((char *)&container_size, sizeof(INTEGER_TYPE));
+        INTEGER_TYPE ind;
         PRECISION val;
-        for (size_t j = 0; j < container_size; j++)
+        for (INTEGER_TYPE j = 0; j < container_size; j++)
         {
             ind = row_ind_ptr[j];
             val = val_ptr[j];
-            output.write((char *)&ind, sizeof(size_t));
+            output.write((char *)&ind, sizeof(INTEGER_TYPE));
             output.write((char *)&val, sizeof(PRECISION));
         }
     }
@@ -247,23 +247,23 @@ void binary_print_smat(std::ostream &output, SparseMatrix *sb2t_mat)
 
 SparseMatrix *binary_read_smat(std::istream &input)
 {
-    typedef Array2D_tuple<size_t, PRECISION> CCS_arr_type;
+    typedef Array2D_tuple<INTEGER_TYPE, PRECISION> CCS_arr_type;
 
-    size_t r, c, CCS_size, row_ind;
+    INTEGER_TYPE r, c, CCS_size, row_ind;
     PRECISION val;
-    input.read((char *)&r, sizeof(size_t));
-    input.read((char *)&c, sizeof(size_t));
+    input.read((char *)&r, sizeof(INTEGER_TYPE));
+    input.read((char *)&c, sizeof(INTEGER_TYPE));
 
     SparseMatrix *Ans = new SparseMatrix(r, c);
     Ans->initialize_CCS();
-    for (size_t i = 0; i < c; i++)
+    for (INTEGER_TYPE i = 0; i < c; i++)
     {
-        input.read((char *)&CCS_size, sizeof(size_t));
-        Array<size_t> *row_ind_i = new Array<size_t>(0, CCS_size);
+        input.read((char *)&CCS_size, sizeof(INTEGER_TYPE));
+        Array<INTEGER_TYPE> *row_ind_i = new Array<INTEGER_TYPE>(0, CCS_size);
         Array<PRECISION> *val_i = new Array<PRECISION>(0, CCS_size);
-        for (size_t j = 0; j < CCS_size; j++)
+        for (INTEGER_TYPE j = 0; j < CCS_size; j++)
         {
-            input.read((char *)&row_ind, sizeof(size_t));
+            input.read((char *)&row_ind, sizeof(INTEGER_TYPE));
             input.read((char *)&val, sizeof(PRECISION));
             row_ind_i->push(row_ind);
             val_i->push(val);
@@ -277,20 +277,20 @@ void binary_print_lowertri(std::ostream &output, SpecMat::LowerTri<PRECISION> *l
 {
     if (ltmat == nullptr)
     {
-        unsigned dim = 0;
-        output.write((char *)&dim, sizeof(unsigned));
+        int dim = 0;
+        output.write((char *)&dim, sizeof(int));
         return;
     }
 
-    unsigned dim = ltmat->dimension();
-    output.write((char *)&dim, sizeof(unsigned));
+    int dim = ltmat->dimension();
+    output.write((char *)&dim, sizeof(int));
 
     PRECISION *data = ltmat->get_vec();
-    size_t ind = 0;
+    INTEGER_TYPE ind = 0;
     PRECISION val;
-    for (size_t i = 0; i < dim; i++)
+    for (INTEGER_TYPE i = 0; i < dim; i++)
     {
-        for (size_t j = 0; j <= i; j++)
+        for (INTEGER_TYPE j = 0; j <= i; j++)
         {
             val = data[ind++];
             output.write((char *)&val, sizeof(PRECISION));
@@ -300,13 +300,13 @@ void binary_print_lowertri(std::ostream &output, SpecMat::LowerTri<PRECISION> *l
 
 SpecMat::LowerTri<PRECISION> *binary_read_lowertri(std::istream &input)
 {
-    size_t n;
-    input.read((char *)&n, sizeof(size_t));
+    INTEGER_TYPE n;
+    input.read((char *)&n, sizeof(INTEGER_TYPE));
     if (n == 0)
         return nullptr;
-    size_t size = (n * (n + 1)) / 2;
+    INTEGER_TYPE size = (n * (n + 1)) / 2;
     PRECISION *val = new PRECISION[size];
-    for (size_t i = 0; i < size; i++)
+    for (INTEGER_TYPE i = 0; i < size; i++)
     {
         input.read((char *)&val[i], sizeof(PRECISION));
     }
@@ -319,14 +319,14 @@ void print_lowertri(std::ostream &output, SpecMat::LowerTri<PRECISION> *ltmat)
     if (ltmat == nullptr)
         return;
 
-    unsigned dim = ltmat->dimension();
+    int dim = ltmat->dimension();
 
     PRECISION *data = ltmat->get_vec();
-    size_t ind = 0;
+    INTEGER_TYPE ind = 0;
     PRECISION val;
-    for (size_t i = 0; i < dim; i++)
+    for (INTEGER_TYPE i = 0; i < dim; i++)
     {
-        for (size_t j = 0; j <= i; j++)
+        for (INTEGER_TYPE j = 0; j <= i; j++)
         {
             output << data[ind++] << '\t';
         }
@@ -349,7 +349,7 @@ void binary_print_taxon(std::ostream &output, TaxonList *taxa)
     {
         n = taxa->Ind2Taxon.get_size();
         output << n;
-        for (size_t i = 0; i < n; i++)
+        for (INTEGER_TYPE i = 0; i < n; i++)
             output << taxa->Ind2Taxon[i];
     }
 
@@ -358,7 +358,7 @@ void binary_print_taxon(std::ostream &output, TaxonList *taxa)
     {
         n = taxa->IndB2IndA.get_size();
         output << n;
-        for (size_t i = 0; i < n; i++)
+        for (INTEGER_TYPE i = 0; i < n; i++)
             output << taxa->IndB2IndA[i];
     }
 }

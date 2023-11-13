@@ -17,7 +17,7 @@ String make_stdname(String s, std::map<String, String> &paras);
 
 String get_path(String fname);
 
-bool read_subset(String fname, Array<size_t> &subset);
+bool read_subset(String fname, Array<int> &subset);
 
 void read_paras_from_csv(String fname, map<String, String> &paras, bool allow_insert);
 
@@ -42,25 +42,25 @@ TaxonList *binary_read_taxon(std::istream &input);
 template <class T>
 void binary_print_bitstr(std::ostream &output, BitString<T> &bitstr)
 {
-    size_t l, b_size;
+    int l, b_size;
     l = bitstr.get_length();
     b_size = bitstr.get_bitsize();
 
     T *v = bitstr.get_vec();
 
     output << l << b_size;
-    for (size_t i = 0; i < l; i++)
+    for (int i = 0; i < l; i++)
         output << v[i];
 }
 
 template <class T>
 BitString<T> *binary_read_bitstr(std::istream &input, T dummy)
 {
-    size_t l, b_size;
+    int l, b_size;
     input >> l >> b_size;
 
     T *v = new T[l];
-    for (size_t i = 0; i < l; i++)
+    for (int i = 0; i < l; i++)
         input >> v[i];
 
     BitString<T> *Ans = new BitString<T>(l, b_size, v);
@@ -71,13 +71,13 @@ template <class T>
 void binary_print_bipart(std::ostream &output, Bipartition<T> *Bipart)
 {
     T hb, inv_h;
-    size_t n;
+    int n;
     bool iss;
 
     Array2D<int> *h2i;
     Array<int> *h2i_col;
     int *h2i_col_vec;
-    size_t h2i_size, h2i_col_size;
+    int h2i_size, h2i_col_size;
 
     hb = Bipart->get_hash_bound();
     inv_h = Bipart->get_invariant_hashing();
@@ -87,20 +87,20 @@ void binary_print_bipart(std::ostream &output, Bipartition<T> *Bipart)
 
     output << hb << inv_h;
     output << h2i_size;
-    for (size_t i = 0; i < h2i_size; i++)
+    for (int i = 0; i < h2i_size; i++)
     {
         h2i_col = h2i->get_c_ptr(i);
         h2i_col_size = (h2i_col == nullptr) ? 0 : h2i_col->get_size();
         h2i_col_vec = (h2i_col == nullptr) ? nullptr : h2i_col->get_vec();
         output << h2i_col_size;
-        for (size_t j = 0; j < h2i_col_size; j++)
+        for (int j = 0; j < h2i_col_size; j++)
         {
             output << h2i_col_vec[j];
         }
     }
 
     output << n;
-    for (size_t i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
         binary_print_bitstr(output, &Bipart[i]);
 
     iss = Bipart->get_issorted();
@@ -111,20 +111,20 @@ template <class T>
 Bipartition<T> *binary_read_bipart(std::istream &input, T dummy, TaxonList *Taxa)
 {
     T hb, inv_h;
-    size_t n;
+    int n;
     int ind;
     bool iss;
 
-    size_t h2i_size, h2i_col_size;
+    int h2i_size, h2i_col_size;
 
     input >> hb >> inv_h >> h2i_size;
     Array2D<int> *h2i = new Array2D<int>(hb);
-    for (size_t i = 0; i < hb; i++)
+    for (int i = 0; i < hb; i++)
     {
         input >> h2i_col_size;
         if (h2i_col_size != 0)
             h2i->set_c(i, new Array<int>(0, 50));
-        for (size_t j = 0; j < h2i_col_size; j++)
+        for (int j = 0; j < h2i_col_size; j++)
         {
             input >> ind;
             h2i->push(ind, i);
@@ -138,7 +138,7 @@ Bipartition<T> *binary_read_bipart(std::istream &input, T dummy, TaxonList *Taxa
     Ans->set_hash_table(h2i);
 
     input >> n;
-    for (size_t i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
         Ans->push_bs_only(*binary_read_bitstr(input, dummy));
 
     return Ans;

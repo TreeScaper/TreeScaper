@@ -19,19 +19,19 @@ enum SparseMatrixOutputType
 //	// is then the pointer to each block.
 //public:
 //	dSparseMatrix() : row(0), col(0), Val(nullptr), RowInd(nullptr), RowCCSInd(nullptr), ColInd(nullptr), flag_RCS(false) {};
-//	dSparseMatrix(size_t c) : dSparseMatrix() {
+//	dSparseMatrix(INTEGER_TYPE c) : dSparseMatrix() {
 //		col = c;
 //	}
-//	dSparseMatrix(size_t r, size_t c, bool RCS = false) : dSparseMatrix() {
+//	dSparseMatrix(INTEGER_TYPE r, INTEGER_TYPE c, bool RCS = false) : dSparseMatrix() {
 //		row = r;
 //		col = c;
 //		flag_RCS = RCS;
 //	}
 //	dSparseMatrix(const dSparseMatrix& src) : dSparseMatrix(src.row, src.col, src.flag_RCS) {
 //		Val = new darray_dc<PRECISION>(*(src.Val));
-//		RowInd = new darray_dc<size_t>(*(src.RowInd));
+//		RowInd = new darray_dc<INTEGER_TYPE>(*(src.RowInd));
 //		//ColRef = (src.ColRef == nullptr) ? nullptr : new darray_dc<PRECISION*>(*src.ColRef);
-//		ColInd = (src.ColInd == nullptr) ? nullptr : new darray_dc<size_t>(*src.ColInd);
+//		ColInd = (src.ColInd == nullptr) ? nullptr : new darray_dc<INTEGER_TYPE>(*src.ColInd);
 //	}
 //
 //	friend void swap(dSparseMatrix& lhs, dSparseMatrix& rhs) {
@@ -55,7 +55,7 @@ enum SparseMatrixOutputType
 //	public:
 //		typedef typename dSparseMatrix::ColIterator self_type;
 //		typedef typename darray_dc<PRECISION>::iterator val_it_type;
-//		typedef typename darray_dc<size_t>::iterator ind_it_type;
+//		typedef typename darray_dc<INTEGER_TYPE>::iterator ind_it_type;
 //		typedef PRECISION& reference;
 //		typedef PRECISION* pointer;
 //
@@ -81,9 +81,9 @@ enum SparseMatrixOutputType
 //
 //		reference operator*() { return *val_it; };
 //		pointer operator->() { return val_it.operator->(); };
-//		size_t get_row_ind() { return *row_ind_it; };
-//		size_t get_col_ind() { return val_it.get_block_ind(); };
-//		size_t get_row_CCS_ind() { return val_it.get_entry_ind(); };
+//		INTEGER_TYPE get_row_ind() { return *row_ind_it; };
+//		INTEGER_TYPE get_col_ind() { return val_it.get_block_ind(); };
+//		INTEGER_TYPE get_row_CCS_ind() { return val_it.get_entry_ind(); };
 //
 //		bool operator==(const self_type& rhs) { return ((val_it == rhs.val_it) && (row_ind_it == rhs.row_ind_it)); }
 //		bool operator!=(const self_type& rhs) { return ((val_it != rhs.val_it) || (row_ind_it != rhs.row_ind_it)); }
@@ -97,7 +97,7 @@ enum SparseMatrixOutputType
 //	public:
 //		typedef typename dSparseMatrix::RowIterator self_type;
 //		typedef typename darray_dc<PRECISION*>::iterator ref_it_type;
-//		typedef typename darray_dc<size_t>::iterator ind_it_type;
+//		typedef typename darray_dc<INTEGER_TYPE>::iterator ind_it_type;
 //		typedef darray_dc<PRECISION> val_arr_type;
 //		typedef PRECISION& reference;
 //		typedef PRECISION* pointer;
@@ -126,9 +126,9 @@ enum SparseMatrixOutputType
 //
 //
 //
-//		size_t get_row_ind() { return col_ind_it.get_block_ind(); };
-//		size_t get_row_CCS_ind() { return *row_CCS_ind_it; };
-//		size_t get_col_ind() { return *col_ind_it; };
+//		INTEGER_TYPE get_row_ind() { return col_ind_it.get_block_ind(); };
+//		INTEGER_TYPE get_row_CCS_ind() { return *row_CCS_ind_it; };
+//		INTEGER_TYPE get_col_ind() { return *col_ind_it; };
 //
 //		pointer operator->() { return Val->ele_ptr(get_col_ind(), get_row_CCS_ind()); };
 //		reference operator*() { return *operator->(); };
@@ -152,12 +152,12 @@ enum SparseMatrixOutputType
 //	row_it_type RCS_begin() { return row_it_type(ColInd->begin(), RowCCSInd->begin(), Val); };
 //	row_it_type RCS_end() { return row_it_type(ColInd->end(), RowCCSInd->begin(), Val); };
 //
-//	PRECISION* ele_ptr_CCS(size_t i, size_t j) {
+//	PRECISION* ele_ptr_CCS(INTEGER_TYPE i, INTEGER_TYPE j) {
 //		// get the j-th nonzero in the i-th column
 //		return Val->ele_ptr(i, j);
 //	}
 //
-//	PRECISION& ele_CCS(size_t i, size_t j) {
+//	PRECISION& ele_CCS(INTEGER_TYPE i, INTEGER_TYPE j) {
 //		// get the j-th nonzero in the i-th column
 //		return *ele_ptr_CCS(i, j);
 //	}
@@ -169,7 +169,7 @@ enum SparseMatrixOutputType
 //		Val = new darray_dc<PRECISION>(col);
 //		if (RowInd != nullptr)
 //			delete RowInd;
-//		RowInd = new darray_dc<size_t>(col);
+//		RowInd = new darray_dc<INTEGER_TYPE>(col);
 //	}
 //
 //	void initialize_RCS() {
@@ -179,48 +179,48 @@ enum SparseMatrixOutputType
 //		//ColRef = new darray_dc<PRECISION*>(row);
 //		if (ColInd != nullptr)
 //			delete ColInd;
-//		ColInd = new darray_dc<size_t>(row);
+//		ColInd = new darray_dc<INTEGER_TYPE>(row);
 //		if (RowCCSInd != nullptr)
 //			delete RowCCSInd;
-//		RowCCSInd = new darray_dc<size_t>(row);
+//		RowCCSInd = new darray_dc<INTEGER_TYPE>(row);
 //	}
 //
-//	void set_CCS_col(size_t j, darray<PRECISION>* val_j, darray<size_t>* rowind_j);
+//	void set_CCS_col(INTEGER_TYPE j, darray<PRECISION>* val_j, darray<INTEGER_TYPE>* rowind_j);
 //
-//	void push_CCS_col(darray<PRECISION>* val_j, darray<size_t>* rowind_j);
+//	void push_CCS_col(darray<PRECISION>* val_j, darray<INTEGER_TYPE>* rowind_j);
 //
-//	void set_row(size_t r) { row = r; };
+//	void set_row(INTEGER_TYPE r) { row = r; };
 //
 //	void set_RCS();
 //
-//	void set_RCS_row(size_t i, darray<size_t>* val_ref_i, darray<size_t>* colind_i);
+//	void set_RCS_row(INTEGER_TYPE i, darray<INTEGER_TYPE>* val_ref_i, darray<INTEGER_TYPE>* colind_i);
 //
 //	void print(std::ostream& output, SparseMatrixOutputType smtype);
 //
 //private:
-//	size_t row;
-//	size_t col;
+//	INTEGER_TYPE row;
+//	INTEGER_TYPE col;
 //	bool flag_RCS;
 //	darray_dc<PRECISION>* Val;
-//	darray_dc<size_t>* RowInd;
+//	darray_dc<INTEGER_TYPE>* RowInd;
 //	//darray_dc<PRECISION&>* ColRef;
 //	//darray_dc<PRECISION*>* ColRef;
-//	darray_dc<size_t>* RowCCSInd;
-//	darray_dc<size_t>* ColInd;
+//	darray_dc<INTEGER_TYPE>* RowCCSInd;
+//	darray_dc<INTEGER_TYPE>* ColInd;
 //};
 
 class SparseMatrix
 {
 	typedef SparseMatrix self_type;
-	typedef Array2D_tuple<size_t, PRECISION> CCS_arr_type;
-	typedef Array2D_tuple<size_t, size_t> RCS_arr_type;
+	typedef Array2D_tuple<INTEGER_TYPE, PRECISION> CCS_arr_type;
+	typedef Array2D_tuple<INTEGER_TYPE, INTEGER_TYPE> RCS_arr_type;
 	typedef int ind_type;
 	typedef PRECISION val_type;
 	typedef int add_type;
 
 private:
-	size_t row;
-	size_t col;
+	INTEGER_TYPE row;
+	INTEGER_TYPE col;
 	bool flag_RCS;
 	CCS_arr_type *CCS;
 	RCS_arr_type *RCS;
@@ -232,7 +232,7 @@ private:
 	// storing row indices of nonzeros in a column. The pointer to the column
 	// is then the pointer to each block.
 public:
-	SparseMatrix(size_t r, size_t c, CCS_arr_type *ptr_CCS, RCS_arr_type *ptr_RCS, bool RCS) : row(r),
+	SparseMatrix(INTEGER_TYPE r, INTEGER_TYPE c, CCS_arr_type *ptr_CCS, RCS_arr_type *ptr_RCS, bool RCS) : row(r),
 																							   col(c),
 																							   CCS(ptr_CCS),
 																							   RCS(ptr_RCS),
@@ -244,9 +244,9 @@ public:
 	}
 	SparseMatrix() : SparseMatrix(0, 0, nullptr, nullptr, false){};
 
-	SparseMatrix(size_t c) : SparseMatrix(0, c, nullptr, nullptr, false) {}
+	SparseMatrix(INTEGER_TYPE c) : SparseMatrix(0, c, nullptr, nullptr, false) {}
 
-	SparseMatrix(size_t r, size_t c) : SparseMatrix(r, c, nullptr, nullptr, false) {}
+	SparseMatrix(INTEGER_TYPE r, INTEGER_TYPE c) : SparseMatrix(r, c, nullptr, nullptr, false) {}
 
 	SparseMatrix(const SparseMatrix &src) : SparseMatrix(src.row, src.col)
 	{
@@ -275,84 +275,84 @@ public:
 		return *this;
 	}
 
-	Array<val_type> &operator[](size_t i)
+	Array<val_type> &operator[](INTEGER_TYPE i)
 	{
 		return *(CCS->get_val_ptr(i));
 	}
 
-	Array<ind_type> &get_CCS_ind_c(size_t i)
+	Array<ind_type> &get_CCS_ind_c(INTEGER_TYPE i)
 	{
 		return *(CCS->get_key_ptr(i));
 	}
 
-	Array<val_type> &get_CCS_val_c(size_t i)
+	Array<val_type> &get_CCS_val_c(INTEGER_TYPE i)
 	{
 		return *(CCS->get_val_ptr(i));
 	}
 
-	Array<ind_type> *get_CCS_ind_c_ptr(size_t i)
+	Array<ind_type> *get_CCS_ind_c_ptr(INTEGER_TYPE i)
 	{
 		return CCS->get_key_ptr(i);
 	}
 
-	Array<val_type> *get_CCS_val_c_ptr(size_t i)
+	Array<val_type> *get_CCS_val_c_ptr(INTEGER_TYPE i)
 	{
 		return CCS->get_val_ptr(i);
 	}
 
-	Array<ind_type> &get_RCS_ind_c(size_t i)
+	Array<ind_type> &get_RCS_ind_c(INTEGER_TYPE i)
 	{
 		return *(RCS->get_key_ptr(i));
 	}
 
-	Array<add_type> &get_RCS_val_c(size_t i)
+	Array<add_type> &get_RCS_val_c(INTEGER_TYPE i)
 	{
 		return *(RCS->get_val_ptr(i));
 	}
 
-	Array<ind_type> *get_RCS_ind_c_ptr(size_t i)
+	Array<ind_type> *get_RCS_ind_c_ptr(INTEGER_TYPE i)
 	{
 		return RCS->get_key_ptr(i);
 	}
 
-	Array<add_type> *get_RCS_val_c_ptr(size_t i)
+	Array<add_type> *get_RCS_val_c_ptr(INTEGER_TYPE i)
 	{
 		return RCS->get_val_ptr(i);
 	}
 
-	size_t get_row() { return row; };
-	size_t get_col() { return col; };
+	INTEGER_TYPE get_row() { return row; };
+	INTEGER_TYPE get_col() { return col; };
 
-	size_t get_nonzero_size()
+	INTEGER_TYPE get_nonzero_size()
 	{
 		return CCS->get_size();
 	}
 
-	val_type &operator()(size_t j, size_t e)
+	val_type &operator()(INTEGER_TYPE j, INTEGER_TYPE e)
 	{
 		return CCS->get_val_ptr(j)->ele(e);
 	}
 
-	val_type &CCS_ele(size_t j, size_t e)
+	val_type &CCS_ele(INTEGER_TYPE j, INTEGER_TYPE e)
 	{
 		return CCS->get_val_ptr(j)->ele(e);
 	}
 
-	val_type &RCS_ele(size_t i, size_t e)
+	val_type &RCS_ele(INTEGER_TYPE i, INTEGER_TYPE e)
 	{
-		size_t col_ind = RCS->get_key_ptr(i)->ele(e);
-		size_t row_CCS_ind = RCS->get_val_ptr(i)->ele(e);
+		INTEGER_TYPE col_ind = RCS->get_key_ptr(i)->ele(e);
+		INTEGER_TYPE row_CCS_ind = RCS->get_val_ptr(i)->ele(e);
 		return CCS_ele(col_ind, row_CCS_ind);
 	}
 
-	val_type dense_ele(size_t i, size_t j)
+	val_type dense_ele(INTEGER_TYPE i, INTEGER_TYPE j)
 	{
 		assert(i < row && j < col);
 		auto row_ind_ptr = CCS->get_key_ptr(j);
-		size_t col_size = row_ind_ptr->get_size();
-		size_t row_ind = 0;
+		INTEGER_TYPE col_size = row_ind_ptr->get_size();
+		INTEGER_TYPE row_ind = 0;
 		// Bisection search should be done here.
-		for (size_t it = 0; it < col_size; it++)
+		for (INTEGER_TYPE it = 0; it < col_size; it++)
 		{
 			row_ind = (*row_ind_ptr)[it];
 			if (row_ind == i)
@@ -389,16 +389,16 @@ public:
 			RCS->init_c(i, col);
 	}
 
-	void push_CCS_col(Array<size_t> *rowind_ptr, Array<PRECISION> *val_ptr)
+	void push_CCS_col(Array<INTEGER_TYPE> *rowind_ptr, Array<PRECISION> *val_ptr)
 	{
 		assert(CCS->get_size() < col);
 		assert(rowind_ptr->get_size() == val_ptr->get_size());
 		CCS->push_c(rowind_ptr, val_ptr);
 	};
 
-	void set_CCS_col(size_t j, Array<size_t> *rowind_ptr, Array<PRECISION> *val_ptr) { CCS->set_c(j, rowind_ptr, val_ptr); };
+	void set_CCS_col(INTEGER_TYPE j, Array<INTEGER_TYPE> *rowind_ptr, Array<PRECISION> *val_ptr) { CCS->set_c(j, rowind_ptr, val_ptr); };
 
-	void set_row(size_t r) { row = r; };
+	void set_row(INTEGER_TYPE r) { row = r; };
 
 	void set_RCS()
 	{
@@ -411,12 +411,12 @@ public:
 			RCS->earse();
 
 		Array<PRECISION> *val_c_ptr;
-		Array<size_t> *row_ind_c_ptr;
+		Array<INTEGER_TYPE> *row_ind_c_ptr;
 		PRECISION *val_ptr;
-		size_t *row_ind_ptr;
-		size_t container_size;
+		INTEGER_TYPE *row_ind_ptr;
+		INTEGER_TYPE container_size;
 
-		for (size_t i = 0; i < col; i++)
+		for (INTEGER_TYPE i = 0; i < col; i++)
 		{
 			row_ind_c_ptr = CCS->get_key_ptr(i);
 			val_c_ptr = CCS->get_val_ptr(i);
@@ -425,9 +425,9 @@ public:
 			val_ptr = val_c_ptr->get_vec();
 
 			container_size = row_ind_c_ptr->get_size();
-			for (size_t j = 0; j < container_size; j++)
+			for (INTEGER_TYPE j = 0; j < container_size; j++)
 			{
-				size_t row_ind = row_ind_ptr[j];
+				INTEGER_TYPE row_ind = row_ind_ptr[j];
 				RCS->key()[row_ind].push(i);
 				RCS->val()[row_ind].push(j);
 			}
@@ -435,19 +435,19 @@ public:
 		flag_RCS = true;
 	};
 
-	void set_RCS_row(size_t i, Array<size_t> *colind_ptr, Array<add_type> *valadd_ptr) { RCS->set_c(i, colind_ptr, valadd_ptr); };
+	void set_RCS_row(INTEGER_TYPE i, Array<INTEGER_TYPE> *colind_ptr, Array<add_type> *valadd_ptr) { RCS->set_c(i, colind_ptr, valadd_ptr); };
 
 	void print(std::ostream &output, SparseMatrixOutputType smtype)
 	{
 		if (smtype == RCVLIST)
 		{
 			Array<PRECISION> *val_c_ptr;
-			Array<size_t> *row_ind_c_ptr;
+			Array<INTEGER_TYPE> *row_ind_c_ptr;
 			PRECISION *val_ptr;
-			size_t *row_ind_ptr;
-			size_t container_size;
+			INTEGER_TYPE *row_ind_ptr;
+			INTEGER_TYPE container_size;
 
-			for (size_t i = 0; i < col; i++)
+			for (INTEGER_TYPE i = 0; i < col; i++)
 			{
 				row_ind_c_ptr = CCS->get_key_ptr(i);
 				val_c_ptr = CCS->get_val_ptr(i);
@@ -456,7 +456,7 @@ public:
 				val_ptr = val_c_ptr->get_vec();
 
 				container_size = row_ind_c_ptr->get_size();
-				for (size_t j = 0; j < container_size; j++)
+				for (INTEGER_TYPE j = 0; j < container_size; j++)
 					output << row_ind_ptr[j] << ' ' << i << ' ' << val_ptr[j] << '\n';
 			}
 		}
@@ -614,5 +614,5 @@ public:
 
 	SparseMatrix *subMat_row(const Array<ind_type> &row_subset, Array<ind_type> &ind_mapping);
 
-	void compress_indices(Array<ind_type> **ind, size_t n, Array<ind_type> &ind_mapping);
+	void compress_indices(Array<ind_type> **ind, INTEGER_TYPE n, Array<ind_type> &ind_mapping);
 };

@@ -27,7 +27,7 @@ public:
 	SparseMatrix* Multiply(const SparseMatrix& mat) const;
 	
 	// Return a mean vector
-	double* Mean(const unsigned int& num_tree);
+	double* Mean(const int& num_tree);
 	
 	// Multiply a sparse matrix with a column vector
 	double* Multiply_vec(const double* vec) const;

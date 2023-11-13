@@ -6,13 +6,17 @@
 #include <cassert>
 #include "array.hpp"
 
+#ifndef INTEGER_TYPE
+#define INTEGER_TYPE int
+#endif
+
 namespace SpecMat
 {
 	template <class T>
 	class LowerTri
 	{
 	protected:
-		unsigned dim;
+		INTEGER_TYPE dim;
 		T *data;
 		T **row;
 	public:
@@ -22,20 +26,20 @@ namespace SpecMat
 			data = nullptr;
 			row = nullptr;
 		}
-		LowerTri(unsigned d) : dim(d)
+		LowerTri(INTEGER_TYPE d) : dim(d)
 		{
 			data = new T[((1 + dim) * dim) / 2];
 			memset(data, 0, ((1 + dim) * dim) / 2 * sizeof(T));
 			row = nullptr;
 		}
 
-		LowerTri(unsigned d, bool row_ptr) : LowerTri(d)
+		LowerTri(INTEGER_TYPE d, bool row_ptr) : LowerTri(d)
 		{
 			if (row_ptr)
 				this->form_row_ptr();
 		}
 		//LowerTri(const mat::matrix &src):LowerTri(src.getRow()) {
-		//	for (unsigned i = 0; i < dim; i++) {
+		//	for (INTEGER_TYPE i = 0; i < dim; i++) {
 		//		memcpy(data + map(i), src(i), (i + 1) * sizeof(PRECISION));
 		//	}
 		//}
@@ -48,7 +52,7 @@ namespace SpecMat
 			if (src.row)
 				this->form_row_ptr();
 		}
-		LowerTri(unsigned d, T *vec) : dim(d), data(vec){};
+		LowerTri(INTEGER_TYPE d, T *vec) : dim(d), data(vec){};
 		~LowerTri() 
 		{ 
 			if (row)
@@ -56,7 +60,7 @@ namespace SpecMat
 			delete[] data; 
 		};
 
-		LowerTri(unsigned d, std::iostream& file) : LowerTri(d)
+		LowerTri(INTEGER_TYPE d, std::iostream& file) : LowerTri(d)
 		{
 			char* line = new char[d * 10];
 			this->form_row_ptr();
@@ -79,26 +83,26 @@ namespace SpecMat
 
 
 		// Default fast access though extra row. Return error if row not initialized.
-		T *operator[](unsigned i) { 
+		T *operator[](INTEGER_TYPE i) { 
 			return row[i]; 
 			};
-		T *ele(unsigned i) const { 
+		T *ele(INTEGER_TYPE i) const { 
 			return row[i]; 
 			};
-		T &operator()(unsigned i, unsigned j) { 
+		T &operator()(INTEGER_TYPE i, INTEGER_TYPE j) { 
 			// assert(i >= j);
 			return row[i][j];
 		};
-		T &ele(unsigned i, unsigned j) const { 
+		T &ele(INTEGER_TYPE i, INTEGER_TYPE j) const { 
 			// assert(i >= j);
 			return row[i][j];
 		};
 
 		// Slow access that recompute start of each row 
-		T *ele_raw(unsigned i) { return data + map(i); };
-		T *ele_raw_const(unsigned i) const { return data + map(i); };
-		T *ele_raw(unsigned i, unsigned j) { return data[map(i, j)]; };
-		T *ele_raw_const(unsigned i, unsigned j) const { return data[map(i, j)]; };
+		T *ele_raw(INTEGER_TYPE i) { return data + map(i); };
+		T *ele_raw_const(INTEGER_TYPE i) const { return data + map(i); };
+		T *ele_raw(INTEGER_TYPE i, INTEGER_TYPE j) { return data[map(i, j)]; };
+		T *ele_raw_const(INTEGER_TYPE i, INTEGER_TYPE j) const { return data[map(i, j)]; };
 
 
 
@@ -141,9 +145,9 @@ namespace SpecMat
 			return (*this);
 		}
 
-		unsigned dimension() const { return dim; };
-		unsigned map(unsigned i) const { return ((1 + i) * i) / 2; };
-		unsigned map(unsigned i, unsigned j) const
+		INTEGER_TYPE dimension() const { return dim; };
+		INTEGER_TYPE map(INTEGER_TYPE i) const { return ((1 + i) * i) / 2; };
+		INTEGER_TYPE map(INTEGER_TYPE i, INTEGER_TYPE j) const
 		{
 			//assert(j <= i);
 			return (i > j) ? ((1 + i) * i) / 2 + j : ((1 + j) * j) / 2 + i;
@@ -158,7 +162,7 @@ namespace SpecMat
     		using pointer           = T*;  // or also value_type*
     		using reference         = T&;  // or also value_type&
 
-			Row_Iterator(pointer ptr, unsigned r, unsigned c) : m_ptr(ptr), row(r), col(c){};
+			Row_Iterator(pointer ptr, INTEGER_TYPE r, INTEGER_TYPE c) : m_ptr(ptr), row(r), col(c){};
 
 
 			reference operator*() const { return *m_ptr; }
@@ -177,33 +181,33 @@ namespace SpecMat
     		friend bool operator== (const self_type& a, const self_type& b) { return a.row == b.row && a.col == b.col; };
     		friend bool operator!= (const self_type& a, const self_type& b) { return a.row != b.row || a.col != b.col; };
 
-			unsigned get_col() { return col; };
+			INTEGER_TYPE get_col() { return col; };
 
 		private:
 
     		pointer m_ptr;
-			unsigned row;
-			unsigned col;
+			INTEGER_TYPE row;
+			INTEGER_TYPE col;
 		};
 
-		Row_Iterator row_begin(unsigned r) { return Row_Iterator((*this)[r], r, 0); };
-		Row_Iterator row_end(unsigned r) { return Row_Iterator(nullptr, r, dim); };
+		Row_Iterator row_begin(INTEGER_TYPE r) { return Row_Iterator((*this)[r], r, 0); };
+		Row_Iterator row_end(INTEGER_TYPE r) { return Row_Iterator(nullptr, r, dim); };
 
 		PRECISION norm_Frobenius_square()
 		{
 			PRECISION temp = 0;
-			unsigned length = ((1 + dim) * dim) / 2;
-			for (unsigned i = 0; i < length; i++)
+			INTEGER_TYPE length = ((1 + dim) * dim) / 2;
+			for (INTEGER_TYPE i = 0; i < length; i++)
 				temp += data[i] * data[i];
 			return temp;
 		}
 
 		void print(std::ostream &output = std::cout)
 		{
-			unsigned ind = 0;
-			for (unsigned i = 0; i < dim; i++)
+			INTEGER_TYPE ind = 0;
+			for (INTEGER_TYPE i = 0; i < dim; i++)
 			{
-				for (unsigned j = 0; j <= i; j++)
+				for (INTEGER_TYPE j = 0; j <= i; j++)
 				{
 					output << data[ind] << '\t';
 					ind++;
@@ -218,7 +222,7 @@ namespace SpecMat
 		friend PRECISION diff_norm(const LowerTri<PRECISION> &lhs, const LowerTri<PRECISION> &rhs, MAT_NORM_TYPE mnt)
 		{
 			PRECISION ans = 0, dif = 0;
-			unsigned len = (lhs.dim * (lhs.dim + 1)) / 2;
+			INTEGER_TYPE len = (lhs.dim * (lhs.dim + 1)) / 2;
 			switch (mnt)
 			{
 			case M_FOR_NORM:
@@ -238,7 +242,7 @@ namespace SpecMat
 		PRECISION norm(MAT_NORM_TYPE mnt)
 		{
 			PRECISION ans = 0;
-			unsigned len = (dim * (dim + 1)) / 2;
+			INTEGER_TYPE len = (dim * (dim + 1)) / 2;
 			switch (mnt)
 			{
 			case M_FOR_NORM:
@@ -257,7 +261,7 @@ namespace SpecMat
 	// class LowerTri
 	// {
 	// protected:
-	// 	unsigned dim;
+	// 	INTEGER_TYPE dim;
 	// 	PRECISION *data;
 
 	// public:
@@ -266,13 +270,13 @@ namespace SpecMat
 	// 		dim = 0;
 	// 		data = nullptr;
 	// 	}
-	// 	LowerTri(unsigned d) : dim(d)
+	// 	LowerTri(INTEGER_TYPE d) : dim(d)
 	// 	{
 	// 		data = new T[((1 + dim) * dim) / 2];
 	// 		memset(data, 0, ((1 + dim) * dim) / 2 * sizeof(T));
 	// 	}
 	// 	//LowerTri(const mat::matrix &src):LowerTri(src.getRow()) {
-	// 	//	for (unsigned i = 0; i < dim; i++) {
+	// 	//	for (INTEGER_TYPE i = 0; i < dim; i++) {
 	// 	//		memcpy(data + map(i), src(i), (i + 1) * sizeof(PRECISION));
 	// 	//	}
 	// 	//}
@@ -283,20 +287,20 @@ namespace SpecMat
 	// 		for (auto i = 0; i < s; i++)
 	// 			data[i] = src.data[i];
 	// 	}
-	// 	LowerTri(unsigned d, T *vec) : dim(d), data(vec){};
+	// 	LowerTri(INTEGER_TYPE d, T *vec) : dim(d), data(vec){};
 	// 	~LowerTri() { delete[] data; };
 
-	// 	T *operator[](unsigned i) { return data + map(i); };
-	// 	//PRECISION* operator()(unsigned i) const { return data + map(i); };
-	// 	T &operator()(unsigned i, unsigned j) { return data[map(i, j)]; };
-	// 	T &ele(unsigned i, unsigned j) const { return data[map(i, j)]; };
-	// 	T *ele(unsigned i) const { return data + map(i); };
+	// 	T *operator[](INTEGER_TYPE i) { return data + map(i); };
+	// 	//PRECISION* operator()(INTEGER_TYPE i) const { return data + map(i); };
+	// 	T &operator()(INTEGER_TYPE i, INTEGER_TYPE j) { return data[map(i, j)]; };
+	// 	T &ele(INTEGER_TYPE i, INTEGER_TYPE j) const { return data[map(i, j)]; };
+	// 	T *ele(INTEGER_TYPE i) const { return data + map(i); };
 	// 	LowerTri<T> operator+(const LowerTri<T> &rhs) const
 	// 	{
 	// 		LowerTri<T> result(rhs);
-	// 		for (unsigned i = 0; i < dim; i++)
+	// 		for (INTEGER_TYPE i = 0; i < dim; i++)
 	// 		{
-	// 			for (unsigned j = 0; j <= i; j++)
+	// 			for (INTEGER_TYPE j = 0; j <= i; j++)
 	// 				result[i][j] = result[i][j] + data[this->map(i, j)];
 	// 		}
 	// 		return result;
@@ -304,9 +308,9 @@ namespace SpecMat
 	// 	LowerTri<T> operator-(const LowerTri<T> &rhs) const
 	// 	{
 	// 		LowerTri<T> result(rhs);
-	// 		for (unsigned i = 0; i < dim; i++)
+	// 		for (INTEGER_TYPE i = 0; i < dim; i++)
 	// 		{
-	// 			for (unsigned j = 0; j <= i; j++)
+	// 			for (INTEGER_TYPE j = 0; j <= i; j++)
 	// 				result[i][j] = data[this->map(i, j)] - result[i][j];
 	// 		}
 	// 		return result;
@@ -324,9 +328,9 @@ namespace SpecMat
 	// 		return (*this);
 	// 	}
 
-	// 	unsigned dimension() const { return dim; };
-	// 	unsigned map(unsigned i) const { return ((1 + i) * i) / 2; };
-	// 	unsigned map(unsigned i, unsigned j) const
+	// 	INTEGER_TYPE dimension() const { return dim; };
+	// 	INTEGER_TYPE map(INTEGER_TYPE i) const { return ((1 + i) * i) / 2; };
+	// 	INTEGER_TYPE map(INTEGER_TYPE i, INTEGER_TYPE j) const
 	// 	{
 	// 		//assert(j <= i);
 	// 		return (i > j) ? ((1 + i) * i) / 2 + j : ((1 + j) * j) / 2 + i;
@@ -334,18 +338,18 @@ namespace SpecMat
 	// 	PRECISION norm_Frobenius_square()
 	// 	{
 	// 		PRECISION temp = 0;
-	// 		unsigned length = ((1 + dim) * dim) / 2;
-	// 		for (unsigned i = 0; i < length; i++)
+	// 		INTEGER_TYPE length = ((1 + dim) * dim) / 2;
+	// 		for (INTEGER_TYPE i = 0; i < length; i++)
 	// 			temp += data[i] * data[i];
 	// 		return temp;
 	// 	}
 
 	// 	void print(std::ostream &output = std::cout)
 	// 	{
-	// 		unsigned ind = 0;
-	// 		for (unsigned i = 0; i < dim; i++)
+	// 		INTEGER_TYPE ind = 0;
+	// 		for (INTEGER_TYPE i = 0; i < dim; i++)
 	// 		{
-	// 			for (unsigned j = 0; j <= i; j++)
+	// 			for (INTEGER_TYPE j = 0; j <= i; j++)
 	// 			{
 	// 				output << data[ind] << '\t';
 	// 				ind++;
@@ -360,7 +364,7 @@ namespace SpecMat
 	// 	friend PRECISION diff_norm(const LowerTri<PRECISION> &lhs, const LowerTri<PRECISION> &rhs, MAT_NORM_TYPE mnt)
 	// 	{
 	// 		PRECISION ans = 0, dif = 0;
-	// 		unsigned len = (lhs.dim * (lhs.dim + 1)) / 2;
+	// 		INTEGER_TYPE len = (lhs.dim * (lhs.dim + 1)) / 2;
 	// 		switch (mnt)
 	// 		{
 	// 		case M_FOR_NORM:
@@ -380,7 +384,7 @@ namespace SpecMat
 	// 	PRECISION norm(MAT_NORM_TYPE mnt)
 	// 	{
 	// 		PRECISION ans = 0;
-	// 		unsigned len = (dim * (dim + 1)) / 2;
+	// 		INTEGER_TYPE len = (dim * (dim + 1)) / 2;
 	// 		switch (mnt)
 	// 		{
 	// 		case M_FOR_NORM:
@@ -398,7 +402,7 @@ namespace SpecMat
 	class UpperTri
 	{
 	protected:
-		unsigned dim;
+		INTEGER_TYPE dim;
 		PRECISION *data;
 
 	public:
@@ -408,13 +412,13 @@ namespace SpecMat
 			data = new PRECISION[((1 + dim) * dim) / 2];
 			memset(data, 0, ((1 + dim) * dim) / 2 * sizeof(PRECISION));
 		}
-		UpperTri(unsigned d) : dim(d)
+		UpperTri(INTEGER_TYPE d) : dim(d)
 		{
 			data = new PRECISION[((1 + dim) * dim) / 2];
 			memset(data, 0, ((1 + dim) * dim) / 2 * sizeof(PRECISION));
 		}
 		//UpperTri(const mat::matrix &src) :dim(src.getRow()) {
-		//	for (unsigned i = 0; i < dim; i++) {
+		//	for (INTEGER_TYPE i = 0; i < dim; i++) {
 		//		memcpy(data + map(i), src(i), (dim - i) * sizeof(PRECISION));
 		//	}
 		//}
@@ -423,10 +427,10 @@ namespace SpecMat
 			memcpy(data, src(0), (((1 + dim) * dim) / 2) * sizeof(PRECISION));
 		}
 
-		unsigned map(unsigned i) const { return ((dim + dim + 1 - i) * i) / 2; };
-		PRECISION *operator[](unsigned i) { return data + map(i); };
-		PRECISION *operator()(unsigned i) const { return data + map(i); };
-		PRECISION operator()(unsigned i, unsigned j) const { return data[map(i) + j]; };
+		INTEGER_TYPE map(INTEGER_TYPE i) const { return ((dim + dim + 1 - i) * i) / 2; };
+		PRECISION *operator[](INTEGER_TYPE i) { return data + map(i); };
+		PRECISION *operator()(INTEGER_TYPE i) const { return data + map(i); };
+		PRECISION operator()(INTEGER_TYPE i, INTEGER_TYPE j) const { return data[map(i) + j]; };
 		void swap(UpperTri &rhs)
 		{
 			using std::swap;
@@ -439,13 +443,13 @@ namespace SpecMat
 			return (*this);
 		}
 
-		unsigned dimension() const { return dim; };
+		INTEGER_TYPE dimension() const { return dim; };
 
 		void print()
 		{
-			for (unsigned i = 0; i < dim; i++)
+			for (INTEGER_TYPE i = 0; i < dim; i++)
 			{
-				for (unsigned j = 0; j <= dim - i; j++)
+				for (INTEGER_TYPE j = 0; j <= dim - i; j++)
 				{
 					std::cout << data[map(i) + j] << '\t';
 				}
@@ -457,32 +461,32 @@ namespace SpecMat
 
 	//class Banded_d {
 	//protected:
-	//	unsigned dim;
-	//	unsigned upper;
-	//	unsigned lower;
-	//	unsigned len;
+	//	INTEGER_TYPE dim;
+	//	INTEGER_TYPE upper;
+	//	INTEGER_TYPE lower;
+	//	INTEGER_TYPE len;
 	//	PRECISION* data;
 	//public:
 	//	Banded_d() :dim(5), upper(0), lower(0) {
 	//		len = dim + ((dim - 1 + dim - upper)*upper) / 2 + ((dim - 1 + dim - lower)*lower) / 2;
 	//		data = new PRECISION[len]; memset(data, 0, len * sizeof(PRECISION));
 	//	};
-	//	Banded_d(unsigned d, unsigned u, unsigned l) :dim(d), upper(u), lower(l) {
+	//	Banded_d(INTEGER_TYPE d, INTEGER_TYPE u, INTEGER_TYPE l) :dim(d), upper(u), lower(l) {
 	//		len = dim + ((dim - 1 + dim - upper)*upper) / 2 + ((dim - 1 + dim - lower)*lower) / 2;
 	//		data = new PRECISION[len]; memset(data, 0, len * sizeof(PRECISION));
 	//	}
-	//	Banded_d(unsigned d, unsigned u, unsigned l, unsigned length) :dim(d), upper(u), lower(l), len(length) {
+	//	Banded_d(INTEGER_TYPE d, INTEGER_TYPE u, INTEGER_TYPE l, INTEGER_TYPE length) :dim(d), upper(u), lower(l), len(length) {
 	//		data = new PRECISION[len]; memset(data, 0, len * sizeof(PRECISION));
 	//	}
-	//	Banded_d(PRECISION *v, unsigned d, unsigned u, unsigned l) :dim(d), upper(u), lower(l) {
+	//	Banded_d(PRECISION *v, INTEGER_TYPE d, INTEGER_TYPE u, INTEGER_TYPE l) :dim(d), upper(u), lower(l) {
 	//		len = dim + ((dim - 1 + dim - upper)*upper) / 2 + ((dim - 1 + dim - lower)*lower) / 2;
 	//		data = new PRECISION[len]; memcpy(data, v, len * sizeof(PRECISION));
 	//	}
-	//	Banded_d(PRECISION **v, unsigned d, unsigned u, unsigned l) :dim(d), upper(u), lower(l) {
+	//	Banded_d(PRECISION **v, INTEGER_TYPE d, INTEGER_TYPE u, INTEGER_TYPE l) :dim(d), upper(u), lower(l) {
 	//		len = dim + ((dim - 1 + dim - upper)*upper) / 2 + ((dim - 1 + dim - lower)*lower) / 2;
 	//		data = new PRECISION[len];
 	//		PRECISION* current = data;
-	//		for (unsigned i = 0; i < u + l + 1; i++) {
+	//		for (INTEGER_TYPE i = 0; i < u + l + 1; i++) {
 	//			if(i < u){
 	//				memcpy(current, v[i], (dim - u + i) * sizeof(PRECISION));
 	//				current = current + (dim - u + i);
@@ -516,7 +520,7 @@ namespace SpecMat
 	//	}
 	//	Banded_d& operator=(Banded_d & rhs) { swap(rhs); return (*this); }
 
-	//	unsigned dimension() const { return dim; };
+	//	INTEGER_TYPE dimension() const { return dim; };
 	//	PRECISION* start() const { return data; };
 
 	//};
@@ -524,15 +528,15 @@ namespace SpecMat
 	//class UpperBiD_d: public Banded_d {
 	//public:
 	//	UpperBiD_d() : Banded_d(5,1,0,9) {};
-	//	UpperBiD_d(unsigned d) :Banded_d(d, 1, 0, 2 * d + 1) {};
-	//	UpperBiD_d(PRECISION* v, unsigned d) :Banded_d(d, 1, 0, 2 * d + 1) { memcpy(data, v, len * sizeof(PRECISION)); };
-	//	UpperBiD_d(PRECISION* v_u, PRECISION*v_d, unsigned d) :Banded_d(d, 1, 0, 2 * d + 1) {
+	//	UpperBiD_d(INTEGER_TYPE d) :Banded_d(d, 1, 0, 2 * d + 1) {};
+	//	UpperBiD_d(PRECISION* v, INTEGER_TYPE d) :Banded_d(d, 1, 0, 2 * d + 1) { memcpy(data, v, len * sizeof(PRECISION)); };
+	//	UpperBiD_d(PRECISION* v_u, PRECISION*v_d, INTEGER_TYPE d) :Banded_d(d, 1, 0, 2 * d + 1) {
 	//		memcpy(data, v_u, (dim - 1) * sizeof(PRECISION));
 	//	};
 	//	UpperBiD_d(const UpperBiD_d &src) :Banded_d(src) {};
 
 	//	//using Banded_d::operator[];
-	//	PRECISION* operator[](unsigned i) {
+	//	PRECISION* operator[](INTEGER_TYPE i) {
 	//		if (i == 1)
 	//			return data;
 	//		else if (i == 0)
@@ -556,8 +560,8 @@ namespace SpecMat
 
 	//class Toeplitz {
 	//protected:
-	//	unsigned dim;
-	//	unsigned length;
+	//	INTEGER_TYPE dim;
+	//	INTEGER_TYPE length;
 	//	PRECISION* data;
 	//	//Important: data store the first row of the extended Circulant matrix
 	//	// 3 by 3 Toeplitz with data = {3, 4, 5, 1, 2}:
@@ -574,15 +578,15 @@ namespace SpecMat
 	//		data = new PRECISION[length];
 	//		memset(data, 0, length * sizeof(PRECISION));
 	//	}
-	//	Toeplitz(unsigned d) : dim(d), length(2 * dim - 1) {
+	//	Toeplitz(INTEGER_TYPE d) : dim(d), length(2 * dim - 1) {
 	//		data = new PRECISION[length];
 	//		memset(data, 0, length * sizeof(PRECISION));
 	//	}
-	//	Toeplitz(PRECISION* src, unsigned d) : dim(d), length(2 * d - 1) {
+	//	Toeplitz(PRECISION* src, INTEGER_TYPE d) : dim(d), length(2 * d - 1) {
 	//		data = new PRECISION[length];
 	//		memcpy(data, src, length * sizeof(PRECISION));
 	//	}
-	//	Toeplitz(const vec::vector &src, unsigned d) : Toeplitz(src.start(), d) {};
+	//	Toeplitz(const vec::vector &src, INTEGER_TYPE d) : Toeplitz(src.start(), d) {};
 	//	Toeplitz(const Toeplitz &src) : dim(src.dimension()), length(2 * src.dimension() - 1) {
 	//		data = new PRECISION[length];
 	//		memcpy(data, src.start(), length * sizeof(PRECISION));
@@ -598,7 +602,7 @@ namespace SpecMat
 	//	Toeplitz& operator=(Toeplitz & rhs) { swap(rhs); return (*this); }
 
 	//	bool SymmetricQ()const {
-	//		for (unsigned i = 0; i < dim; i++) {
+	//		for (INTEGER_TYPE i = 0; i < dim; i++) {
 	//			if (data[i + 1] != data[length - 1 - i])
 	//				return false;
 	//		}
@@ -606,8 +610,8 @@ namespace SpecMat
 	//	}
 	//	virtual mat::matrix dense() const {
 	//		mat::matrix result(dim, dim);
-	//		for (unsigned i = 0; i < dim; i++) {
-	//			for (unsigned j = 0; j < dim; j++)
+	//		for (INTEGER_TYPE i = 0; i < dim; i++) {
+	//			for (INTEGER_TYPE j = 0; j < dim; j++)
 	//				result[i][j] = data[(length + j - i) % length];
 	//		}
 	//		return result;
@@ -615,11 +619,11 @@ namespace SpecMat
 	//	vec::vector FactoredForm() const {
 	//		PRECISION *temp = new PRECISION[dim];
 	//		temp[0] = sqrt(data[0]);
-	//		for (unsigned i = 1; i < dim; i++)
+	//		for (INTEGER_TYPE i = 1; i < dim; i++)
 	//			temp[i] = data[i] / temp[0];
 	//		return vec::vector(temp, dim);
 	//	};
-	//	unsigned dimension() const { return dim; };
+	//	INTEGER_TYPE dimension() const { return dim; };
 	//	PRECISION* start() const { return data; };
 	//};
 
@@ -631,29 +635,29 @@ namespace SpecMat
 	//		data = new PRECISION[length];
 	//		memset(data, 0, length * sizeof(PRECISION));
 	//	}
-	//	Circulant(unsigned d) {
+	//	Circulant(INTEGER_TYPE d) {
 	//		dim = d;
 	//		length = dim;
 	//		data = new PRECISION[length];
 	//		memset(data, 0, length * sizeof(PRECISION));
 	//	}
-	//	Circulant(PRECISION* src, unsigned d) : Circulant(d) { memcpy(data, src, length * sizeof(PRECISION)); }
+	//	Circulant(PRECISION* src, INTEGER_TYPE d) : Circulant(d) { memcpy(data, src, length * sizeof(PRECISION)); }
 	//	Circulant(const vec::vector &src) : Circulant(src.start(), src.length()) {};
 	//};
 
 	//class HypRotation {
 	//public:
-	//	unsigned dim;
-	//	unsigned i;
-	//	unsigned j;
+	//	INTEGER_TYPE dim;
+	//	INTEGER_TYPE i;
+	//	INTEGER_TYPE j;
 	//	PRECISION ch;
 	//	PRECISION sh;
 
 	//	HypRotation() :dim(2), i(0), j(1), ch(1), sh(0) {};
 	//	HypRotation(PRECISION rho) :dim(2), i(0), j(1), ch(cosh(rho)), sh(sinh(rho)) {};
 	//	HypRotation(PRECISION c, PRECISION s) :dim(2), i(0), j(1), ch(c), sh(s) {};
-	//	HypRotation(unsigned d, unsigned i1, unsigned i2, PRECISION rho) :dim(d), i(i1), j(i2), ch(cosh(rho)), sh(sinh(rho)) {};
-	//	HypRotation(unsigned d, unsigned i1, unsigned i2, PRECISION c, PRECISION s) :dim(d), i(i1), j(i2), ch(c), sh(s) {};
+	//	HypRotation(INTEGER_TYPE d, INTEGER_TYPE i1, INTEGER_TYPE i2, PRECISION rho) :dim(d), i(i1), j(i2), ch(cosh(rho)), sh(sinh(rho)) {};
+	//	HypRotation(INTEGER_TYPE d, INTEGER_TYPE i1, INTEGER_TYPE i2, PRECISION c, PRECISION s) :dim(d), i(i1), j(i2), ch(c), sh(s) {};
 	//	HypRotation(HypRotation &src) :dim(src.dim), i(src.i), j(src.j), ch(src.ch), sh(src.sh) {};
 	//	~HypRotation() {}
 
@@ -667,28 +671,28 @@ namespace SpecMat
 	//	}
 	//	HypRotation& operator=(HypRotation & rhs) { swap(rhs); return (*this); }
 
-	//	void action(PRECISION *v1, PRECISION *v2, unsigned n) {
+	//	void action(PRECISION *v1, PRECISION *v2, INTEGER_TYPE n) {
 	//		PRECISION* temp = new PRECISION[n];
 	//		memcpy(temp, v1, n * sizeof(PRECISION));
-	//		for (unsigned i = 0; i < n; i++) {
+	//		for (INTEGER_TYPE i = 0; i < n; i++) {
 	//			v1[i] = v1[i] * ch + v2[i] * sh;
 	//			v2[i] = temp[i] * sh + v2[i] * ch;
 	//		}
 	//	}
 
-	//	void action(mat::matrix& src, unsigned start, unsigned M_LEN, char c) {
+	//	void action(mat::matrix& src, INTEGER_TYPE start, INTEGER_TYPE M_LEN, char c) {
 	//		PRECISION* temp = new PRECISION[M_LEN];
 	//		if (c == 'L')
 	//			memcpy(temp, src(i) + start, M_LEN * sizeof(PRECISION));
 	//		else if (c == 'R') {
-	//			for (unsigned k = 0; k < M_LEN; k++)
+	//			for (INTEGER_TYPE k = 0; k < M_LEN; k++)
 	//				temp[k] = src(k + start, i);
 	//		}
 	//		else {
 	//			std::cout << "Error: the control variable in action() of HypRotation is incorrect.\n";
 	//			exit(1);
 	//		}
-	//		for (unsigned k = 0; k < M_LEN; k++) {
+	//		for (INTEGER_TYPE k = 0; k < M_LEN; k++) {
 	//			if (c == 'L') {
 	//				src[i][k] = ch * src[i][k] + sh * src[j][k];
 	//				src[j][k] = sh * temp[k] + ch * src[j][k];
@@ -700,7 +704,7 @@ namespace SpecMat
 	//		}
 	//	};
 
-	//	void action(mat::matrix& src, unsigned start, char c) {
+	//	void action(mat::matrix& src, INTEGER_TYPE start, char c) {
 	//		if (c == 'L')
 	//			action(src, start, src.getCol() - start, c);
 	//		else if (c == 'R')
@@ -711,19 +715,19 @@ namespace SpecMat
 	//		}
 	//	}
 
-	//	void action(vec::vector &src, unsigned start) {
+	//	void action(vec::vector &src, INTEGER_TYPE start) {
 	//		PRECISION temp = 0;
-	//		unsigned ii = i + start;
-	//		unsigned jj = j + start;
+	//		INTEGER_TYPE ii = i + start;
+	//		INTEGER_TYPE jj = j + start;
 	//		temp = src[ii];
 	//		src[ii] = src[ii] * ch + src[jj] * sh;
 	//		src[jj] = temp * sh + src[jj] * ch;
 	//	}
 	//	void action(vec::vector &src) { action(src, 0); };
-	//	void action_transpose(vec::vector &src, unsigned start) {
+	//	void action_transpose(vec::vector &src, INTEGER_TYPE start) {
 	//		PRECISION temp = 0;
-	//		unsigned ii = i + start;
-	//		unsigned jj = j + start;
+	//		INTEGER_TYPE ii = i + start;
+	//		INTEGER_TYPE jj = j + start;
 	//		temp = src[ii];
 	//		src[ii] = src[ii] * ch + src[jj] * sh;
 	//		src[jj] = src[jj] * ch + temp * sh;
@@ -733,17 +737,17 @@ namespace SpecMat
 
 	//class GivRotation {
 	//public:
-	//	unsigned dim;
-	//	unsigned i;
-	//	unsigned j;
+	//	INTEGER_TYPE dim;
+	//	INTEGER_TYPE i;
+	//	INTEGER_TYPE j;
 	//	PRECISION co;
 	//	PRECISION si;
 
 	//	GivRotation() :dim(2), i(0), j(1), co(1), si(0) {};
 	//	GivRotation(PRECISION rho) :dim(2), i(0), j(1), co(cos(rho)), si(sin(rho)) {};
 	//	GivRotation(PRECISION c, PRECISION s) :dim(2), i(0), j(1), co(c), si(s) {};
-	//	GivRotation(unsigned d, unsigned i1, unsigned i2, PRECISION rho) :dim(d), i(i1), j(i2), co(cos(rho)), si(sin(rho)) {};
-	//	GivRotation(unsigned d, unsigned i1, unsigned i2, PRECISION c, PRECISION s) :dim(d), i(i1), j(i2), co(c), si(s) {};
+	//	GivRotation(INTEGER_TYPE d, INTEGER_TYPE i1, INTEGER_TYPE i2, PRECISION rho) :dim(d), i(i1), j(i2), co(cos(rho)), si(sin(rho)) {};
+	//	GivRotation(INTEGER_TYPE d, INTEGER_TYPE i1, INTEGER_TYPE i2, PRECISION c, PRECISION s) :dim(d), i(i1), j(i2), co(c), si(s) {};
 	//	GivRotation(GivRotation &src) :dim(src.dim), i(src.i), j(src.j), co(src.co), si(src.si) {};
 	//	~GivRotation() {}
 
@@ -757,28 +761,28 @@ namespace SpecMat
 	//	}
 	//	GivRotation& operator=(GivRotation & rhs) { swap(rhs); return (*this); }
 
-	//	void action(PRECISION *v1, PRECISION *v2, unsigned n) {
+	//	void action(PRECISION *v1, PRECISION *v2, INTEGER_TYPE n) {
 	//		PRECISION* temp = new PRECISION[n];
 	//		memcpy(temp, v1, n * sizeof(PRECISION));
-	//		for (unsigned i = 0; i < n; i++) {
+	//		for (INTEGER_TYPE i = 0; i < n; i++) {
 	//			v1[i] = v1[i] * co - v2[i] * si;
 	//			v2[i] = temp[i] * si + v2[i] * co;
 	//		}
 	//	}
 
-	//	void action(mat::matrix& src, unsigned start,unsigned M_LEN,char c) {
+	//	void action(mat::matrix& src, INTEGER_TYPE start,INTEGER_TYPE M_LEN,char c) {
 	//		PRECISION* temp = new PRECISION[M_LEN];
 	//		if (c == 'L')
 	//			memcpy(temp, src(i) + start, M_LEN * sizeof(PRECISION));
 	//		else if (c == 'R') {
-	//			for (unsigned k = 0; k < M_LEN; k++)
+	//			for (INTEGER_TYPE k = 0; k < M_LEN; k++)
 	//				temp[k] = src(k + start, i);
 	//		}
 	//		else {
 	//			std::cout << "Error: the control variable in action() of GivRotation is incorrect.\n";
 	//			exit(1);
 	//		}
-	//		for (unsigned k = 0; k < M_LEN; k++) {
+	//		for (INTEGER_TYPE k = 0; k < M_LEN; k++) {
 	//			if(c == 'L'){
 	//				src[i][k] = co*src[i][k] - si*src[j][k];
 	//				src[j][k] = si*temp[k] + co*src[j][k];
@@ -790,7 +794,7 @@ namespace SpecMat
 	//		}
 	//	};
 
-	//	void action(mat::matrix& src, unsigned start, char c) {
+	//	void action(mat::matrix& src, INTEGER_TYPE start, char c) {
 	//		if (c == 'L')
 	//			action(src, start, src.getCol() - start, c);
 	//		else if (c == 'R')
@@ -801,19 +805,19 @@ namespace SpecMat
 	//		}
 	//	}
 
-	//	void action(vec::vector &src, unsigned start) {
+	//	void action(vec::vector &src, INTEGER_TYPE start) {
 	//		PRECISION temp = 0;
-	//		unsigned ii = i + start;
-	//		unsigned jj = j + start;
+	//		INTEGER_TYPE ii = i + start;
+	//		INTEGER_TYPE jj = j + start;
 	//		temp = src[ii];
 	//		src[ii] = src[ii] * co - src[jj] * si;
 	//		src[jj] = temp*si + src[jj] * co;
 	//	}
 	//	void action(vec::vector &src) { action(src, 0); };
-	//	void action_transpose(vec::vector &src, unsigned start){
+	//	void action_transpose(vec::vector &src, INTEGER_TYPE start){
 	//		PRECISION temp = 0;
-	//		unsigned ii = i + start;
-	//		unsigned jj = j + start;
+	//		INTEGER_TYPE ii = i + start;
+	//		INTEGER_TYPE jj = j + start;
 	//		temp = src[ii];
 	//		src[ii] = src[ii] * co + src[jj] * si;
 	//		src[jj] = src[jj] * co - temp * si;
@@ -823,28 +827,28 @@ namespace SpecMat
 
 	//class Permutation {
 	//public:
-	//	unsigned i;
-	//	unsigned j;
-	//	unsigned dim;
+	//	INTEGER_TYPE i;
+	//	INTEGER_TYPE j;
+	//	INTEGER_TYPE dim;
 	//	Permutation() { dim = 2; i = 0; j = 1; };
-	//	Permutation(unsigned d, unsigned ii, unsigned jj) :dim(d), i(ii), j(jj) {};
+	//	Permutation(INTEGER_TYPE d, INTEGER_TYPE ii, INTEGER_TYPE jj) :dim(d), i(ii), j(jj) {};
 	//	~Permutation() {};
 
 	//	void action_l(mat::matrix &src) {
-	//		unsigned d = src.getCol();
+	//		INTEGER_TYPE d = src.getCol();
 	//		PRECISION *temp = new PRECISION[d];
 	//		memcpy(temp, src[i], d * sizeof(PRECISION));
 	//		memcpy(src[i], src[j], d * sizeof(PRECISION));
 	//		memcpy(src[j], temp, d * sizeof(PRECISION));
 	//	}
 	//	void action_r(mat::matrix &src) {
-	//		unsigned d = src.getRow();
+	//		INTEGER_TYPE d = src.getRow();
 	//		PRECISION *temp = new PRECISION[d];
-	//		for (unsigned k = 0; k < d; k++)
+	//		for (INTEGER_TYPE k = 0; k < d; k++)
 	//			temp[k] = src[k][i];
-	//		for (unsigned k = 0; k < d; k++)
+	//		for (INTEGER_TYPE k = 0; k < d; k++)
 	//			src[k][i] = src[k][j];
-	//		for (unsigned k = 0; k < d; k++)
+	//		for (INTEGER_TYPE k = 0; k < d; k++)
 	//			src[k][j] = temp[k];
 
 	//	}
@@ -858,14 +862,14 @@ namespace SpecMat
 
 	//class HouseHolder {
 	//private:
-	//	unsigned len;
+	//	INTEGER_TYPE len;
 	//	PRECISION *data;
 	//	PRECISION alpha;
 	//public:
 	//	HouseHolder() : len(1), alpha(0) { data = new PRECISION[len]; memset(data, 0, len * sizeof(PRECISION)); };
-	//	HouseHolder(unsigned l) : len(l), alpha(0) { data = new PRECISION[len]; memset(data, 0, len * sizeof(PRECISION)); };
-	//	HouseHolder(PRECISION *d, unsigned l, PRECISION a) : len(l), alpha(a) { data = new PRECISION[len]; memcpy(data, d, len * sizeof(PRECISION));};
-	//	HouseHolder(PRECISION *d, unsigned l) : HouseHolder(d, l, -2.0 / vec::norm_pow(d, len, 2)) {};
+	//	HouseHolder(INTEGER_TYPE l) : len(l), alpha(0) { data = new PRECISION[len]; memset(data, 0, len * sizeof(PRECISION)); };
+	//	HouseHolder(PRECISION *d, INTEGER_TYPE l, PRECISION a) : len(l), alpha(a) { data = new PRECISION[len]; memcpy(data, d, len * sizeof(PRECISION));};
+	//	HouseHolder(PRECISION *d, INTEGER_TYPE l) : HouseHolder(d, l, -2.0 / vec::norm_pow(d, len, 2)) {};
 	//	HouseHolder(const vec::vector &src) : HouseHolder(src.start(), src.length()) {};
 	//	HouseHolder(const HouseHolder &src) : len(src.len), alpha(src.alpha) { data = new PRECISION[len]; memcpy(data, src.v(), len * sizeof(PRECISION)); };
 	//	~HouseHolder() { delete[] data; };
@@ -879,33 +883,33 @@ namespace SpecMat
 	//	HouseHolder& operator=(HouseHolder & rhs) { swap(rhs); return (*this); }
 
 	//	PRECISION* v() const { return data; };
-	//	unsigned length() const { return len; };
+	//	INTEGER_TYPE length() const { return len; };
 
 	//	void action(PRECISION *vv) {
 	//		PRECISION *temp = new PRECISION[len];
 	//		PRECISION scalar = 0;
 	//		memcpy(temp, vv, len * sizeof(PRECISION));
 	//		scalar = alpha*vec::dot(data, vv, len);
-	//		for (unsigned i = 0; i < len; i++)
+	//		for (INTEGER_TYPE i = 0; i < len; i++)
 	//			vv[i] += scalar*data[i];
 	//	};
-	//	void action(vec::vector &vv,unsigned i_start) {
+	//	void action(vec::vector &vv,INTEGER_TYPE i_start) {
 	//		action(vv.start() + i_start);
 	//	}
 	//	void action(vec::vector &vv) { action(vv.start()); };
-	//	void action(mat::matrix &M, unsigned i_start, unsigned j_start, unsigned M_LEN, char c) {
+	//	void action(mat::matrix &M, INTEGER_TYPE i_start, INTEGER_TYPE j_start, INTEGER_TYPE M_LEN, char c) {
 	//		PRECISION *scalars = new PRECISION[M_LEN];
 	//		memset(scalars, 0, M_LEN * sizeof(PRECISION));
 	//		if (c == 'L') {
-	//			for (unsigned j = 0; j < M_LEN; j++) {
-	//				for (unsigned i = 0; i < len; i++)
+	//			for (INTEGER_TYPE j = 0; j < M_LEN; j++) {
+	//				for (INTEGER_TYPE i = 0; i < len; i++)
 	//					scalars[j] += data[i] * M(i + i_start, j + j_start);
 	//				scalars[j] *= alpha;
 	//			}
 	//		}
 	//		else if (c == 'R') {
-	//			for (unsigned i = 0; i < M_LEN; i++) {
-	//				for (unsigned j = 0; j < len; j++)
+	//			for (INTEGER_TYPE i = 0; i < M_LEN; i++) {
+	//				for (INTEGER_TYPE j = 0; j < len; j++)
 	//					scalars[i] += M(i + i_start, j + j_start)*data[j];
 	//				scalars[i] *= alpha;
 	//			}
@@ -916,14 +920,14 @@ namespace SpecMat
 	//		}
 	//
 	//		if (c == 'L') {
-	//			for (unsigned i = 0; i < len; i++) {
-	//				for (unsigned j = 0; j < M_LEN; j++)
+	//			for (INTEGER_TYPE i = 0; i < len; i++) {
+	//				for (INTEGER_TYPE j = 0; j < M_LEN; j++)
 	//					M[i + i_start][j + j_start] = M[i + i_start][j + j_start] + scalars[j] * data[i];
 	//			}
 	//		}
 	//		else if (c == 'R') {
-	//			for (unsigned i = 0; i < M_LEN; i++) {
-	//				for(unsigned j=0;j<len;j++)
+	//			for (INTEGER_TYPE i = 0; i < M_LEN; i++) {
+	//				for(INTEGER_TYPE j=0;j<len;j++)
 	//					M[i + i_start][j + j_start] = M[i + i_start][j + j_start] + scalars[i] * data[j];
 	//			}
 	//		}
@@ -933,7 +937,7 @@ namespace SpecMat
 	//		}
 	//		delete[] scalars;
 	//	}
-	//	void action(mat::matrix &M, unsigned i_start, unsigned j_start, char c) {
+	//	void action(mat::matrix &M, INTEGER_TYPE i_start, INTEGER_TYPE j_start, char c) {
 	//		if (c == 'L')
 	//			action(M, i_start, j_start, M.getCol() - j_start, c);
 	//		else if (c == 'R')

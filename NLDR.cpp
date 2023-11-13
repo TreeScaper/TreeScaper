@@ -1,6 +1,6 @@
 #include "NLDR.hpp"
 
-void NLDR::NLDR_Var_Copy(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::NLDR_Var_Copy(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *src = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     PRECISION *f_src = reinterpret_cast<PRECISION *>(kws.arg(ind[1]));
@@ -10,13 +10,13 @@ void NLDR::NLDR_Var_Copy(OptimLib::Optim_KwArg &kws, unsigned *ind)
     *(des->eta) = *(src->eta);
     *(des->rho) = *(src->rho);
 
-    unsigned n = des->Cor->get_row();
-    unsigned d = des->Cor->get_col();
+    INTEGER_TYPE n = des->Cor->get_row();
+    INTEGER_TYPE d = des->Cor->get_col();
     PRECISION **des_Cor_ptr = des->Cor->get_vec();
     PRECISION **src_Cor_ptr = src->Cor->get_vec();
     PRECISION *des_Dis_ptr = des->Dis->get_vec();
     PRECISION *src_Dis_ptr = src->Dis->get_vec();
-    unsigned n_dis = n * (n + 1) / 2;
+    INTEGER_TYPE n_dis = n * (n + 1) / 2;
     for (auto i = 0; i < n; i++)
         for (auto k = 0; k < d; k++)
             des_Cor_ptr[i][k] = src_Cor_ptr[i][k];
@@ -45,7 +45,7 @@ PRECISION NLDR::stress_raw(NLDR::NLDR_Var *X, NLDR::NLDR_Paras *Paras)
     }
 }
 
-void NLDR::stress(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::stress(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     PRECISION *f = reinterpret_cast<PRECISION *>(kws.arg(ind[1]));
@@ -55,8 +55,8 @@ void NLDR::stress(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 void NLDR::Cor2Dis(Matrix<PRECISION> &C, LowerTri<PRECISION> &D)
 {
-    unsigned n = C.get_row();
-    unsigned dim = C.get_col();
+    INTEGER_TYPE n = C.get_row();
+    INTEGER_TYPE dim = C.get_col();
     PRECISION temp;
 
     auto C_ = C.get_vec();
@@ -83,8 +83,8 @@ void NLDR::Cor2Dis_with_paras(NLDR_Var *X, NLDR::NLDR_Paras *Paras)
     Matrix<PRECISION> &CX = *(X->Cor);
     LowerTri<PRECISION> &DX = *(X->Dis);
     LowerTri<PRECISION> &D = *(Paras->Dis);
-    unsigned n = CX.get_row();
-    unsigned dim = CX.get_col();
+    INTEGER_TYPE n = CX.get_row();
+    INTEGER_TYPE dim = CX.get_col();
     PRECISION temp = 0;
     PRECISION &eta = *(X->eta);
     PRECISION eta_d = *(X->eta_d);
@@ -119,8 +119,8 @@ void NLDR::Cor2Dis_no_paras(NLDR_Var *X, NLDR::NLDR_Paras *Paras)
     Matrix<PRECISION> &CX = *(X->Cor);
     LowerTri<PRECISION> &DX = *(X->Dis);
     LowerTri<PRECISION> &D = *(Paras->Dis);
-    unsigned n = CX.get_row();
-    unsigned dim = CX.get_col();
+    INTEGER_TYPE n = CX.get_row();
+    INTEGER_TYPE dim = CX.get_col();
     PRECISION temp = 0;
 
     auto CX_ = CX.get_vec();
@@ -150,9 +150,9 @@ void NLDR::Cor2Dis_no_paras(NLDR_Var *X, NLDR::NLDR_Paras *Paras)
 //     LowerTri<PRECISION> &D = *(Paras->Dis);
 //     Matrix<PRECISION> &Delta = *(Dir->Delta);
 
-//     unsigned dim = C.get_col(), n = C.get_row();
-//     unsigned i = Dir->activated_row;
-//     unsigned k = Dir->activated_coo;
+//     INTEGER_TYPE dim = C.get_col(), n = C.get_row();
+//     INTEGER_TYPE i = Dir->activated_row;
+//     INTEGER_TYPE k = Dir->activated_coo;
 //     PRECISION e1 = Delta(0, k);
 //     PRECISION e2 = Delta(1, k);
 //     PRECISION xcnew = C(i, k) - stepsize * e1 / e2;
@@ -214,10 +214,10 @@ void NLDR::Cor2Dis_no_paras(NLDR_Var *X, NLDR::NLDR_Paras *Paras)
 
 void NLDR::update_distance_row_from_VarDiff(NLDR_Var *X, NLDR_Var *Y, NLDR_Dir *Dir, PRECISION stepsize, NLDR_Paras_GAU *Paras)
 {
-    unsigned i = Paras->VarDiff->activated_row;
-    unsigned k = Paras->VarDiff->activated_coo;
-    unsigned n = X->Cor->get_row();
-    unsigned d = X->Cor->get_col();
+    INTEGER_TYPE i = Paras->VarDiff->activated_row;
+    INTEGER_TYPE k = Paras->VarDiff->activated_coo;
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE d = X->Cor->get_col();
 
     Matrix<PRECISION> &CY_ = *Y->Cor;
     LowerTri<PRECISION> &DY_ = *Y->Dis;
@@ -238,7 +238,7 @@ void NLDR::update_distance_row_from_VarDiff(NLDR_Var *X, NLDR_Var *Y, NLDR_Dir *
 
 // void NLDR::compute_V(NLDR_Var *X, NLDR_Paras *Paras)
 // {
-//     unsigned n;
+//     INTEGER_TYPE n;
 //     LowerTri<PRECISION> *D;
 //     Matrix<PRECISION> *V;
 //     LowerTri<PRECISION> *DX;
@@ -301,8 +301,8 @@ void NLDR::update_distance_row_from_VarDiff(NLDR_Var *X, NLDR_Var *Y, NLDR_Dir *
 
 // void NLDR::compute_BX(NLDR_Var *X, NLDR_Paras *Paras)
 // {
-//     unsigned n = X->Cor->get_row();
-//     unsigned dim = X->Cor->get_col();
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE dim = X->Cor->get_col();
 //     LowerTri<PRECISION> &DX = *(X->Dis);
 //     LowerTri<PRECISION> &D = *(Paras->Dis);
 //     LowerTri<PRECISION> &BX = *(Paras->BX);
@@ -348,8 +348,8 @@ void NLDR::update_distance_row_from_VarDiff(NLDR_Var *X, NLDR_Var *Y, NLDR_Dir *
 
 // void NLDR::update_cor_by_BX(NLDR_Var *X, NLDR_Paras *Paras)
 // {
-//     unsigned n = X->Cor->get_row();
-//     unsigned dim = X->Cor->get_col();
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE dim = X->Cor->get_col();
 //     Matrix<PRECISION> &Cor = *(X->Cor);
 //     LowerTri<PRECISION> &BX = *(Paras->BX);
 //     PRECISION **BX_ = new PRECISION*[n];
@@ -400,7 +400,7 @@ void NLDR::update_distance_row_from_VarDiff(NLDR_Var *X, NLDR_Var *Y, NLDR_Dir *
 //     delete[] BX_;
 // }
 
-void NLDR::update_coordinates_inplace(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_coordinates_inplace(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
@@ -412,14 +412,14 @@ void NLDR::update_coordinates_inplace(OptimLib::Optim_KwArg &kws, unsigned *ind)
     shift(CX, DeltaX, t);
 }
 
-void NLDR::update_coordinates_notinplace(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_coordinates_notinplace(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     PRECISION t = *reinterpret_cast<PRECISION *>(kws.arg(ind[2]));
     NLDR_Var *Y = reinterpret_cast<NLDR_Var *>(kws.arg(ind[3]));
 
-    unsigned forward_cp_ind[4] = {ind[0], ind[4], ind[3], ind[5]};
+    INTEGER_TYPE forward_cp_ind[4] = {ind[0], ind[4], ind[3], ind[5]};
     NLDR_Var_Copy(kws, forward_cp_ind);
 
     Matrix<PRECISION> &CY = *(Y->Cor);
@@ -428,7 +428,7 @@ void NLDR::update_coordinates_notinplace(OptimLib::Optim_KwArg &kws, unsigned *i
     shift(CY, DeltaY, t);
 }
 
-void NLDR::update_Var_inplace(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_Var_inplace(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     update_coordinates_inplace(kws, ind);
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
@@ -449,7 +449,7 @@ void NLDR::Init_X(NLDR::NLDR_Var *X, PRECISION *stressX, NLDR::NLDR_Paras *paras
     eta = 0;
     eta_d = 0;
     rho = 0;
-    unsigned n = D.dimension();
+    INTEGER_TYPE n = D.dimension();
     PRECISION total = 0;
 
     if (Dis_0 && Dis_0->dimension() != 0)
@@ -492,7 +492,7 @@ void NLDR::Init_X(NLDR::NLDR_Var *X, LowerTri<PRECISION> *DX0, LowerTri<PRECISIO
     eta = 0;
     eta_d = 0;
     rho = 0;
-    unsigned n = D.dimension();
+    INTEGER_TYPE n = D.dimension();
     PRECISION total = 0;
 
     if (DX0 && DX0->dimension() != 0)
@@ -513,7 +513,7 @@ void NLDR::Init_X(NLDR::NLDR_Var *X, LowerTri<PRECISION> *DX0, LowerTri<PRECISIO
     }
 }
 
-void NLDR::update_MAJORIZATION(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_MAJORIZATION(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
     switch (paras->nst)
@@ -536,7 +536,7 @@ void NLDR::update_MAJORIZATION(OptimLib::Optim_KwArg &kws, unsigned *ind)
     }
 };
 
-void NLDR::update_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_STOCHASTIC(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
 
     // in-place update
@@ -555,7 +555,7 @@ void NLDR::update_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind)
     }
 };
 
-void NLDR::direction_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_STOCHASTIC(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
     switch (paras->nst)
@@ -578,7 +578,7 @@ void NLDR::direction_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind)
     }
 };
 
-void NLDR::update_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_METROPOLIS(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // not-in-place update
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
@@ -588,8 +588,8 @@ void NLDR::update_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
     PRECISION T = paras->T;
     PRECISION r_scalar = 0;
-    unsigned n = paras->Dis->dimension();
-    unsigned d = paras->dim;
+    INTEGER_TYPE n = paras->Dis->dimension();
+    INTEGER_TYPE d = paras->dim;
     r_scalar = sqrt(T * stepsize / n / d);
 
     auto eng = paras->eng;
@@ -624,7 +624,7 @@ void NLDR::update_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
     }
 };
 
-void NLDR::direction_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_METROPOLIS(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     bool accepted = *reinterpret_cast<bool *>(kws.arg(12));
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
@@ -651,7 +651,7 @@ void NLDR::direction_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
     }
 };
 
-bool NLDR::accept_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
+bool NLDR::accept_METROPOLIS(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     PRECISION f_cur = *reinterpret_cast<PRECISION *>(kws.arg(3));
     PRECISION f_new = *reinterpret_cast<PRECISION *>(kws.arg(5));
@@ -682,7 +682,7 @@ bool NLDR::accept_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
     paras->T = paras->T * 0.99;
 }
 
-// void NLDR::direction_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind){
+// void NLDR::direction_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind){
 //     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
 
 //     auto d = Dir->Delta->get_col();
@@ -721,7 +721,7 @@ bool NLDR::accept_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //     }
 // }
 
-void NLDR::slope_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::slope_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Dir *Delta = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     PRECISION &s = *reinterpret_cast<PRECISION *>(kws.arg(ind[2]));
@@ -732,7 +732,7 @@ void NLDR::slope_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
     s = -e1 * e1 / e2;
 }
 
-// void NLDR::update_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
+// void NLDR::update_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 // {
 //     // This update routine is called in Line_search wolfe.
 //     // Perform not inplace update from VarDiff, no update on cost.
@@ -744,10 +744,10 @@ void NLDR::slope_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 //     pre_update_by_index_KRUSKAL1_GAUSS_SEIDEL(X, Dir, stepsize, Paras);
 
-//     unsigned i = Paras->VarDiff->activated_row;
-//     unsigned k = Paras->VarDiff->activated_coo;
-//     unsigned n = X->Cor->get_row();
-//     unsigned d = X->Cor->get_col();
+//     INTEGER_TYPE i = Paras->VarDiff->activated_row;
+//     INTEGER_TYPE k = Paras->VarDiff->activated_coo;
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE d = X->Cor->get_col();
 
 //     Matrix<PRECISION> &CY_ = *Y->Cor;
 //     LowerTri<PRECISION> &DY_ = *Y->Dis;
@@ -766,7 +766,7 @@ void NLDR::slope_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //     *Y->rho = Paras->VarDiff->rho;
 // }
 
-void NLDR::cost_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::cost_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     auto *X = reinterpret_cast<NLDR_Var *>(kws.arg(1));
     auto *fx = reinterpret_cast<PRECISION *>(kws.arg(2));
@@ -791,7 +791,7 @@ void NLDR::cost_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *i
     }
 }
 
-void NLDR::cost_GAUSS_SEIDEL_iteration(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::cost_GAUSS_SEIDEL_iteration(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // Every k-iterations(a row get updated), CCA adopt new lambda and need to recompute cost function,
     // Every nk-iterations(entire coordinates get updated), compute the error.
@@ -821,7 +821,7 @@ void NLDR::cost_GAUSS_SEIDEL_iteration(OptimLib::Optim_KwArg &kws, unsigned *ind
     }
 }
 
-void NLDR::copy_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::copy_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     auto src = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     auto des = reinterpret_cast<NLDR_Var *>(kws.arg(ind[1]));
@@ -841,15 +841,15 @@ void NLDR::copy_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *i
     *(des->rho) = *(src->rho);
 }
 
-void NLDR::MAJORIZATION(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<PRECISION> *Cor_0, LowerTri<PRECISION> *Dis_0,
-                        NLDR_STRESS_TYPE stress_type, unsigned MaxIter, unsigned MaxTime, PRECISION ErrTol, PRECISION DifTol,
+void NLDR::MAJORIZATION(LowerTri<PRECISION> *Dis, INTEGER_TYPE n, INTEGER_TYPE d, Matrix<PRECISION> *Cor_0, LowerTri<PRECISION> *Dis_0,
+                        NLDR_STRESS_TYPE stress_type, INTEGER_TYPE MaxIter, INTEGER_TYPE MaxTime, PRECISION ErrTol, PRECISION DifTol,
                         PRECISION *lambda)
 {
     using namespace OptimLib;
 
     std::cout << "\tInitial parameters of solver...\n";
 
-    unsigned it = 0, ti = 0;
+    INTEGER_TYPE it = 0, ti = 0;
     PRECISION err = 100, diff = 100, nD = 0;
 
     Optim_Paras o_paras(MaxIter, MaxTime, ErrTol, DifTol);
@@ -938,13 +938,13 @@ void NLDR::MAJORIZATION(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix
         delete CX_temp;
 }
 
-void NLDR::STOCHASTIC(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<PRECISION> *Cor_0, LowerTri<PRECISION> *Dis_0,
-                      NLDR_STRESS_TYPE stress_type, unsigned MaxIter, unsigned MaxTime, PRECISION ErrTol, PRECISION DifTol,
-                      PRECISION *alpha, PRECISION *lambda, unsigned *s_ind)
+void NLDR::STOCHASTIC(LowerTri<PRECISION> *Dis, INTEGER_TYPE n, INTEGER_TYPE d, Matrix<PRECISION> *Cor_0, LowerTri<PRECISION> *Dis_0,
+                      NLDR_STRESS_TYPE stress_type, INTEGER_TYPE MaxIter, INTEGER_TYPE MaxTime, PRECISION ErrTol, PRECISION DifTol,
+                      PRECISION *alpha, PRECISION *lambda, INTEGER_TYPE *s_ind)
 {
     using namespace OptimLib;
 
-    unsigned it = 0, ti = 0;
+    INTEGER_TYPE it = 0, ti = 0;
     PRECISION err = 100, diff = 100, nD = 0;
     Optim_Paras o_paras(MaxIter, MaxTime, ErrTol, DifTol);
 
@@ -989,13 +989,13 @@ void NLDR::STOCHASTIC(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<P
     //     (*Dis_0) = LowerTri<PRECISION>(*(X.Dis));
 }
 
-void NLDR::METROPOLIS(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<PRECISION> *Cor_0, LowerTri<PRECISION> *Dis_0,
-                      NLDR_STRESS_TYPE stress_type, unsigned MaxIter, unsigned MaxTime, PRECISION ErrTol, PRECISION DifTol,
+void NLDR::METROPOLIS(LowerTri<PRECISION> *Dis, INTEGER_TYPE n, INTEGER_TYPE d, Matrix<PRECISION> *Cor_0, LowerTri<PRECISION> *Dis_0,
+                      NLDR_STRESS_TYPE stress_type, INTEGER_TYPE MaxIter, INTEGER_TYPE MaxTime, PRECISION ErrTol, PRECISION DifTol,
                       PRECISION *lambda, std::default_random_engine *eng, PRECISION T)
 {
     using namespace OptimLib;
 
-    unsigned it = 0, ti = 0;
+    INTEGER_TYPE it = 0, ti = 0;
     PRECISION err = 100, diff = 100, nD = 0;
 
     Optim_Paras o_paras(MaxIter, MaxTime, ErrTol, DifTol);
@@ -1037,7 +1037,7 @@ void NLDR::METROPOLIS(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<P
     kws_iter.set_carg(&nldr_paras, 0);
     Optim_Iter o_iter(&kws_iter);
 
-    unsigned first_gradient[2] = {4, 6};
+    INTEGER_TYPE first_gradient[2] = {4, 6};
 
     direction_METROPOLIS(kws_iter, first_gradient); // Compute the first gradient.
 
@@ -1077,13 +1077,13 @@ void NLDR::METROPOLIS(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<P
     //     (*Dis_0) = LowerTri<PRECISION>(*(X.Dis));
 }
 
-void NLDR::GAUSS_SEIDEL(LowerTri<PRECISION> *Dis, unsigned n, unsigned d, Matrix<PRECISION> *Cor_0, LowerTri<PRECISION> *Dis_0,
-                        NLDR_STRESS_TYPE stress_type, unsigned MaxIter, unsigned MaxTime, PRECISION ErrTol, PRECISION DifTol,
+void NLDR::GAUSS_SEIDEL(LowerTri<PRECISION> *Dis, INTEGER_TYPE n, INTEGER_TYPE d, Matrix<PRECISION> *Cor_0, LowerTri<PRECISION> *Dis_0,
+                        NLDR_STRESS_TYPE stress_type, INTEGER_TYPE MaxIter, INTEGER_TYPE MaxTime, PRECISION ErrTol, PRECISION DifTol,
                         PRECISION *lambda)
 {
     using namespace OptimLib;
 
-    unsigned it = 0, ti = 0, oit = 0;
+    INTEGER_TYPE it = 0, ti = 0, oit = 0;
     PRECISION err = 100, diff = 100, nD = 0;
 
     Optim_Paras o_paras(MaxIter, MaxTime, ErrTol, DifTol);
@@ -1223,8 +1223,8 @@ void NLDR::KRUSKAL1_rescale(NLDR::NLDR_Var *X)
     PRECISION &eta = *(X->eta);
     PRECISION eta_d = *(X->eta_d);
     PRECISION &rho = *(X->rho);
-    unsigned dim = C.get_col();
-    unsigned n = C.get_row();
+    INTEGER_TYPE dim = C.get_col();
+    INTEGER_TYPE n = C.get_row();
 
     PRECISION beta = eta_d / rho;
     for (auto i = 0; i < n; i++)
@@ -1241,8 +1241,8 @@ void NLDR::KRUSKAL1_rescale(NLDR::NLDR_Var *X)
 
 void NLDR::compute_BX_KRUSKAL1(NLDR_Var *X, NLDR_Paras *Paras)
 {
-    unsigned n = X->Cor->get_row();
-    unsigned dim = X->Cor->get_col();
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = X->Cor->get_col();
     LowerTri<PRECISION> &DX = *(X->Dis);
     LowerTri<PRECISION> &D = *(Paras->Dis);
     LowerTri<PRECISION> &BX = *(Paras->BX);
@@ -1271,8 +1271,8 @@ void NLDR::compute_BX_KRUSKAL1(NLDR_Var *X, NLDR_Paras *Paras)
 
 void NLDR::update_cor_by_BX_KRUSKAL1(NLDR_Var *X, NLDR_Paras *Paras)
 {
-    unsigned n = X->Cor->get_row();
-    unsigned dim = X->Cor->get_col();
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = X->Cor->get_col();
     auto &Cor = *(X->Cor);
     auto &BX = *(Paras->BX);
     auto XC_ = Cor.get_vec();
@@ -1296,7 +1296,7 @@ void NLDR::update_cor_by_BX_KRUSKAL1(NLDR_Var *X, NLDR_Paras *Paras)
         }
 }
 
-void NLDR::update_KRUSKAL1_MAJORIZATION(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_KRUSKAL1_MAJORIZATION(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // ip_Update(X, ..., paras)
     // Taking X, stress, error | paras
@@ -1315,19 +1315,19 @@ void NLDR::update_KRUSKAL1_MAJORIZATION(OptimLib::Optim_KwArg &kws, unsigned *in
     paras->pre_stress = *(stress);
 }
 
-void NLDR::direction_KRUSKAL1_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_KRUSKAL1_STOCHASTIC(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
 
-    unsigned i = paras->s_ind[*(paras->iter)];
+    INTEGER_TYPE i = paras->s_ind[*(paras->iter)];
     LowerTri<PRECISION> &D = *(paras->Dis);
     LowerTri<PRECISION> &DX = *(X->Dis);
     Matrix<PRECISION> &CX = *(X->Cor);
     Matrix<PRECISION> &Delta = *(Dir->Delta);
-    unsigned n = D.dimension();
-    unsigned dim = CX.get_col();
+    INTEGER_TYPE n = D.dimension();
+    INTEGER_TYPE dim = CX.get_col();
 
     PRECISION D_ij, DX_ij;
 
@@ -1361,7 +1361,7 @@ void NLDR::direction_KRUSKAL1_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *i
     //      D_i++, DX_i++)
     //     for (auto k = 0; k < dim; k++)
     //     {
-    //         unsigned j = D_i.get_col();
+    //         INTEGER_TYPE j = D_i.get_col();
     //         D_ij = *D_i;
     //         DX_ij = *DX_i;
     //         if (DX_ij > 1e-7)
@@ -1409,14 +1409,14 @@ void NLDR::direction_KRUSKAL1_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *i
     // std::cout << "\t Computation time: " << (clock() - start) / (double) CLOCKS_PER_SEC << "\n";
 }
 
-void NLDR::direction_KRUSKAL1_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_KRUSKAL1_METROPOLIS(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
 
-    unsigned n = X->Cor->get_row();
-    unsigned dim = X->Cor->get_col();
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = X->Cor->get_col();
     PRECISION n1, n2;
     double eta = *(X->eta);
     double eta_d = *(X->eta_d);
@@ -1465,9 +1465,9 @@ void NLDR::pre_update_by_index_KRUSKAL1_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir,
     LowerTri<PRECISION> &D = *(Paras->Dis);
     Matrix<PRECISION> &Delta = *(Dir->Delta);
 
-    unsigned dim = C.get_col(), n = C.get_row();
-    unsigned i = Dir->activated_row;
-    unsigned k = Dir->activated_coo;
+    INTEGER_TYPE dim = C.get_col(), n = C.get_row();
+    INTEGER_TYPE i = Dir->activated_row;
+    INTEGER_TYPE k = Dir->activated_coo;
     PRECISION e1 = Delta(0, k);
     PRECISION e2 = Delta(1, k);
     PRECISION xcnew = C(i, k) - stepsize * e1 / e2;
@@ -1536,7 +1536,7 @@ void NLDR::pre_update_by_index_KRUSKAL1_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir,
     Paras->VarDiff->rho = rho;
 }
 
-void NLDR::update_KRUSKAL1_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_KRUSKAL1_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // This update routine is called in Line_search wolfe.
     // Perform not inplace update from VarDiff, no update on cost.
@@ -1551,7 +1551,7 @@ void NLDR::update_KRUSKAL1_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, 
     update_distance_row_from_VarDiff(X, Y, Dir, stepsize, Paras);
 }
 
-void NLDR::cost_KRUSKAL1_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::cost_KRUSKAL1_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *Y = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     PRECISION *f = reinterpret_cast<PRECISION *>(kws.arg(ind[1]));
@@ -1559,7 +1559,7 @@ void NLDR::cost_KRUSKAL1_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, un
     *f = KRUSKAL1_stress_by_parameter(Y);
 }
 
-void NLDR::direction_KRUSKAL1_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU *paras, unsigned a_row,
+void NLDR::direction_KRUSKAL1_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU *paras, INTEGER_TYPE a_row,
                                            PRECISION **XD_, PRECISION **XD2_, PRECISION *DTX_, PRECISION *DTX3_)
 {
 
@@ -1647,7 +1647,7 @@ void NLDR::direction_KRUSKAL1_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Para
     }
 }
 
-void NLDR::update_KRUSKAL1_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_KRUSKAL1_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // This is called by the Optim_Update_Solver.Optim::Iter, ind = x, Dir, stepsize, stress, error
 
@@ -1714,8 +1714,8 @@ PRECISION NLDR::NORMALIZED_stress_by_parameter(NLDR_Var *X)
 
 void NLDR::compute_BX_NORMALIZED(NLDR_Var *X, NLDR_Paras *Paras)
 {
-    unsigned n = X->Cor->get_row();
-    unsigned dim = X->Cor->get_col();
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = X->Cor->get_col();
     LowerTri<PRECISION> &DX = *(X->Dis);
     LowerTri<PRECISION> &D = *(Paras->Dis);
     LowerTri<PRECISION> &BX = *(Paras->BX);
@@ -1744,8 +1744,8 @@ void NLDR::compute_BX_NORMALIZED(NLDR_Var *X, NLDR_Paras *Paras)
 
 void NLDR::update_cor_by_BX_NORMALIZED(NLDR_Var *X, NLDR_Paras *Paras)
 {
-    unsigned n = X->Cor->get_row();
-    unsigned dim = X->Cor->get_col();
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = X->Cor->get_col();
     auto &Cor = *(X->Cor);
     auto &BX = *(Paras->BX);
     auto XC_ = Cor.get_vec();
@@ -1769,7 +1769,7 @@ void NLDR::update_cor_by_BX_NORMALIZED(NLDR_Var *X, NLDR_Paras *Paras)
         }
 }
 
-void NLDR::update_NORMALIZED_MAJORIZATION(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_NORMALIZED_MAJORIZATION(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // ip_Update(X, ..., paras)
     // Taking X, stress, error | paras
@@ -1788,19 +1788,19 @@ void NLDR::update_NORMALIZED_MAJORIZATION(OptimLib::Optim_KwArg &kws, unsigned *
     paras->pre_stress = *(stress);
 }
 
-void NLDR::direction_NORMALIZED_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_NORMALIZED_STOCHASTIC(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
 
-    unsigned i = paras->s_ind[*(paras->iter)];
+    INTEGER_TYPE i = paras->s_ind[*(paras->iter)];
     LowerTri<PRECISION> &D = *(paras->Dis);
     LowerTri<PRECISION> &DX = *(X->Dis);
     Matrix<PRECISION> &CX = *(X->Cor);
     Matrix<PRECISION> &Delta = *(Dir->Delta);
-    unsigned n = D.dimension();
-    unsigned dim = CX.get_col();
+    INTEGER_TYPE n = D.dimension();
+    INTEGER_TYPE dim = CX.get_col();
 
     auto CX_ = CX.get_vec();
     auto Delta_ = Delta.get_vec();
@@ -1842,14 +1842,14 @@ void NLDR::direction_NORMALIZED_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned 
     }
 }
 
-void NLDR::direction_NORMALIZED_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_NORMALIZED_METROPOLIS(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
 
-    unsigned n = X->Cor->get_row();
-    unsigned dim = X->Cor->get_col();
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = X->Cor->get_col();
     Matrix<PRECISION> &Cor = *(X->Cor);
     Matrix<PRECISION> &DeltaX = *(Dir->Delta);
     LowerTri<PRECISION> &DX = *(X->Dis);
@@ -1883,7 +1883,7 @@ void NLDR::direction_NORMALIZED_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned 
         }
 }
 
-void NLDR::direction_NORMALIZED_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_NORMALIZED_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
@@ -1959,9 +1959,9 @@ void NLDR::pre_update_by_index_NORMALIZED_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Di
     LowerTri<PRECISION> &D = *(Paras->Dis);
     Matrix<PRECISION> &Delta = *(Dir->Delta);
 
-    unsigned dim = C.get_col(), n = C.get_row();
-    unsigned i = Dir->activated_row;
-    unsigned k = Dir->activated_coo;
+    INTEGER_TYPE dim = C.get_col(), n = C.get_row();
+    INTEGER_TYPE i = Dir->activated_row;
+    INTEGER_TYPE k = Dir->activated_coo;
     PRECISION e1 = Delta(0, k);
     PRECISION e2 = Delta(1, k);
     PRECISION xcnew = C(i, k) - stepsize * e1 / e2;
@@ -2030,7 +2030,7 @@ void NLDR::pre_update_by_index_NORMALIZED_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Di
     Paras->VarDiff->rho = rho;
 }
 
-void NLDR::update_NORMALIZED_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_NORMALIZED_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // This update routine is called in Line_search wolfe.
     // Perform not inplace update from VarDiff, no update on cost.
@@ -2045,7 +2045,7 @@ void NLDR::update_NORMALIZED_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws
     update_distance_row_from_VarDiff(X, Y, Dir, stepsize, Paras);
 }
 
-void NLDR::cost_NORMALIZED_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::cost_NORMALIZED_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *Y = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     PRECISION *f = reinterpret_cast<PRECISION *>(kws.arg(ind[1]));
@@ -2053,7 +2053,7 @@ void NLDR::cost_NORMALIZED_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, 
     *f = NORMALIZED_stress_by_parameter(Y);
 }
 
-void NLDR::direction_NORMALIZED_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU *paras, unsigned a_row,
+void NLDR::direction_NORMALIZED_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU *paras, INTEGER_TYPE a_row,
                                              PRECISION **XD_, PRECISION **XD2_, PRECISION *DTX_, PRECISION *DTX3_)
 {
 
@@ -2132,7 +2132,7 @@ void NLDR::direction_NORMALIZED_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Pa
     }
 }
 
-void NLDR::update_NORMALIZED_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_NORMALIZED_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // This is called by the Optim_Update_Solver.Optim::Iter, ind = x, Dir, stepsize, stress, error
 
@@ -2180,8 +2180,8 @@ PRECISION NLDR::SAMMON_stress_by_distance(NLDR_Var *X, NLDR_Paras *Paras)
     LowerTri<PRECISION> &DX = *(X->Dis);
     LowerTri<PRECISION> &D = *(Paras->Dis);
 
-    unsigned dim = Paras->dim;
-    unsigned n = DX.dimension();
+    INTEGER_TYPE dim = Paras->dim;
+    INTEGER_TYPE n = DX.dimension();
 
     PRECISION temp = 0;
     PRECISION stress = 0;
@@ -2208,7 +2208,7 @@ PRECISION NLDR::SAMMON_stress_by_distance(NLDR_Var *X, LowerTri<PRECISION> *D, P
 {
     LowerTri<PRECISION> &DX = *(X->Dis);
 
-    unsigned n = DX.dimension();
+    INTEGER_TYPE n = DX.dimension();
 
     PRECISION temp = 0;
     PRECISION stress = 0;
@@ -2236,8 +2236,8 @@ void NLDR::SAMMON_stress_by_index(NLDR_Var *X, PRECISION &stress, NLDR_Paras *Pa
     LowerTri<PRECISION> &DX = *(X->Dis);
     PRECISION *newD_i = Paras->VarDiff->newD_row;
     PRECISION total_d = Paras->total_d;
-    unsigned i = Paras->VarDiff->activated_row;
-    unsigned n = X->Cor->get_row();
+    INTEGER_TYPE i = Paras->VarDiff->activated_row;
+    INTEGER_TYPE n = X->Cor->get_row();
 
     PRECISION temp = 0;
     for (auto j = 0; j < i; j++)
@@ -2263,8 +2263,8 @@ void NLDR::SAMMON_stress_by_index(NLDR_Var *X, PRECISION &stress, NLDR_Paras_GAU
     LowerTri<PRECISION> &DX = *(X->Dis);
     PRECISION *newD_i = Paras->VarDiff->newD_row;
     PRECISION total_d = Paras->total_d;
-    unsigned i = Paras->VarDiff->activated_row;
-    unsigned n = X->Cor->get_row();
+    INTEGER_TYPE i = Paras->VarDiff->activated_row;
+    INTEGER_TYPE n = X->Cor->get_row();
 
     PRECISION temp = 0;
     for (auto j = 0; j < i; j++)
@@ -2286,8 +2286,8 @@ void NLDR::SAMMON_stress_by_index(NLDR_Var *X, PRECISION &stress, NLDR_Paras_GAU
 
 void NLDR::compute_BX_SAMMON(NLDR_Var *X, NLDR_Paras *Paras)
 {
-    unsigned n = X->Cor->get_row();
-    unsigned dim = X->Cor->get_col();
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = X->Cor->get_col();
     LowerTri<PRECISION> &DX = *(X->Dis);
     LowerTri<PRECISION> &D = *(Paras->Dis);
     LowerTri<PRECISION> &BX = *(Paras->BX);
@@ -2341,8 +2341,8 @@ void NLDR::compute_V_SAMMON(NLDR_Var *X, NLDR_Paras *Paras)
 
 void NLDR::update_cor_by_BX_SAMMON(NLDR_Var *X, NLDR_Paras *Paras)
 {
-    unsigned n = X->Cor->get_row();
-    unsigned dim = X->Cor->get_col();
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = X->Cor->get_col();
     auto &Cor = *(X->Cor);
     auto &BX = *(Paras->BX);
 
@@ -2371,7 +2371,7 @@ void NLDR::update_cor_by_BX_SAMMON(NLDR_Var *X, NLDR_Paras *Paras)
         }
 }
 
-void NLDR::update_SAMMON_MAJORIZATION(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_SAMMON_MAJORIZATION(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // ip_Update(X, ..., paras)
     // Taking X, stress, error ; paras
@@ -2390,19 +2390,19 @@ void NLDR::update_SAMMON_MAJORIZATION(OptimLib::Optim_KwArg &kws, unsigned *ind)
     paras->pre_stress = *(stress);
 }
 
-void NLDR::direction_SAMMON_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_SAMMON_STOCHASTIC(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
 
-    unsigned i = paras->s_ind[*(paras->iter)];
+    INTEGER_TYPE i = paras->s_ind[*(paras->iter)];
     LowerTri<PRECISION> &D = *(paras->Dis);
     LowerTri<PRECISION> &DX = *(X->Dis);
     Matrix<PRECISION> &CX = *(X->Cor);
     Matrix<PRECISION> &Delta = *(Dir->Delta);
-    unsigned n = D.dimension();
-    unsigned dim = CX.get_col();
+    INTEGER_TYPE n = D.dimension();
+    INTEGER_TYPE dim = CX.get_col();
 
     auto CX_ = CX.get_vec();
     auto Delta_ = Delta.get_vec();
@@ -2457,14 +2457,14 @@ void NLDR::direction_SAMMON_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind
     }
 }
 
-void NLDR::direction_SAMMON_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_SAMMON_METROPOLIS(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
 
-    unsigned n = X->Cor->get_row();
-    unsigned dim = X->Cor->get_col();
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = X->Cor->get_col();
     Matrix<PRECISION> &Cor = *(X->Cor);
     Matrix<PRECISION> &DeltaX = *(Dir->Delta);
     LowerTri<PRECISION> &DX = *(X->Dis);
@@ -2499,7 +2499,7 @@ void NLDR::direction_SAMMON_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind
         }
 }
 
-void NLDR::direction_SAMMON_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_SAMMON_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
@@ -2578,9 +2578,9 @@ void NLDR::pre_update_by_index_SAMMON_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, P
     LowerTri<PRECISION> &D = *(Paras->Dis);
     Matrix<PRECISION> &Delta = *(Dir->Delta);
 
-    unsigned dim = C.get_col(), n = C.get_row();
-    unsigned i = Dir->activated_row;
-    unsigned k = Dir->activated_coo;
+    INTEGER_TYPE dim = C.get_col(), n = C.get_row();
+    INTEGER_TYPE i = Dir->activated_row;
+    INTEGER_TYPE k = Dir->activated_coo;
     PRECISION e1 = Delta(0, k);
     PRECISION e2 = Delta(1, k);
     PRECISION xcnew = C(i, k) - stepsize * e1 / e2;
@@ -2622,7 +2622,7 @@ void NLDR::pre_update_by_index_SAMMON_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, P
     }
 }
 
-void NLDR::update_SAMMON_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_SAMMON_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // This update routine is called in Line_search wolfe.
     // Perform not inplace update from VarDiff, no update on cost.
@@ -2637,7 +2637,7 @@ void NLDR::update_SAMMON_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, un
     update_distance_row_from_VarDiff(X, Y, Dir, stepsize, Paras);
 }
 
-void NLDR::cost_SAMMON_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::cost_SAMMON_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     auto X = reinterpret_cast<NLDR_Var *>(kws.arg(1));
     auto &fY = *reinterpret_cast<PRECISION *>(kws.arg(ind[1]));
@@ -2647,7 +2647,7 @@ void NLDR::cost_SAMMON_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsi
     SAMMON_stress_by_index(X, fY, paras);
 }
 
-void NLDR::direction_SAMMON_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU *paras, unsigned a_row,
+void NLDR::direction_SAMMON_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU *paras, INTEGER_TYPE a_row,
                                          PRECISION **XD_, PRECISION **XD2_, PRECISION *DTX_, PRECISION *DTX3_)
 {
 
@@ -2727,7 +2727,7 @@ void NLDR::direction_SAMMON_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_
     }
 }
 
-void NLDR::update_SAMMON_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_SAMMON_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // This is called by the Optim_Update_Solver.Optim::Iter, ind = x, Dir, stepsize, stress, error
 
@@ -2771,7 +2771,7 @@ void NLDR::update_SAMMON_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 PRECISION NLDR::compute_lambda(NLDR_Var *X, NLDR_Paras *Paras)
 {
-    unsigned n = X->Cor->get_row();
+    INTEGER_TYPE n = X->Cor->get_row();
     PRECISION lambda = 0;
     LowerTri<PRECISION> &DX = *(X->Dis);
     LowerTri<PRECISION> &D = *(Paras->Dis);
@@ -2806,8 +2806,8 @@ PRECISION NLDR::CCA_stress_by_distance(NLDR_Var *X, NLDR_Paras *Paras)
     LowerTri<PRECISION> &DX = *(X->Dis);
     LowerTri<PRECISION> &D = *(Paras->Dis);
 
-    unsigned dim = Paras->dim;
-    unsigned n = DX.dimension();
+    INTEGER_TYPE dim = Paras->dim;
+    INTEGER_TYPE n = DX.dimension();
 
     PRECISION temp = 0;
     PRECISION stress = 0;
@@ -2840,7 +2840,7 @@ PRECISION NLDR::CCA_stress_by_distance_lambda(LowerTri<PRECISION> *DX, LowerTri<
 {
     PRECISION temp = 0;
     PRECISION stress = 0;
-    unsigned n = DX->dimension();
+    INTEGER_TYPE n = DX->dimension();
     for (auto i = 0; i < n; i++)
     {
         PRECISION *DX_i = DX->ele(i);
@@ -2860,9 +2860,9 @@ void NLDR::CCA_stress_by_index(NLDR_Var *X, PRECISION &stress, NLDR_Paras *Paras
     LowerTri<PRECISION> &DX = *(X->Dis);
     PRECISION *newD_i = Paras->VarDiff->newD_row;
     PRECISION temp;
-    unsigned i = Paras->VarDiff->activated_row;
-    unsigned n = X->Cor->get_row();
-    unsigned dim = Paras->dim;
+    INTEGER_TYPE i = Paras->VarDiff->activated_row;
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = Paras->dim;
 
     PRECISION c_l = Paras->lambda[(*Paras->iter) / dim];
     // PRECISION c_l = Paras->cur_lambda;
@@ -2895,8 +2895,8 @@ void NLDR::CCA_stress_by_index(NLDR_Var *X, PRECISION &stress, NLDR_Paras_GAU *P
     LowerTri<PRECISION> &DX = *(X->Dis);
     PRECISION *newD_i = Paras->VarDiff->newD_row;
     PRECISION temp;
-    unsigned i = Paras->VarDiff->activated_row;
-    unsigned n = X->Cor->get_row();
+    INTEGER_TYPE i = Paras->VarDiff->activated_row;
+    INTEGER_TYPE n = X->Cor->get_row();
 
     PRECISION c_l = *Paras->cur_lambda;
 
@@ -2923,8 +2923,8 @@ void NLDR::CCA_stress_by_index(NLDR_Var *X, PRECISION &stress, NLDR_Paras_GAU *P
 
 void NLDR::compute_BX_CCA(NLDR_Var *X, NLDR_Paras *Paras)
 {
-    unsigned n = X->Cor->get_row();
-    unsigned dim = X->Cor->get_col();
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = X->Cor->get_col();
     LowerTri<PRECISION> &DX = *(X->Dis);
     LowerTri<PRECISION> &D = *(Paras->Dis);
     LowerTri<PRECISION> &BX = *(Paras->BX);
@@ -2980,8 +2980,8 @@ void NLDR::compute_V_CCA(NLDR_Var *X, NLDR_Paras *Paras)
 
 void NLDR::update_cor_by_BX_CCA(NLDR_Var *X, NLDR_Paras *Paras)
 {
-    unsigned n = X->Cor->get_row();
-    unsigned dim = X->Cor->get_col();
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = X->Cor->get_col();
     auto &Cor = *(X->Cor);
     auto &BX = *(Paras->BX);
 
@@ -3010,7 +3010,7 @@ void NLDR::update_cor_by_BX_CCA(NLDR_Var *X, NLDR_Paras *Paras)
         }
 }
 
-void NLDR::update_CCA_MAJORIZATION(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_CCA_MAJORIZATION(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // ip_Update(X, ..., paras)
     // Taking X, stress, error ; paras
@@ -3040,19 +3040,19 @@ void NLDR::update_CCA_MAJORIZATION(OptimLib::Optim_KwArg &kws, unsigned *ind)
     paras->pre_stress = *(stress);
 }
 
-void NLDR::direction_CCA_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_CCA_STOCHASTIC(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
 
-    unsigned i = paras->s_ind[*(paras->iter)];
+    INTEGER_TYPE i = paras->s_ind[*(paras->iter)];
     LowerTri<PRECISION> &D = *(paras->Dis);
     LowerTri<PRECISION> &DX = *(X->Dis);
     Matrix<PRECISION> &CX = *(X->Cor);
     Matrix<PRECISION> &Delta = *(Dir->Delta);
-    unsigned n = D.dimension();
-    unsigned dim = CX.get_col();
+    INTEGER_TYPE n = D.dimension();
+    INTEGER_TYPE dim = CX.get_col();
 
     auto CX_ = CX.get_vec();
     auto Delta_ = Delta.get_vec();
@@ -3101,14 +3101,14 @@ void NLDR::direction_CCA_STOCHASTIC(OptimLib::Optim_KwArg &kws, unsigned *ind)
     }
 }
 
-void NLDR::direction_CCA_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_CCA_METROPOLIS(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
     NLDR_Paras *paras = reinterpret_cast<NLDR_Paras *>(kws.carg(0));
 
-    unsigned n = X->Cor->get_row();
-    unsigned dim = X->Cor->get_col();
+    INTEGER_TYPE n = X->Cor->get_row();
+    INTEGER_TYPE dim = X->Cor->get_col();
     Matrix<PRECISION> &Cor = *(X->Cor);
     Matrix<PRECISION> &DeltaX = *(Dir->Delta);
     LowerTri<PRECISION> &DX = *(X->Dis);
@@ -3141,7 +3141,7 @@ void NLDR::direction_CCA_METROPOLIS(OptimLib::Optim_KwArg &kws, unsigned *ind)
         }
 }
 
-void NLDR::direction_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::direction_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     NLDR_Var *X = reinterpret_cast<NLDR_Var *>(kws.arg(ind[0]));
     NLDR_Dir *Dir = reinterpret_cast<NLDR_Dir *>(kws.arg(ind[1]));
@@ -3239,9 +3239,9 @@ void NLDR::pre_update_by_index_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, PREC
     LowerTri<PRECISION> &D = *(Paras->Dis);
     Matrix<PRECISION> &Delta = *(Dir->Delta);
 
-    unsigned dim = C.get_col(), n = C.get_row();
-    unsigned i = Dir->activated_row;
-    unsigned k = Dir->activated_coo;
+    INTEGER_TYPE dim = C.get_col(), n = C.get_row();
+    INTEGER_TYPE i = Dir->activated_row;
+    INTEGER_TYPE k = Dir->activated_coo;
     PRECISION e1 = Delta(0, k);
     PRECISION e2 = Delta(1, k);
     PRECISION xcnew = C(i, k) - stepsize * e1 / e2;
@@ -3283,7 +3283,7 @@ void NLDR::pre_update_by_index_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, PREC
     }
 }
 
-void NLDR::update_CCA_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_CCA_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // This update routine is called in Line_search wolfe.
     // Perform not inplace update from VarDiff, no update on cost.
@@ -3298,7 +3298,7 @@ void NLDR::update_CCA_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsig
     update_distance_row_from_VarDiff(X, Y, Dir, stepsize, Paras);
 }
 
-void NLDR::cost_CCA_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::cost_CCA_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     auto X = reinterpret_cast<NLDR_Var *>(kws.arg(1));
     auto &fY = *reinterpret_cast<PRECISION *>(kws.arg(ind[1]));
@@ -3308,7 +3308,7 @@ void NLDR::cost_CCA_GAUSS_SEIDEL_line_search(OptimLib::Optim_KwArg &kws, unsigne
     CCA_stress_by_index(X, fY, paras);
 }
 
-void NLDR::direction_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU *paras, unsigned a_row,
+void NLDR::direction_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU *paras, INTEGER_TYPE a_row,
                                       PRECISION **XD_, PRECISION **XD2_, PRECISION *DPJ_, PRECISION *DQ_, PRECISION *DR_)
 {
 
@@ -3414,7 +3414,7 @@ void NLDR::direction_CCA_GAUSS_SEIDEL(NLDR_Var *X, NLDR_Dir *Dir, NLDR_Paras_GAU
     }
 }
 
-void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
+void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 {
     // This is called by the Optim_Update_Solver.Optim::Iter, ind = x, Dir, stepsize, stress, error
 
@@ -3462,8 +3462,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //     Matrix<PRECISION> &C = *(X->Cor);
 //     LowerTri<PRECISION> &DX = *(X->Dis);
 //     LowerTri<PRECISION> &D = *(Paras->Dis);
-//     unsigned dim = Paras->dim;
-//     unsigned n = C.get_row();
+//     INTEGER_TYPE dim = Paras->dim;
+//     INTEGER_TYPE n = C.get_row();
 
 //     PRECISION temp = 0;
 //     PRECISION &stress = *f;
@@ -3494,9 +3494,9 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //     Matrix<PRECISION> &C = *(X->Cor);
 //     LowerTri<PRECISION> &DX = *(X->Dis);
 //     Matrix<PRECISION> &Delta = *(Dir->Delta);
-//     unsigned dim = Delta.get_col(), n = Delta.get_row();
-//     unsigned i = Dir->activated_row;
-//     unsigned k = Dir->activated_coo;
+//     INTEGER_TYPE dim = Delta.get_col(), n = Delta.get_row();
+//     INTEGER_TYPE i = Dir->activated_row;
+//     INTEGER_TYPE k = Dir->activated_coo;
 //     PRECISION xcnew = C(i, k) + stepsize * Delta(i, k);
 
 //     PRECISION temp = 0;
@@ -3524,9 +3524,9 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //     LowerTri<PRECISION> &D = *(Paras->Dis);
 //     Matrix<PRECISION> &Delta = *(Dir->Delta);
 
-//     unsigned dim = Delta.get_col(), n = Delta.get_row();
-//     unsigned i = Dir->activated_row;
-//     unsigned k = Dir->activated_coo;
+//     INTEGER_TYPE dim = Delta.get_col(), n = Delta.get_row();
+//     INTEGER_TYPE i = Dir->activated_row;
+//     INTEGER_TYPE k = Dir->activated_coo;
 //     PRECISION xcnew = C(i, k) + stepsize * Delta(i, k);
 
 //     PRECISION *newD_i = Paras->VarDiff->newD_row;
@@ -3561,7 +3561,7 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //     Paras->VarDiff->rho = rho;
 // }
 
-// void NLDR::inplace_update_by_index(OptimLib::Optim_KwArg &kws, unsigned *ind);
+// void NLDR::inplace_update_by_index(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind);
 
 // void NLDR::KRUSKAL1_update_stress_by_index(NLDR::NLDR_Var *X, NLDR::NLDR_Dir *Dir, PRECISION stepsize, PRECISION &stress, NLDR::NLDR_Paras *Paras)
 // {
@@ -3590,8 +3590,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //     LowerTri<PRECISION> &DX = *(X->Dis);
 //     PRECISION *newD_i = Paras->VarDiff->newD_row;
 //     PRECISION weight = Paras->weight;
-//     unsigned i = Dir->activated_row;
-//     unsigned n = Dir->Delta->get_row();
+//     INTEGER_TYPE i = Dir->activated_row;
+//     INTEGER_TYPE n = Dir->Delta->get_row();
 
 //     for (auto j = 0; j < n; j++)
 //         if (j != i)
@@ -3609,8 +3609,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //     LowerTri<PRECISION> &DX = *(X->Dis);
 //     PRECISION *newD_i = Paras->VarDiff->newD_row;
 //     PRECISION weight = Paras->weight;
-//     unsigned i = Dir->activated_row;
-//     unsigned n = Dir->Delta->get_row();
+//     INTEGER_TYPE i = Dir->activated_row;
+//     INTEGER_TYPE n = Dir->Delta->get_row();
 
 //     for (auto j = 0; j < n; j++)
 //         if (j != i && D(i, j) >= 1e-10)
@@ -3629,8 +3629,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //     PRECISION *newD_i = Paras->VarDiff->newD_row;
 //     PRECISION weight = Paras->weight;
 //     PRECISION temp;
-//     unsigned i = Dir->activated_row;
-//     unsigned n = Dir->Delta->get_row();
+//     INTEGER_TYPE i = Dir->activated_row;
+//     INTEGER_TYPE n = Dir->Delta->get_row();
 
 //     for (auto j = 0; j < n; j++)
 //     {
@@ -3644,7 +3644,7 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //     }
 // }
 
-// void NLDR::inplace_update_with_pre_update_by_index(OptimLib::Optim_KwArg &kws, unsigned *ind)
+// void NLDR::inplace_update_with_pre_update_by_index(OptimLib::Optim_KwArg &kws, INTEGER_TYPE *ind)
 // {
 //     // Perform update from VarDiff, no update on cost.
 //     NLDR::NLDR_Var *X = reinterpret_cast<NLDR::NLDR_Var *>(kws.arg(ind[0]));
@@ -3653,9 +3653,9 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 //     PRECISION stress = *reinterpret_cast<PRECISION *>(kws.arg(ind[3])); // Already updated
 //     NLDR::NLDR_Paras *Paras = reinterpret_cast<NLDR::NLDR_Paras *>(kws.carg(0));
 
-//     unsigned i = Paras->VarDiff->activated_row;
-//     unsigned k = Paras->VarDiff->activated_coo;
-//     unsigned n = Paras->dim;
+//     INTEGER_TYPE i = Paras->VarDiff->activated_row;
+//     INTEGER_TYPE k = Paras->VarDiff->activated_coo;
+//     INTEGER_TYPE n = Paras->dim;
 
 //     (*X->Cor)(i, k) += stepsize * (*Delta->Delta)(0, k);
 //     for (auto j = 0; j < n; j++)
@@ -3667,8 +3667,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 // void NLDR::update_cor_dis_by_BX(NLDR::NLDR_Var *X, const LowerTri<PRECISION> &BX)
 // {
-//     unsigned n = X->Cor->get_row();
-//     unsigned dim = X->Cor->get_col();
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE dim = X->Cor->get_col();
 //     Matrix<PRECISION> &Cor = *(X->Cor);
 //     Matrix<PRECISION> C_temp(Cor);
 
@@ -3685,8 +3685,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 // void NLDR::update_cor_dis_by_BX_V(NLDR::NLDR_Var *X, const LowerTri<PRECISION> &BX, const Matrix<PRECISION> &V)
 // {
-//     unsigned n = X->Cor->get_row();
-//     unsigned dim = X->Cor->get_col();
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE dim = X->Cor->get_col();
 //     Matrix<PRECISION> &Cor = *(X->Cor);
 //     PRECISION *A = new PRECISION[n * dim];
 //     memset(A, 0, n * dim * sizeof(PRECISION));
@@ -3708,8 +3708,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 // void NLDR::update_cor_by_BX_V(NLDR::NLDR_Var *X, const LowerTri<PRECISION> &BX, const Matrix<PRECISION> &V)
 // {
-//     unsigned n = X->Cor->get_row();
-//     unsigned dim = X->Cor->get_col();
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE dim = X->Cor->get_col();
 //     Matrix<PRECISION> &Cor = *(X->Cor);
 //     PRECISION *A = new PRECISION[n * dim];
 //     memset(A, 0, n * dim * sizeof(PRECISION));
@@ -3730,8 +3730,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 // void NLDR::SAMMOM_compute_BX(NLDR::NLDR_Var *X, NLDR::NLDR_Paras *Paras, LowerTri<PRECISION> &BX)
 // {
-//     unsigned n = X->Cor->get_row();
-//     unsigned dim = X->Cor->get_col();
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE dim = X->Cor->get_col();
 //     LowerTri<PRECISION> &DX = *(X->Dis);
 //     LowerTri<PRECISION> &D = *(Paras->Dis);
 //     PRECISION *row_sum = new PRECISION[n];
@@ -3752,8 +3752,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 // void NLDR::SAMMOM_compute_BX(NLDR::NLDR_Var *X, NLDR::NLDR_Paras *Paras, LowerTri<PRECISION> &BX)
 // {
-//     unsigned n = X->Cor->get_row();
-//     unsigned dim = X->Cor->get_col();
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE dim = X->Cor->get_col();
 //     LowerTri<PRECISION> &DX = *(X->Dis);
 //     LowerTri<PRECISION> &D = *(Paras->Dis);
 //     PRECISION *row_sum = new PRECISION[n];
@@ -3774,8 +3774,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 // void NLDR::CCA_compute_BX(NLDR::NLDR_Var *X, NLDR::NLDR_Paras *Paras, LowerTri<PRECISION> &BX, PRECISION lambda)
 // {
-//     unsigned n = X->Cor->get_row();
-//     unsigned dim = X->Cor->get_col();
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE dim = X->Cor->get_col();
 //     LowerTri<PRECISION> &DX = *(X->Dis);
 //     LowerTri<PRECISION> &D = *(Paras->Dis);
 //     PRECISION *row_sum = new PRECISION[n];
@@ -3796,8 +3796,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 // void NLDR::KRUSKAL1_Gradient(NLDR::NLDR_Var *X, NLDR::NLDR_Dir *Delta, NLDR::NLDR_Paras *Paras)
 // {
-//     unsigned n = X->Cor->get_row();
-//     unsigned dim = X->Cor->get_col();
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE dim = X->Cor->get_col();
 //     PRECISION n1, n2;
 //     double eta = *(X->eta);
 //     double eta_d = *(X->eta_d);
@@ -3824,8 +3824,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 // void NLDR::NORMALIZED_Gradient(NLDR::NLDR_Var *X, NLDR::NLDR_Dir *Delta, NLDR::NLDR_Paras *Paras)
 // {
-//     unsigned n = X->Cor->get_row();
-//     unsigned dim = X->Cor->get_col();
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE dim = X->Cor->get_col();
 //     Matrix<PRECISION> &Cor = *(X->Cor);
 //     Matrix<PRECISION> &DeltaX = *(Delta->Delta);
 //     LowerTri<PRECISION> &DX = *(X->Dis);
@@ -3853,8 +3853,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 // void NLDR::SAMMON_Gradient(NLDR::NLDR_Var *X, NLDR::NLDR_Dir *Delta, NLDR::NLDR_Paras *Paras)
 // {
-//     unsigned n = X->Cor->get_row();
-//     unsigned dim = X->Cor->get_col();
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE dim = X->Cor->get_col();
 //     Matrix<PRECISION> &Cor = *(X->Cor);
 //     Matrix<PRECISION> &DeltaX = *(Delta->Delta);
 //     LowerTri<PRECISION> &DX = *(X->Dis);
@@ -3881,8 +3881,8 @@ void NLDR::update_CCA_GAUSS_SEIDEL(OptimLib::Optim_KwArg &kws, unsigned *ind)
 
 // void NLDR::CCA_Gradient(NLDR::NLDR_Var *X, NLDR::NLDR_Dir *Delta, NLDR::NLDR_Paras *Paras)
 // {
-//     unsigned n = X->Cor->get_row();
-//     unsigned dim = X->Cor->get_col();
+//     INTEGER_TYPE n = X->Cor->get_row();
+//     INTEGER_TYPE dim = X->Cor->get_col();
 //     Matrix<PRECISION> &Cor = *(X->Cor);
 //     Matrix<PRECISION> &DeltaX = *(Delta->Delta);
 //     LowerTri<PRECISION> &DX = *(X->Dis);

@@ -139,7 +139,7 @@ SparseMatrix* SparseMatrix::Multiply(const SparseMatrix& mat) const
 	return result;
 }
 
-double* SparseMatrix::Mean(const unsigned int& num_tree)
+double* SparseMatrix::Mean(const int& num_tree)
 {
 	double* result = new double[rows];
 	for (int i = 0; i < rows; i++)
