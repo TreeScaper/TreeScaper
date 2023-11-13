@@ -15,7 +15,7 @@ using std::ostream;
 using std::string;
 
 template <class T>
-T GetPrime(T topNum, unsigned from)
+T GetPrime(T topNum, int from)
 {
 	T primeNum = 0;
 	T candidate = 0;
@@ -61,7 +61,7 @@ public:
 	void push(string item, bool flag_str_format = true);
 	void insert(string item);
 	bool cmp_taxa(string &tree, bool *barray);
-	bool report_missing_taxon(size_t tree_id, string &tree, bool *barray, std::ostream &out);
+	bool report_missing_taxon(int tree_id, string &tree, bool *barray, std::ostream &out);
 
 	template <class T>
 	void set_bitstr_size(T ele)
@@ -78,9 +78,9 @@ public:
 		Taxon2Ind.insert(std::pair<string, int>(taxon, Ind2Taxon.get_size() - 1));
 		size++;
 	}
-	size_t ReadTaxa(std::string fname);
-	size_t ReadTaxa(std::string fname, bool same_leaf);
-	bool ScanTaxa(std::string fname, size_t tree_pos, std::string outname);
+	int ReadTaxa(std::string fname);
+	int ReadTaxa(std::string fname, bool same_leaf);
+	bool ScanTaxa(std::string fname, int tree_pos, std::string outname);
 	string operator()(int i) const { return Ind2Taxon(i); };
 	string get_Taxon(int i) const { return Ind2Taxon(i); };
 };
@@ -91,8 +91,8 @@ class BitString
 	// This is a bitstring representing the bipartition.
 	// T must be unsigned.
 private:
-	size_t length;
-	size_t bit_size; // These two terms can be better managed.
+	int length;
+	int bit_size; // These two terms can be better managed.
 	T *vec;
 
 public:
@@ -198,7 +198,7 @@ public:
 					return false;
 				temp = vec[i + 1] ^ rhs.vec[i + 1];
 			}
-			size_t remainder = 8 * length * sizeof(T) - bit_size;
+			int remainder = 8 * length * sizeof(T) - bit_size;
 			T mask = ((T)-1 >> remainder);
 			if ((temp & mask) != mask)
 				return false;
@@ -310,9 +310,9 @@ public:
 		return *this;
 	};
 
-	T &operator[](size_t i) { return vec[i]; };
+	T &operator[](int i) { return vec[i]; };
 
-	T operator()(size_t i) const { return vec[i]; };
+	T operator()(int i) const { return vec[i]; };
 
 	int size() const { return length; };
 
@@ -322,7 +322,7 @@ public:
 		{ // First bit is 1
 			for (int i = 0; i < length; i++)
 				vec[i] = ~vec[i];
-			size_t remainder = 8 * length * sizeof(T) - bit_size;
+			int remainder = 8 * length * sizeof(T) - bit_size;
 			T temp = -1;
 			temp = (temp >> remainder);
 			vec[length - 1] = vec[length - 1] & temp;
@@ -363,7 +363,7 @@ public:
 	void print_BitString(ostream &fout)
 	{
 		bool bit;
-		size_t n = sizeof(T) * 8;
+		int n = sizeof(T) * 8;
 		T one = 1, temp = 0;
 		for (int i = 0; i < length - 1; i++)
 		{
@@ -386,8 +386,8 @@ public:
 	}
 
 	T *get_vec() { return vec; };
-	size_t get_length() { return length; };
-	size_t get_bitsize() { return bit_size; };
+	int get_length() { return length; };
+	int get_bitsize() { return bit_size; };
 
 	int get_taxon_id() const
 	{
@@ -508,7 +508,7 @@ public:
 		}
 		else
 		{
-			size_t collison_size = Hash2Id->get_c_ptr(index_hash)->get_size();
+			int collison_size = Hash2Id->get_c_ptr(index_hash)->get_size();
 			for (int i = 0; i < collison_size; i++)
 			{
 				index = Hash2Id->ele(index_hash, i);
@@ -540,7 +540,7 @@ public:
 		}
 		else
 		{
-			size_t collison_size = Hash2Id->get_c_ptr(index_hash)->get_size();
+			int collison_size = Hash2Id->get_c_ptr(index_hash)->get_size();
 			for (int i = 0; i < collison_size; i++)
 			{
 				index = Hash2Id->ele(index_hash, i);
@@ -586,11 +586,11 @@ public:
 	void set_hash_bound(int n_tree)
 	{
 		T p = 0;
-		unsigned int mul = 1;
+		int mul = 1;
 		T top = (n_tree * (2 * Taxa->size - 3)) / 10;
 		do
 		{
-			unsigned from = 100 * mul;
+			int from = 100 * mul;
 			p = GetPrime(top, from);
 			++mul;
 		} while (p == 0);
@@ -652,7 +652,7 @@ public:
 	// darray_dc<int>* get_Id2Tree_ptr() { return &(Id2Tree); };
 
 	// void print_Bipart(ostream& fout, int n_tree) {
-	//	size_t n = Id2BitString.get_size();
+	//	int n = Id2BitString.get_size();
 	//	fout << Taxa->size << '\t' << n << '\n';
 	//	for (int i = 0; i < n; i++){
 	//		fout << i << " ";
@@ -664,14 +664,14 @@ public:
 	//	}
 	// }
 
-	void print_Bipart(ostream &fout, size_t i)
+	void print_Bipart(ostream &fout, int i)
 	{
 		Id2BitString[i].print_BitString(fout);
 	}
 
-	BitString<T> &operator[](size_t i) { return Id2BitString[i]; };
+	BitString<T> &operator[](int i) { return Id2BitString[i]; };
 
-	// BitString<T> &operator()(size_t i) const { return Id2BitString[i]; };
+	// BitString<T> &operator()(int i) const { return Id2BitString[i]; };
 };
 
 class TreeArray
@@ -690,8 +690,8 @@ private:
 	Array<Array<int>> *levels;
 	Array<PRECISION> *weights; // weights will be kept and used in generalizing B2T matrix.
 	int **edges;
-	Array<size_t> *t2b;
-	Array<size_t> *t2b_upper;
+	Array<int> *t2b;
+	Array<int> *t2b_upper;
 
 	bool issorted;
 	bool sameleaf;
@@ -726,8 +726,8 @@ public:
 	// {
 
 	// 	// std::cout << "------------------Bitstring computation started----------------------\n";
-	// 	t2b = new Array<size_t>(size);
-	// 	t2b->resize(size, (size_t)-1);
+	// 	t2b = new Array<int>(size);
+	// 	t2b->resize(size, (int)-1);
 	// 	T *index_hash = new T[size];
 	// 	memset(index_hash, 0, size * sizeof(T));
 
@@ -801,8 +801,8 @@ public:
 	BitString<T> *compute_bitstring_sameleaf(Bipartition<T> *Bipart)
 	{
 		// std::cout << "------------------Bitstring computation started----------------------\n";
-		t2b = new Array<size_t>(size);
-		t2b->resize(size, (size_t)-1);
+		t2b = new Array<int>(size);
+		t2b->resize(size, (int)-1);
 
 
 		// darray<int>* t2b_ptr = TreeId2Bipart->get_c_ptr(tree_id);
@@ -885,11 +885,11 @@ public:
 	{
 
 		// std::cout << "------------------Bitstring computation started----------------------\n";
-		t2b = new Array<size_t>(size);
-		t2b_upper = new Array<size_t>(size);
+		t2b = new Array<int>(size);
+		t2b_upper = new Array<int>(size);
 
-		t2b->resize(size, (size_t)-1);
-		t2b_upper->resize(size, (size_t)-1);
+		t2b->resize(size, (int)-1);
+		t2b_upper->resize(size, (int)-1);
 
 		// darray<int>* t2b_ptr = TreeId2Bipart->get_c_ptr(tree_id);
 
@@ -1030,12 +1030,12 @@ public:
 	//	if (issorted)
 	//		return;
 
-	//	size_t n = size;
+	//	int n = size;
 	//	bool swapped = false;
 	//	bool isweighted = !weights->is_empty();
 
 	//	while (n > 1) {
-	//		size_t new_n = 0;
+	//		int new_n = 0;
 	//		int i = 1;
 	//		for (auto it = t2b->begin(); i < n; it++, i++) {
 	//			if (*it > *(it + 1)) {
@@ -1059,18 +1059,18 @@ public:
 
 	int get_size() const { return size; };
 
-	Array<size_t> *get_t2b() { return t2b; };
+	Array<int> *get_t2b() { return t2b; };
 
-	Array<size_t> *pop_t2b()
+	Array<int> *pop_t2b()
 	{
-		Array<size_t> *b_ptr = t2b;
+		Array<int> *b_ptr = t2b;
 		t2b = nullptr;
 		return b_ptr;
 	};
 
-	Array<size_t> *pop_t2b_upper()
+	Array<int> *pop_t2b_upper()
 	{
-		Array<size_t> *b_ptr = t2b_upper;
+		Array<int> *b_ptr = t2b_upper;
 		t2b_upper = nullptr;
 		return b_ptr;
 	};
@@ -1104,7 +1104,7 @@ private:
 	bool sameleaf;
 
 public:
-	TreeSet(size_t N) : size(0), trees(Array<TreeArray *>(0, N)),
+	TreeSet(int N) : size(0), trees(Array<TreeArray *>(0, N)),
 						LeafSets(nullptr), Uniform_LeafSet(nullptr),
 						Bipart(nullptr), Taxa(nullptr), sameleaf(true){};
 
@@ -1140,20 +1140,17 @@ public:
 		size++;
 	};
 
-	TreeArray *ele_ptr(size_t i) { return trees[i]; };
-
-	TreeArray &ele(size_t i) { return *(trees[i]); };
+	TreeArray *ele_ptr(int i) { return trees[i]; };
 
 	TreeArray &ele(int i) { return *(trees[i]); };
-
-	TreeArray &operator[](size_t i) { return this->ele(i); };
 
 	TreeArray &operator[](int i) { return this->ele(i); };
 
 
-	void ReadTree(std::string fname, size_t pos, int flag_label, bool flag_rooted, bool flag_weighted)
+
+	void ReadTree(std::string fname, int pos, int flag_label, bool flag_rooted, bool flag_weighted)
 	{
-		size_t leaf_size = Taxa->size;
+		int leaf_size = Taxa->size;
 		Array<int> active_levels(0, 100);
 		Array<int> unlabeled(0, 100);
 

@@ -14,6 +14,8 @@
 #include "zdfileio.hpp"
 
 #include "rspr.hpp"
+// #include "hungarian.h"
+
 extern "C" {
 #include "hungarian.h"
 }
@@ -21,6 +23,12 @@ extern "C" {
 // rspr.hpp for SPR distance
 // hungarian.h for matching distance
 
+enum DISTANCE_TYPE
+{
+	ROBINSONFOULDS,
+	MATCHING_DIST,
+	SPR_DISTANCE
+};
 
 template <class T>
 class TreeSetObjects
@@ -99,12 +107,12 @@ public:
 
 	//	if (!ISSORTED_Bipart) {
 	//		for (int i = 0; i < unique_bipart; i++) {
-	//			size_t n_trees_Bipart_i = BipartId2Tree->get_c(i).get_size();
+	//			int n_trees_Bipart_i = BipartId2Tree->get_c(i).get_size();
 	//			if (BipartId2Tree->ele(i, 0) == -1)
 	//				continue;
 	//			else {
 	//				while (n_trees_Bipart_i > 1) {
-	//					size_t new_n = 0;
+	//					int new_n = 0;
 	//					for (int j = 1; j < n_trees_Bipart_i; j++) {
 	//						if (BipartId2Tree->ele(i, j - 1) > BipartId2Tree->ele(i, j)) {
 	//							// Swapped
@@ -284,7 +292,7 @@ public:
 
 				// pointers above will be released while existing.
 
-				auto full_treevec = new Array<size_t>(join(*bipart_lower, *bipart_upper));
+				auto full_treevec = new Array<int>(join(*bipart_lower, *bipart_upper));
 				auto full_weights = new Array<PRECISION>(duplicate(2, *weight_lower));
 
 				// pointers above will be sent to the sparse matrix and held there.
@@ -358,7 +366,7 @@ public:
 				(*cov_mat)(j, i) /= (n_trees - 1);
 	};
 
-	void Compute_Covariance_Matrix(const Array<size_t> &sub_bipart_id, Array<size_t> &bipart_id_mapping)
+	void Compute_Covariance_Matrix(const Array<int> &sub_bipart_id, Array<int> &bipart_id_mapping)
 	{
 		assert(sb2t_mat != nullptr);
 
@@ -368,7 +376,7 @@ public:
 
 		std::cout << "\tComputing covariance matrix of the sparse sub-matrix...\n";
 
-		size_t sub_row = sb2t_sub_mat->get_row(), sub_col = sb2t_sub_mat->get_col();
+		int sub_row = sb2t_sub_mat->get_row(), sub_col = sb2t_sub_mat->get_col();
 
 		this->n_sub_bipart = sub_row;
 		this->n_sub_trees = sub_col;
@@ -400,7 +408,7 @@ public:
 		delete sb2t_sub_mat;
 	};
 
-	void Compute_Distance_Matrix(DISTANCE_TYPE dist_type, const Array<size_t> &sub_bipart_id, Array<size_t> &bipart_id_mapping)
+	void Compute_Distance_Matrix(DISTANCE_TYPE dist_type, const Array<int> &sub_bipart_id, Array<int> &bipart_id_mapping)
 	{
 		if (dist_type == ROBINSONFOULDS)
 			Compute_RF_Distance_Matrix(sub_bipart_id, bipart_id_mapping);
@@ -451,7 +459,7 @@ public:
 			auto col_ind_ptr = sb2t_mat->get_RCS_ind_c_ptr(i);
 			auto CCS_ind_ptr = sb2t_mat->get_RCS_val_c_ptr(i);
 
-			size_t RCS_row_size = (col_ind_ptr == nullptr) ? 0 : col_ind_ptr->get_size();
+			int RCS_row_size = (col_ind_ptr == nullptr) ? 0 : col_ind_ptr->get_size();
 
 			// Handle 0 <= j < cur_col  with M[i, j] = 0 first.
 			for (int j = 0; j < (*col_ind_ptr)[0]; j++)
@@ -459,7 +467,7 @@ public:
 				for (int RCS_next_ind = 0; RCS_next_ind < RCS_row_size; RCS_next_ind++)
 				{
 					// Found all nonzero behind j.
-					size_t next_col = (*col_ind_ptr)[RCS_next_ind];
+					int next_col = (*col_ind_ptr)[RCS_next_ind];
 					PRECISION next_val = sb2t_mat->CCS_ele(next_col, (*CCS_ind_ptr)[RCS_next_ind]);
 					(*dis_mat)(next_col, j) += next_val;
 					//(*dis_mat)(j, next_col) += next_val;
@@ -470,11 +478,11 @@ public:
 			for (int RCS_ind = 0; RCS_ind < RCS_row_size; RCS_ind++)
 			{
 				// RCS_ind pointing at nonzero entries on the i-th row.
-				size_t cur_col = (*col_ind_ptr)[RCS_ind];
+				int cur_col = (*col_ind_ptr)[RCS_ind];
 				PRECISION cur_val = sb2t_mat->CCS_ele(cur_col, (*CCS_ind_ptr)[RCS_ind]);
 
-				size_t RCS_next_ind = (RCS_ind < RCS_row_size - 1) ? RCS_ind + 1 : RCS_ind;
-				size_t next_col = (*col_ind_ptr)[RCS_next_ind];
+				int RCS_next_ind = (RCS_ind < RCS_row_size - 1) ? RCS_ind + 1 : RCS_ind;
+				int next_col = (*col_ind_ptr)[RCS_next_ind];
 				PRECISION next_val = sb2t_mat->CCS_ele(next_col, (*CCS_ind_ptr)[RCS_next_ind]);
 				// Record the next nonzero. If this is the last nonzero in the row, record itself
 				// which will not be triggered in later computation.
@@ -535,7 +543,7 @@ public:
 		}
 	}
 
-	void Compute_RF_Distance_Matrix(const Array<size_t> &sub_tree_id, Array<size_t> &bipart_id_mapping)
+	void Compute_RF_Distance_Matrix(const Array<int> &sub_tree_id, Array<int> &bipart_id_mapping)
 	{
 		// Update formula:
 		// 1) D[j, k] += abs(M[i, j] - M[i, k]), for i in 1:row.
@@ -550,7 +558,7 @@ public:
 
 		std::cout << "\tComputing distance matrix of the sparse sub-matrix...\n";
 
-		size_t sub_row = sb2t_sub_mat->get_row(), sub_col = sb2t_sub_mat->get_col();
+		int sub_row = sb2t_sub_mat->get_row(), sub_col = sb2t_sub_mat->get_col();
 
 		this->n_sub_bipart = sub_row;
 		this->n_sub_trees = sub_col;
@@ -569,7 +577,7 @@ public:
 			auto col_ind_ptr = sb2t_sub_mat->get_RCS_ind_c_ptr(i);
 			auto CCS_ind_ptr = sb2t_sub_mat->get_RCS_val_c_ptr(i);
 
-			size_t RCS_row_size = (col_ind_ptr == nullptr) ? 0 : col_ind_ptr->get_size();
+			int RCS_row_size = (col_ind_ptr == nullptr) ? 0 : col_ind_ptr->get_size();
 
 			// Handle 0 <= j < cur_col  with M[i, j] = 0 first.
 			for (int j = 0; j < (*col_ind_ptr)[0]; j++)
@@ -577,7 +585,7 @@ public:
 				for (int RCS_next_ind = 0; RCS_next_ind < RCS_row_size; RCS_next_ind++)
 				{
 					// Found all nonzero behind j.
-					size_t next_col = (*col_ind_ptr)[RCS_next_ind];
+					int next_col = (*col_ind_ptr)[RCS_next_ind];
 					PRECISION next_val = sb2t_mat->CCS_ele(next_col, (*CCS_ind_ptr)[RCS_next_ind]);
 					(*dis_mat)(next_col, j) += next_val;
 					//(*dis_mat)(j, next_col) += next_val;
@@ -588,11 +596,11 @@ public:
 			for (int RCS_ind = 0; RCS_ind < RCS_row_size; RCS_ind++)
 			{
 				// RCS_ind pointing at nonzero entries on the i-th row.
-				size_t cur_col = (*col_ind_ptr)[RCS_ind];
+				int cur_col = (*col_ind_ptr)[RCS_ind];
 				PRECISION cur_val = sb2t_sub_mat->CCS_ele(cur_col, (*CCS_ind_ptr)[RCS_ind]);
 
-				size_t RCS_next_ind = (RCS_ind < RCS_row_size - 1) ? RCS_ind + 1 : RCS_ind;
-				size_t next_col = (*col_ind_ptr)[RCS_next_ind];
+				int RCS_next_ind = (RCS_ind < RCS_row_size - 1) ? RCS_ind + 1 : RCS_ind;
+				int next_col = (*col_ind_ptr)[RCS_next_ind];
 				PRECISION next_val = sb2t_sub_mat->CCS_ele(next_col, (*CCS_ind_ptr)[RCS_next_ind]);
 				// Record the next nonzero. If this is the last nonzero in the row, record itself
 				// which will not be triggered in later computation.
@@ -678,10 +686,10 @@ public:
 
 		for (int j = 0; j < n_trees; j++)
 		{
-			dis_mat[j][j] = 0;
+			*(dis_mat)[j][j] = 0;
 			auto bipart_ind_tree_j = sb2t_mat->get_CCS_val_c(j);
 			int num_internal_bipart_tree_j = bipart_ind_tree_j.get_size() - n_leaves;
-			for (int i = (j + 1); i < num_sub_tree; i++)
+			for (int i = (j + 1); i < n_trees; i++)
 			{
 				auto bipart_ind_tree_i = sb2t_mat->get_CCS_val_c(i);
 				int num_internal_bipart_tree_i = bipart_ind_tree_i.get_size() - n_leaves;
@@ -694,7 +702,7 @@ public:
 				}
 				else
 				{
-					int temp_size = num_internal_bipart_tree_i > num_internal_bipart_tree_j ? num_internal_bipart_tree_i : num_internal_bipart_tree_j
+					int temp_size = num_internal_bipart_tree_i > num_internal_bipart_tree_j ? num_internal_bipart_tree_i : num_internal_bipart_tree_j;
 					if (workspace_size != temp_size)
 					{
 						// Re-allocate workspace
@@ -742,7 +750,7 @@ public:
 
 						hungarian_init(&p, workspace, workspace_size, workspace_size, HUNGARIAN_MODE_MINIMIZE_COST) ;
             			int mdist = hungarian_solve(&p);
-            			dis_mat[i][j] = mdist;
+            			(*dis_mat)[i][j] = mdist;
             			hungarian_free(&p);
 					}
 				}
@@ -757,7 +765,7 @@ public:
 		}
 	};
 
-	void Compute_Matching_Distance_Matrix(const Array<size_t> &sub_tree_id, Array<size_t> &bipart_id_mapping)
+	void Compute_Matching_Distance_Matrix(const Array<int> &sub_tree_id, Array<int> &bipart_id_mapping)
 	{
 		// bipart_id_mapping is redundancy from RF_Distance, where a sub-b2t matrix is computed and worth storing.
 		// For matching distance, b2t matrix is not needed in this implementation, therefore, the full b2t is not assumed.
@@ -784,12 +792,13 @@ public:
 
 		for (int j = 0; j < num_sub_tree; j++)
 		{
-			dis_mat[j][j] = 0;
-			auto bipart_ind_tree_j = sb2t_mat->get_CCS_val_c(sub_tree_id[j]);
+			// dis_mat[j][j] = 0;
+			(*dis_mat)[j][j] = 0;
+			auto bipart_ind_tree_j = sb2t_mat->get_CCS_val_c(sub_tree_id(j));
 			int num_internal_bipart_tree_j = bipart_ind_tree_j.get_size() - n_leaves;
 			for (int i = (j + 1); i < num_sub_tree; i++)
 			{
-				auto bipart_ind_tree_i = sb2t_mat->get_CCS_val_c(sub_tree_id[i]);
+				auto bipart_ind_tree_i = sb2t_mat->get_CCS_val_c(sub_tree_id(i));
 				int num_internal_bipart_tree_i = bipart_ind_tree_i.get_size() - n_leaves;
 				if (workspace == nullptr)
 				{
@@ -800,7 +809,7 @@ public:
 				}
 				else
 				{
-					int temp_size = num_internal_bipart_tree_i > num_internal_bipart_tree_j ? num_internal_bipart_tree_i : num_internal_bipart_tree_j
+					int temp_size = num_internal_bipart_tree_i > num_internal_bipart_tree_j ? num_internal_bipart_tree_i : num_internal_bipart_tree_j;
 					if (workspace_size != temp_size)
 					{
 						// Re-allocate workspace
@@ -848,7 +857,7 @@ public:
 
 						hungarian_init(&p, workspace, workspace_size, workspace_size, HUNGARIAN_MODE_MINIMIZE_COST) ;
             			int mdist = hungarian_solve(&p);
-            			dis_mat[i][j] = mdist;
+            			(*dis_mat)[i][j] = mdist;
             			hungarian_free(&p);
 					}
 				}
@@ -891,7 +900,7 @@ public:
 			auto newick_tree = this->Build_Newick_Tree(i);
 
 			std::ostringstream sstream;
-			newick_tree->Print_Newick_Tree(sstream, *Taxa_ptr);
+			newick_tree->Print_Newick_Tree(sstream, *Taxa);
 			std::string newick_str = sstream.str();
             sprtrees[i] = spr_building_tree(newick_str);
 			sprtrees[i]->labels_to_numbers(&label_map, &reverse_label_map);
@@ -903,9 +912,9 @@ public:
 
 		for(int j = 0; j < n_trees; j++)
     	{
-        	dis_mat[j][j] = 0;
+        	(*dis_mat)[j][j] = 0;
 			for(int i = (j + 1); i < n_trees; i++)
-				dis_mat[i][j] = rSPR_branch_and_bound_simple_clustering(sprtrees[i], sprtrees[j]);
+				(*dis_mat)[i][j] = rSPR_branch_and_bound_simple_clustering(sprtrees[i], sprtrees[j]);
 		}
 
 		// clean
@@ -914,7 +923,7 @@ public:
 
 	};
 
-	void Compute_SPR_Distance_Matrix(const Array<size_t> &sub_tree_id, Array<size_t> &bipart_id_mapping)
+	void Compute_SPR_Distance_Matrix(const Array<int> &sub_tree_id, Array<int> &bipart_id_mapping)
 	{
 		// bipart_id_mapping is redundancy from RF_Distance, where a sub-b2t matrix is computed and worth storing.
 		// For matching distance, b2t matrix is not needed in this implementation, therefore, the full b2t is not assumed.
@@ -941,10 +950,10 @@ public:
 
 		for (int i = 0; i < num_sub_tree; i++)
 		{
-			auto newick_tree = this->Build_Newick_Tree(sub_tree_id[i]);
+			auto newick_tree = this->Build_Newick_Tree(sub_tree_id(i));
 
 			std::ostringstream sstream;
-			newick_tree->Print_Newick_Tree(sstream, *Taxa_ptr);
+			newick_tree->Print_Newick_Tree(sstream, *Taxa);
 			std::string newick_str = sstream.str();
             sprtrees[i] = spr_building_tree(newick_str);
 			sprtrees[i]->labels_to_numbers(&label_map, &reverse_label_map);
@@ -956,9 +965,9 @@ public:
 
 		for(int j = 0; j < num_sub_tree; j++)
     	{
-        	dis_mat[j][j] = 0;
+        	(*dis_mat)[j][j] = 0;
 			for(int i = (j + 1); i < num_sub_tree; i++)
-				dis_mat[i][j] = rSPR_branch_and_bound_simple_clustering(sprtrees[i], sprtrees[j]);
+				(*dis_mat)[i][j] = rSPR_branch_and_bound_simple_clustering(sprtrees[i], sprtrees[j]);
 		}
 
 		// clean
@@ -1184,7 +1193,7 @@ public:
 		return true;
 	}
 
-	void bipart_frequency_check(double lf, double hf, Array<size_t> &bipart_id)
+	void bipart_frequency_check(double lf, double hf, Array<int> &bipart_id)
 	{
 		assert(sb2t_mat != nullptr);
 

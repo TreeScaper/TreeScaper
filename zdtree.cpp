@@ -8,7 +8,7 @@ using std::string;
 
 char read_sequence(string &tree, int &index, string &temp)
 {
-	size_t found = tree.find_first_of(",): ", index);
+	int found = tree.find_first_of(",): ", index);
 	if (found == std::string::npos)
 	{
 		temp = tree.substr(index);
@@ -41,11 +41,11 @@ void TaxonList::push(string item, bool flag_str_format)
 	}
 	else if (flag_str_format)
 	{
-		size_t found = item.find(' ', i);
+		int found = item.find(' ', i);
 
 		if (found != std::string::npos)
 		{
-			size_t end_pos = item.find_first_of(",;.\n\t ", found + 1);
+			int end_pos = item.find_first_of(",;.\n\t ", found + 1);
 			string taxon = item.substr(found + 1, end_pos - found - 1);
 			Ind2Taxon.push(taxon);
 			Taxon2Ind.insert(std::pair<string, int>(taxon, Ind2Taxon.get_size() - 1));
@@ -136,7 +136,7 @@ bool TaxonList::cmp_taxa(string &tree, bool *barray)
 	return same_taxa;
 }
 
-bool TaxonList::report_missing_taxon(size_t tree_id, string &tree, bool *barray, std::ostream &out)
+bool TaxonList::report_missing_taxon(int tree_id, string &tree, bool *barray, std::ostream &out)
 { // Assuming the taxon list is complete. Compare the taxa found in tree string with the list and report the absent taxa.
 	string taxon;
 	int i = 0;
@@ -205,7 +205,7 @@ bool TaxonList::report_missing_taxon(size_t tree_id, string &tree, bool *barray,
 	return true;
 }
 
-size_t TaxonList::ReadTaxa(std::string fname)
+int TaxonList::ReadTaxa(std::string fname)
 {
 	std::ifstream fin;
 	fin.open(fname);
@@ -215,7 +215,7 @@ size_t TaxonList::ReadTaxa(std::string fname)
 		throw(1);
 	}
 
-	size_t pos = std::ios_base::beg;
+	int pos = std::ios_base::beg;
 	bool flag_internal = false;
 
 	string temp;
@@ -298,7 +298,7 @@ size_t TaxonList::ReadTaxa(std::string fname)
 	return pos;
 }
 
-size_t TaxonList::ReadTaxa(std::string fname, bool same_leaf)
+int TaxonList::ReadTaxa(std::string fname, bool same_leaf)
 {
 	std::cout << "-----Enter Read_Taxa-----\n";
 	std::ifstream fin;
@@ -309,7 +309,7 @@ size_t TaxonList::ReadTaxa(std::string fname, bool same_leaf)
 		throw(1);
 	}
 
-	size_t pos = std::ios_base::beg;
+	int pos = std::ios_base::beg;
 	bool flag_internal = false;
 
 	string temp;
@@ -432,7 +432,7 @@ size_t TaxonList::ReadTaxa(std::string fname, bool same_leaf)
 }
 
 
-bool TaxonList::ScanTaxa(std::string fname, size_t pos, std::string outname)
+bool TaxonList::ScanTaxa(std::string fname, int pos, std::string outname)
 {
 	std::cout << "Entering ScanTaxa().\n";
 	std::ifstream fin;
@@ -440,7 +440,7 @@ bool TaxonList::ScanTaxa(std::string fname, size_t pos, std::string outname)
 	fin.seekg(pos, std::ios_base::beg);
 	bool *barray = new bool(10 * this->Ind2Taxon.get_size());
 	bool same_taxa = true;
-	size_t tree_id = 0;
+	int tree_id = 0;
 
 	string tree;
 	while (!fin.eof())
@@ -532,7 +532,7 @@ bool TaxonList::ScanTaxa(std::string fname, size_t pos, std::string outname)
 //	//Start scanning/
 //
 //
-//	size_t i = tree.find_first_of('(') + 1;
+//	int i = tree.find_first_of('(') + 1;
 //	ch = tree[i];
 //
 //	while (ch != ';' && ch != '\0') {
