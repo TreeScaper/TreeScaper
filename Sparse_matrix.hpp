@@ -8,12 +8,12 @@
 
 enum SparseMatrixOutputType{RCVLIST, FULLMATRIX};
 
-class SparseMatrix
+class SparseMatrixWH
 {
 public:
-    SparseMatrix(){rows = 0; cols = 0; colptr = NULL; rowind = NULL; vals = NULL;}
-    SparseMatrix(int rows, int columns, double *Vals, int *RowInds, int *ColPtr);
-	~SparseMatrix();
+    SparseMatrixWH(){rows = 0; cols = 0; colptr = NULL; rowind = NULL; vals = NULL;}
+    SparseMatrixWH(int rows, int columns, double *Vals, int *RowInds, int *ColPtr);
+	~SparseMatrixWH();
 
     void destructor();
 	
@@ -21,10 +21,10 @@ public:
 	double operator ()(int row, int column) const;
 	
 	// Return the transpose of the sparse matrix.
-	SparseMatrix* transpose() const;
+	SparseMatrixWH* transpose() const;
 	
 	// Return the product of two sparse matrix.
-	SparseMatrix* Multiply(const SparseMatrix& mat) const;
+	SparseMatrixWH* Multiply(const SparseMatrixWH& mat) const;
 	
 	// Return a mean vector
 	double* Mean(const int& num_tree);
@@ -47,7 +47,7 @@ private:
     int* rowind;	// length = number of entries = colptr[cols]
     double* vals;	// length = number of entries = colptr[cols]
 
-	SparseMatrix(int rows, int columns, int nnz)
+	SparseMatrixWH(int rows, int columns, int nnz)
 	{
 		this->rows = rows;
 		cols = columns;
@@ -57,7 +57,7 @@ private:
 		rowind = new int[nnz];
 	}
 	
-	SparseMatrix(int rows, int columns)
+	SparseMatrixWH(int rows, int columns)
 	{
 		this->rows = rows;
 		cols = columns;

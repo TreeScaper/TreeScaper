@@ -1,7 +1,7 @@
 
 #include "Sparse_matrix.hpp"
 
-SparseMatrix::SparseMatrix(int rows, int columns, double* Vals, int* RowInds, int*ColPtr)
+SparseMatrixWH::SparseMatrixWH(int rows, int columns, double* Vals, int* RowInds, int*ColPtr)
 {
 	this->rows = rows;
     cols = columns;
@@ -10,12 +10,12 @@ SparseMatrix::SparseMatrix(int rows, int columns, double* Vals, int* RowInds, in
 	rowind = RowInds;
 }
 
-SparseMatrix::~SparseMatrix()
+SparseMatrixWH::~SparseMatrixWH()
 {
     destructor();
 }
 
-void SparseMatrix::destructor()
+void SparseMatrixWH::destructor()
 {
     if (colptr != NULL)
     {
@@ -38,7 +38,7 @@ void SparseMatrix::destructor()
     }
 }
 
-double SparseMatrix::operator()(int row, int column) const
+double SparseMatrixWH::operator()(int row, int column) const
 {
 	if (column <= cols / 2)
 	{
@@ -67,7 +67,7 @@ double SparseMatrix::operator()(int row, int column) const
 	return 0;
 }
 
-SparseMatrix* SparseMatrix::transpose() const
+SparseMatrixWH* SparseMatrixWH::transpose() const
 {
 	int *temp = new int[rows];
     double* values = new double[colptr[cols]];
@@ -99,15 +99,15 @@ SparseMatrix* SparseMatrix::transpose() const
         }
     }
 	delete[] temp;
-    return new SparseMatrix(cols, rows, values, newRowind, newColptr);
+    return new SparseMatrixWH(cols, rows, values, newRowind, newColptr);
 }
 
-SparseMatrix* SparseMatrix::Multiply(const SparseMatrix& mat) const
+SparseMatrixWH* SparseMatrixWH::Multiply(const SparseMatrixWH& mat) const
 {
 	double *resultcol = new double[rows];
 	Vector<double> results(rows * mat.cols / 2);
 	Vector<int> rowInds(rows * mat.cols / 2);
-	SparseMatrix *result = new SparseMatrix(rows, mat.cols);
+	SparseMatrixWH *result = new SparseMatrixWH(rows, mat.cols);
 	result->colptr[0] = 0;
 	for (int i = 0; i < rows; i++)
 		resultcol[i] = 0;
@@ -139,7 +139,7 @@ SparseMatrix* SparseMatrix::Multiply(const SparseMatrix& mat) const
 	return result;
 }
 
-double* SparseMatrix::Mean(const int& num_tree)
+double* SparseMatrixWH::Mean(const int& num_tree)
 {
 	double* result = new double[rows];
 	for (int i = 0; i < rows; i++)
@@ -155,7 +155,7 @@ double* SparseMatrix::Mean(const int& num_tree)
 	return result;
 }
 
-double* SparseMatrix::Multiply_vec(const double* vec) const
+double* SparseMatrixWH::Multiply_vec(const double* vec) const
 {
 	double* result = new double[rows];
 	
@@ -174,7 +174,7 @@ double* SparseMatrix::Multiply_vec(const double* vec) const
 }
 
 // added by WH
-void SparseMatrix::OutputSparseMatrix(std::ostream &output, SparseMatrixOutputType smtype)
+void SparseMatrixWH::OutputSparseMatrix(std::ostream &output, SparseMatrixOutputType smtype)
 {
     if(smtype == RCVLIST)
     {
