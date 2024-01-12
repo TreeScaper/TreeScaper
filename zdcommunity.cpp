@@ -169,8 +169,8 @@ void create_resolution(double lp, double ln, int nb_layers, int *sign, double *&
 
 bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<String, String> &paras)
 {
-	string highfreq = (char *)paras["-hf"];
-	string lowfreq = (char *)paras["-lf"];
+	string highfreq = (char *)paras["-comm-hf"];
+	string lowfreq = (char *)paras["-comm-lf"];
 	int modelType = 0;
 	if (paras["-modularity-type"] == (String) "CNM")
 		modelType = 3;
@@ -783,8 +783,8 @@ bool community_detection_automatically(SpecMat::LowerTri<PRECISION> &adj, map<St
 
 bool community_detection_manually(SpecMat::LowerTri<PRECISION> &adj, map<String, String> &paras)
 {
-	string highfreq = (char *)paras["-hf"];
-	string lowfreq = (char *)paras["-lf"];
+	string highfreq = (char *)paras["-comm-hf"];
+	string lowfreq = (char *)paras["-comm-lf"];
 	int modelType = 0;
 	if (paras["-modularity-type"] == (String) "CNM")
 		modelType = 3;

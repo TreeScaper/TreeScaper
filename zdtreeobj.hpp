@@ -1027,6 +1027,13 @@ public:
 		}
 	};
 
+	void print_TaxonID_Map(ostream &fout) {
+		int n = Taxa->Ind2Taxon.get_size();
+		for (int i = 0; i < n; i++) {
+			fout << i << " , " << Taxa->Ind2Taxon[i] << std::endl;
+		}
+	}
+
 	void print_Bipart2Tree_Matrix(ostream &fout, SparseMatrixOutputType smtype) { (*sb2t_mat).print(fout, smtype); };
 
 	void print_Covariance_Matrix(ostream &fout) { (*cov_mat).print(fout); };
