@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
 		map<String, String> paras = read_paras(argc, argv, n_adj_key_option, default_paras, options);
 
-		if (paras["-key"] != (String) "none")
+		if (paras["-adj-key"] != (String) "none")
 		{
 			std::cout << "Reading parameters from " << paras["-adj-key"] << endl;
 			read_paras_from_csv(paras["-adj-key"], paras, true);
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
 
 		map<String, String> paras = read_paras(argc, argv, n_nldr_key_option, default_paras, options);
 
-		if (paras["-key"] != (String) "none")
+		if (paras["-nldr-key"] != (String) "none")
 		{
 			std::cout << "Reading parameters from " << paras["-nldr-key"] << endl;
 			read_paras_from_csv(paras["-nldr-key"], paras, true);
@@ -252,6 +252,22 @@ TreeSetObjects<Container_type> *trees_driver(map<String, String> &paras, Contain
 	treesobj_ptr->print_Bipart2Tree_Matrix(fout, RCVLIST);
 	fout.close();
 	cout << "Sucessfully printed bipartition-to-tree sparse matrix in Bipartition_" << (char *)paras["-post"] << ".out file.\n\n";
+
+	// Print Taxon ID to name map
+	// Size field of header is no longer output, but is not needed by the CloudForest application.
+	String outname_TaxonID("TaxonID");
+	outname_TaxonID.make_stdname(paras);
+	Header_info Header_TaxonID;
+	Header_TaxonID.insert("created", time_stamp());
+	Header_TaxonID.insert("output type", "Taxon ID");
+	Header_TaxonID.insert("format", "taxon id, taxon name");
+	Header_TaxonID.insert("source", paras["-f"]);
+
+	fout.open((char *)outname_TaxonID);
+	fout << Header_TaxonID;
+	treesobj_ptr->print_TaxonID_Map(fout);
+	fout.close();
+	cout << "Sucessfully printed Taxon ID to name map in TaxonID_" << (char *)paras["-post"] << ".out file.\n\n";
 
 	if (paras["-output"] == (String) "Covariance")
 	{

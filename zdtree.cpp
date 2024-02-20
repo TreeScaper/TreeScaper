@@ -642,6 +642,7 @@ TreeArray::TreeArray(string &tree, TaxonList &taxon_list, Array<int> &active_lev
 
 	weights = nullptr;
 	t2b = nullptr;
+	t2b_upper = nullptr;
 	edges = nullptr;
 	this->leafsize = 0;
 
